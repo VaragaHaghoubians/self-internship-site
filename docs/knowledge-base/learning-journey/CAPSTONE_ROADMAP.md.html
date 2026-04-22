@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Capstone Roadmap - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../index.html">Back to website</a>
+      <a href="../../../index.html#python-lab">Python lab</a>
+      <a href="../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Capstone Roadmap</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">knowledge-base/learning-journey/CAPSTONE_ROADMAP.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="12-month-capstone-project-roadmap">12-Month Capstone Project Roadmap</h2>
+<blockquote>This file defines the <strong>deliverable projects</strong> for Months 5–9.</blockquote>
+<blockquote>Months 1–4 taught the skills. Months 5–9 are where you prove them.</blockquote>
+<blockquote></blockquote>
+<blockquote>Each capstone has:</blockquote>
+<blockquote>- A specific <strong>deliverable</strong> (what you hand to an interviewer or put on GitHub)</blockquote>
+<blockquote>- A <strong>technical spec</strong> (what code to write, what libraries to use)</blockquote>
+<blockquote>- <strong>Skills demonstrated</strong> (what the project proves to an employer)</blockquote>
+<blockquote>- <strong>Acceptance criteria</strong> (how you know it is done)</blockquote>
+<h3 id="capstone-1-month-5-weeks-17-20-django-smart-home-portal">Capstone 1 — Month 5 (Weeks 17–20): Django Smart Home Portal</h3>
+<p><strong>Elevator pitch:</strong> &quot;I upgraded my Flask IoT server to a production Django app with user accounts, a PostgreSQL database, and deployed it to AWS so it&#x27;s accessible from any phone.&quot;</p>
+<h4 id="what-to-build">What to Build</h4>
+<p>Take your Month 4 smart home system (ESP32 → Flask → SQLite → dashboard) and upgrade it:</p>
+<table><thead><tr><th>Month 4 (starter)</th><th>Month 5 (capstone)</th></tr></thead><tbody><tr><td>Flask</td><td>Django</td></tr><tr><td>SQLite</td><td>PostgreSQL</td></tr><tr><td>No auth</td><td>User login/logout (Django auth)</td></tr><tr><td>localhost only</td><td>Live on AWS EC2 (public URL)</td></tr><tr><td>Manual refresh</td><td>Auto-refreshing Plotly chart</td></tr></tbody></table>
+<h4 id="technical-spec">Technical Spec</h4>
+<pre><code class="language-">django-smart-home/
+├── manage.py
+├── requirements.txt           ← django, psycopg2, plotly, gunicorn
+├── smart_home/
+│   ├── settings.py            ← DATABASE = postgresql, SECRET_KEY from env var
+│   ├── urls.py
+│   └── wsgi.py
+├── sensors/
+│   ├── models.py              ← SensorReading(device_id, temperature, humidity, timestamp)
+│   ├── views.py               ← POST /api/upload/, GET /dashboard/
+│   ├── serializers.py
+│   └── templates/
+│       └── dashboard.html     ← Plotly chart, last reading, anomaly flag
+└── Dockerfile</code></pre>
+<p><strong>Key tasks in order:</strong></p>
+<ol>
+<li><code>django-admin startproject smart_home</code> + <code>python manage.py startapp sensors</code></li>
+<li>Define <code>SensorReading</code> model, run migrations</li>
+<li>Create a POST API endpoint that accepts <code>{device_id, temperature, humidity}</code> JSON</li>
+<li>Update your ESP32 Arduino sketch to POST to the new endpoint (change the URL)</li>
+<li>Build the dashboard view: query last 200 readings, render Plotly line chart in template</li>
+<li>Add Django&#x27;s built-in <code>LoginRequiredMixin</code> so only logged-in users see the dashboard</li>
+<li>Dockerize: <code>Dockerfile</code> + <code>docker-compose.yml</code> (Django + PostgreSQL containers)</li>
+<li>Deploy to AWS EC2: launch <code>t2.micro</code> (free tier), SSH in, <code>docker compose up -d</code></li>
+</ol>
+<h4 id="acceptance-criteria">Acceptance Criteria</h4>
+<ul>
+<li>[ ] ESP32 sends real data every 60 seconds; it appears on the dashboard within 2 minutes</li>
+<li>[ ] Accessing <code>/dashboard/</code> without login redirects to <code>/login/</code></li>
+<li>[ ] <code>docker compose up</code> starts the full system with one command</li>
+<li>[ ] Dashboard is accessible at <code>http://&lt;your-ec2-public-ip&gt;/dashboard/</code> from your phone</li>
+<li>[ ] GitHub README includes: architecture diagram, setup instructions, screenshot</li>
+</ul>
+<h4 id="skills-demonstrated">Skills Demonstrated</h4>
+<p>Django ORM, REST APIs, user authentication, Docker Compose, AWS EC2 deployment, PostgreSQL.</p>
+<h3 id="capstone-2-month-6-weeks-21-24-predictive-maintenance-mvp">Capstone 2 — Month 6 (Weeks 21–24): Predictive Maintenance MVP</h3>
+<p><strong>Elevator pitch:</strong> &quot;I built an anomaly detector that watches live sensor data from my ESP32 and sends an email alert when it predicts a cooling failure 2 hours before it happens.&quot;</p>
+<h4 id="what-to-build">What to Build</h4>
+<p>Use the time series + ML skills from Month 3 on your real ESP32 data from Month 4.</p>
+<p><strong>The Pipeline:</strong></p>
+<pre><code class="language-">ESP32 sensor (every 60s)
+    → Django API (save to PostgreSQL)
+    → Background task (Celery or APScheduler) runs every 5 minutes:
+        1. Load last 6 hours of readings from DB
+        2. Engineer lag features (lag_1h, lag_3h, rolling_1h_std)
+        3. Score with pre-trained RandomForestClassifier
+        4. If failure_probability &gt; 0.7: send email alert via smtplib
+    → Dashboard shows: live reading + failure probability gauge + alert history</code></pre>
+<h4 id="technical-spec">Technical Spec</h4>
+<p><strong>Model training script</strong> (<code>train_anomaly_model.py</code>):</p>
+<pre><code class="language-python"># Simulate training data: inject artificial &quot;failure&quot; events into historical readings
+# Failure signature: temperature rising &gt; 0.5°C per reading for 3+ consecutive readings
+# Label those as anomaly=1, everything else as anomaly=0
+# Features: lag_1, lag_3, lag_6, rolling_30min_mean, rolling_30min_std, hour_of_day
+# Model: RandomForestClassifier(class_weight=&#x27;balanced&#x27;)  ← handles imbalance
+# Save with: import joblib; joblib.dump(model, &#x27;anomaly_model.pkl&#x27;)</code></pre>
+<p><strong>Scoring endpoint</strong> (<code>sensors/tasks.py</code>):</p>
+<pre><code class="language-python">import joblib, smtplib
+from email.message import EmailMessage
+
+model = joblib.load(&quot;anomaly_model.pkl&quot;)
+
+def score_latest_readings():
+    # called every 5 minutes by APScheduler
+    df = load_last_6h_from_db()
+    features = engineer_features(df)
+    prob = model.predict_proba(features.tail(1))[0][1]
+    if prob &gt; 0.70:
+        send_alert_email(prob)</code></pre>
+<p><strong>Libraries:</strong> <code>scikit-learn</code>, <code>joblib</code>, <code>APScheduler</code>, <code>smtplib</code> (built-in)</p>
+<h4 id="acceptance-criteria">Acceptance Criteria</h4>
+<ul>
+<li>[ ] <code>train_anomaly_model.py</code> runs end-to-end and saves <code>anomaly_model.pkl</code></li>
+<li>[ ] Dashboard shows a &quot;failure risk&quot; percentage that updates every 5 minutes</li>
+<li>[ ] Manually injecting a high temperature (hold your hand on the sensor) triggers an alert email within 10 minutes</li>
+<li>[ ] GitHub README documents: model accuracy on held-out test set, false positive rate, alert threshold rationale</li>
+</ul>
+<h4 id="skills-demonstrated">Skills Demonstrated</h4>
+<p>Feature engineering on time series, classification model deployment, background scheduling, email alerting, <code>joblib</code> model serialization.</p>
+<h3 id="capstone-3-month-7-weeks-25-28-supply-chain-demand-forecasting">Capstone 3 — Month 7 (Weeks 25–28): Supply Chain Demand Forecasting</h3>
+<p><strong>Elevator pitch:</strong> &quot;I built a demand forecasting system on a Kaggle retail dataset comparing three model classes — statistical, ML, and deep learning — and deployed the best one as a Plotly dashboard.&quot;</p>
+<h4 id="what-to-build">What to Build</h4>
+<p>Download the <strong>Kaggle Store Item Demand Forecasting</strong> dataset (10 stores × 50 items = 500 time series, 5 years of daily sales). Build a forecasting pipeline that:</p>
+<ol>
+<li>Trains three models on each time series</li>
+<li>Picks the best model per series based on validation MAE</li>
+<li>Displays forecasts in a Plotly dashboard with confidence intervals</li>
+</ol>
+<h4 id="technical-spec">Technical Spec</h4>
+<p><strong>Repository structure:</strong></p>
+<pre><code class="language-">supply-chain-forecasting/
+├── data/
+│   └── train.csv               ← Kaggle dataset (gitignored, too large)
+├── notebooks/
+│   └── 01_eda.ipynb            ← exploratory analysis (required deliverable)
+├── src/
+│   ├── features.py             ← create_lag_features(), add_calendar_features()
+│   ├── models.py               ← SARIMAModel, ProphetModel, XGBoostModel (classes)
+│   ├── evaluate.py             ← mae(), rmse(), mape() functions + comparison table
+│   └── dashboard.py            ← Plotly Dash app: store selector + forecast chart
+├── tests/
+│   └── test_features.py        ← pytest: verify lag features are correctly shifted
+├── requirements.txt
+└── README.md</code></pre>
+<p><strong>Model comparison format</strong> (print this at the end of <code>main.py</code>):</p>
+<pre><code class="language-">Store 1, Item 1 — Validation MAE (last 90 days):
+  SARIMA(1,1,1)(1,1,1,7):   12.4 units
+  Prophet (weekly+yearly):  10.8 units   ← WINNER
+  XGBoost (lag features):   11.3 units</code></pre>
+<p><strong>Minimum viable deliverable (focus here first):</strong></p>
+<ul>
+<li>One store, one item, all three models, comparison table → 1 week</li>
+<li>Scale to all 50 items in one store, visualize best model per item → 1 week</li>
+<li>Plotly Dash dashboard with store/item dropdowns → 1 week</li>
+<li>Deploy dashboard to AWS or Render.com → 1 week</li>
+</ul>
+<h4 id="acceptance-criteria">Acceptance Criteria</h4>
+<ul>
+<li>[ ] <code>notebooks/01_eda.ipynb</code> has: time plots, seasonal decomposition, ACF/PACF, summary statistics</li>
+<li>[ ] Three models are implemented as classes with <code>.fit(train)</code> and <code>.predict(horizon)</code> interface</li>
+<li>[ ] Comparison table shows MAE, RMSE, MAPE for each model on the same held-out test set</li>
+<li>[ ] Dashboard lets user select any store + item and see the forecast with confidence interval</li>
+<li>[ ] <code>tests/test_features.py</code> passes: verify lag feature shift, verify no data leakage</li>
+</ul>
+<h4 id="skills-demonstrated">Skills Demonstrated</h4>
+<p>Time series forecasting (SARIMA, Prophet, XGBoost), model comparison methodology, Plotly Dash, software engineering (classes, tests), cloud deployment.</p>
+<h3 id="capstone-4-month-8-weeks-29-32-inventory-route-optimization">Capstone 4 — Month 8 (Weeks 29–32): Inventory + Route Optimization</h3>
+<p><strong>Elevator pitch:</strong> &quot;I built an optimization engine that takes demand forecasts as input and outputs: how much to order (EOQ + safety stock), when to reorder, and which truck routes minimize delivery cost.&quot;</p>
+<h4 id="what-to-build">What to Build</h4>
+<p>Connect the Month 7 forecasts to an operations optimizer using the tools from <code>zero-to-hero-guides/optimization/</code>:</p>
+<pre><code class="language-">[Input]  Prophet forecast → weekly demand per location
+    ↓
+[Pillar 2]  EOQ + Monte Carlo safety stock → order quantities + reorder points
+    ↓
+[Pillar 3]  OR-Tools VRP → optimal truck routes to fulfil the orders
+    ↓
+[Output]  Plotly supply chain map + financial summary table</code></pre>
+<h4 id="technical-spec">Technical Spec</h4>
+<p><strong><code>inventory_optimizer.py</code></strong> — wraps your supply chain guide functions:</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class InventoryPolicy:
+    sku: str
+    eoq: int
+    safety_stock: int
+    reorder_point: int
+    annual_cost_usd: float
+
+def compute_policy(sku: str, forecast: pd.Series, order_cost: float,
+                   holding_cost: float, lead_time_days: int,
+                   service_level: float = 0.95) -&gt; InventoryPolicy:
+    # 1. Use forecast mean and std as demand_mean and demand_std
+    # 2. Call economic_order_quantity() from supply-chain guide
+    # 3. Call simulate_safety_stock() for stochastic safety stock
+    # 4. Return InventoryPolicy dataclass
+    ...</code></pre>
+<p><strong><code>route_optimizer.py</code></strong> — wraps OR-Tools VRP:</p>
+<pre><code class="language-python">def build_replenishment_routes(locations, order_quantities, vehicle_capacities):
+    # locations: list of (lat, lon) — warehouses + stores
+    # order_quantities: from InventoryPolicy.eoq per location
+    # Returns: list of vehicle routes, total distance, total cost estimate
+    ...</code></pre>
+<p><strong><code>supply_chain_map.py</code></strong> — Plotly visualization:</p>
+<pre><code class="language-python">import plotly.graph_objects as go
+
+def plot_supply_chain(G: nx.DiGraph, routes: list, inventory_policies: list):
+    # Nodes: circles sized by inventory level, colored by stockout risk
+    # Edges: width proportional to flow volume, colored by cost
+    # Hover: show InventoryPolicy details per node
+    ...</code></pre>
+<h4 id="acceptance-criteria">Acceptance Criteria</h4>
+<ul>
+<li>[ ] <code>compute_policy()</code> returns correct EOQ for known inputs (test with hand calculation)</li>
+<li>[ ] <code>build_replenishment_routes()</code> returns feasible routes (no vehicle exceeds capacity)</li>
+<li>[ ] Supply chain map shows at least 5 nodes and 2 vehicles with labeled routes</li>
+<li>[ ] Financial summary table shows: total ordering cost, total holding cost, total routing cost, total logistics cost</li>
+<li>[ ] <code>pytest tests/</code> passes: EOQ math, safety stock service level, route feasibility</li>
+</ul>
+<h4 id="skills-demonstrated">Skills Demonstrated</h4>
+<p>Operations research (LP, VRP), inventory management, stochastic simulation, network visualization, connecting ML outputs to optimization inputs.</p>
+<h3 id="capstone-5-month-9-weeks-33-36-grand-capstone-cold-chain-intelligence-system">Capstone 5 — Month 9 (Weeks 33–36): Grand Capstone — Cold Chain Intelligence System</h3>
+<p><strong>Elevator pitch:</strong> &quot;I built a full-stack system that monitors cold storage sensors in real time, predicts cooling failures using machine learning, and automatically computes the optimal inventory transfer plan to minimize spoilage — all in one live dashboard.&quot;</p>
+<h4 id="what-to-build">What to Build</h4>
+<p>This is the integration of everything. Every previous capstone feeds into this one:</p>
+<pre><code class="language-">[Hardware]   ESP32 with temperature sensor in a small cooler box
+    ↓
+[Ingest]     Django API (Capstone 1) — saves readings to PostgreSQL
+    ↓
+[Detection]  ML anomaly scorer (Capstone 2) — runs every 5 minutes
+    ↓
+[Response]   OR-Tools assignment optimizer (Capstone 4) — triggered when risk &gt; 70%
+    ↓
+[Dashboard]  Unified Django view showing:
+               • Live temperature chart (last 6 hours)
+               • Failure probability gauge (0–100%)
+               • Current inventory levels per location
+               • Optimal transfer plan (which pallets go where)
+               • Financial impact: estimated spoilage cost if no action taken</code></pre>
+<h4 id="repository-structure">Repository Structure</h4>
+<pre><code class="language-">cold-chain-intelligence/
+├── README.md                  ← architecture diagram + demo GIF + setup guide
+├── docker-compose.yml         ← Django + PostgreSQL + Redis (for Celery)
+├── Dockerfile
+├── requirements.txt
+├── manage.py
+├── cold_chain/                ← Django project settings
+├── sensors/                   ← sensor ingestion API (from Capstone 1)
+├── detection/                 ← anomaly model + scoring task (from Capstone 2)
+│   ├── models/
+│   │   └── anomaly_model.pkl  ← trained model
+│   ├── tasks.py               ← Celery task: score every 5 minutes
+│   └── train.py               ← model training script
+├── optimizer/                 ← OR-Tools inventory assignment (from Capstone 4)
+│   ├── assignment.py          ← solve_inventory_assignment()
+│   └── vrp.py                 ← solve_vrp() for emergency routing
+├── dashboard/                 ← unified view
+│   ├── views.py
+│   └── templates/
+│       └── index.html         ← Plotly charts + risk gauge + transfer table
+└── tests/
+    ├── test_detection.py
+    ├── test_optimizer.py
+    └── test_api.py</code></pre>
+<h4 id="technical-spec-the-decision-pipeline">Technical Spec: The Decision Pipeline</h4>
+<pre><code class="language-python"># optimizer/pipeline.py
+
+def run_cold_chain_pipeline(device_id: str) -&gt; dict:
+    &quot;&quot;&quot;
+    Called by the Celery scoring task every 5 minutes.
+    Returns a decision object the dashboard renders.
+    &quot;&quot;&quot;
+    # Step 1: Load last 6h of readings for this device
+    readings = SensorReading.objects.filter(
+        device_id=device_id,
+        timestamp__gte=timezone.now() - timedelta(hours=6)
+    ).order_by(&quot;timestamp&quot;)
+
+    # Step 2: Engineer features, score with ML model
+    df       = pd.DataFrame(list(readings.values()))
+    features = engineer_features(df)
+    failure_prob = anomaly_model.predict_proba(features.tail(1))[0][1]
+
+    result = {
+        &quot;device_id&quot;:              device_id,
+        &quot;latest_temp_c&quot;:          df[&quot;temperature&quot;].iloc[-1],
+        &quot;failure_probability&quot;:    round(failure_prob, 3),
+        &quot;financial_risk_usd&quot;:     round(failure_prob * AVG_INVENTORY_VALUE, 2),
+        &quot;action_required&quot;:        failure_prob &gt; ALERT_THRESHOLD,
+        &quot;optimal_transfer_plan&quot;:  None,
+        &quot;alert_sent&quot;:             False,
+    }
+
+    # Step 3: If high risk, compute optimal inventory transfer
+    if result[&quot;action_required&quot;]:
+        inventory   = fetch_current_inventory(device_id)
+        warehouses  = fetch_available_warehouses()
+        result[&quot;optimal_transfer_plan&quot;] = solve_inventory_assignment(
+            inventory, warehouses
+        )
+        send_alert_email(result)
+        result[&quot;alert_sent&quot;] = True
+
+    # Step 4: Save decision to DB for audit trail
+    Decision.objects.create(**result)
+    return result</code></pre>
+<h4 id="acceptance-criteria">Acceptance Criteria</h4>
+<ul>
+<li>[ ] System runs end-to-end with <code>docker compose up</code> and no manual steps</li>
+<li>[ ] ESP32 (or simulated data generator) sends readings; they appear on dashboard within 2 minutes</li>
+<li>[ ] Manually heating the sensor raises failure probability above 70% within 10 minutes</li>
+<li>[ ] When threshold is crossed: email alert is sent AND transfer plan appears on dashboard</li>
+<li>[ ] Transfer plan shows correct pallet assignments (verified against hand-calculation)</li>
+<li>[ ] GitHub README includes:</li>
+<li>Architecture diagram (boxes and arrows, can be hand-drawn and photographed)</li>
+<li>Demo GIF or video (screen record the dashboard during a simulated failure)</li>
+<li>Performance metrics: false positive rate, alert lead time (minutes before actual failure)</li>
+<li>Cost analysis: estimated spoilage prevented per year at current sensitivity settings</li>
+</ul>
+<h4 id="skills-demonstrated-for-interviewers">Skills Demonstrated for Interviewers</h4>
+<table><thead><tr><th>Skill</th><th>Where it shows</th></tr></thead><tbody><tr><td>Full-stack web development</td><td>Django + PostgreSQL + Docker Compose</td></tr><tr><td>Real-time data pipelines</td><td>ESP32 → API → DB → background scoring</td></tr><tr><td>Machine learning in production</td><td><code>joblib</code> model, feature engineering, threshold tuning</td></tr><tr><td>Operations research</td><td>OR-Tools assignment solver wired to live ML output</td></tr><tr><td>Software engineering</td><td>Tests, Dockerfile, environment variables, logging</td></tr><tr><td>Domain expertise</td><td>Cold chain, pharmaceutical supply chain, spoilage cost modelling</td></tr><tr><td>Communication</td><td>Architecture diagram, README, demo video</td></tr></tbody></table>
+<h4 id="interview-story-memorize-this">Interview Story (memorize this)</h4>
+<blockquote>&quot;For my capstone project, I built a cold chain monitoring system from hardware to deployment.</blockquote>
+<blockquote>An ESP32 microcontroller with a temperature sensor sends readings every 60 seconds to a Django API.</blockquote>
+<blockquote>A machine learning model runs in the background and scores the latest readings for cooling failure risk.</blockquote>
+<blockquote>If the risk exceeds 70%, the system automatically computes the optimal inventory transfer plan</blockquote>
+<blockquote>using Google OR-Tools and sends an alert email with the transfer recommendations.</blockquote>
+<blockquote>The whole system runs in Docker and is deployed on AWS EC2.</blockquote>
+<blockquote>I chose this project because it combines my industrial engineering background — specifically</blockquote>
+<blockquote>inventory management and operations research — with data science and software engineering.</blockquote>
+<blockquote>It&#x27;s the kind of system that would be valuable at a pharmaceutical distributor, food logistics company,</blockquote>
+<blockquote>or any company managing temperature-sensitive goods.&quot;</blockquote>
+<h3 id="summary-what-you-will-have-on-github-by-month-9">Summary: What You Will Have on GitHub by Month 9</h3>
+<table><thead><tr><th>#</th><th>Repository</th><th>Core Technology</th><th>What It Proves</th></tr></thead><tbody><tr><td>1</td><td><code>linux-data-journey</code></td><td>Terminal, Git</td><td>Developer workflow</td></tr><tr><td>2</td><td><code>sensor-eda-analysis</code></td><td>Pandas, Matplotlib</td><td>Data analysis</td></tr><tr><td>3</td><td><code>housing-price-predictor</code></td><td>scikit-learn</td><td>ML fundamentals</td></tr><tr><td>4</td><td><code>smart-home-dashboard</code></td><td>ESP32, Flask, SQLite</td><td>End-to-end IoT</td></tr><tr><td>5</td><td><code>django-smart-home</code></td><td>Django, PostgreSQL, AWS</td><td>Full-stack + deployment</td></tr><tr><td>6</td><td><code>predictive-maintenance-mvp</code></td><td>ML in production, alerts</td><td>Applied ML + automation</td></tr><tr><td>7</td><td><code>supply-chain-forecasting</code></td><td>SARIMA, Prophet, XGBoost</td><td>Demand forecasting</td></tr><tr><td>8</td><td><code>inventory-route-optimizer</code></td><td>PuLP, OR-Tools</td><td>Operations research</td></tr><tr><td>9</td><td><code>cold-chain-intelligence</code></td><td>All pillars integrated</td><td>Grand capstone</td></tr></tbody></table>
+<p><strong>This portfolio is not a list of tutorials.</strong> Each project solves a real operations problem with real code. That is what separates you from the thousands of data science graduates who have only completed Coursera courses.</p></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#12-month-capstone-project-roadmap">12-Month Capstone Project Roadmap</a><a style="margin-left:12px" href="#capstone-1-month-5-weeks-17-20-django-smart-home-portal">Capstone 1 — Month 5 (Weeks 17–20): Django Smart Home Portal</a><a style="margin-left:24px" href="#what-to-build">What to Build</a><a style="margin-left:24px" href="#technical-spec">Technical Spec</a><a style="margin-left:24px" href="#acceptance-criteria">Acceptance Criteria</a><a style="margin-left:24px" href="#skills-demonstrated">Skills Demonstrated</a><a style="margin-left:12px" href="#capstone-2-month-6-weeks-21-24-predictive-maintenance-mvp">Capstone 2 — Month 6 (Weeks 21–24): Predictive Maintenance MVP</a><a style="margin-left:24px" href="#what-to-build">What to Build</a><a style="margin-left:24px" href="#technical-spec">Technical Spec</a><a style="margin-left:24px" href="#acceptance-criteria">Acceptance Criteria</a><a style="margin-left:24px" href="#skills-demonstrated">Skills Demonstrated</a><a style="margin-left:12px" href="#capstone-3-month-7-weeks-25-28-supply-chain-demand-forecasting">Capstone 3 — Month 7 (Weeks 25–28): Supply Chain Demand Forecasting</a><a style="margin-left:24px" href="#what-to-build">What to Build</a><a style="margin-left:24px" href="#technical-spec">Technical Spec</a><a style="margin-left:24px" href="#acceptance-criteria">Acceptance Criteria</a><a style="margin-left:24px" href="#skills-demonstrated">Skills Demonstrated</a><a style="margin-left:12px" href="#capstone-4-month-8-weeks-29-32-inventory-route-optimization">Capstone 4 — Month 8 (Weeks 29–32): Inventory + Route Optimization</a><a style="margin-left:24px" href="#what-to-build">What to Build</a><a style="margin-left:24px" href="#technical-spec">Technical Spec</a><a style="margin-left:24px" href="#acceptance-criteria">Acceptance Criteria</a><a style="margin-left:24px" href="#skills-demonstrated">Skills Demonstrated</a><a style="margin-left:12px" href="#capstone-5-month-9-weeks-33-36-grand-capstone-cold-chain-intelligence-system">Capstone 5 — Month 9 (Weeks 33–36): Grand Capstone — Cold Chain Intelligence System</a><a style="margin-left:24px" href="#what-to-build">What to Build</a><a style="margin-left:24px" href="#repository-structure">Repository Structure</a></aside>
+    </main>
+  </body>
+</html>

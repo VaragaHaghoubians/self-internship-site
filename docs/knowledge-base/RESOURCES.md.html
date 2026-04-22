@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Resources - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../index.html">Back to website</a>
+      <a href="../../index.html#python-lab">Python lab</a>
+      <a href="../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Resources</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">knowledge-base/RESOURCES.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="curated-resource-bookmarks">Curated Resource Bookmarks</h2>
+<blockquote>Every link here was hand-picked for the <strong>Industrial Data Scientist</strong> path.</blockquote>
+<blockquote>Organised by the three IE superpowers + general foundations.</blockquote>
+<blockquote>Open this file whenever you start a new phase to know exactly where to go.</blockquote>
+<h3 id="superpower-1-optimization-operations-research">Superpower 1 — Optimization (Operations Research)</h3>
+<p><em>Turn predictions into money-saving decisions.</em></p>
+<h4 id="google-or-tools-industry-standard">Google OR-Tools — Industry Standard</h4>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>Python Introduction (start here)</td><td>https://developers.google.com/optimization/introduction/python</td><td>Day 1 of OR-Tools — routing and bin-packing overview</td></tr><tr><td>VRP Documentation</td><td>https://developers.google.com/optimization/routing/vrp</td><td>Month 9 Week 3 — build the capstone transfer optimizer</td></tr><tr><td>CP-SAT Solver Reference</td><td>https://developers.google.com/optimization/reference/python/sat/python/cp_model</td><td>Assignment problem deep-dive</td></tr><tr><td>Code Examples (GitHub)</td><td>https://github.com/google/or-tools</td><td>Browse <code>ortools/linear_solver/samples/</code> for real Python scripts</td></tr></tbody></table>
+<h4 id="pulp-linear-programming">PuLP — Linear Programming</h4>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>Official Documentation</td><td>https://coin-or.github.io/pulp/</td><td>Translating IE LP math (production planning, transportation) into Python</td></tr></tbody></table>
+<p><strong>Related workspace files:</strong></p>
+<ul>
+<li><code>knowledge-base/zero-to-hero-guides/optimization/README.md</code> — full guide with working code examples</li>
+<li><code>phase-5-capstone/month-09-grand-capstone/deliverable/cold_chain_capstone.py</code> → <code>InventoryOptimizer</code> class</li>
+</ul>
+<h3 id="superpower-2-industry-4-0-amp-predictive-maintenance">Superpower 2 — Industry 4.0 &amp; Predictive Maintenance</h3>
+<p><em>Predict machine failure before it costs money.</em></p>
+<h4 id="dataset">Dataset</h4>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>NASA CMAPSS Turbofan Dataset (Kaggle)</td><td>https://www.kaggle.com/datasets/behrad3d/nasa-cmaps</td><td>Month 9 — study top notebooks to learn how to predict engine RUL from sensor data</td></tr></tbody></table>
+<blockquote><strong>How to use the Kaggle link:</strong> click &quot;Code&quot; tab → sort by &quot;Most Votes&quot; → read the top 3 notebooks before writing a single line of your own code. You will learn more in 2 hours than in a week of guessing.</blockquote>
+<h4 id="architecture-reference">Architecture Reference</h4>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>Microsoft Predictive Maintenance Guide</td><td>https://learn.microsoft.com/en-us/azure/architecture/data-guide/relational-data/predictive-maintenance</td><td>Before designing your capstone ML pipeline — excellent system-level thinking</td></tr></tbody></table>
+<p><strong>Related workspace files:</strong></p>
+<ul>
+<li><code>projects/advanced/project-6-predictive-maintenance/project2_predictive_maintenance.py</code> — full project skeleton with NASA CMAPSS loader and XGBoost RUL model</li>
+</ul>
+<h3 id="superpower-3-ai-product-manager-engineering-management">Superpower 3 — AI Product Manager (Engineering Management)</h3>
+<p><em>Bridge the gap between &quot;We need AI&quot; and &quot;Here is what it costs / saves.&quot;</em></p>
+<h4 id="books">Books</h4>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>&quot;Machine Learning Engineering&quot; — Andriy Burkov</td><td>http://www.mlebook.com/</td><td>Read alongside Phase 2 (MLOps). Author offers chapters free online. Focuses on deployment and lifecycle, not math.</td></tr></tbody></table>
+<h4 id="frameworks">Frameworks</h4>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>CRISP-DM Guide (datascience-pm.com)</td><td>https://www.datascience-pm.com/crisp-dm-2/</td><td>Before starting ANY project. Use CRISP-DM as your planning template to show stakeholders you manage data projects like an engineer, not a researcher.</td></tr></tbody></table>
+<h3 id="supply-chain-ai-domain-your-target-industry">Supply Chain AI Domain (Your Target Industry)</h3>
+<p><em>The three technical pillars that make you an Operations Data Scientist. Study these alongside and after Phase 2.</em></p>
+<h4 id="pillar-1-demand-forecasting-predicting-the-future">Pillar 1 — Demand Forecasting (Predicting the Future)</h4>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>Store Item Demand Forecasting Challenge (Kaggle)</td><td>https://www.kaggle.com/competitions/demand-forecasting-kernels-only</td><td>Month 2–3 — classic dataset: predict 3 months of item sales across store locations. Study top notebooks first.</td></tr><tr><td>DataCo Smart Supply Chain Dataset (Kaggle)</td><td>https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis</td><td>Month 5+ — massive real-world dataset covering provisioning, delivery, pricing, and routing. Perfect for Phase 3 projects.</td></tr><tr><td>Olist Brazilian E-Commerce Dataset (Kaggle)</td><td>https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce</td><td>Month 2 or 5 — 100k real orders. Practice delivery delay analysis, logistics performance, and customer satisfaction.</td></tr></tbody></table>
+<h4 id="pillar-2-inventory-optimization-balancing-the-scale">Pillar 2 — Inventory Optimization (Balancing the Scale)</h4>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>Search: &quot;Inventory Management using Python&quot;</td><td>https://towardsdatascience.com/</td><td>Month 3–4 — search this site for EOQ, safety stock, and Monte Carlo simulation tutorials</td></tr></tbody></table>
+<blockquote><strong>Key skills:</strong> EOQ (Economic Order Quantity) as a Python function, Monte Carlo simulation with <code>numpy</code>/<code>scipy</code> to find optimal safety stock levels, stochastic demand modeling.</blockquote>
+<h4 id="pillar-3-network-amp-route-optimization-moving-the-goods">Pillar 3 — Network &amp; Route Optimization (Moving the Goods)</h4>
+<blockquote>Already covered in <strong>Superpower 1</strong> above. OR-Tools VRP is the primary tool.</blockquote>
+<blockquote>Additional library: <strong>NetworkX</strong> — maps warehouse locations as graph nodes and finds shortest paths.</blockquote>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>NetworkX Documentation</td><td>https://networkx.org/documentation/stable/</td><td>Month 9 — model your supply chain network as a directed graph before running the optimizer</td></tr></tbody></table>
+<h4 id="gold-standard-courses">Gold Standard Courses</h4>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>MITx Supply Chain Analytics (edX)</td><td>https://www.edx.org/learn/supply-chain-management/massachusetts-institute-of-technology-supply-chain-analytics</td><td>Phase 2–3 — MIT&#x27;s #1 supply chain program. Foundational courses are free. Bridges raw math and supply chain strategy.</td></tr></tbody></table>
+<p><strong>Related workspace files:</strong></p>
+<ul>
+<li><code>projects/advanced/project-7-supply-chain/project3_supply_chain.py</code> — full project skeleton (NetworkX graph + Prophet forecaster + PuLP optimizer)</li>
+<li><code>knowledge-base/zero-to-hero-guides/supply-chain/README.md</code> — three-pillar guide with code examples</li>
+</ul>
+<h3 id="management-information-systems-mis-the-enterprise-layer">Management Information Systems (MIS) — The Enterprise Layer</h3>
+<p><em>The digital nervous system of a company. Where your Engineering Management degree meets your coding skills.</em></p>
+<h4 id="pillar-1-data-architecture-amp-etl">Pillar 1 — Data Architecture &amp; ETL</h4>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>Kimball Group — Dimensional Modelling (Star Schema)</td><td>https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/</td><td>Before Month 2 SQL work — the industry standard for designing databases that managers can query</td></tr></tbody></table>
+<blockquote><strong>Key skills:</strong> Star Schema vs. Snowflake Schema design, fact tables vs. dimension tables, ETL pipelines in Python (<code>pandas</code> + SQLAlchemy), automating with Celery (Month 6).</blockquote>
+<h4 id="pillar-2-business-intelligence-amp-dashboards">Pillar 2 — Business Intelligence &amp; Dashboards</h4>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>Metabase (open-source BI)</td><td>https://www.metabase.com/docs/latest/</td><td>Month 3 — spin up a Metabase container with Docker and connect it to your SQL database for enterprise-grade dashboards in minutes</td></tr><tr><td>Apache Superset</td><td>https://superset.apache.org/</td><td>Month 3–5 — alternative to Metabase; heavier but more powerful for custom SQL charts</td></tr><tr><td>Plotly Dash Tutorials</td><td>https://dash.plotly.com/tutorial</td><td>Month 5–6 — embed interactive BI dashboards directly inside your Django app</td></tr></tbody></table>
+<h4 id="pillar-3-enterprise-automation-amp-workflow-orchestration">Pillar 3 — Enterprise Automation &amp; Workflow Orchestration</h4>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th></tr></thead><tbody><tr><td>Apache Airflow Documentation</td><td>https://airflow.apache.org/docs/</td><td>Month 4–5 — industry standard for orchestrating ETL pipelines and scheduled ML jobs</td></tr><tr><td>n8n (no-code/low-code automation)</td><td>https://n8n.io/</td><td>Month 5 — visually wire together APIs, databases, and alerts (Slack, email) for internal business workflows</td></tr></tbody></table>
+<p><strong>Related workspace files:</strong></p>
+<ul>
+<li><code>knowledge-base/zero-to-hero-guides/mis/README.md</code> — three-pillar MIS guide with ETL, BI, and automation code examples</li>
+</ul>
+<h3 id="general-foundations-phase-1-amp-2">General Foundations (Phase 1 &amp; 2)</h3>
+<table><thead><tr><th>Resource</th><th>URL</th><th>When to use it</th><th>Phase</th></tr></thead><tbody><tr><td>University of Helsinki Python MOOC</td><td>https://programming-26.mooc.fi/</td><td>Solidify Python fundamentals before Month 1</td><td>Pre-work / Phase 1</td></tr><tr><td>LeetCode</td><td>https://leetcode.com/</td><td>Start 1 Easy problem/day in Month 2 for interview prep</td><td>Phase 1+</td></tr><tr><td>Play With Docker (browser playground)</td><td>https://labs.play-with-docker.com/</td><td>If VirtualBox gives you trouble in Month 3 — practice Docker in browser</td><td>Phase 2</td></tr></tbody></table>
+<h3 id="quick-access-by-phase">Quick-Access by Phase</h3>
+<table><thead><tr><th>Phase</th><th>Month</th><th>Go-to links</th></tr></thead><tbody><tr><td>Pre-work</td><td>—</td><td>Helsinki MOOC</td></tr><tr><td>1</td><td>1–2</td><td>Helsinki MOOC, LeetCode, Olist dataset (explore only), Kimball Dimensional Modelling</td></tr><tr><td>2</td><td>3</td><td>Play With Docker, Burkov book, Demand Forecasting Kaggle, Metabase Docker setup</td></tr><tr><td>2</td><td>4</td><td>Burkov book, CRISP-DM, DataCo Smart Supply Chain dataset, Apache Airflow Docs</td></tr><tr><td>3</td><td>5–6</td><td>DataCo Smart Supply Chain dataset, MITx Supply Chain Analytics, Plotly Dash, n8n</td></tr><tr><td>5</td><td>9</td><td>OR-Tools Python Intro, OR-Tools VRP, PuLP Docs, NASA CMAPSS Kaggle, NetworkX Docs, Microsoft PM Guide</td></tr><tr><td>Job Hunt</td><td>Month 9+</td><td>LeetCode (ramp up to Medium), CRISP-DM (for interviews), MITx certificate</td></tr></tbody></table></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#curated-resource-bookmarks">Curated Resource Bookmarks</a><a style="margin-left:12px" href="#superpower-1-optimization-operations-research">Superpower 1 — Optimization (Operations Research)</a><a style="margin-left:24px" href="#google-or-tools-industry-standard">Google OR-Tools — Industry Standard</a><a style="margin-left:24px" href="#pulp-linear-programming">PuLP — Linear Programming</a><a style="margin-left:12px" href="#superpower-2-industry-4-0-amp-predictive-maintenance">Superpower 2 — Industry 4.0 &amp; Predictive Maintenance</a><a style="margin-left:24px" href="#dataset">Dataset</a><a style="margin-left:24px" href="#architecture-reference">Architecture Reference</a><a style="margin-left:12px" href="#superpower-3-ai-product-manager-engineering-management">Superpower 3 — AI Product Manager (Engineering Management)</a><a style="margin-left:24px" href="#books">Books</a><a style="margin-left:24px" href="#frameworks">Frameworks</a><a style="margin-left:12px" href="#supply-chain-ai-domain-your-target-industry">Supply Chain AI Domain (Your Target Industry)</a><a style="margin-left:24px" href="#pillar-1-demand-forecasting-predicting-the-future">Pillar 1 — Demand Forecasting (Predicting the Future)</a><a style="margin-left:24px" href="#pillar-2-inventory-optimization-balancing-the-scale">Pillar 2 — Inventory Optimization (Balancing the Scale)</a><a style="margin-left:24px" href="#pillar-3-network-amp-route-optimization-moving-the-goods">Pillar 3 — Network &amp; Route Optimization (Moving the Goods)</a><a style="margin-left:24px" href="#gold-standard-courses">Gold Standard Courses</a><a style="margin-left:12px" href="#management-information-systems-mis-the-enterprise-layer">Management Information Systems (MIS) — The Enterprise Layer</a><a style="margin-left:24px" href="#pillar-1-data-architecture-amp-etl">Pillar 1 — Data Architecture &amp; ETL</a><a style="margin-left:24px" href="#pillar-2-business-intelligence-amp-dashboards">Pillar 2 — Business Intelligence &amp; Dashboards</a><a style="margin-left:24px" href="#pillar-3-enterprise-automation-amp-workflow-orchestration">Pillar 3 — Enterprise Automation &amp; Workflow Orchestration</a><a style="margin-left:12px" href="#general-foundations-phase-1-amp-2">General Foundations (Phase 1 &amp; 2)</a><a style="margin-left:12px" href="#quick-access-by-phase">Quick-Access by Phase</a></aside>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Optimization - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Optimization</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/optimization/README.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="zero-to-hero-guide-optimization-in-python">Zero-to-Hero Guide: Optimization in Python</h2>
+<blockquote><strong>IE Superpower 1</strong> — Operations Research in code. You already know the math from your IE degree. This guide teaches you the Python APIs that implement it.</blockquote>
+<h3 id="why-this-matters">Why This Matters</h3>
+<p>Standard data scientists predict outcomes. Industrial Engineers optimize decisions given those outcomes. This is the gap that makes you worth more:</p>
+<table><thead><tr><th>Role</th><th>What they do</th><th>Salary implication</th></tr></thead><tbody><tr><td>Data Scientist</td><td>&quot;We predict 500 units will ship tomorrow&quot;</td><td>Baseline</td></tr><tr><td><strong>Operations Data Scientist</strong></td><td>&quot;Given 500 units, here is the mathematically optimal route assignment to minimize $4,200 in fuel costs&quot;</td><td>+30–50%</td></tr></tbody></table>
+<p>Companies that actively hire for this combination: <strong>Amazon Last-Mile Logistics, Uber Freight, Flexport, DHL, UPS, pharmaceutical cold-chain distributors, semiconductor manufacturers.</strong></p>
+<h3 id="part-1-linear-programming-with-pulp">Part 1 — Linear Programming with PuLP</h3>
+<h4 id="what-is-linear-programming">What is Linear Programming?</h4>
+<p>An LP problem has three components:</p>
+<ol>
+<li><strong>Decision variables</strong> — what you control (e.g., how many units to ship on each route)</li>
+<li><strong>Objective function</strong> — what you minimize or maximize (e.g., total cost)</li>
+<li><strong>Constraints</strong> — the limits of the real world (e.g., warehouse capacity, truck capacity)</li>
+</ol>
+<p>You already solved these by hand in your IE courses. PuLP just does the algebra for you.</p>
+<h4 id="installation">Installation</h4>
+<pre><code class="language-bash">pip install pulp</code></pre>
+<p>PuLP uses the free CBC solver by default. For larger problems, install HiGHS:</p>
+<pre><code class="language-bash">pip install highspy</code></pre>
+<h4 id="minimal-working-example-production-planning">Minimal Working Example: Production Planning</h4>
+<pre><code class="language-python">import pulp
+
+# The Problem:
+# A factory makes two products: A and B.
+# Product A earns $25 profit, Product B earns $30 profit.
+# Constraint: machine hours limited to 40/week
+# Product A needs 2 hours, Product B needs 4 hours.
+# Question: how many of each to produce to maximize profit?
+
+prob = pulp.LpProblem(&quot;production_plan&quot;, pulp.LpMaximize)
+
+# Decision variables (non-negative integers)
+x_a = pulp.LpVariable(&quot;units_A&quot;, lowBound=0, cat=&quot;Integer&quot;)
+x_b = pulp.LpVariable(&quot;units_B&quot;, lowBound=0, cat=&quot;Integer&quot;)
+
+# Objective: maximize profit
+prob += 25 * x_a + 30 * x_b
+
+# Constraint: machine hours
+prob += 2 * x_a + 4 * x_b &lt;= 40
+
+# Solve
+status = prob.solve(pulp.PULP_CBC_CMD(msg=0))
+
+print(f&quot;Status: {pulp.LpStatus[status]}&quot;)
+print(f&quot;Units A: {x_a.value()}&quot;)
+print(f&quot;Units B: {x_b.value()}&quot;)
+print(f&quot;Max Profit: ${pulp.value(prob.objective)}&quot;)</code></pre>
+<h4 id="transportation-problem-classic-ie-problem">Transportation Problem (Classic IE Problem)</h4>
+<pre><code class="language-python">import pulp
+
+# Ship goods from 3 warehouses to 4 customers at minimum cost.
+# supply[i] = capacity of warehouse i
+# demand[j] = requirement of customer j
+# cost[i][j] = cost per unit shipped from i to j
+
+warehouses = [&quot;W1&quot;, &quot;W2&quot;, &quot;W3&quot;]
+customers  = [&quot;C1&quot;, &quot;C2&quot;, &quot;C3&quot;, &quot;C4&quot;]
+
+supply = {&quot;W1&quot;: 120, &quot;W2&quot;: 80,  &quot;W3&quot;: 80}
+demand = {&quot;C1&quot;: 150, &quot;C2&quot;: 70,  &quot;C3&quot;: 100, &quot;C4&quot;: 60}  # note: demand &lt; supply intentionally
+
+cost = {
+    (&quot;W1&quot;,&quot;C1&quot;): 2, (&quot;W1&quot;,&quot;C2&quot;): 3, (&quot;W1&quot;,&quot;C3&quot;): 1, (&quot;W1&quot;,&quot;C4&quot;): 5,
+    (&quot;W2&quot;,&quot;C1&quot;): 7, (&quot;W2&quot;,&quot;C2&quot;): 3, (&quot;W2&quot;,&quot;C3&quot;): 4, (&quot;W2&quot;,&quot;C4&quot;): 6,
+    (&quot;W3&quot;,&quot;C1&quot;): 4, (&quot;W3&quot;,&quot;C2&quot;): 6, (&quot;W3&quot;,&quot;C3&quot;): 4, (&quot;W3&quot;,&quot;C4&quot;): 3,
+}
+
+prob = pulp.LpProblem(&quot;transportation&quot;, pulp.LpMinimize)
+
+# Decision variables: flow on each route
+flow = {
+    (i, j): pulp.LpVariable(f&quot;flow_{i}_{j}&quot;, lowBound=0)
+    for i in warehouses for j in customers
+}
+
+# Objective: minimize total shipping cost
+prob += pulp.lpSum(cost[i, j] * flow[i, j] for i in warehouses for j in customers)
+
+# Supply constraints: don&#x27;t ship more than each warehouse has
+for i in warehouses:
+    prob += pulp.lpSum(flow[i, j] for j in customers) &lt;= supply[i]
+
+# Demand constraints: each customer must receive their full demand
+for j in customers:
+    prob += pulp.lpSum(flow[i, j] for i in warehouses) &gt;= demand[j]
+
+prob.solve(pulp.PULP_CBC_CMD(msg=0))
+
+print(&quot;Optimal shipping plan:&quot;)
+for (i, j), var in flow.items():
+    if var.value() &gt; 0:
+        print(f&quot;  {i} → {j}: {var.value():.0f} units (cost: ${cost[i,j] * var.value():.0f})&quot;)
+print(f&quot;Total cost: ${pulp.value(prob.objective):.0f}&quot;)</code></pre>
+<h3 id="part-2-google-or-tools">Part 2 — Google OR-Tools</h3>
+<p>OR-Tools is the <strong>industry standard</strong> for combinatorial optimization problems that LP cannot solve efficiently: vehicle routing, scheduling, assignment, bin packing.</p>
+<h4 id="installation">Installation</h4>
+<pre><code class="language-bash">pip install ortools</code></pre>
+<h4 id="the-assignment-problem-cold-chain-capstone-core">The Assignment Problem (Cold-Chain Capstone Core)</h4>
+<p>Given N inventory items and M warehouses, assign each item to a warehouse to minimize total relocation cost. This is what your cold-chain capstone optimizer does when a cooling failure is predicted.</p>
+<pre><code class="language-python">from ortools.sat.python import cp_model
+
+# Scenario: 3 pallets of inventory, 3 destination warehouses
+# cost[pallet][warehouse] = estimated spoilage/transport cost in $
+pallets     = [&quot;insulin_pallet&quot;, &quot;vaccine_pallet&quot;, &quot;frozen_food_pallet&quot;]
+warehouses  = [&quot;warehouse_A&quot;,    &quot;warehouse_B&quot;,    &quot;warehouse_C&quot;]
+
+cost = [
+    [120, 200, 180],   # insulin pallet to A/B/C
+    [150,  90, 210],   # vaccine pallet to A/B/C
+    [180, 160,  80],   # frozen food pallet to A/B/C
+]
+
+# Warehouse capacities (max pallets they can absorb)
+capacity = {&quot;warehouse_A&quot;: 2, &quot;warehouse_B&quot;: 1, &quot;warehouse_C&quot;: 2}
+
+model = cp_model.CpModel()
+
+# Decision variables: assign[pallet][warehouse] is 1 if that pallet goes there
+assign = {}
+for p in range(len(pallets)):
+    for w in range(len(warehouses)):
+        assign[p, w] = model.NewBoolVar(f&quot;assign_{p}_{w}&quot;)
+
+# Constraint 1: each pallet must go to exactly one warehouse
+for p in range(len(pallets)):
+    model.AddExactlyOne(assign[p, w] for w in range(len(warehouses)))
+
+# Constraint 2: warehouse capacity limits
+cap_list = [capacity[w] for w in warehouses]
+for w in range(len(warehouses)):
+    model.Add(sum(assign[p, w] for p in range(len(pallets))) &lt;= cap_list[w])
+
+# Objective: minimize total relocation cost
+model.Minimize(
+    sum(cost[p][w] * assign[p, w] for p in range(len(pallets)) for w in range(len(warehouses)))
+)
+
+solver = cp_model.CpSolver()
+status = solver.Solve(model)
+
+if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+    print(&quot;Optimal inventory transfer plan:&quot;)
+    for p in range(len(pallets)):
+        for w in range(len(warehouses)):
+            if solver.Value(assign[p, w]):
+                print(f&quot;  {pallets[p]} → {warehouses[w]}  (cost: ${cost[p][w]})&quot;)
+    print(f&quot;Total cost: ${solver.ObjectiveValue():.0f}&quot;)</code></pre>
+<h4 id="vehicle-routing-problem-vrp-the-canonical-logistics-problem">Vehicle Routing Problem (VRP) — The Canonical Logistics Problem</h4>
+<p>The VRP asks: given N delivery locations and K trucks, find routes for each truck that minimize total distance while respecting capacity limits. This is what Amazon solves billions of times per day.</p>
+<pre><code class="language-python">from ortools.constraint_solver import routing_enums_pb2
+from ortools.constraint_solver import pywrapcp
+
+def build_distance_matrix(locations: list[tuple]) -&gt; list[list[int]]:
+    &quot;&quot;&quot;
+    Computes integer distance matrix from (lat, lon) coordinates.
+    OR-Tools requires integer costs, so multiply by 1000 and round.
+    &quot;&quot;&quot;
+    import math
+    n = len(locations)
+    matrix = []
+    for i in range(n):
+        row = []
+        for j in range(n):
+            lat1, lon1 = locations[i]
+            lat2, lon2 = locations[j]
+            # Euclidean approximation — good enough for small regions
+            dist = math.sqrt((lat2 - lat1)**2 + (lon2 - lon1)**2) * 111_000  # meters
+            row.append(int(dist))
+        matrix.append(row)
+    return matrix
+
+
+def solve_vrp(locations, demands, vehicle_capacities, depot_index=0):
+    &quot;&quot;&quot;
+    Solve a capacitated VRP.
+
+    Args:
+        locations:         list of (lat, lon) tuples; index 0 is the depot
+        demands:           units required at each location (0 for depot)
+        vehicle_capacities: list of capacity per vehicle
+        depot_index:       index of the depot in locations
+
+    Returns:
+        list of routes, where each route is a list of location indices
+    &quot;&quot;&quot;
+    distance_matrix = build_distance_matrix(locations)
+    n_vehicles = len(vehicle_capacities)
+
+    manager = pywrapcp.RoutingIndexManager(len(locations), n_vehicles, depot_index)
+    routing = pywrapcp.RoutingModel(manager)
+
+    # Distance callback
+    def distance_callback(from_idx, to_idx):
+        from_node = manager.IndexToNode(from_idx)
+        to_node   = manager.IndexToNode(to_idx)
+        return distance_matrix[from_node][to_node]
+
+    transit_cb_idx = routing.RegisterTransitCallback(distance_callback)
+    routing.SetArcCostEvaluatorOfAllVehicles(transit_cb_idx)
+
+    # Capacity constraint
+    def demand_callback(from_idx):
+        return demands[manager.IndexToNode(from_idx)]
+
+    demand_cb_idx = routing.RegisterUnaryTransitCallback(demand_callback)
+    routing.AddDimensionWithVehicleCapacity(
+        demand_cb_idx,
+        0,                   # null capacity slack
+        vehicle_capacities,  # vehicle maximum capacities
+        True,                # start cumul to zero
+        &quot;Capacity&quot;,
+    )
+
+    # Search parameters
+    search_params = pywrapcp.DefaultRoutingSearchParameters()
+    search_params.first_solution_strategy = (
+        routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
+    )
+    search_params.local_search_metaheuristic = (
+        routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
+    )
+    search_params.time_limit.seconds = 30
+
+    solution = routing.SolveWithParameters(search_params)
+
+    if not solution:
+        return None
+
+    routes = []
+    for v in range(n_vehicles):
+        route = []
+        idx = routing.Start(v)
+        while not routing.IsEnd(idx):
+            route.append(manager.IndexToNode(idx))
+            idx = solution.Value(routing.NextVar(idx))
+        route.append(manager.IndexToNode(idx))  # append depot at end
+        routes.append(route)
+
+    return routes
+
+
+# --- Example usage ---
+if __name__ == &quot;__main__&quot;:
+    # Depot at index 0, then 4 delivery locations
+    locations = [
+        (40.712, -74.006),   # depot: New York
+        (40.730, -73.935),   # stop 1
+        (40.650, -73.950),   # stop 2
+        (40.680, -74.044),   # stop 3
+        (40.740, -74.178),   # stop 4
+    ]
+    demands           = [0, 10, 7, 13, 15]     # depot has 0 demand
+    vehicle_capacities = [25, 20]               # 2 trucks
+
+    routes = solve_vrp(locations, demands, vehicle_capacities)
+    if routes:
+        for i, route in enumerate(routes):
+            print(f&quot;Truck {i + 1}: {&#x27; → &#x27;.join(str(r) for r in route)}&quot;)</code></pre>
+<h3 id="part-3-connecting-optimization-to-your-ml-model-the-ie-money-move">Part 3 — Connecting Optimization to Your ML Model (The IE Money Move)</h3>
+<p>The pattern that sets Operations Data Scientists apart is chaining ML output directly into an optimizer input. This is the core of your cold-chain capstone.</p>
+<pre><code class="language-python"># Pseudocode architecture — implement this in cold_chain_capstone.py
+
+def run_decision_pipeline(sensor_reading: dict) -&gt; dict:
+    &quot;&quot;&quot;
+    The full IE pipeline:
+      1. ML model scores the latest sensor data
+      2. If risk is high, OR-Tools computes the optimal response
+      3. Returns a decision object the Django dashboard can display
+    &quot;&quot;&quot;
+    # Step 1: ML — predict cooling failure probability
+    features = extract_features(sensor_reading)          # your feature engineering
+    failure_prob_48h = ml_model.predict_proba(features)  # survival model output
+
+    result = {
+        &quot;temperature&quot;: sensor_reading[&quot;temp_celsius&quot;],
+        &quot;humidity&quot;:    sensor_reading[&quot;humidity_pct&quot;],
+        &quot;failure_probability_48h&quot;: failure_prob_48h,
+        &quot;financial_risk_usd&quot;: failure_prob_48h * AVG_SPOILAGE_COST,
+        &quot;action_required&quot;: failure_prob_48h &gt; ALERT_THRESHOLD,
+        &quot;optimal_transfer_plan&quot;: None,
+    }
+
+    # Step 2: OR-Tools — if risk is high, optimize the response
+    if result[&quot;action_required&quot;]:
+        inventory = fetch_current_inventory()            # from your Django DB
+        transfer_plan = solve_inventory_assignment(inventory)
+        result[&quot;optimal_transfer_plan&quot;] = transfer_plan
+
+    return result</code></pre>
+<h3 id="part-4-quick-reference-when-to-use-what">Part 4 — Quick Reference: When to Use What</h3>
+<table><thead><tr><th>Problem Type</th><th>Library</th><th>Example</th></tr></thead><tbody><tr><td>Linear program (continuous variables)</td><td><strong>PuLP</strong></td><td>Production planning, blending, diet problem</td></tr><tr><td>Integer/mixed-integer program</td><td><strong>PuLP</strong> (cat=&#x27;Integer&#x27;)</td><td>Facility location, binary assignment</td></tr><tr><td>Vehicle routing, scheduling</td><td><strong>OR-Tools</strong></td><td>Delivery optimization, job shop scheduling</td></tr><tr><td>Large-scale MIP (&gt;10,000 variables)</td><td><strong>OR-Tools CP-SAT</strong></td><td>Workforce scheduling, supply chain design</td></tr><tr><td>Non-linear optimization</td><td><strong>Pyomo</strong></td><td>Energy systems, chemical process optimization</td></tr><tr><td>Simple assignment (one-to-one)</td><td><strong>scipy.optimize.linear_sum_assignment</strong></td><td>Hungarian algorithm, fastest for small cases</td></tr></tbody></table>
+<h3 id="learning-path-spend-3-days-before-month-9-week-3">Learning Path (Spend ~3 Days Before Month 9 Week 3)</h3>
+<p><strong>Day 1 — PuLP</strong></p>
+<ul>
+<li>[ ] Run the production planning example above</li>
+<li>[ ] Run the transportation problem above</li>
+<li>[ ] Read: <a href="https://coin-or.github.io/pulp/">PuLP Official Documentation</a> — great for translating IE math into Python</li>
+</ul>
+<p><strong>Day 2 — OR-Tools Basics</strong></p>
+<ul>
+<li>[ ] Run the assignment problem example above</li>
+<li>[ ] Read: <a href="https://developers.google.com/optimization/introduction/python">OR-Tools Python Introduction</a> — start here; covers vehicle routing and bin packing</li>
+<li>[ ] Browse real scripts: <a href="https://github.com/google/or-tools">github.com/google/or-tools</a> → look in <code>ortools/linear_solver/samples/</code></li>
+<li>[ ] Read: <a href="https://developers.google.com/optimization/reference/python/sat/python/cp_model">OR-Tools CP-SAT Guide</a></li>
+</ul>
+<p><strong>Day 3 — VRP (The Interview Showpiece)</strong></p>
+<ul>
+<li>[ ] Run the VRP example above with your own city coordinates</li>
+<li>[ ] Read: <a href="https://developers.google.com/optimization/routing/vrp">OR-Tools VRP Documentation</a></li>
+<li>[ ] Understand: why does OR-Tools use integer costs? (floating point solver precision)</li>
+</ul>
+<h3 id="where-this-fits-in-your-12-month-roadmap">Where This Fits in Your 12-Month Roadmap</h3>
+<table><thead><tr><th>Month</th><th>What you build</th><th>How this guide is used</th></tr></thead><tbody><tr><td>3</td><td>Housing price predictor</td><td>Background reading — see how ML and optimization differ</td></tr><tr><td>5</td><td>Django Smart Home Portal</td><td>Not yet; focus on deployment first</td></tr><tr><td><strong>8</strong></td><td><strong>Inventory + Route Optimizer</strong></td><td><strong>Core deliverable: PuLP EOQ + OR-Tools VRP</strong></td></tr><tr><td><strong>9</strong></td><td><strong>Cold Chain Intelligence System</strong></td><td><strong>Integration: ML risk score → <code>solve_inventory_assignment()</code></strong></td></tr></tbody></table>
+<p><strong>Spend the 3 days described in the learning path above before starting Capstone 4 (Month 8).</strong> Full capstone specs are in <code>knowledge-base/learning-journey/CAPSTONE_ROADMAP.md</code>.</p>
+<h3 id="key-concepts-to-be-able-to-explain-in-an-interview">Key Concepts to Be Able to Explain in an Interview</h3>
+<table><thead><tr><th>Concept</th><th>What to say</th></tr></thead><tbody><tr><td><strong>Why LP?</strong></td><td>&quot;LP finds the global optimum in polynomial time for continuous problems. It gives me a provably optimal answer, not just a heuristic.&quot;</td></tr><tr><td><strong>Why OR-Tools over LP for routing?</strong></td><td>&quot;Routing problems are combinatorial — the number of possible routes grows factorially. OR-Tools uses constraint propagation + heuristic search to find near-optimal solutions in bounded time.&quot;</td></tr><tr><td><strong>How do you know your model is good?</strong></td><td>&quot;I compare its output to the baseline (greedy nearest-neighbor for routing, or manual expert rules for assignment). If it consistently beats baseline by &gt;15%, it earns its place in production.&quot;</td></tr><tr><td><strong>What is the connection between your ML model and the optimizer?</strong></td><td>&quot;The ML model quantifies the risk. The optimizer decides the response. Neither is useful without the other — that&#x27;s the IE advantage.&quot;</td></tr></tbody></table></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#zero-to-hero-guide-optimization-in-python">Zero-to-Hero Guide: Optimization in Python</a><a style="margin-left:12px" href="#why-this-matters">Why This Matters</a><a style="margin-left:12px" href="#part-1-linear-programming-with-pulp">Part 1 — Linear Programming with PuLP</a><a style="margin-left:24px" href="#what-is-linear-programming">What is Linear Programming?</a><a style="margin-left:24px" href="#installation">Installation</a><a style="margin-left:24px" href="#minimal-working-example-production-planning">Minimal Working Example: Production Planning</a><a style="margin-left:24px" href="#transportation-problem-classic-ie-problem">Transportation Problem (Classic IE Problem)</a><a style="margin-left:12px" href="#part-2-google-or-tools">Part 2 — Google OR-Tools</a><a style="margin-left:24px" href="#installation">Installation</a><a style="margin-left:24px" href="#the-assignment-problem-cold-chain-capstone-core">The Assignment Problem (Cold-Chain Capstone Core)</a><a style="margin-left:24px" href="#vehicle-routing-problem-vrp-the-canonical-logistics-problem">Vehicle Routing Problem (VRP) — The Canonical Logistics Problem</a><a style="margin-left:12px" href="#part-3-connecting-optimization-to-your-ml-model-the-ie-money-move">Part 3 — Connecting Optimization to Your ML Model (The IE Money Move)</a><a style="margin-left:12px" href="#part-4-quick-reference-when-to-use-what">Part 4 — Quick Reference: When to Use What</a><a style="margin-left:12px" href="#learning-path-spend-3-days-before-month-9-week-3">Learning Path (Spend ~3 Days Before Month 9 Week 3)</a><a style="margin-left:12px" href="#where-this-fits-in-your-12-month-roadmap">Where This Fits in Your 12-Month Roadmap</a><a style="margin-left:12px" href="#key-concepts-to-be-able-to-explain-in-an-interview">Key Concepts to Be Able to Explain in an Interview</a></aside>
+    </main>
+  </body>
+</html>

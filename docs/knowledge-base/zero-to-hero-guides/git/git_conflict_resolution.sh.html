@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Git Conflict Resolution.Sh - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Git Conflict Resolution.Sh</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/git/git_conflict_resolution.sh</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><pre><code>#!/bin/bash
+# ==============================================================================
+#  GIT — CONFLICT RESOLUTION (Step-by-Step)
+#  FILE: git_conflict_resolution.sh
+#
+#  TASK: Learn to resolve merge conflicts confidently.
+#        This is the #1 Git skill that beginners fear and professionals master.
+#
+#  WHY:  Every team eventually has two people editing the same file.
+#        Git can&#x27;t decide which version wins — that&#x27;s YOUR job.
+#        Knowing how to resolve conflicts is the difference between
+#        &quot;I broke the repo&quot; and &quot;I fixed it in 2 minutes.&quot;
+#
+#  PREREQ: git_commands.sh (you know add, commit, branch, merge)
+#
+#  HOW TO USE:
+#    Run each command block in your terminal.
+#    READ all comments before running — understand WHAT you&#x27;re doing and WHY.
+# ==============================================================================
+
+
+# ==============================================================================
+# LESSON 01 — WHAT IS A MERGE CONFLICT AND WHY DOES IT HAPPEN?
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A MERGE CONFLICT happens when:
+#   1. Branch A edits line 10 of file.py
+#   2. Branch B ALSO edits line 10 of file.py
+#   3. You try to merge them → Git doesn&#x27;t know which version to keep
+#
+# Git marks the conflict INSIDE the file with special markers:
+#
+#   &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD               ← start of YOUR version (current branch)
+#   your code here
+#   =======                    ← separator
+#   their code here
+#   &gt;&gt;&gt;&gt;&gt;&gt;&gt; feature-branch     ← start of THEIR version (incoming branch)
+#
+# Your job: edit the file to keep the RIGHT version, remove the markers.
+#
+# THREE OUTCOMES when you see a conflict:
+#   1. Keep YOUR version (delete their block)
+#   2. Keep THEIR version (delete your block)
+#   3. Keep BOTH (combine them intelligently)
+#   4. Write something completely new
+#
+
+
+# ==============================================================================
+# LESSON 02 — CREATE A CONFLICT FROM SCRATCH (Lab Setup)
+# ==============================================================================
+#
+# We&#x27;ll create a controlled conflict so you can practice resolving it.
+# Follow each step exactly.
+
+echo &quot;=== LESSON 02: Creating a Lab Environment ===&quot;
+
+# 1. Create a fresh repo:
+mkdir git-conflict-lab
+cd git-conflict-lab
+git init
+git config user.name  &quot;Student&quot;
+git config user.email &quot;student@example.com&quot;
+
+# 2. Create the initial shared file (both branches will start from this):
+cat &gt; model_config.py &lt;&lt; &#x27;EOF&#x27;
+# Model Configuration
+
+LEARNING_RATE = 0.01
+BATCH_SIZE = 32
+EPOCHS = 10
+MODEL_NAME = &quot;churn_v1&quot;
+
+def get_config():
+    return {
+        &quot;lr&quot;:    LEARNING_RATE,
+        &quot;batch&quot;: BATCH_SIZE,
+        &quot;epochs&quot;: EPOCHS
+    }
+EOF
+
+git add model_config.py
+git commit -m &quot;feat: initial model configuration&quot;
+
+echo &quot;✓ Initial commit created&quot;
+git log --oneline
+
+
+# ==============================================================================
+# LESSON 03 — CREATING THE CONFLICT
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 03: Creating the Conflict ===&quot;
+
+# 3. Create branch-A (Alice&#x27;s changes):
+git checkout -b feature/alice-tuning
+
+# Alice changes learning rate and batch size:
+cat &gt; model_config.py &lt;&lt; &#x27;EOF&#x27;
+# Model Configuration — Alice&#x27;s tuning
+
+LEARNING_RATE = 0.001          # Alice: reduced for stability
+BATCH_SIZE = 64                # Alice: increased batch size
+EPOCHS = 10
+MODEL_NAME = &quot;churn_v1&quot;
+
+def get_config():
+    return {
+        &quot;lr&quot;:    LEARNING_RATE,
+        &quot;batch&quot;: BATCH_SIZE,
+        &quot;epochs&quot;: EPOCHS
+    }
+EOF
+
+git add model_config.py
+git commit -m &quot;feat: tune learning rate and batch size (Alice)&quot;
+
+echo &quot;✓ Alice&#x27;s branch committed&quot;
+
+# 4. Go back to main, create branch-B (Bob&#x27;s changes):
+git checkout main
+git checkout -b feature/bob-tuning
+
+# Bob ALSO changes learning rate (different value!) and epochs:
+cat &gt; model_config.py &lt;&lt; &#x27;EOF&#x27;
+# Model Configuration — Bob&#x27;s tuning
+
+LEARNING_RATE = 0.005          # Bob: tried a different rate
+BATCH_SIZE = 32
+EPOCHS = 50                    # Bob: more epochs for better convergence
+MODEL_NAME = &quot;churn_v1&quot;
+
+def get_config():
+    return {
+        &quot;lr&quot;:    LEARNING_RATE,
+        &quot;batch&quot;: BATCH_SIZE,
+        &quot;epochs&quot;: EPOCHS
+    }
+EOF
+
+git add model_config.py
+git commit -m &quot;feat: increase epochs and adjust learning rate (Bob)&quot;
+
+echo &quot;✓ Bob&#x27;s branch committed&quot;
+
+# 5. Merge Alice&#x27;s branch first (no conflict — main was clean):
+git checkout main
+git merge feature/alice-tuning
+echo &quot;✓ Alice&#x27;s branch merged into main (no conflict)&quot;
+
+# 6. Now try to merge Bob&#x27;s branch — CONFLICT!
+git merge feature/bob-tuning
+echo &quot;→ Expected: CONFLICT! Git cannot auto-merge model_config.py&quot;
+
+
+# ==============================================================================
+# LESSON 04 — READING THE CONFLICT MARKERS
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 04: Reading the Conflict File ===&quot;
+echo &quot;&quot;
+echo &quot;The conflict looks like this in model_config.py:&quot;
+echo &quot;&quot;
+cat &lt;&lt; &#x27;EOF&#x27;
+# Model Configuration
+
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+# Model Configuration — Alice&#x27;s tuning
+
+LEARNING_RATE = 0.001          # Alice: reduced for stability
+BATCH_SIZE = 64                # Alice: increased batch size
+EPOCHS = 10
+=======
+# Model Configuration — Bob&#x27;s tuning
+
+LEARNING_RATE = 0.005          # Bob: tried a different rate
+BATCH_SIZE = 32
+EPOCHS = 50                    # Bob: more epochs for better convergence
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/bob-tuning
+MODEL_NAME = &quot;churn_v1&quot;
+
+def get_config():
+    return {
+        &quot;lr&quot;:    LEARNING_RATE,
+        &quot;batch&quot;: BATCH_SIZE,
+        &quot;epochs&quot;: EPOCHS
+    }
+EOF
+
+echo &quot;&quot;
+echo &quot;Git status shows:&quot;
+git status
+
+echo &quot;&quot;
+echo &quot;EXPLAIN THE MARKERS:&quot;
+echo &quot;  &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD            = Start of YOUR version (Alice&#x27;s — already in main)&quot;
+echo &quot;  =======                 = Separator between the two versions&quot;
+echo &quot;  &gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/bob-tuning = Start of THEIR version (Bob&#x27;s — incoming)&quot;
+
+
+# ==============================================================================
+# LESSON 05 — RESOLVING THE CONFLICT
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 05: Resolving the Conflict ===&quot;
+echo &quot;&quot;
+echo &quot;STEP 1: Open the file and decide what to keep.&quot;
+echo &quot;        Option A: keep Alice&#x27;s values (0.001 lr, 64 batch)&quot;
+echo &quot;        Option B: keep Bob&#x27;s values  (0.005 lr, 50 epochs)&quot;
+echo &quot;        Option C: COMBINE BOTH (best! take the best from each person)&quot;
+echo &quot;&quot;
+echo &quot;In a real team, you&#x27;d TALK to Alice and Bob about which values to use.&quot;
+echo &quot;For this exercise, we combine: Alice&#x27;s lr + Bob&#x27;s epochs + Alice&#x27;s batch.&quot;
+echo &quot;&quot;
+echo &quot;STEP 2: Edit the file to the FINAL version (remove all conflict markers):&quot;
+
+# Write the RESOLVED version (no conflict markers):
+cat &gt; model_config.py &lt;&lt; &#x27;EOF&#x27;
+# Model Configuration — Combined tuning (Alice + Bob)
+
+LEARNING_RATE = 0.001          # Alice: stable low rate (accepted)
+BATCH_SIZE = 64                # Alice: larger batch (accepted)
+EPOCHS = 50                    # Bob: more epochs (accepted)
+MODEL_NAME = &quot;churn_v1&quot;
+
+def get_config():
+    return {
+        &quot;lr&quot;:    LEARNING_RATE,
+        &quot;batch&quot;: BATCH_SIZE,
+        &quot;epochs&quot;: EPOCHS
+    }
+EOF
+
+echo &quot;✓ Conflict resolved: combined best of both contributions&quot;
+echo &quot;&quot;
+cat model_config.py
+
+# STEP 3: Stage the resolved file:
+git add model_config.py
+echo &quot;&quot;
+echo &quot;STEP 3: Stage the resolved file: git add model_config.py&quot;
+
+# STEP 4: Complete the merge commit:
+git commit -m &quot;merge: resolve conflict — combine Alice&#x27;s lr/batch + Bob&#x27;s epochs&quot;
+echo &quot;&quot;
+echo &quot;STEP 4: Complete merge with commit&quot;
+
+git log --oneline --graph --all
+
+
+# ==============================================================================
+# LESSON 06 — GIT STATUS DURING A CONFLICT
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 06: What git status shows during a conflict ===&quot;
+echo &quot;&quot;
+echo &quot;During a conflict, &#x27;git status&#x27; shows:&quot;
+echo &quot;&quot;
+echo &quot;  On branch main&quot;
+echo &quot;  You have unmerged paths.&quot;
+echo &quot;    (fix conflicts and run &#x27;git commit&#x27;)&quot;
+echo &quot;&quot;
+echo &quot;  Unmerged paths:&quot;
+echo &quot;    (use &#x27;git add &lt;file&gt;...&#x27; to mark resolution)&quot;
+echo &quot;          both modified:   model_config.py&quot;
+echo &quot;&quot;
+echo &quot;KEY RULE: Until you git add the resolved file, the merge is NOT complete.&quot;
+echo &quot;  git add &lt;file&gt;   →  marks conflict as resolved&quot;
+echo &quot;  git commit       →  finalizes the merge&quot;
+
+
+# ==============================================================================
+# LESSON 07 — ABORTING A MERGE CONFLICT
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 07: How to ABORT a merge ===&quot;
+echo &quot;&quot;
+echo &quot;Sometimes you&#x27;re mid-conflict and realize:&quot;
+echo &quot;  &#x27;I need to go back! I&#x27;ll merge this later.&#x27;&quot;
+echo &quot;&quot;
+echo &quot;Safe escape hatch:&quot;
+echo &quot;&quot;
+echo &quot;  git merge --abort&quot;
+echo &quot;&quot;
+echo &quot;This CANCELS the merge entirely and returns your branch to its state&quot;
+echo &quot;BEFORE you ran git merge. No damage. All conflict markers removed.&quot;
+echo &quot;&quot;
+echo &quot;After aborting: your repo is clean, both branches still exist separately.&quot;
+echo &quot;You can re-attempt the merge anytime.&quot;
+
+
+# ==============================================================================
+# LESSON 08 — USING VS CODE TO RESOLVE CONFLICTS (Modern Way)
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 08: VS Code Conflict UI ===&quot;
+echo &quot;&quot;
+cat &lt;&lt; &#x27;EOF&#x27;
+VS Code has a built-in conflict editor that shows 4 buttons above each conflict:
+
+  [ Accept Current Change ]   → keep YOUR version (HEAD)
+  [ Accept Incoming Change ]  → keep THEIR version (feature branch)
+  [ Accept Both Changes ]     → keep BOTH (concatenated)
+  [ Compare Changes ]         → see a side-by-side diff
+
+HOW TO USE:
+  1. When a conflict occurs, open the file in VS Code.
+  2. You&#x27;ll see colored highlights:
+       GREEN  = current branch (HEAD) version
+       BLUE   = incoming branch version
+  3. Click the button that matches your decision.
+  4. Save the file.
+  5. git add &lt;file&gt;
+  6. git commit
+
+This is FAR faster than editing conflict markers by hand.
+Most developers use this approach for all but the simplest conflicts.
+EOF
+
+
+# ==============================================================================
+# LESSON 09 — MULTIPLE FILES IN CONFLICT
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 09: Handling Multiple Conflicted Files ===&quot;
+echo &quot;&quot;
+echo &quot;When multiple files conflict:&quot;
+echo &quot;&quot;
+echo &quot;  git status               ← lists ALL conflicted files&quot;
+echo &quot;  git diff                 ← shows ALL conflict markers across all files&quot;
+echo &quot;&quot;
+echo &quot;Resolve ONE file at a time:&quot;
+echo &quot;  1. Open the first file&quot;
+echo &quot;  2. Resolve its conflicts&quot;
+echo &quot;  3. git add that-file&quot;
+echo &quot;  4. Move to the next file&quot;
+echo &quot;  5. Repeat until all files are staged&quot;
+echo &quot;  6. git commit (finalizes the merge)&quot;
+echo &quot;&quot;
+echo &quot;TIP: use git mergetool to open a visual 3-way merge editor:&quot;
+echo &quot;  git config --global merge.tool vscode&quot;
+echo &quot;  git config --global mergetool.vscode.cmd &#x27;code --wait \$MERGED&#x27;&quot;
+echo &quot;  git mergetool&quot;
+
+
+# ==============================================================================
+# LESSON 10 — PREVENTING CONFLICTS (BEST PRACTICES)
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 10: How to Prevent Conflicts ===&quot;
+echo &quot;&quot;
+cat &lt;&lt; &#x27;EOF&#x27;
+BEST PRACTICES to minimize merge conflicts:
+
+1. PULL OFTEN:
+   git pull origin main   ← Do this every morning before you start coding.
+   This keeps your local branch close to main — fewer divergences.
+
+2. SMALL, FOCUSED COMMITS:
+   Don&#x27;t work for 5 days without committing.
+   Commit small, meaningful chunks: one feature, one fix.
+   Smaller commits = less divergence = fewer conflicts.
+
+3. SHORT-LIVED FEATURE BRANCHES:
+   Merge feature branches into main within 1-3 days.
+   Long-lived branches = more drift = more conflicts.
+
+4. COMMUNICATE WITH YOUR TEAM:
+   &quot;Hey, I&#x27;m refactoring data_loader.py today.&quot;
+   If two people know they&#x27;re touching the same file, they coordinate.
+
+5. USE A CONSISTENT STYLE (via tools):
+   Black (Python), Prettier (JS), Google Java Format...
+   If everyone&#x27;s code is formatted the same, no formatting conflicts.
+
+6. DIVIDE FILES BY RESPONSIBILITY:
+   Alice works on model.py, Bob works on data.py.
+   Agree on file ownership to minimize overlap.
+
+7. REBASE BEFORE MERGING:
+   git rebase origin/main   ← replay YOUR commits on top of latest main.
+   Resolves conflicts one at a time, in order — easier to manage.
+   (Covered in git_advanced.sh)
+EOF
+
+
+# ==============================================================================
+# 🎯 YOUR TASKS
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;==================================================================&quot;
+echo &quot;YOUR TURN — Conflict Resolution Practice&quot;
+echo &quot;==================================================================&quot;
+cat &lt;&lt; &#x27;EOF&#x27;
+
+TASK 1 — REPRODUCE THE LAB:
+    Re-create the conflict lab from LESSON 02-05 from memory.
+    (Don&#x27;t look at the script — try to remember the steps!)
+    Verify you can:
+    a) Create a conflict
+    b) See the conflict markers in the file
+    c) Resolve it and complete the merge
+
+TASK 2 — MULTI-FILE CONFLICT:
+    From your conflict lab repo:
+    a) Create branch &#x27;feature/alice-v2&#x27;
+    b) Modify BOTH model_config.py AND create requirements.txt:
+         numpy==1.26.0
+         pandas==2.1.0
+    c) Create branch &#x27;feature/bob-v2&#x27; from main
+    d) Bob ALSO modifies model_config.py (different values) AND creates requirements.txt:
+         numpy==2.0.0
+         scikit-learn==1.4.0
+    e) Merge feature/alice-v2 into main (no conflict)
+    f) Merge feature/bob-v2 — both files conflict!
+    g) Resolve BOTH files and complete the merge.
+    Hints:
+    - For requirements.txt: keep BOTH libraries (combine the lists)
+    - For model_config.py: choose values collaboratively (document WHY)
+
+TASK 3 — ABORT AND RETRY:
+    a) Start merging a conflicting branch
+    b) ABORT the merge with: git merge --abort
+    c) Verify git status is clean
+    d) Re-attempt the merge and resolve it properly
+
+TASK 4 — VS CODE CONFLICT UI:
+    a) Create a small conflict (modify the same line in two branches)
+    b) Open the conflicted file in VS Code
+    c) Use the &quot;Accept Current Change&quot; / &quot;Accept Incoming Change&quot; buttons
+    d) Complete the merge
+    Which button did you use and why?
+
+TASK 5 — REAL WORLD (SIMULATE TEAM):
+    a) Create a file: pipeline.py with 20 lines of fake ML pipeline code
+    b) Create branch &#x27;alice/feature-preprocessing&#x27;
+    c) Alice modifies lines 5-8 (data cleaning section)
+    d) Create branch &#x27;bob/feature-scaling&#x27; from main
+    e) Bob modifies lines 5-8 (same section — different approach)
+    f) Merge Alice → main, then Bob → main
+    g) RESOLVE: write a combined version that uses Alice&#x27;s cleaning
+       AND Bob&#x27;s scaling. Document in a comment WHY you made this decision.
+
+Write your experience and any lessons learned in a comment below:
+EOF
+
+
+echo &quot;&quot;
+echo &quot;git_conflict_resolution.sh complete!&quot;
+echo &quot;Next: git_advanced.sh (rebase, squash, stash, blame, bisect)&quot;
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

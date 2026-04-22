@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>12-Month Self-Internship Planner</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Go to start">
+        <span class="brand-mark" aria-hidden="true">12</span>
+        <span>Self-Internship</span>
+      </a>
+      <nav class="nav-links" aria-label="Page sections">
+        <a href="#mission-control">Start</a>
+        <a href="#cloud-coding">Cloud</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#python-lab">Python</a>
+        <a href="#skill-labs">Skills</a>
+        <a href="#code-lab">Submit</a>
+        <a href="#projects">Projects</a>
+        <a href="#resources">Files</a>
+        <a href="#git-reminder">Git</a>
+        <a href="#reference">Help</a>
+      </nav>
+      <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+        <span aria-hidden="true">T</span>
+      </button>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="hero-visual" aria-hidden="true">
+          <div class="signal-grid">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Beginner-friendly path from data science to AI systems engineering</p>
+          <h1 id="heroTitle">12-Month Data-to-AI Engineering Self-Internship</h1>
+          <p class="lead">
+            A working guide through every phase, project, resource folder, and capstone in your workspace.
+            Pick a month, follow the daily rhythm, track progress, and know exactly what to build.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="#mission-control">Start here</a>
+            <a class="secondary-action" href="#roadmap">View roadmap</a>
+          </div>
+        </div>
+        <aside class="hero-panel reveal" aria-label="Current internship summary">
+          <div>
+            <span class="panel-number" id="completedCount">0</span>
+            <span class="panel-label">months checked off</span>
+          </div>
+          <div>
+            <span class="panel-number">4-6h</span>
+            <span class="panel-label">daily build block</span>
+          </div>
+          <div>
+            <span class="panel-number">7</span>
+            <span class="panel-label">portfolio projects</span>
+          </div>
+        </aside>
+      </section>
+
+      <section id="mission-control" class="section-pad mission-section" aria-labelledby="missionTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Mission control</p>
+          <h2 id="missionTitle">Everything you need to run the internship from this website.</h2>
+          <p>
+            Use this as your daily workspace: prepare your tools, plan today, log work, track portfolio evidence,
+            search terms, recover from common blockers, and back up your saved progress.
+          </p>
+        </div>
+        <div class="mission-grid">
+          <article class="mission-panel">
+            <div class="panel-heading">
+              <h3>Start checklist</h3>
+              <span id="startChecklistCount">0/0</span>
+            </div>
+            <div class="checklist" id="startChecklist"></div>
+          </article>
+          <article class="mission-panel">
+            <div class="panel-heading">
+              <h3>Today</h3>
+              <span id="todayDate"></span>
+            </div>
+            <label class="field">
+              <span>Main goal</span>
+              <input id="dailyGoal" type="text" placeholder="Example: finish Python lesson 4 and commit notes" />
+            </label>
+            <label class="field">
+              <span>What I did</span>
+              <textarea id="dailyLog" placeholder="Write your study/build/debug notes here."></textarea>
+            </label>
+            <div class="lab-actions">
+              <button class="mark-button" id="saveDailyLog" type="button">Save daily log</button>
+              <button class="file-link as-button" id="clearDailyLog" type="button">Clear today</button>
+            </div>
+            <pre class="mini-output" id="dailyLogStatus">Daily notes autosave locally.</pre>
+          </article>
+          <article class="mission-panel">
+            <div class="panel-heading">
+              <h3>Portfolio evidence</h3>
+              <span id="evidenceCount">0 saved</span>
+            </div>
+            <label class="field">
+              <span>Evidence item</span>
+              <input id="evidenceTitle" type="text" placeholder="Example: Month 2 FastAPI /predict endpoint works" />
+            </label>
+            <label class="field">
+              <span>Details</span>
+              <textarea id="evidenceDetail" placeholder="Paste metrics, screenshots path, demo URL, command output, or what you proved."></textarea>
+            </label>
+            <button class="mark-button" id="addEvidence" type="button">Add evidence</button>
+            <div class="evidence-list" id="evidenceList"></div>
+          </article>
+          <article class="mission-panel">
+            <div class="panel-heading">
+              <h3>Backup</h3>
+              <span>local progress</span>
+            </div>
+            <p class="muted-note">Your progress is saved in this browser. Export a backup regularly so clearing browser data does not erase your work.</p>
+            <div class="lab-actions">
+              <button class="mark-button" id="exportProgress" type="button">Export progress</button>
+              <label class="file-link as-button" for="importProgress">Import progress</label>
+              <input id="importProgress" type="file" accept="application/json" hidden />
+            </div>
+            <pre class="mini-output" id="backupStatus">No backup action yet.</pre>
+          </article>
+          <article class="mission-panel mission-wide">
+            <div class="panel-heading">
+              <h3>Use the website in this order</h3>
+              <span>beginner flow</span>
+            </div>
+            <ol class="site-order">
+              <li><strong>Start:</strong> finish setup checklist, write today's goal, and back up progress.</li>
+              <li><strong>Roadmap:</strong> choose the current month and understand what you are building.</li>
+              <li><strong>Python:</strong> complete beginner Python lessons first.</li>
+              <li><strong>Skills:</strong> practice SQL, Git/Linux, Docker, FastAPI, Django, ML, IoT, and AI tools.</li>
+              <li><strong>Submit:</strong> submit month tasks and project evidence for checks.</li>
+              <li><strong>Projects and Files:</strong> open clean guides, code files, and reference projects when needed.</li>
+              <li><strong>Help:</strong> use glossary and blocker guide when stuck.</li>
+            </ol>
+          </article>
+        </div>
+      </section>
+
+      <div class="progress-bar-section" id="progressBarWrap" aria-label="Overall progress">
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+        </div>
+        <span class="progress-bar-label" id="progressLabel">0 / 12 months complete — 0%</span>
+      </div>
+
+      <section class="overview section-pad" aria-label="Internship positioning">
+        <div class="section-heading">
+          <p class="eyebrow">Career direction</p>
+          <h2>Build toward AI systems engineering, not generic junior data science.</h2>
+          <p>
+            The roadmap turns your industrial engineering and engineering management background into provable software:
+            optimization, predictive maintenance, and enterprise AI systems.
+          </p>
+        </div>
+        <div class="superpowers" id="superpowers"></div>
+      </section>
+
+      <section id="cloud-coding" class="section-pad cloud-coding-section" aria-labelledby="cloudCodingTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Cloud coding mentor</p>
+          <h2 id="cloudCodingTitle">Use this website for guidance, then use a cloud IDE for real projects.</h2>
+          <p>
+            The browser lessons are for practice. For full projects, use GitHub Codespaces first.
+            It gives you VS Code, a terminal, Git, Python, Node, and project files in one browser workspace.
+          </p>
+        </div>
+        <div class="mentor-grid">
+          <article class="mentor-panel mentor-primary">
+            <span class="step-index">A</span>
+            <h3>Recommended path: GitHub Codespaces</h3>
+            <p>Use this when you want the easiest beginner setup with a real terminal and code editor in the browser.</p>
+            <ol>
+              <li>Create a GitHub account.</li>
+              <li>Create a repository named <strong>self-internship</strong>.</li>
+              <li>Upload this whole folder to the repository.</li>
+              <li>Open the repository, choose <strong>Code</strong>, then <strong>Codespaces</strong>, then create a codespace.</li>
+              <li>In the terminal, run the month command from this website.</li>
+              <li>Commit your work after every task so your progress is saved.</li>
+            </ol>
+            <a class="file-link" href="https://docs.github.com/en/codespaces/developing-in-a-codespace/developing-in-a-codespace" target="_blank" rel="noreferrer">Open GitHub Codespaces docs</a>
+          </article>
+          <article class="mentor-panel">
+            <span class="step-index">B</span>
+            <h3>GitLab option</h3>
+            <p>Use GitLab if you prefer GitLab projects, issues, merge requests, and GitLab Workspaces.</p>
+            <ol>
+              <li>Create a GitLab project.</li>
+              <li>Push or upload this internship folder.</li>
+              <li>Open the Web IDE for quick edits.</li>
+              <li>Use GitLab Workspaces when you need a running terminal environment.</li>
+            </ol>
+            <a class="file-link" href="https://docs.gitlab.com/user/workspace/" target="_blank" rel="noreferrer">Open GitLab Workspaces docs</a>
+          </article>
+          <article class="mentor-panel">
+            <span class="step-index">C</span>
+            <h3>Daily mentor loop</h3>
+            <p>Each day, let the website tell you the task and let the cloud IDE run the real code.</p>
+            <ol>
+              <li>Open this website and choose the current month.</li>
+              <li>Read the lesson and expected output.</li>
+              <li>Open the same file or folder in Codespaces.</li>
+              <li>Run the command in the terminal.</li>
+              <li>Paste your result into the website submission box.</li>
+              <li>Save evidence, commit, and move to the next lesson.</li>
+            </ol>
+          </article>
+        </div>
+      </section>
+
+      <section id="roadmap" class="section-pad roadmap-section" aria-labelledby="roadmapTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Interactive roadmap</p>
+          <h2 id="roadmapTitle">Choose a month. The page becomes your checklist.</h2>
+          <p>
+            Each month explains the beginner mental model, the practical skills, what to study, what to build,
+            and when the output becomes useful for jobs.
+          </p>
+        </div>
+
+        <div class="roadmap-shell">
+          <div class="month-rail" id="monthRail" role="tablist" aria-label="Months"></div>
+          <article class="month-detail" id="monthDetail" aria-live="polite"></article>
+        </div>
+      </section>
+
+      <section class="section-pad weekly-system" aria-labelledby="weeklyTitle">
+        <div class="section-heading">
+          <p class="eyebrow">How to work</p>
+          <h2 id="weeklyTitle">A simple weekly loop for every beginner month.</h2>
+        </div>
+        <div class="loop-grid">
+          <div>
+            <span class="step-index">1</span>
+            <h3>Read before coding</h3>
+            <p>Open the matching README and zero-to-hero guide. Your job is to understand the tool before changing code.</p>
+          </div>
+          <div>
+            <span class="step-index">2</span>
+            <h3>Run one small example</h3>
+            <p>Execute the resource file exactly once. If it fails, debug the environment before adding features.</p>
+          </div>
+          <div>
+            <span class="step-index">3</span>
+            <h3>Build the deliverable</h3>
+            <p>Move from copied examples to your own folder, README, screenshots, saved models, or deployed endpoint.</p>
+          </div>
+          <div>
+            <span class="step-index">4</span>
+            <h3>Explain the business value</h3>
+            <p>Write what changed: time saved, risk reduced, errors avoided, cost optimized, or decision improved.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="python-lab" class="section-pad python-lab-section" aria-labelledby="pythonLabTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Python step by step</p>
+          <h2 id="pythonLabTitle">Learn Python in small lessons and run every step here.</h2>
+          <p>
+            Start at Lesson 1, read the explanation, edit the starter code, run it, then submit.
+            Your code, output, checks, and completion are saved in this browser.
+          </p>
+        </div>
+        <div class="lab-status" aria-live="polite">
+          <span><strong id="pythonLessonCount">0</strong> Python lessons completed</span>
+          <span id="pythonLessonStatus">Choose a lesson and run it here</span>
+        </div>
+        <div class="learning-flow" aria-label="Python lesson workflow">
+          <span>1. Learn</span>
+          <span>2. Practice</span>
+          <span>3. Run</span>
+          <span>4. Submit</span>
+          <span>5. Check</span>
+        </div>
+        <div class="python-lab">
+          <aside class="python-lesson-list" id="pythonLessonList" aria-label="Python lessons"></aside>
+          <article class="python-lesson-workspace">
+            <div class="python-lesson-header" id="pythonLessonHeader"></div>
+            <div class="python-lesson-grid">
+              <section class="lesson-explain" id="pythonLessonExplain"></section>
+              <section class="editor-wrap">
+                <label for="pythonLessonEditor">Your Python code</label>
+                <textarea id="pythonLessonEditor" spellcheck="false"></textarea>
+              </section>
+              <section class="output-wrap">
+                <h3>Output</h3>
+                <pre id="pythonLessonOutput">Run the lesson to see output.</pre>
+              </section>
+              <section class="output-wrap">
+                <h3>Checks</h3>
+                <div class="check-results" id="pythonLessonChecks"></div>
+              </section>
+            </div>
+            <div class="lab-actions">
+              <button class="mark-button" id="runPythonLesson" type="button">Run lesson</button>
+              <button class="mark-button" id="submitPythonLesson" type="button">Submit lesson</button>
+              <button class="file-link as-button" id="resetPythonLesson" type="button">Reset starter</button>
+              <button class="file-link as-button" id="nextPythonLesson" type="button">Next lesson</button>
+              <a class="file-link" href="docs/knowledge-base/zero-to-hero-guides/python/python_zero_to_hero.py.html">Open full Python guide</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="skill-labs" class="section-pad skill-labs-section" aria-labelledby="skillLabsTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Other skill labs</p>
+          <h2 id="skillLabsTitle">Practice the rest of the roadmap the same way.</h2>
+          <p>
+            Choose a skill, read the mini lesson, write the command/code/query, run what can run in-browser,
+            then submit. Your drafts, outputs, checks, and completions are saved.
+          </p>
+        </div>
+        <div class="skill-track-tabs" id="skillTrackTabs" role="tablist" aria-label="Skill tracks"></div>
+        <div class="lab-status" aria-live="polite">
+          <span><strong id="skillLessonCount">0</strong> skill lessons completed</span>
+          <span id="skillLessonStatus">Choose a skill lesson</span>
+        </div>
+        <div class="learning-flow" aria-label="Skill lesson workflow">
+          <span>1. Learn</span>
+          <span>2. Practice</span>
+          <span>3. Run or review</span>
+          <span>4. Submit</span>
+          <span>5. Check</span>
+        </div>
+        <div class="skill-lab">
+          <aside class="skill-lesson-list" id="skillLessonList" aria-label="Skill lessons"></aside>
+          <article class="skill-lesson-workspace">
+            <div class="skill-lesson-header" id="skillLessonHeader"></div>
+            <div class="python-lesson-grid">
+              <section class="lesson-explain" id="skillLessonExplain"></section>
+              <section class="editor-wrap">
+                <label for="skillLessonEditor">Your answer/code/query</label>
+                <textarea id="skillLessonEditor" spellcheck="false"></textarea>
+              </section>
+              <section class="output-wrap">
+                <h3>Output</h3>
+                <pre id="skillLessonOutput">Run or submit the lesson.</pre>
+              </section>
+              <section class="output-wrap">
+                <h3>Checks</h3>
+                <div class="check-results" id="skillLessonChecks"></div>
+              </section>
+            </div>
+            <div class="lab-actions">
+              <button class="mark-button" id="runSkillLesson" type="button">Run lesson</button>
+              <button class="mark-button" id="submitSkillLesson" type="button">Submit lesson</button>
+              <button class="file-link as-button" id="resetSkillLesson" type="button">Reset starter</button>
+              <button class="file-link as-button" id="nextSkillLesson" type="button">Next lesson</button>
+              <a class="file-link" id="skillSourceLink" href="docs/README.md.html">Open source guide</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="code-lab" class="section-pad code-lab-section" aria-labelledby="codeLabTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Code and submit</p>
+          <h2 id="codeLabTitle">Practice tasks and project submission checks.</h2>
+          <p>
+            Select a month task or portfolio project, write code or a submission note, run what can run in the browser,
+            and submit it for checks against the expected output and required evidence.
+          </p>
+        </div>
+        <div class="lab-status" aria-live="polite">
+          <span><strong id="labPassedCount">0</strong> submissions passed</span>
+          <span id="pythonStatus">Python runner: not loaded</span>
+        </div>
+        <div class="learning-flow" aria-label="Task submission workflow">
+          <span>1. Choose task</span>
+          <span>2. Build</span>
+          <span>3. Run if possible</span>
+          <span>4. Submit</span>
+          <span>5. Save proof</span>
+        </div>
+        <div class="code-lab">
+          <aside class="lab-list" id="labList" aria-label="Code lab tasks"></aside>
+          <article class="lab-workspace">
+            <div class="lab-header" id="labHeader"></div>
+            <div class="lab-body">
+              <div class="editor-wrap">
+                <label for="codeEditor">Your code or submission</label>
+                <textarea id="codeEditor" spellcheck="false"></textarea>
+              </div>
+              <div class="output-wrap">
+                <h3>Output and checks</h3>
+                <pre id="labOutput">Choose a task, then run or submit.</pre>
+                <div class="check-results" id="checkResults"></div>
+              </div>
+            </div>
+            <div class="lab-actions">
+              <button class="mark-button" id="runCode" type="button">Run Python</button>
+              <button class="mark-button" id="submitCode" type="button">Submit check</button>
+              <button class="file-link as-button" id="resetCode" type="button">Reset starter</button>
+              <a class="file-link" id="labSourceLink" href="docs/README.md.html">Open source file</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="projects" class="section-pad projects-section" aria-labelledby="projectsTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Portfolio projects</p>
+          <h2 id="projectsTitle">Seven projects that prove the path.</h2>
+          <p>
+            Start with foundations, then move into advanced industrial AI systems. Each project has a role, outcome, and exact workspace files.
+          </p>
+        </div>
+        <div class="project-tabs" id="projectTabs" role="tablist" aria-label="Project groups"></div>
+        <div class="project-grid" id="projectGrid"></div>
+      </section>
+
+      <section id="workspace" class="section-pad workspace-section" aria-labelledby="workspaceTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Folder map</p>
+          <h2 id="workspaceTitle">What every folder is for.</h2>
+          <p>
+            The phase folders are your execution plan. The knowledge base is your textbook. The project folders are your portfolio examples.
+          </p>
+        </div>
+        <div class="folder-map" id="folderMap"></div>
+      </section>
+
+      <section id="resources" class="section-pad resources-section" aria-labelledby="resourcesTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Everything in the website</p>
+          <h2 id="resourcesTitle">Search every guide, code file, project, and task.</h2>
+          <p>
+            This includes the whole self-internship folder: Markdown guides, Python files, SQL scripts, Arduino sketches,
+            shell scripts, Dockerfiles, project instructions, and generated clean reader pages.
+          </p>
+        </div>
+        <div class="resource-controls" role="search">
+          <label class="search-box" for="resourceSearch">
+            <span>Search</span>
+            <input id="resourceSearch" type="search" placeholder="Try Python, Docker, Django, SQL, capstone, RAG, customer churn..." />
+          </label>
+          <div class="chips" id="resourceChips" aria-label="Resource filters"></div>
+        </div>
+        <div class="resource-list" id="resourceList"></div>
+      </section>
+
+      <section class="section-pad reality-section" aria-labelledby="realityTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Reality checks</p>
+          <h2 id="realityTitle">The hard parts are expected.</h2>
+        </div>
+        <div class="reality-list">
+          <details open>
+            <summary>Month 3 and Month 5 will feel slow.</summary>
+            <p>Docker and Django force you to think like a production engineer. If they take longer than four weeks, keep the scope small and finish the deliverable.</p>
+          </details>
+          <details>
+            <summary>Apply before the roadmap is finished.</summary>
+            <p>After Month 2 you can apply for analyst roles. After Month 4 you can apply for junior ML roles. After Month 6 you can apply for ML engineer or backend Python roles.</p>
+          </details>
+          <details>
+            <summary>Keep hardware boring.</summary>
+            <p>Use one ESP32, one DHT11 sensor, one endpoint, and one chart. The value is the data pipeline, not the number of wires.</p>
+          </details>
+        </div>
+      </section>
+
+      <section id="git-reminder" class="section-pad git-reminder-section" aria-labelledby="gitReminderTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Daily habit</p>
+          <h2 id="gitReminderTitle">Save your work to GitHub every single day.</h2>
+          <p>Run these 4 commands in VS Code terminal every time you finish a lesson, task, or project part. This is how your work is backed up and your portfolio grows.</p>
+        </div>
+        <div class="git-workflow-grid">
+          <div class="git-commands-card">
+            <h3>The 4 commands</h3>
+            <div class="git-step">
+              <span class="git-num">1</span>
+              <div>
+                <code>git status</code>
+                <p>See what files changed before saving</p>
+              </div>
+            </div>
+            <div class="git-step">
+              <span class="git-num">2</span>
+              <div>
+                <code>git add .</code>
+                <p>Select all changed files</p>
+              </div>
+            </div>
+            <div class="git-step">
+              <span class="git-num">3</span>
+              <div>
+                <code>git commit -m "Month 1 Day 2: practiced Python loops"</code>
+                <p>Save a snapshot on your computer</p>
+              </div>
+            </div>
+            <div class="git-step">
+              <span class="git-num">4</span>
+              <div>
+                <code>git push</code>
+                <p>Send the snapshot to GitHub</p>
+              </div>
+            </div>
+            <div class="git-reminder-note">
+              <strong>Remember:</strong>
+              <code>Ctrl+S</code> saves file &rarr; <code>git commit</code> saves in Git &rarr; <code>git push</code> saves on GitHub
+            </div>
+          </div>
+
+          <div class="git-side-cards">
+            <div class="git-folder-card">
+              <h3>Which folder to open in VS Code?</h3>
+              <table class="git-table">
+                <tr><td>Month 1–2</td><td><code>phase-1-software-engineering</code></td></tr>
+                <tr><td>Month 3–4</td><td><code>phase-2-production-ml</code></td></tr>
+                <tr><td>Month 5–6</td><td><code>phase-3-full-stack-web</code></td></tr>
+                <tr><td>Month 7–8</td><td><code>phase-4-iot-hardware</code></td></tr>
+                <tr><td>Month 9</td><td><code>phase-5-capstone</code></td></tr>
+                <tr><td>Month 10–12</td><td><code>phase-6-generative-ai</code></td></tr>
+              </table>
+            </div>
+            <div class="git-messages-card">
+              <h3>Good commit messages</h3>
+              <div class="git-msg-row"><span class="git-bad">❌ "stuff"</span><span class="git-good">✅ "Month 1: completed OOP inheritance"</span></div>
+              <div class="git-msg-row"><span class="git-bad">❌ "update"</span><span class="git-good">✅ "Month 3: Docker compose for FastAPI"</span></div>
+              <div class="git-msg-row"><span class="git-bad">❌ "fix"</span><span class="git-good">✅ "Month 6: fixed ML model accuracy bug"</span></div>
+              <div class="git-msg-row"><span class="git-bad">❌ "done"</span><span class="git-good">✅ "Month 9: capstone dashboard live"</span></div>
+            </div>
+            <div class="git-repos-card">
+              <h3>Your private GitHub repos</h3>
+              <p class="muted-note">All created at <strong>github.com/VaragaHaghoubians</strong> — make portfolio ones public when polished.</p>
+              <div class="git-repo-tags">
+                <span class="repo-tag">month-01-python</span>
+                <span class="repo-tag">month-03-docker-mlops</span>
+                <span class="repo-tag">month-05-django</span>
+                <span class="repo-tag">month-07-esp32-iot</span>
+                <span class="repo-tag repo-portfolio">cold-chain-capstone 🌍</span>
+                <span class="repo-tag repo-portfolio">rag-document-chat 🌍</span>
+                <span class="repo-tag repo-portfolio">predictive-maintenance-ml 🌍</span>
+                <span class="repo-tag repo-portfolio">ai-agent-system 🌍</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="reference" class="section-pad reference-section" aria-labelledby="referenceTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Beginner reference</p>
+          <h2 id="referenceTitle">Glossary and blocker guide.</h2>
+          <p>
+            When you get stuck, start here before searching elsewhere. These are the concepts and failure modes that repeat across the roadmap.
+          </p>
+        </div>
+        <div class="reference-shell">
+          <div>
+            <label class="search-box" for="glossarySearch">
+              <span>Search glossary</span>
+              <input id="glossarySearch" type="search" placeholder="Try API, Docker, ORM, vector database..." />
+            </label>
+            <div class="resource-list" id="glossaryList"></div>
+          </div>
+          <div class="reality-list" id="blockerList"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Built from the files in this self-internship workspace. Progress is saved in this browser with local storage.</p>
+      <a href="docs/README.md.html">Open root README</a>
+    </footer>
+
+    <script src="docs-manifest.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

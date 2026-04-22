@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Read Serial Data.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Read Serial Data.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">phase-4-iot-hardware/month-07-microcontrollers/resources/read_serial_data.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "# ==============================================================\n# WEEK 8: Arduino Hardware \u2014 Collect Your Own Sensor Data\n# FILE: read_serial_data.py\n#\n# TASK: Read temperature and humidity data from your ELEGOO Arduino\n#       kit using Python, and save it to a CSV file.\n#\n# WHY:  Most data scientists use pre-made datasets from Kaggle.\n#       YOU will have something unique: data YOU collected with\n#       YOUR sensor. This makes your portfolio stand out!\n#\n# HARDWARE NEEDED: ELEGOO UNO R3 Kit + DHT11 sensor (in the kit)\n#\n# INSTALL: pip install pyserial pandas\n#\n# HOW THIS WORKS:\n#   1. The Arduino collects temperature readings every 2 seconds\n#   2. It sends those readings through the USB cable as text\n#   3. This Python script reads that text, parses the numbers,\n#      adds a timestamp, and saves it to a CSV file\n#\n# HOW TO RUN:\n#   1. First, upload the Arduino code (see ARDUINO CODE section below)\n#   2. Note which USB port your Arduino is on (e.g., COM3 on Windows,\n#      /dev/ttyUSB0 on Linux)\n#   3. Update the PORT variable below\n#   4. Run: python read_serial_data.py\n# ==============================================================\n\n\n# ==============================================================\n# ARDUINO CODE (upload this to your Arduino FIRST)\n# ==============================================================\n\n# Open the Arduino IDE, create a new sketch, and paste this code:\n\nARDUINO_CODE = \"\"\"\n// ============================================================\n// Arduino Code: Read DHT11 and send data over USB Serial\n// Upload this to your ELEGOO Arduino UNO board\n// ============================================================\n\n#include <DHT.h>            // You need to install the DHT library\n                            // In Arduino IDE: Tools > Manage Libraries\n                            // Search \"DHT sensor library\" by Adafruit, install it\n\n#define DHTPIN 2            // DHT11 data pin connected to Arduino pin 2\n#define DHTTYPE DHT11       // We're using the DHT11 model\n\nDHT dht(DHTPIN, DHTTYPE);  // Create DHT sensor object\n\nvoid setup() {\n    Serial.begin(9600);     // Start communication at 9600 baud rate\n    dht.begin();            // Initialize the sensor\n    Serial.println(\"Arduino ready. Starting temperature readings...\");\n}\n\nvoid loop() {\n    float humidity    = dht.readHumidity();       // Read humidity %\n    float temperature = dht.readTemperature();    // Read temperature in Celsius\n\n    // Check if reading was successful (sensor can sometimes fail)\n    if (isnan(humidity) || isnan(temperature)) {\n        Serial.println(\"ERROR: Failed to read from DHT sensor!\");\n    } else {\n        // Send data as: \"TEMP:22.5,HUM:55.0\"\n        // This format is easy for Python to parse\n        Serial.print(\"TEMP:\");\n        Serial.print(temperature);\n        Serial.print(\",HUM:\");\n        Serial.println(humidity);\n    }\n\n    delay(2000);   // Wait 2 seconds before next reading\n}\n\"\"\"\n\nprint(\"=\" * 60)\nprint(\"WEEK 8: Arduino + Python Serial Communication\")\nprint(\"=\" * 60)\nprint(\"\\nArduino code to upload is saved in this script.\")\nprint(\"See the ARDUINO_CODE variable above for the sketch.\")\n\n\n# ==============================================================\n# WIRING GUIDE (DHT11 sensor)\n# ==============================================================\n\nWIRING_GUIDE = \"\"\"\nDHT11 Sensor Wiring (the sensor has 4 pins):\n\n  DHT11 Pin 1 (VCC/+)  \u2192 Arduino 5V pin\n  DHT11 Pin 2 (DATA)   \u2192 Arduino Digital Pin 2\n  DHT11 Pin 3 (NC)     \u2192 Not connected (skip this one)\n  DHT11 Pin 4 (GND/-)  \u2192 Arduino GND pin\n\n  Also add a 10k\u03a9 resistor between Pin 1 (VCC) and Pin 2 (DATA)\n  (Look in your ELEGOO kit \u2014 this yellow resistor is included)\n\n  If your DHT11 comes on a small breakout board (3-pin version),\n  wire it as: GND \u2192 GND, DATA \u2192 Pin 2, VCC \u2192 5V\n\"\"\"\n\nprint(WIRING_GUIDE)\n\n\n# ==============================================================\n# PYTHON SCRIPT: Read Serial Data from Arduino\n# ==============================================================\n\nimport serial          # For USB serial communication (pip install pyserial)\nimport pandas as pd\nfrom datetime import datetime\nimport time\nimport csv\nimport os\n\n# ----------------------------------------------------------\n# CONFIGURATION \u2014 UPDATE THESE VALUES FOR YOUR COMPUTER\n# ----------------------------------------------------------\n\n# Find your Arduino's USB port:\n# Windows: Open Device Manager \u2192 Ports (COM & LPT) \u2192 look for \"Arduino\" \u2192 e.g., COM3\n# Linux: Run `ls /dev/tty*` before and after plugging in Arduino \u2192 the new one is yours\n# Mac: Run `ls /dev/cu.*` in terminal\n\nPORT = \"COM3\"          # CHANGE THIS: e.g., \"COM3\" on Windows, \"/dev/ttyUSB0\" on Linux\nBAUD_RATE = 9600       # Must match the Serial.begin(9600) in your Arduino code\nDURATION_SECONDS = 60  # How long to collect data (60 seconds = 30 readings at 2s interval)\nOUTPUT_FILE = \"arduino_temperature_log.csv\"\n\n\ndef parse_arduino_line(line):\n    \"\"\"\n    Parse a line like \"TEMP:22.5,HUM:55.0\" into a dictionary.\n    Returns None if the line format is unexpected.\n    \"\"\"\n    try:\n        # Split by comma: [\"TEMP:22.5\", \"HUM:55.0\"]\n        parts = line.strip().split(\",\")\n        if len(parts) != 2:\n            return None\n\n        # Split each part by colon and take the value after it\n        temp = float(parts[0].split(\":\")[1])   # \"TEMP:22.5\" \u2192 22.5\n        hum = float(parts[1].split(\":\")[1])    # \"HUM:55.0\" \u2192 55.0\n\n        return {\"temperature\": temp, \"humidity\": hum}\n    except (ValueError, IndexError):\n        return None\n\n\ndef collect_data_from_arduino():\n    \"\"\"Connect to Arduino and collect sensor readings.\"\"\"\n\n    print(f\"\\nConnecting to Arduino on port {PORT}...\")\n\n    try:\n        # Open the serial connection to Arduino\n        ser = serial.Serial(PORT, BAUD_RATE, timeout=1)\n        time.sleep(2)   # Give Arduino 2 seconds to reset after connecting\n        print(\"Connected! Starting data collection...\")\n        print(f\"Collecting for {DURATION_SECONDS} seconds. Press Ctrl+C to stop early.\\n\")\n\n        readings = []\n        start_time = time.time()\n\n        while time.time() - start_time < DURATION_SECONDS:\n            # Read one line from the serial port\n            if ser.in_waiting > 0:\n                raw_line = ser.readline().decode(\"utf-8\", errors=\"ignore\")\n                parsed = parse_arduino_line(raw_line)\n\n                if parsed:\n                    # Add a timestamp to each reading\n                    parsed[\"timestamp\"] = datetime.now().strftime(\"%Y-%m-%d %H:%M:%S\")\n                    readings.append(parsed)\n                    print(f\"  [{parsed['timestamp']}] Temp: {parsed['temperature']}\u00b0C | Humidity: {parsed['humidity']}%\")\n                else:\n                    # Print raw messages (like \"Arduino ready...\" status messages)\n                    raw_stripped = raw_line.strip()\n                    if raw_stripped:\n                        print(f\"  Arduino says: {raw_stripped}\")\n\n        ser.close()\n        print(f\"\\nDone! Collected {len(readings)} readings.\")\n        return readings\n\n    except serial.SerialException as e:\n        print(f\"\\nCould not connect to Arduino on {PORT}\")\n        print(f\"Error: {e}\")\n        print(\"\\nTROUBLESHOOTING:\")\n        print(\"  1. Is the Arduino plugged in via USB?\")\n        print(\"  2. Did you update the PORT variable above?\")\n        print(\"  3. On Linux/Mac, run: ls /dev/tty* to find the port\")\n        print(\"  4. On Windows, check Device Manager \u2192 Ports\")\n        print(\"\\nRUNNING IN DEMO MODE with fake data instead...\\n\")\n        return generate_demo_data()\n\n\ndef generate_demo_data():\n    \"\"\"\n    Generate fake sensor data for practice when no Arduino is connected.\n    Remove this function and the fallback once your hardware is set up.\n    \"\"\"\n    import random\n\n    print(\"Generating 30 fake sensor readings for practice...\")\n    readings = []\n    base_time = datetime.now()\n\n    for i in range(30):\n        # Simulate a temperature that fluctuates slightly around 22\u00b0C\n        temp = round(22.0 + random.uniform(-2.0, 2.0), 1)\n        hum = round(55.0 + random.uniform(-5.0, 5.0), 1)\n        timestamp = base_time.replace(second=base_time.second + (i * 2))\n\n        readings.append({\n            \"timestamp\": timestamp.strftime(\"%Y-%m-%d %H:%M:%S\"),\n            \"temperature\": temp,\n            \"humidity\": hum\n        })\n\n    return readings\n\n\ndef save_to_csv(readings, filename):\n    \"\"\"Save the list of readings to a CSV file.\"\"\"\n    if not readings:\n        print(\"No data to save.\")\n        return\n\n    df = pd.DataFrame(readings)\n    df.to_csv(filename, index=False)\n    print(f\"\\nSaved {len(readings)} readings to '{filename}'\")\n\n    print(\"\\nData summary:\")\n    print(f\"  Temperature: avg={df['temperature'].mean():.1f}\u00b0C, \"\n          f\"min={df['temperature'].min()}\u00b0C, max={df['temperature'].max()}\u00b0C\")\n    print(f\"  Humidity:    avg={df['humidity'].mean():.1f}%, \"\n          f\"min={df['humidity'].min()}%, max={df['humidity'].max()}%\")\n\n\n# ==============================================================\n# MAIN \u2014 Run the data collection\n# ==============================================================\n\nif __name__ == \"__main__\":\n    readings = collect_data_from_arduino()\n    save_to_csv(readings, OUTPUT_FILE)\n\n    print(f\"\\n\u2705 Your data is in '{OUTPUT_FILE}'\")\n    print(\"This CSV becomes your Portfolio Project 1 dataset!\")\n    print(\"\\nNext step: Open month-02-data-science/week-05-pandas-numpy/pandas_basics.py\")\n    print(\"and load this CSV to analyze your own sensor data!\")\n";
+      const readerOutputKey = "readerRun:phase-4-iot-hardware/month-07-microcontrollers/resources/read_serial_data.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code># ==============================================================
+# WEEK 8: Arduino Hardware — Collect Your Own Sensor Data
+# FILE: read_serial_data.py
+#
+# TASK: Read temperature and humidity data from your ELEGOO Arduino
+#       kit using Python, and save it to a CSV file.
+#
+# WHY:  Most data scientists use pre-made datasets from Kaggle.
+#       YOU will have something unique: data YOU collected with
+#       YOUR sensor. This makes your portfolio stand out!
+#
+# HARDWARE NEEDED: ELEGOO UNO R3 Kit + DHT11 sensor (in the kit)
+#
+# INSTALL: pip install pyserial pandas
+#
+# HOW THIS WORKS:
+#   1. The Arduino collects temperature readings every 2 seconds
+#   2. It sends those readings through the USB cable as text
+#   3. This Python script reads that text, parses the numbers,
+#      adds a timestamp, and saves it to a CSV file
+#
+# HOW TO RUN:
+#   1. First, upload the Arduino code (see ARDUINO CODE section below)
+#   2. Note which USB port your Arduino is on (e.g., COM3 on Windows,
+#      /dev/ttyUSB0 on Linux)
+#   3. Update the PORT variable below
+#   4. Run: python read_serial_data.py
+# ==============================================================
+
+
+# ==============================================================
+# ARDUINO CODE (upload this to your Arduino FIRST)
+# ==============================================================
+
+# Open the Arduino IDE, create a new sketch, and paste this code:
+
+ARDUINO_CODE = &quot;&quot;&quot;
+// ============================================================
+// Arduino Code: Read DHT11 and send data over USB Serial
+// Upload this to your ELEGOO Arduino UNO board
+// ============================================================
+
+#include &lt;DHT.h&gt;            // You need to install the DHT library
+                            // In Arduino IDE: Tools &gt; Manage Libraries
+                            // Search &quot;DHT sensor library&quot; by Adafruit, install it
+
+#define DHTPIN 2            // DHT11 data pin connected to Arduino pin 2
+#define DHTTYPE DHT11       // We&#x27;re using the DHT11 model
+
+DHT dht(DHTPIN, DHTTYPE);  // Create DHT sensor object
+
+void setup() {
+    Serial.begin(9600);     // Start communication at 9600 baud rate
+    dht.begin();            // Initialize the sensor
+    Serial.println(&quot;Arduino ready. Starting temperature readings...&quot;);
+}
+
+void loop() {
+    float humidity    = dht.readHumidity();       // Read humidity %
+    float temperature = dht.readTemperature();    // Read temperature in Celsius
+
+    // Check if reading was successful (sensor can sometimes fail)
+    if (isnan(humidity) || isnan(temperature)) {
+        Serial.println(&quot;ERROR: Failed to read from DHT sensor!&quot;);
+    } else {
+        // Send data as: &quot;TEMP:22.5,HUM:55.0&quot;
+        // This format is easy for Python to parse
+        Serial.print(&quot;TEMP:&quot;);
+        Serial.print(temperature);
+        Serial.print(&quot;,HUM:&quot;);
+        Serial.println(humidity);
+    }
+
+    delay(2000);   // Wait 2 seconds before next reading
+}
+&quot;&quot;&quot;
+
+print(&quot;=&quot; * 60)
+print(&quot;WEEK 8: Arduino + Python Serial Communication&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;\nArduino code to upload is saved in this script.&quot;)
+print(&quot;See the ARDUINO_CODE variable above for the sketch.&quot;)
+
+
+# ==============================================================
+# WIRING GUIDE (DHT11 sensor)
+# ==============================================================
+
+WIRING_GUIDE = &quot;&quot;&quot;
+DHT11 Sensor Wiring (the sensor has 4 pins):
+
+  DHT11 Pin 1 (VCC/+)  → Arduino 5V pin
+  DHT11 Pin 2 (DATA)   → Arduino Digital Pin 2
+  DHT11 Pin 3 (NC)     → Not connected (skip this one)
+  DHT11 Pin 4 (GND/-)  → Arduino GND pin
+
+  Also add a 10kΩ resistor between Pin 1 (VCC) and Pin 2 (DATA)
+  (Look in your ELEGOO kit — this yellow resistor is included)
+
+  If your DHT11 comes on a small breakout board (3-pin version),
+  wire it as: GND → GND, DATA → Pin 2, VCC → 5V
+&quot;&quot;&quot;
+
+print(WIRING_GUIDE)
+
+
+# ==============================================================
+# PYTHON SCRIPT: Read Serial Data from Arduino
+# ==============================================================
+
+import serial          # For USB serial communication (pip install pyserial)
+import pandas as pd
+from datetime import datetime
+import time
+import csv
+import os
+
+# ----------------------------------------------------------
+# CONFIGURATION — UPDATE THESE VALUES FOR YOUR COMPUTER
+# ----------------------------------------------------------
+
+# Find your Arduino&#x27;s USB port:
+# Windows: Open Device Manager → Ports (COM &amp; LPT) → look for &quot;Arduino&quot; → e.g., COM3
+# Linux: Run `ls /dev/tty*` before and after plugging in Arduino → the new one is yours
+# Mac: Run `ls /dev/cu.*` in terminal
+
+PORT = &quot;COM3&quot;          # CHANGE THIS: e.g., &quot;COM3&quot; on Windows, &quot;/dev/ttyUSB0&quot; on Linux
+BAUD_RATE = 9600       # Must match the Serial.begin(9600) in your Arduino code
+DURATION_SECONDS = 60  # How long to collect data (60 seconds = 30 readings at 2s interval)
+OUTPUT_FILE = &quot;arduino_temperature_log.csv&quot;
+
+
+def parse_arduino_line(line):
+    &quot;&quot;&quot;
+    Parse a line like &quot;TEMP:22.5,HUM:55.0&quot; into a dictionary.
+    Returns None if the line format is unexpected.
+    &quot;&quot;&quot;
+    try:
+        # Split by comma: [&quot;TEMP:22.5&quot;, &quot;HUM:55.0&quot;]
+        parts = line.strip().split(&quot;,&quot;)
+        if len(parts) != 2:
+            return None
+
+        # Split each part by colon and take the value after it
+        temp = float(parts[0].split(&quot;:&quot;)[1])   # &quot;TEMP:22.5&quot; → 22.5
+        hum = float(parts[1].split(&quot;:&quot;)[1])    # &quot;HUM:55.0&quot; → 55.0
+
+        return {&quot;temperature&quot;: temp, &quot;humidity&quot;: hum}
+    except (ValueError, IndexError):
+        return None
+
+
+def collect_data_from_arduino():
+    &quot;&quot;&quot;Connect to Arduino and collect sensor readings.&quot;&quot;&quot;
+
+    print(f&quot;\nConnecting to Arduino on port {PORT}...&quot;)
+
+    try:
+        # Open the serial connection to Arduino
+        ser = serial.Serial(PORT, BAUD_RATE, timeout=1)
+        time.sleep(2)   # Give Arduino 2 seconds to reset after connecting
+        print(&quot;Connected! Starting data collection...&quot;)
+        print(f&quot;Collecting for {DURATION_SECONDS} seconds. Press Ctrl+C to stop early.\n&quot;)
+
+        readings = []
+        start_time = time.time()
+
+        while time.time() - start_time &lt; DURATION_SECONDS:
+            # Read one line from the serial port
+            if ser.in_waiting &gt; 0:
+                raw_line = ser.readline().decode(&quot;utf-8&quot;, errors=&quot;ignore&quot;)
+                parsed = parse_arduino_line(raw_line)
+
+                if parsed:
+                    # Add a timestamp to each reading
+                    parsed[&quot;timestamp&quot;] = datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
+                    readings.append(parsed)
+                    print(f&quot;  [{parsed[&#x27;timestamp&#x27;]}] Temp: {parsed[&#x27;temperature&#x27;]}°C | Humidity: {parsed[&#x27;humidity&#x27;]}%&quot;)
+                else:
+                    # Print raw messages (like &quot;Arduino ready...&quot; status messages)
+                    raw_stripped = raw_line.strip()
+                    if raw_stripped:
+                        print(f&quot;  Arduino says: {raw_stripped}&quot;)
+
+        ser.close()
+        print(f&quot;\nDone! Collected {len(readings)} readings.&quot;)
+        return readings
+
+    except serial.SerialException as e:
+        print(f&quot;\nCould not connect to Arduino on {PORT}&quot;)
+        print(f&quot;Error: {e}&quot;)
+        print(&quot;\nTROUBLESHOOTING:&quot;)
+        print(&quot;  1. Is the Arduino plugged in via USB?&quot;)
+        print(&quot;  2. Did you update the PORT variable above?&quot;)
+        print(&quot;  3. On Linux/Mac, run: ls /dev/tty* to find the port&quot;)
+        print(&quot;  4. On Windows, check Device Manager → Ports&quot;)
+        print(&quot;\nRUNNING IN DEMO MODE with fake data instead...\n&quot;)
+        return generate_demo_data()
+
+
+def generate_demo_data():
+    &quot;&quot;&quot;
+    Generate fake sensor data for practice when no Arduino is connected.
+    Remove this function and the fallback once your hardware is set up.
+    &quot;&quot;&quot;
+    import random
+
+    print(&quot;Generating 30 fake sensor readings for practice...&quot;)
+    readings = []
+    base_time = datetime.now()
+
+    for i in range(30):
+        # Simulate a temperature that fluctuates slightly around 22°C
+        temp = round(22.0 + random.uniform(-2.0, 2.0), 1)
+        hum = round(55.0 + random.uniform(-5.0, 5.0), 1)
+        timestamp = base_time.replace(second=base_time.second + (i * 2))
+
+        readings.append({
+            &quot;timestamp&quot;: timestamp.strftime(&quot;%Y-%m-%d %H:%M:%S&quot;),
+            &quot;temperature&quot;: temp,
+            &quot;humidity&quot;: hum
+        })
+
+    return readings
+
+
+def save_to_csv(readings, filename):
+    &quot;&quot;&quot;Save the list of readings to a CSV file.&quot;&quot;&quot;
+    if not readings:
+        print(&quot;No data to save.&quot;)
+        return
+
+    df = pd.DataFrame(readings)
+    df.to_csv(filename, index=False)
+    print(f&quot;\nSaved {len(readings)} readings to &#x27;{filename}&#x27;&quot;)
+
+    print(&quot;\nData summary:&quot;)
+    print(f&quot;  Temperature: avg={df[&#x27;temperature&#x27;].mean():.1f}°C, &quot;
+          f&quot;min={df[&#x27;temperature&#x27;].min()}°C, max={df[&#x27;temperature&#x27;].max()}°C&quot;)
+    print(f&quot;  Humidity:    avg={df[&#x27;humidity&#x27;].mean():.1f}%, &quot;
+          f&quot;min={df[&#x27;humidity&#x27;].min()}%, max={df[&#x27;humidity&#x27;].max()}%&quot;)
+
+
+# ==============================================================
+# MAIN — Run the data collection
+# ==============================================================
+
+if __name__ == &quot;__main__&quot;:
+    readings = collect_data_from_arduino()
+    save_to_csv(readings, OUTPUT_FILE)
+
+    print(f&quot;\n✅ Your data is in &#x27;{OUTPUT_FILE}&#x27;&quot;)
+    print(&quot;This CSV becomes your Portfolio Project 1 dataset!&quot;)
+    print(&quot;\nNext step: Open month-02-data-science/week-05-pandas-numpy/pandas_basics.py&quot;)
+    print(&quot;and load this CSV to analyze your own sensor data!&quot;)
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

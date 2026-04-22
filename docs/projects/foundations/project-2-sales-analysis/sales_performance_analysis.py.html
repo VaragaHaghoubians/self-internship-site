@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sales Performance Analysis.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Sales Performance Analysis.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">projects/foundations/project-2-sales-analysis/sales_performance_analysis.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "\"\"\"\n=============================================================================\nPROJECT 2 \u2014 RETAIL SALES PERFORMANCE ANALYSIS\nRole       : Data Analyst\nDataset    : Sample Superstore Sales Dataset (Kaggle)\n            https://www.kaggle.com/datasets/vivek468/superstore-dataset-final\nAuthor     : [Your Name]\nDate       : [Date]\n=============================================================================\n\nDESCRIPTION:\n    This script performs a comprehensive sales analysis on the Superstore\n    dataset to answer key business questions about revenue, profit, regional\n    performance, time trends, customer segments, and discount impact.\n\nBUSINESS QUESTIONS TO ANSWER:\n    1. What are the total revenue, profit, and profit margin?\n    2. Which product categories and sub-categories are most profitable?\n    3. Which regions and states generate the most sales?\n    4. Are there seasonal sales trends?\n    5. Which customer segment is most valuable?\n    6. Does discounting hurt profit?\n    7. What is the average order processing time by shipping mode?\n    8. Which sub-categories are LOSING money?\n\nHOW TO USE:\n    1. Read INSTRUCTIONS.md before starting\n    2. Download the dataset and place in data/superstore.csv\n    3. Work through each section in order\n    4. Fill in the code below each comment hint\n    5. Save all charts to outputs/figures/\n\n=============================================================================\n\"\"\"\n\n\n# =============================================================================\n# STEP 0 \u2014 IMPORTS\n# =============================================================================\n# HINT: Import the following libraries at the top.\n#\n#   - pandas (as pd)          \u2192 data manipulation and aggregation\n#   - numpy (as np)           \u2192 numerical operations\n#   - matplotlib.pyplot (as plt) \u2192 base plotting\n#   - seaborn (as sns)        \u2192 statistical and categorical charts\n#   - warnings                \u2192 to suppress warnings\n#\n# OPTIONAL (for interactive charts):\n#   - plotly.express (as px)  \u2192 beautiful interactive charts\n#   - plotly.graph_objects (as go)\n#\n# STYLING TIP:\n#   Set a consistent visual style at the top:\n#   sns.set_style(\"whitegrid\")\n#   sns.set_palette(\"Set2\")\n#   plt.rcParams['figure.figsize'] = (12, 6)\n#   plt.rcParams['font.size'] = 12\n\n# === YOUR IMPORT CODE HERE ===\n\n\n# =============================================================================\n# STEP 1 \u2014 LOAD AND EXPLORE THE DATA\n# =============================================================================\n# HINT: Load the CSV file from data/superstore.csv\n#\n#   IMPORTANT: This file may have encoding issues.\n#   Try: pd.read_csv('data/superstore.csv', encoding='latin1')\n#   If that fails, try: encoding='windows-1252'\n#\n#   PARSE DATES: Tell pandas to parse date columns immediately.\n#   Add: parse_dates=['Order Date', 'Ship Date']\n#\n# EXPLORE THE DATA (answer these questions with code):\n#\n#   Q1: What is the shape? \u2192 df.shape\n#   Q2: What are the columns and types? \u2192 df.info()\n#   Q3: Are there missing values? \u2192 df.isnull().sum()\n#   Q4: What does the data look like? \u2192 df.head()\n#   Q5: What is the date range?\n#       \u2192 print(df['Order Date'].min(), df['Order Date'].max())\n#   Q6: How many unique customers, orders, products?\n#       \u2192 df['Customer ID'].nunique(), df['Order ID'].nunique()\n#   Q7: What categories and regions exist?\n#       \u2192 df['Category'].unique(), df['Region'].unique()\n\n# === YOUR DATA LOADING CODE HERE ===\n\n\n# =============================================================================\n# STEP 2 \u2014 DATA CLEANING & FEATURE ENGINEERING\n# =============================================================================\n# HINT: Clean any issues and create new columns that will be useful for analysis.\n#\n# --------------------------------------------------------------------------\n# 2.1 \u2014 Data Cleaning\n# --------------------------------------------------------------------------\n# HINT:\n#   - Check for duplicate rows: df.duplicated().sum()\n#   - If duplicates exist, remove them: df.drop_duplicates(inplace=True)\n#   - Check if 'Order Date' and 'Ship Date' are datetime type\n#     If not: df['Order Date'] = pd.to_datetime(df['Order Date'])\n#   - Check for any remaining missing values and decide how to handle them\n\n# === YOUR CLEANING CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# 2.2 \u2014 Feature Engineering (Create New Columns)\n# --------------------------------------------------------------------------\n# HINT: Create these new columns from existing ones.\n#       Each one will be used in later analysis steps.\n#\n#   Profit Margin column:\n#     df['Profit Margin'] = df['Profit'] / df['Sales']\n#     (a value of 0.2 means 20% profit margin)\n#\n#   Processing time (how many days to ship):\n#     df['Processing Days'] = (df['Ship Date'] - df['Order Date']).dt.days\n#\n#   Time-based columns for grouping:\n#     df['Year']       = df['Order Date'].dt.year\n#     df['Month']      = df['Order Date'].dt.month\n#     df['Month Name'] = df['Order Date'].dt.month_name()\n#     df['Quarter']    = df['Order Date'].dt.quarter\n#     df['Year-Month'] = df['Order Date'].dt.to_period('M')\n#\n# VERIFY: Print df[['Order Date', 'Ship Date', 'Processing Days', 'Year', 'Month']].head()\n\n# === YOUR FEATURE ENGINEERING CODE HERE ===\n\n\n# =============================================================================\n# STEP 3 \u2014 KPI DASHBOARD\n# =============================================================================\n# HINT: Compute and print your top-level business KPIs.\n#       These are the \"headline numbers\" every analyst reports first.\n#\n#   Metrics to compute:\n#     total_revenue      = df['Sales'].sum()\n#     total_profit       = df['Profit'].sum()\n#     overall_margin     = (total_profit / total_revenue) * 100\n#     total_orders       = df['Order ID'].nunique()\n#     total_customers    = df['Customer ID'].nunique()\n#     avg_order_value    = df.groupby('Order ID')['Sales'].sum().mean()\n#     total_products_sold = df['Quantity'].sum()\n#\n# FORMAT: Print them neatly using f-strings:\n#   print(f\"Total Revenue:      ${total_revenue:,.2f}\")\n#   print(f\"Total Profit:       ${total_profit:,.2f}\")\n#   print(f\"Profit Margin:      {overall_margin:.1f}%\")\n#   ...\n#\n# TIP: Wrap your output in:\n#   print(\"=\" * 50)\n#   print(\"    SALES PERFORMANCE KPI DASHBOARD\")\n#   print(\"=\" * 50)\n\n# === YOUR KPI CODE HERE ===\n\n\n# =============================================================================\n# STEP 4 \u2014 CATEGORY & SUB-CATEGORY ANALYSIS\n# =============================================================================\n# HINT: Answer Business Questions 2 and 8.\n#\n# --------------------------------------------------------------------------\n# PLOT 1 \u2014 Sales and Profit by Category (Grouped Bar Chart)\n# --------------------------------------------------------------------------\n# HINT:\n#   Step 1: Group data by Category:\n#           category_df = df.groupby('Category')[['Sales','Profit']].sum().reset_index()\n#   Step 2: Create a grouped bar chart using matplotlib or seaborn\n#           You can melt the DataFrame for seaborn:\n#           melted = category_df.melt(id_vars='Category', var_name='Metric', value_name='Amount')\n#           sns.barplot(x='Category', y='Amount', hue='Metric', data=melted)\n#   Step 3: Add data labels on top of bars (optional but professional)\n#   Step 4: Title, axis labels, save as 'outputs/figures/01_category_sales_profit.png'\n#\n# QUESTION TO ANSWER: Which category has the best profit margin?\n#   (Compute: category_df['Profit Margin'] = category_df['Profit'] / category_df['Sales'])\n\n# === YOUR PLOT 1 CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# PLOT 2 \u2014 Profit by Sub-Category (Horizontal Bar Chart)\n# --------------------------------------------------------------------------\n# HINT:\n#   Step 1: Group by Sub-Category, sum Profit:\n#           sub_cat_profit = df.groupby('Sub-Category')['Profit'].sum().sort_values()\n#   Step 2: Create a horizontal bar chart:\n#           colors = ['red' if x < 0 else 'steelblue' for x in sub_cat_profit.values]\n#           sub_cat_profit.plot(kind='barh', color=colors)\n#   Step 3: Add a vertical line at x=0 to clearly show profit/loss split:\n#           plt.axvline(x=0, color='black', linewidth=1)\n#   Step 4: Title, labels, save as '02_subcategory_profit.png'\n#\n# KEY FINDING: Which sub-categories have NEGATIVE profit?\n#              Print their names and profit values explicitly.\n\n# === YOUR PLOT 2 CODE HERE ===\n\n\n# =============================================================================\n# STEP 5 \u2014 REGIONAL ANALYSIS\n# =============================================================================\n# HINT: Answer Business Question 3.\n#\n# --------------------------------------------------------------------------\n# PLOT 3 \u2014 Sales and Profit by Region\n# --------------------------------------------------------------------------\n# HINT:\n#   Group by 'Region', aggregate Sales and Profit (sum).\n#   Create a grouped bar chart (same approach as Plot 1 but for regions).\n#   Which region is the best performer overall?\n\n# === YOUR PLOT 3 CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# PLOT 4 \u2014 Top 10 States by Sales\n# --------------------------------------------------------------------------\n# HINT:\n#   state_sales = df.groupby('State')['Sales'].sum().sort_values(ascending=False).head(10)\n#   Plot as a horizontal bar chart.\n#   Title: \"Top 10 States by Revenue\"\n#   Save as '04_top10_states.png'\n#\n# QUESTION: Are the top states the most populated US states?\n#           (California, Texas, New York, etc.)\n\n# === YOUR PLOT 4 CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# PLOT 5 \u2014 Category Profit by Region (Heatmap)\n# --------------------------------------------------------------------------\n# HINT:\n#   Create a pivot table:\n#   pivot = df.pivot_table(values='Profit', index='Region', columns='Category', aggfunc='sum')\n#\n#   Plot as a heatmap:\n#   sns.heatmap(pivot, annot=True, fmt='.0f', cmap='RdYlGn', linewidths=0.5)\n#   plt.title('Profit by Region and Category')\n#\n# WHAT TO LOOK FOR: Are any category-region combinations losing money?\n#                   This can reveal where the business has geographical weakness.\n\n# === YOUR PLOT 5 CODE HERE ===\n\n\n# =============================================================================\n# STEP 6 \u2014 TIME SERIES ANALYSIS\n# =============================================================================\n# HINT: Answer Business Question 4. Look for trends and seasonality.\n#\n# --------------------------------------------------------------------------\n# PLOT 6 \u2014 Monthly Sales Trend (Line Chart)\n# --------------------------------------------------------------------------\n# HINT:\n#   Step 1: Group by 'Year-Month', sum Sales:\n#           monthly_sales = df.groupby('Year-Month')['Sales'].sum()\n#   Step 2: Convert index to string for clean x-axis:\n#           monthly_sales.index = monthly_sales.index.astype(str)\n#   Step 3: Plot as a line chart with markers:\n#           plt.plot(monthly_sales.index, monthly_sales.values, marker='o', linewidth=2)\n#   Step 4: Rotate x-axis labels: plt.xticks(rotation=45)\n#   Step 5: Add a title and save\n#\n# QUESTION: Do you see spikes in November/December? (Holiday season effect)\n\n# === YOUR PLOT 6 CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# PLOT 7 \u2014 Annual Sales Comparison (Bar Chart)\n# --------------------------------------------------------------------------\n# HINT:\n#   Group by 'Year', sum Sales and Profit.\n#   Plot as a grouped bar chart.\n#   Also compute Year-over-Year (YoY) growth:\n#     year_df = df.groupby('Year')['Sales'].sum()\n#     year_df_pct = year_df.pct_change() * 100   <- percentage change vs previous year\n#     print(\"YoY Growth (%):\")\n#     print(year_df_pct)\n\n# === YOUR PLOT 7 CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# PLOT 8 \u2014 Monthly Sales Heatmap (Year vs. Month)\n# --------------------------------------------------------------------------\n# HINT:\n#   Create a pivot table: rows = Year, columns = Month, values = Sales (sum)\n#   pivot_time = df.pivot_table(values='Sales', index='Year', columns='Month', aggfunc='sum')\n#\n#   Rename month numbers to names for readability:\n#   pivot_time.columns = ['Jan','Feb','Mar','Apr','May','Jun',\n#                         'Jul','Aug','Sep','Oct','Nov','Dec']\n#\n#   Plot as a heatmap with cmap='YlOrRd'\n#   This shows which month of which year had the highest sales.\n\n# === YOUR PLOT 8 CODE HERE ===\n\n\n# =============================================================================\n# STEP 7 \u2014 CUSTOMER SEGMENT ANALYSIS\n# =============================================================================\n# HINT: Answer Business Question 5.\n#\n# --------------------------------------------------------------------------\n# PLOT 9 \u2014 Revenue and Profit by Customer Segment\n# --------------------------------------------------------------------------\n# HINT:\n#   Group by 'Segment', aggregate Sales and Profit (sum).\n#   Also compute profit margin per segment.\n#   Create a grouped bar chart (or two subplots side by side).\n#\n# QUESTION: Which segment (Consumer, Corporate, Home Office) is most profitable?\n#           Which has the best margin?\n\n# === YOUR PLOT 9 CODE HERE ===\n\n\n# =============================================================================\n# STEP 8 \u2014 DISCOUNT IMPACT ANALYSIS\n# =============================================================================\n# HINT: Answer Business Question 6. This is one of the most actionable findings.\n#\n# --------------------------------------------------------------------------\n# PLOT 10 \u2014 Discount vs. Profit (Scatter Plot)\n# --------------------------------------------------------------------------\n# HINT:\n#   sns.scatterplot(x='Discount', y='Profit', data=df, hue='Category', alpha=0.5)\n#   Add a horizontal line at y=0:\n#     plt.axhline(y=0, color='red', linestyle='--', linewidth=1)\n#   Add a trend line:\n#     Use sns.regplot(x='Discount', y='Profit', data=df, scatter=False, color='black')\n#     on the same axes (use ax parameter or plt.gca())\n#\n# WHAT TO SEE: There should be a negative correlation \u2014 higher discounts = lower profit.\n#              Points below y=0 are orders where the company LOST money.\n\n# === YOUR PLOT 10 CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# PLOT 11 \u2014 Average Profit by Discount Range (Bar Chart)\n# --------------------------------------------------------------------------\n# HINT:\n#   Create discount bins to group orders by discount level:\n#   bins = [0, 0.001, 0.2, 0.4, 0.6, 1.01]\n#   labels = ['No Discount', '1-20%', '21-40%', '41-60%', '61-100%']\n#   df['Discount Range'] = pd.cut(df['Discount'], bins=bins, labels=labels, right=False)\n#\n#   Group by 'Discount Range', compute mean Profit:\n#   discount_profit = df.groupby('Discount Range')['Profit'].mean()\n#\n#   Plot as a bar chart with colors: green if positive, red if negative.\n#   This chart makes it very clear at which discount level orders start losing money.\n\n# === YOUR PLOT 11 CODE HERE ===\n\n\n# =============================================================================\n# STEP 9 \u2014 SHIPPING ANALYSIS\n# =============================================================================\n# HINT: Answer Business Question 7.\n#\n# --------------------------------------------------------------------------\n# PLOT 12 \u2014 Average Processing Days by Ship Mode\n# --------------------------------------------------------------------------\n# HINT:\n#   Group by 'Ship Mode', compute mean 'Processing Days':\n#   ship_days = df.groupby('Ship Mode')['Processing Days'].mean().sort_values()\n#\n#   Plot as a bar chart.\n#   Add data labels on each bar showing the exact average.\n#\n# QUESTION: What is the average shipping time?\n#           Is \"Same Day\" shipping actually processed on the same day?\n#           Does \"First Class\" really differ from \"Standard Class\"?\n\n# === YOUR PLOT 12 CODE HERE ===\n\n\n# =============================================================================\n# STEP 10 \u2014 FINAL BUSINESS SUMMARY REPORT\n# =============================================================================\n# HINT: Compile all your findings into a structured report.\n#       Print it to the console AND optionally save to a text file.\n#\n# REPORT STRUCTURE:\n#   ================================================================\n#   RETAIL SALES PERFORMANCE REPORT \u2014 [Date Range]\n#   ================================================================\n#\n#   SECTION 1 \u2014 HEADLINE KPIs\n#     Total Revenue:    $X,XXX,XXX\n#     Total Profit:     $XXX,XXX\n#     Profit Margin:    XX.X%\n#     Total Orders:     X,XXX\n#     ...\n#\n#   SECTION 2 \u2014 KEY FINDINGS\n#     Finding 1: Technology is the most profitable category (margin: XX%)\n#     Finding 2: Furniture's Tables sub-category lost $XX,XXX\n#     Finding 3: ...\n#     Finding 4: Sales peak in November/December every year\n#     Finding 5: Discounts above 20% consistently produce negative profit\n#\n#   SECTION 3 \u2014 PROBLEM AREAS\n#     Issue 1: [Sub-category X] has a loss of $X,XXX \u2014 needs review\n#     Issue 2: High discount orders in [Region] are dragging down margins\n#\n#   SECTION 4 \u2014 RECOMMENDATIONS\n#     Rec 1: Eliminate or reprice [Sub-category X] which consistently loses money\n#     Rec 2: Cap discounts at 20% \u2014 above this point profit turns negative\n#     Rec 3: Invest more in [top performing region] where margins are highest\n#     Rec 4: Run promotions in Q3 to boost the sales dip before the Q4 peak\n#   ================================================================\n#\n# TIP: To save to a file:\n#   with open('outputs/summary_report.txt', 'w') as f:\n#       f.write(\"Your report text here...\")\n\n# === YOUR FINAL REPORT CODE HERE ===\n\n\n# =============================================================================\n# END OF PROJECT 2\n# =============================================================================\n# NEXT STEPS (after completing this project):\n#   - Create an interactive Plotly dashboard:\n#     pip install plotly \u2192 use plotly.express for all your charts\n#   - Try building a simple Tableau or Power BI dashboard with the same data\n#   - Add a choropleth map of US state sales using plotly:\n#     px.choropleth(data, locations='State', locationmode='USA-states', ...)\n#   - Write a blog post: \"What I Learned from Analyzing 10,000 Sales Records\"\n#   - Update README.md with your actual results\n# =============================================================================\n";
+      const readerOutputKey = "readerRun:projects/foundations/project-2-sales-analysis/sales_performance_analysis.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code>&quot;&quot;&quot;
+=============================================================================
+PROJECT 2 — RETAIL SALES PERFORMANCE ANALYSIS
+Role       : Data Analyst
+Dataset    : Sample Superstore Sales Dataset (Kaggle)
+            https://www.kaggle.com/datasets/vivek468/superstore-dataset-final
+Author     : [Your Name]
+Date       : [Date]
+=============================================================================
+
+DESCRIPTION:
+    This script performs a comprehensive sales analysis on the Superstore
+    dataset to answer key business questions about revenue, profit, regional
+    performance, time trends, customer segments, and discount impact.
+
+BUSINESS QUESTIONS TO ANSWER:
+    1. What are the total revenue, profit, and profit margin?
+    2. Which product categories and sub-categories are most profitable?
+    3. Which regions and states generate the most sales?
+    4. Are there seasonal sales trends?
+    5. Which customer segment is most valuable?
+    6. Does discounting hurt profit?
+    7. What is the average order processing time by shipping mode?
+    8. Which sub-categories are LOSING money?
+
+HOW TO USE:
+    1. Read INSTRUCTIONS.md before starting
+    2. Download the dataset and place in data/superstore.csv
+    3. Work through each section in order
+    4. Fill in the code below each comment hint
+    5. Save all charts to outputs/figures/
+
+=============================================================================
+&quot;&quot;&quot;
+
+
+# =============================================================================
+# STEP 0 — IMPORTS
+# =============================================================================
+# HINT: Import the following libraries at the top.
+#
+#   - pandas (as pd)          → data manipulation and aggregation
+#   - numpy (as np)           → numerical operations
+#   - matplotlib.pyplot (as plt) → base plotting
+#   - seaborn (as sns)        → statistical and categorical charts
+#   - warnings                → to suppress warnings
+#
+# OPTIONAL (for interactive charts):
+#   - plotly.express (as px)  → beautiful interactive charts
+#   - plotly.graph_objects (as go)
+#
+# STYLING TIP:
+#   Set a consistent visual style at the top:
+#   sns.set_style(&quot;whitegrid&quot;)
+#   sns.set_palette(&quot;Set2&quot;)
+#   plt.rcParams[&#x27;figure.figsize&#x27;] = (12, 6)
+#   plt.rcParams[&#x27;font.size&#x27;] = 12
+
+# === YOUR IMPORT CODE HERE ===
+
+
+# =============================================================================
+# STEP 1 — LOAD AND EXPLORE THE DATA
+# =============================================================================
+# HINT: Load the CSV file from data/superstore.csv
+#
+#   IMPORTANT: This file may have encoding issues.
+#   Try: pd.read_csv(&#x27;data/superstore.csv&#x27;, encoding=&#x27;latin1&#x27;)
+#   If that fails, try: encoding=&#x27;windows-1252&#x27;
+#
+#   PARSE DATES: Tell pandas to parse date columns immediately.
+#   Add: parse_dates=[&#x27;Order Date&#x27;, &#x27;Ship Date&#x27;]
+#
+# EXPLORE THE DATA (answer these questions with code):
+#
+#   Q1: What is the shape? → df.shape
+#   Q2: What are the columns and types? → df.info()
+#   Q3: Are there missing values? → df.isnull().sum()
+#   Q4: What does the data look like? → df.head()
+#   Q5: What is the date range?
+#       → print(df[&#x27;Order Date&#x27;].min(), df[&#x27;Order Date&#x27;].max())
+#   Q6: How many unique customers, orders, products?
+#       → df[&#x27;Customer ID&#x27;].nunique(), df[&#x27;Order ID&#x27;].nunique()
+#   Q7: What categories and regions exist?
+#       → df[&#x27;Category&#x27;].unique(), df[&#x27;Region&#x27;].unique()
+
+# === YOUR DATA LOADING CODE HERE ===
+
+
+# =============================================================================
+# STEP 2 — DATA CLEANING &amp; FEATURE ENGINEERING
+# =============================================================================
+# HINT: Clean any issues and create new columns that will be useful for analysis.
+#
+# --------------------------------------------------------------------------
+# 2.1 — Data Cleaning
+# --------------------------------------------------------------------------
+# HINT:
+#   - Check for duplicate rows: df.duplicated().sum()
+#   - If duplicates exist, remove them: df.drop_duplicates(inplace=True)
+#   - Check if &#x27;Order Date&#x27; and &#x27;Ship Date&#x27; are datetime type
+#     If not: df[&#x27;Order Date&#x27;] = pd.to_datetime(df[&#x27;Order Date&#x27;])
+#   - Check for any remaining missing values and decide how to handle them
+
+# === YOUR CLEANING CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# 2.2 — Feature Engineering (Create New Columns)
+# --------------------------------------------------------------------------
+# HINT: Create these new columns from existing ones.
+#       Each one will be used in later analysis steps.
+#
+#   Profit Margin column:
+#     df[&#x27;Profit Margin&#x27;] = df[&#x27;Profit&#x27;] / df[&#x27;Sales&#x27;]
+#     (a value of 0.2 means 20% profit margin)
+#
+#   Processing time (how many days to ship):
+#     df[&#x27;Processing Days&#x27;] = (df[&#x27;Ship Date&#x27;] - df[&#x27;Order Date&#x27;]).dt.days
+#
+#   Time-based columns for grouping:
+#     df[&#x27;Year&#x27;]       = df[&#x27;Order Date&#x27;].dt.year
+#     df[&#x27;Month&#x27;]      = df[&#x27;Order Date&#x27;].dt.month
+#     df[&#x27;Month Name&#x27;] = df[&#x27;Order Date&#x27;].dt.month_name()
+#     df[&#x27;Quarter&#x27;]    = df[&#x27;Order Date&#x27;].dt.quarter
+#     df[&#x27;Year-Month&#x27;] = df[&#x27;Order Date&#x27;].dt.to_period(&#x27;M&#x27;)
+#
+# VERIFY: Print df[[&#x27;Order Date&#x27;, &#x27;Ship Date&#x27;, &#x27;Processing Days&#x27;, &#x27;Year&#x27;, &#x27;Month&#x27;]].head()
+
+# === YOUR FEATURE ENGINEERING CODE HERE ===
+
+
+# =============================================================================
+# STEP 3 — KPI DASHBOARD
+# =============================================================================
+# HINT: Compute and print your top-level business KPIs.
+#       These are the &quot;headline numbers&quot; every analyst reports first.
+#
+#   Metrics to compute:
+#     total_revenue      = df[&#x27;Sales&#x27;].sum()
+#     total_profit       = df[&#x27;Profit&#x27;].sum()
+#     overall_margin     = (total_profit / total_revenue) * 100
+#     total_orders       = df[&#x27;Order ID&#x27;].nunique()
+#     total_customers    = df[&#x27;Customer ID&#x27;].nunique()
+#     avg_order_value    = df.groupby(&#x27;Order ID&#x27;)[&#x27;Sales&#x27;].sum().mean()
+#     total_products_sold = df[&#x27;Quantity&#x27;].sum()
+#
+# FORMAT: Print them neatly using f-strings:
+#   print(f&quot;Total Revenue:      ${total_revenue:,.2f}&quot;)
+#   print(f&quot;Total Profit:       ${total_profit:,.2f}&quot;)
+#   print(f&quot;Profit Margin:      {overall_margin:.1f}%&quot;)
+#   ...
+#
+# TIP: Wrap your output in:
+#   print(&quot;=&quot; * 50)
+#   print(&quot;    SALES PERFORMANCE KPI DASHBOARD&quot;)
+#   print(&quot;=&quot; * 50)
+
+# === YOUR KPI CODE HERE ===
+
+
+# =============================================================================
+# STEP 4 — CATEGORY &amp; SUB-CATEGORY ANALYSIS
+# =============================================================================
+# HINT: Answer Business Questions 2 and 8.
+#
+# --------------------------------------------------------------------------
+# PLOT 1 — Sales and Profit by Category (Grouped Bar Chart)
+# --------------------------------------------------------------------------
+# HINT:
+#   Step 1: Group data by Category:
+#           category_df = df.groupby(&#x27;Category&#x27;)[[&#x27;Sales&#x27;,&#x27;Profit&#x27;]].sum().reset_index()
+#   Step 2: Create a grouped bar chart using matplotlib or seaborn
+#           You can melt the DataFrame for seaborn:
+#           melted = category_df.melt(id_vars=&#x27;Category&#x27;, var_name=&#x27;Metric&#x27;, value_name=&#x27;Amount&#x27;)
+#           sns.barplot(x=&#x27;Category&#x27;, y=&#x27;Amount&#x27;, hue=&#x27;Metric&#x27;, data=melted)
+#   Step 3: Add data labels on top of bars (optional but professional)
+#   Step 4: Title, axis labels, save as &#x27;outputs/figures/01_category_sales_profit.png&#x27;
+#
+# QUESTION TO ANSWER: Which category has the best profit margin?
+#   (Compute: category_df[&#x27;Profit Margin&#x27;] = category_df[&#x27;Profit&#x27;] / category_df[&#x27;Sales&#x27;])
+
+# === YOUR PLOT 1 CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# PLOT 2 — Profit by Sub-Category (Horizontal Bar Chart)
+# --------------------------------------------------------------------------
+# HINT:
+#   Step 1: Group by Sub-Category, sum Profit:
+#           sub_cat_profit = df.groupby(&#x27;Sub-Category&#x27;)[&#x27;Profit&#x27;].sum().sort_values()
+#   Step 2: Create a horizontal bar chart:
+#           colors = [&#x27;red&#x27; if x &lt; 0 else &#x27;steelblue&#x27; for x in sub_cat_profit.values]
+#           sub_cat_profit.plot(kind=&#x27;barh&#x27;, color=colors)
+#   Step 3: Add a vertical line at x=0 to clearly show profit/loss split:
+#           plt.axvline(x=0, color=&#x27;black&#x27;, linewidth=1)
+#   Step 4: Title, labels, save as &#x27;02_subcategory_profit.png&#x27;
+#
+# KEY FINDING: Which sub-categories have NEGATIVE profit?
+#              Print their names and profit values explicitly.
+
+# === YOUR PLOT 2 CODE HERE ===
+
+
+# =============================================================================
+# STEP 5 — REGIONAL ANALYSIS
+# =============================================================================
+# HINT: Answer Business Question 3.
+#
+# --------------------------------------------------------------------------
+# PLOT 3 — Sales and Profit by Region
+# --------------------------------------------------------------------------
+# HINT:
+#   Group by &#x27;Region&#x27;, aggregate Sales and Profit (sum).
+#   Create a grouped bar chart (same approach as Plot 1 but for regions).
+#   Which region is the best performer overall?
+
+# === YOUR PLOT 3 CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# PLOT 4 — Top 10 States by Sales
+# --------------------------------------------------------------------------
+# HINT:
+#   state_sales = df.groupby(&#x27;State&#x27;)[&#x27;Sales&#x27;].sum().sort_values(ascending=False).head(10)
+#   Plot as a horizontal bar chart.
+#   Title: &quot;Top 10 States by Revenue&quot;
+#   Save as &#x27;04_top10_states.png&#x27;
+#
+# QUESTION: Are the top states the most populated US states?
+#           (California, Texas, New York, etc.)
+
+# === YOUR PLOT 4 CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# PLOT 5 — Category Profit by Region (Heatmap)
+# --------------------------------------------------------------------------
+# HINT:
+#   Create a pivot table:
+#   pivot = df.pivot_table(values=&#x27;Profit&#x27;, index=&#x27;Region&#x27;, columns=&#x27;Category&#x27;, aggfunc=&#x27;sum&#x27;)
+#
+#   Plot as a heatmap:
+#   sns.heatmap(pivot, annot=True, fmt=&#x27;.0f&#x27;, cmap=&#x27;RdYlGn&#x27;, linewidths=0.5)
+#   plt.title(&#x27;Profit by Region and Category&#x27;)
+#
+# WHAT TO LOOK FOR: Are any category-region combinations losing money?
+#                   This can reveal where the business has geographical weakness.
+
+# === YOUR PLOT 5 CODE HERE ===
+
+
+# =============================================================================
+# STEP 6 — TIME SERIES ANALYSIS
+# =============================================================================
+# HINT: Answer Business Question 4. Look for trends and seasonality.
+#
+# --------------------------------------------------------------------------
+# PLOT 6 — Monthly Sales Trend (Line Chart)
+# --------------------------------------------------------------------------
+# HINT:
+#   Step 1: Group by &#x27;Year-Month&#x27;, sum Sales:
+#           monthly_sales = df.groupby(&#x27;Year-Month&#x27;)[&#x27;Sales&#x27;].sum()
+#   Step 2: Convert index to string for clean x-axis:
+#           monthly_sales.index = monthly_sales.index.astype(str)
+#   Step 3: Plot as a line chart with markers:
+#           plt.plot(monthly_sales.index, monthly_sales.values, marker=&#x27;o&#x27;, linewidth=2)
+#   Step 4: Rotate x-axis labels: plt.xticks(rotation=45)
+#   Step 5: Add a title and save
+#
+# QUESTION: Do you see spikes in November/December? (Holiday season effect)
+
+# === YOUR PLOT 6 CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# PLOT 7 — Annual Sales Comparison (Bar Chart)
+# --------------------------------------------------------------------------
+# HINT:
+#   Group by &#x27;Year&#x27;, sum Sales and Profit.
+#   Plot as a grouped bar chart.
+#   Also compute Year-over-Year (YoY) growth:
+#     year_df = df.groupby(&#x27;Year&#x27;)[&#x27;Sales&#x27;].sum()
+#     year_df_pct = year_df.pct_change() * 100   &lt;- percentage change vs previous year
+#     print(&quot;YoY Growth (%):&quot;)
+#     print(year_df_pct)
+
+# === YOUR PLOT 7 CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# PLOT 8 — Monthly Sales Heatmap (Year vs. Month)
+# --------------------------------------------------------------------------
+# HINT:
+#   Create a pivot table: rows = Year, columns = Month, values = Sales (sum)
+#   pivot_time = df.pivot_table(values=&#x27;Sales&#x27;, index=&#x27;Year&#x27;, columns=&#x27;Month&#x27;, aggfunc=&#x27;sum&#x27;)
+#
+#   Rename month numbers to names for readability:
+#   pivot_time.columns = [&#x27;Jan&#x27;,&#x27;Feb&#x27;,&#x27;Mar&#x27;,&#x27;Apr&#x27;,&#x27;May&#x27;,&#x27;Jun&#x27;,
+#                         &#x27;Jul&#x27;,&#x27;Aug&#x27;,&#x27;Sep&#x27;,&#x27;Oct&#x27;,&#x27;Nov&#x27;,&#x27;Dec&#x27;]
+#
+#   Plot as a heatmap with cmap=&#x27;YlOrRd&#x27;
+#   This shows which month of which year had the highest sales.
+
+# === YOUR PLOT 8 CODE HERE ===
+
+
+# =============================================================================
+# STEP 7 — CUSTOMER SEGMENT ANALYSIS
+# =============================================================================
+# HINT: Answer Business Question 5.
+#
+# --------------------------------------------------------------------------
+# PLOT 9 — Revenue and Profit by Customer Segment
+# --------------------------------------------------------------------------
+# HINT:
+#   Group by &#x27;Segment&#x27;, aggregate Sales and Profit (sum).
+#   Also compute profit margin per segment.
+#   Create a grouped bar chart (or two subplots side by side).
+#
+# QUESTION: Which segment (Consumer, Corporate, Home Office) is most profitable?
+#           Which has the best margin?
+
+# === YOUR PLOT 9 CODE HERE ===
+
+
+# =============================================================================
+# STEP 8 — DISCOUNT IMPACT ANALYSIS
+# =============================================================================
+# HINT: Answer Business Question 6. This is one of the most actionable findings.
+#
+# --------------------------------------------------------------------------
+# PLOT 10 — Discount vs. Profit (Scatter Plot)
+# --------------------------------------------------------------------------
+# HINT:
+#   sns.scatterplot(x=&#x27;Discount&#x27;, y=&#x27;Profit&#x27;, data=df, hue=&#x27;Category&#x27;, alpha=0.5)
+#   Add a horizontal line at y=0:
+#     plt.axhline(y=0, color=&#x27;red&#x27;, linestyle=&#x27;--&#x27;, linewidth=1)
+#   Add a trend line:
+#     Use sns.regplot(x=&#x27;Discount&#x27;, y=&#x27;Profit&#x27;, data=df, scatter=False, color=&#x27;black&#x27;)
+#     on the same axes (use ax parameter or plt.gca())
+#
+# WHAT TO SEE: There should be a negative correlation — higher discounts = lower profit.
+#              Points below y=0 are orders where the company LOST money.
+
+# === YOUR PLOT 10 CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# PLOT 11 — Average Profit by Discount Range (Bar Chart)
+# --------------------------------------------------------------------------
+# HINT:
+#   Create discount bins to group orders by discount level:
+#   bins = [0, 0.001, 0.2, 0.4, 0.6, 1.01]
+#   labels = [&#x27;No Discount&#x27;, &#x27;1-20%&#x27;, &#x27;21-40%&#x27;, &#x27;41-60%&#x27;, &#x27;61-100%&#x27;]
+#   df[&#x27;Discount Range&#x27;] = pd.cut(df[&#x27;Discount&#x27;], bins=bins, labels=labels, right=False)
+#
+#   Group by &#x27;Discount Range&#x27;, compute mean Profit:
+#   discount_profit = df.groupby(&#x27;Discount Range&#x27;)[&#x27;Profit&#x27;].mean()
+#
+#   Plot as a bar chart with colors: green if positive, red if negative.
+#   This chart makes it very clear at which discount level orders start losing money.
+
+# === YOUR PLOT 11 CODE HERE ===
+
+
+# =============================================================================
+# STEP 9 — SHIPPING ANALYSIS
+# =============================================================================
+# HINT: Answer Business Question 7.
+#
+# --------------------------------------------------------------------------
+# PLOT 12 — Average Processing Days by Ship Mode
+# --------------------------------------------------------------------------
+# HINT:
+#   Group by &#x27;Ship Mode&#x27;, compute mean &#x27;Processing Days&#x27;:
+#   ship_days = df.groupby(&#x27;Ship Mode&#x27;)[&#x27;Processing Days&#x27;].mean().sort_values()
+#
+#   Plot as a bar chart.
+#   Add data labels on each bar showing the exact average.
+#
+# QUESTION: What is the average shipping time?
+#           Is &quot;Same Day&quot; shipping actually processed on the same day?
+#           Does &quot;First Class&quot; really differ from &quot;Standard Class&quot;?
+
+# === YOUR PLOT 12 CODE HERE ===
+
+
+# =============================================================================
+# STEP 10 — FINAL BUSINESS SUMMARY REPORT
+# =============================================================================
+# HINT: Compile all your findings into a structured report.
+#       Print it to the console AND optionally save to a text file.
+#
+# REPORT STRUCTURE:
+#   ================================================================
+#   RETAIL SALES PERFORMANCE REPORT — [Date Range]
+#   ================================================================
+#
+#   SECTION 1 — HEADLINE KPIs
+#     Total Revenue:    $X,XXX,XXX
+#     Total Profit:     $XXX,XXX
+#     Profit Margin:    XX.X%
+#     Total Orders:     X,XXX
+#     ...
+#
+#   SECTION 2 — KEY FINDINGS
+#     Finding 1: Technology is the most profitable category (margin: XX%)
+#     Finding 2: Furniture&#x27;s Tables sub-category lost $XX,XXX
+#     Finding 3: ...
+#     Finding 4: Sales peak in November/December every year
+#     Finding 5: Discounts above 20% consistently produce negative profit
+#
+#   SECTION 3 — PROBLEM AREAS
+#     Issue 1: [Sub-category X] has a loss of $X,XXX — needs review
+#     Issue 2: High discount orders in [Region] are dragging down margins
+#
+#   SECTION 4 — RECOMMENDATIONS
+#     Rec 1: Eliminate or reprice [Sub-category X] which consistently loses money
+#     Rec 2: Cap discounts at 20% — above this point profit turns negative
+#     Rec 3: Invest more in [top performing region] where margins are highest
+#     Rec 4: Run promotions in Q3 to boost the sales dip before the Q4 peak
+#   ================================================================
+#
+# TIP: To save to a file:
+#   with open(&#x27;outputs/summary_report.txt&#x27;, &#x27;w&#x27;) as f:
+#       f.write(&quot;Your report text here...&quot;)
+
+# === YOUR FINAL REPORT CODE HERE ===
+
+
+# =============================================================================
+# END OF PROJECT 2
+# =============================================================================
+# NEXT STEPS (after completing this project):
+#   - Create an interactive Plotly dashboard:
+#     pip install plotly → use plotly.express for all your charts
+#   - Try building a simple Tableau or Power BI dashboard with the same data
+#   - Add a choropleth map of US state sales using plotly:
+#     px.choropleth(data, locations=&#x27;State&#x27;, locationmode=&#x27;USA-states&#x27;, ...)
+#   - Write a blog post: &quot;What I Learned from Analyzing 10,000 Sales Records&quot;
+#   - Update README.md with your actual results
+# =============================================================================
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

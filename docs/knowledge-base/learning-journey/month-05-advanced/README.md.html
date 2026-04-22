@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Month 05 Advanced - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Month 05 Advanced</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">knowledge-base/learning-journey/month-05-advanced/README.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="month-5-the-quot-unicorn-quot-expansion-optional">🟣 Month 5+: The &quot;Unicorn&quot; Expansion (Optional)</h2>
+<p><strong>⛔ STOP: Only open this folder after you have:</strong></p>
+<ul>
+<li>Finished Months 1-4</li>
+<li>Pushed 3 portfolio projects to GitHub</li>
+<li>Started applying for Junior Data Analyst / Data Scientist jobs</li>
+</ul>
+<p><strong>You are already competitive after Month 3. Do not skip the job search!</strong></p>
+<h3 id="the-quot-unicorn-quot-stack">The &quot;Unicorn&quot; Stack</h3>
+<p>By adding these skills on top of your data science + IoT foundation, you become a rare profile that almost no one else has.</p>
+<h3 id="track-a-django-full-stack-web">🔵 Track A: Django (Full-Stack Web)</h3>
+<p><strong>What it is:</strong> Django is a full web framework. Instead of the simple Flask servers you built in Month 4, Django handles user logins, admin panels, complex databases, and is used in production at Instagram, Pinterest, and Spotify.</p>
+<p><strong>Learn in this order:</strong></p>
+<ol>
+<li><a href="https://tutorial.djangogirls.org/en/">Django Girls Tutorial</a> — 1 weekend, free</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django">MDN Django Guide</a> — deeper dive, free</li>
+<li>Upgrade your Smart Home Flask server to a full Django app with:</li>
+</ol>
+<ul>
+<li>User accounts (login/logout)</li>
+<li>PostgreSQL instead of SQLite</li>
+<li>Admin panel to manage sensor data</li>
+</ul>
+<p><strong>Project:</strong> Full-stack Django app — e.g., a Job Board or Smart Home Management Portal.</p>
+<h3 id="track-b-java-amp-big-data-enterprise">🔵 Track B: Java &amp; Big Data (Enterprise)</h3>
+<p><strong>What it is:</strong> Java is the language of enterprise software. PySpark lets Python handle datasets too large for Pandas (millions of rows).</p>
+<p><strong>Learn in this order:</strong></p>
+<ol>
+<li><a href="https://java-programming.mooc.fi/">University of Helsinki Java MOOC</a> — free, takes ~2 months</li>
+<li>PySpark: <code>pip install pyspark</code>, then follow DataCamp&#x27;s PySpark tutorial</li>
+<li>Build a pipeline:</li>
+</ol>
+<ul>
+<li>Java app: clean a large CSV</li>
+<li>PySpark: aggregate it into statistics</li>
+</ul>
+<h3 id="track-c-cloud-amp-mlops-aws">🔵 Track C: Cloud &amp; MLOps (AWS)</h3>
+<p><strong>What it is:</strong> Deploy your Dockerized ML apps to the internet so anyone in the world can access them — not just people on your WiFi.</p>
+<p><strong>Learn in this order:</strong></p>
+<ol>
+<li>Create a FREE AWS account: https://aws.amazon.com/free/</li>
+<li>Launch an EC2 instance (a Linux server in the cloud)</li>
+<li>SSH into it: <code>ssh -i your-key.pem ubuntu@your-ec2-ip</code></li>
+<li>Install Docker on EC2</li>
+<li>Push your docker image to DockerHub, pull it on EC2, run it</li>
+</ol>
+<p><strong>Your dashboard URL changes from</strong> <code>http://localhost:5000</code> <strong>to</strong> <code>http://your-ec2-ip:5000</code> <strong>— accessible from any phone or computer in the world!</strong></p>
+<h3 id="track-d-deep-learning-pytorch">🔵 Track D: Deep Learning (PyTorch)</h3>
+<p><strong>What it is:</strong> Neural networks that can recognize images, understand text, and achieve human-level performance on complex tasks.</p>
+<p><strong>Guided practice file:</strong> <code>deep_learning_basics.py</code> (in this folder)</p>
+<ul>
+<li>Trains a real neural network on the Breast Cancer dataset</li>
+<li>Covers: tensors, forward pass, loss, backprop, training loop, evaluation</li>
+<li>Includes a full cheatsheet of PyTorch patterns</li>
+<li>5 YOUR TASKS including: experiment with architecture, add early stopping,</li>
+</ul>
+<p>convert to multi-class (Iris), train on your own IoT sensor data</p>
+<p><strong>After the guided file, go deeper:</strong></p>
+<ol>
+<li><a href="https://course.fast.ai/">fast.ai course</a> — free, best top-down deep learning course</li>
+<li>Build an image classifier: can your model tell the difference between</li>
+</ol>
+<p>your room being clean vs. messy? (use photos from your phone)</p>
+<ol>
+<li>Serve the model via Django and deploy to AWS</li>
+</ol>
+<h3 id="track-e-stm32-professional-embedded-systems">� Track E: STM32 (Professional Embedded Systems)</h3>
+<p><strong>What it is:</strong> STM32 is the microcontroller used in real industrial products — medical devices, automotive electronics, PLCs, robots, and aerospace systems. It bridges your Python/ML skills with professional hardware engineering.</p>
+<p><strong>When to take this track:</strong> After month-04 IoT is complete. You already know Arduino C++ from week-08 and ESP32 from month-04 — the syntax is identical. STM32 adds: 12-bit ADC precision, hardware interrupt system, real-time OS (FreeRTOS), and a professional debugger (ST-Link).</p>
+<p><strong>Guided practice file:</strong> <code>stm32_guide.py</code> (in this folder)</p>
+<ul>
+<li>Where to buy and which board (Nucleo-F103RB recommended, ~$12)</li>
+<li>Arduino IDE vs. STM32CubeIDE — which to use when</li>
+<li>4 progressively advanced programs (LED, ADC sensor, UART to Python, interrupts)</li>
+<li>Full industrial sensor logger project connecting STM32 → Python → Flask → dashboard</li>
+<li>4-week learning path with free resources</li>
+<li>5 YOUR TASKS including connecting alarms to your existing Flask server</li>
+</ul>
+<p><strong>Why it matters for your career:</strong></p>
+<ul>
+<li>ESP32 on a CV = &quot;I do hobby IoT&quot;</li>
+<li>STM32 on a CV = &quot;I work with industrial embedded systems&quot;</li>
+<li>STM32 + Python/ML = the exact profile companies look for in</li>
+</ul>
+<p>Industrial Engineering, Mechatronics, and Industry 4.0 roles</p>
+<h3 id="all-resources-in-one-place">📚 All Resources in One Place</h3>
+<h4 id="free">Free</h4>
+<table><thead><tr><th>Topic</th><th>Resource</th></tr></thead><tbody><tr><td>Django</td><td>https://tutorial.djangogirls.org/en/</td></tr><tr><td>Java</td><td>https://java-programming.mooc.fi/</td></tr><tr><td>PySpark</td><td>https://www.datacamp.com/tutorial/pyspark-tutorial</td></tr><tr><td>Deep Learning</td><td>https://course.fast.ai/</td></tr><tr><td>AWS</td><td>https://www.youtube.com/watch?v=SOTamWNgDKc</td></tr><tr><td>Docker + Kubernetes</td><td>https://www.youtube.com/@TechWorldwithNana</td></tr><tr><td>STM32</td><td>https://www.youtube.com/@DeepbluEmbedded (best beginner series)</td></tr></tbody></table>
+<h4 id="paid-buy-on-udemy-sales-wait-for-15-price">Paid (buy on Udemy sales — wait for ~$15 price)</h4>
+<table><thead><tr><th>Topic</th><th>Course</th></tr></thead><tbody><tr><td>Django</td><td>Python Django - The Practical Guide (Maximilian Schwarzmüller)</td></tr><tr><td>Java</td><td>Java Programming Masterclass (Tim Buchalka)</td></tr><tr><td>ML</td><td>Machine Learning Specialization (Andrew Ng / Coursera)</td></tr><tr><td>Docker</td><td>Docker Mastery (Udemy)</td></tr><tr><td>Python</td><td>100 Days of Code (Angela Yu)</td></tr></tbody></table>
+<h3 id="month-5-portfolio-projects">🏆 Month 5 Portfolio Projects</h3>
+<table><thead><tr><th>#</th><th>Project</th><th>What It Shows</th></tr></thead><tbody><tr><td>4</td><td>Django Smart Home Portal with user logins</td><td>Full-stack web development</td></tr><tr><td>5</td><td>Java + PySpark enterprise data pipeline</td><td>Big data engineering</td></tr><tr><td>6</td><td>Image classifier deployed on AWS EC2</td><td>Deep learning + cloud deployment</td></tr><tr><td>7</td><td>STM32 industrial sensor logger → Python → live dashboard</td><td>Professional embedded + data pipeline</td></tr></tbody></table>
+<h3 id="final-words">Final Words</h3>
+<p>You started as a complete beginner. If you completed Months 1-4, you can now:</p>
+<p>✅ Use Linux terminal like a developer ✅ Track code with Git and publish to GitHub ✅ Analyze data with Pandas and visualize it ✅ Query databases with SQL ✅ Collect your own sensor data from the real world ✅ Train ML models that predict house prices ✅ Package code with Docker ✅ Build an IoT pipeline that runs 24/7</p>
+<p>That is a Junior Data Scientist / ML Engineer profile.</p>
+<p><strong>Go apply for jobs. Keep building. Never stop.</strong></p></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#month-5-the-quot-unicorn-quot-expansion-optional">🟣 Month 5+: The &quot;Unicorn&quot; Expansion (Optional)</a><a style="margin-left:12px" href="#the-quot-unicorn-quot-stack">The &quot;Unicorn&quot; Stack</a><a style="margin-left:12px" href="#track-a-django-full-stack-web">🔵 Track A: Django (Full-Stack Web)</a><a style="margin-left:12px" href="#track-b-java-amp-big-data-enterprise">🔵 Track B: Java &amp; Big Data (Enterprise)</a><a style="margin-left:12px" href="#track-c-cloud-amp-mlops-aws">🔵 Track C: Cloud &amp; MLOps (AWS)</a><a style="margin-left:12px" href="#track-d-deep-learning-pytorch">🔵 Track D: Deep Learning (PyTorch)</a><a style="margin-left:12px" href="#track-e-stm32-professional-embedded-systems">� Track E: STM32 (Professional Embedded Systems)</a><a style="margin-left:12px" href="#all-resources-in-one-place">📚 All Resources in One Place</a><a style="margin-left:24px" href="#free">Free</a><a style="margin-left:24px" href="#paid-buy-on-udemy-sales-wait-for-15-price">Paid (buy on Udemy sales — wait for ~$15 price)</a><a style="margin-left:12px" href="#month-5-portfolio-projects">🏆 Month 5 Portfolio Projects</a><a style="margin-left:12px" href="#final-words">Final Words</a></aside>
+    </main>
+  </body>
+</html>

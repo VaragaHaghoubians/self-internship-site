@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Esp32 Sensor.Ino - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Esp32 Sensor.Ino</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">phase-4-iot-hardware/month-08-iot-streaming/resources/esp32_sensor.ino</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><pre><code>/*
+  ==============================================================
+  WEEK 15: ESP32 Wireless Sensor
+  FILE: esp32_sensor.ino
+  
+  TASK: Read temperature from DHT11 sensor and send it wirelessly
+        to your Flask server over WiFi every 5 minutes.
+  
+  HARDWARE WIRING (ESP32 + DHT11):
+    DHT11 VCC  → ESP32 3.3V pin (NOT 5V! ESP32 uses 3.3V)
+    DHT11 GND  → ESP32 GND pin
+    DHT11 DATA → ESP32 GPIO pin 4
+    
+    Add a 10kΩ resistor between VCC and DATA pins (pull-up resistor)
+    (This stabilizes the signal)
+  
+  LIBRARIES NEEDED (install in Arduino IDE):
+    1. DHT sensor library by Adafruit
+       → Tools &gt; Manage Libraries &gt; Search &quot;DHT sensor library&quot;
+    2. Adafruit Unified Sensor
+       → Tools &gt; Manage Libraries &gt; Search &quot;Adafruit Unified Sensor&quot;
+  
+  BEFORE UPLOADING:
+    1. Set your WiFi name and password below
+    2. Set your laptop&#x27;s IP address (run &#x27;ipconfig&#x27; on Windows or &#x27;hostname -I&#x27; on Linux)
+    3. Make sure your Flask server is running!
+  ==============================================================
+*/
+
+#include &lt;WiFi.h&gt;           // ESP32 WiFi library (built-in)
+#include &lt;HTTPClient.h&gt;     // For making HTTP POST requests (built-in)
+#include &lt;DHT.h&gt;            // Adafruit DHT sensor library
+#include &lt;ArduinoJson.h&gt;    // For creating JSON — install: &quot;ArduinoJson&quot; by Benoit Blanchon
+
+// ==============================================================
+// ⚙️  CONFIGURATION — CHANGE THESE!
+// ==============================================================
+
+const char* WIFI_SSID     = &quot;YOUR_WIFI_NAME&quot;;        // Your WiFi network name
+const char* WIFI_PASSWORD = &quot;YOUR_WIFI_PASSWORD&quot;;    // Your WiFi password
+
+// Your LAPTOP&#x27;s IP address (the machine running flask_server.py)
+// Run &#x27;ipconfig&#x27; on Windows or &#x27;hostname -I&#x27; on Linux to find it
+const char* SERVER_IP     = &quot;192.168.1.10&quot;;          // ← CHANGE THIS!
+const int   SERVER_PORT   = 5000;
+const char* DEVICE_ID     = &quot;esp32_living_room&quot;;     // Give your device a name
+
+// DHT Sensor settings
+#define DHT_PIN  4          // GPIO pin where DHT11 DATA wire is connected
+#define DHT_TYPE DHT11      // We&#x27;re using DHT11 (use DHT22 for more accuracy)
+
+// How often to send data (in milliseconds)
+// 300000 = 5 minutes. Change to 30000 for every 30 seconds while testing
+#define SEND_INTERVAL_MS 300000
+
+// ==============================================================
+// GLOBAL OBJECTS
+// ==============================================================
+
+DHT dht(DHT_PIN, DHT_TYPE);
+
+unsigned long lastSendTime = 0;   // Tracks when we last sent data
+
+
+// ==============================================================
+// SETUP — runs once when ESP32 powers on
+// ==============================================================
+
+void setup() {
+    Serial.begin(115200);         // Start serial communication for debugging
+    dht.begin();                  // Initialize DHT sensor
+    
+    Serial.println(&quot;\n==============================&quot;);
+    Serial.println(&quot;ESP32 Smart Sensor Starting...&quot;);
+    Serial.println(&quot;==============================&quot;);
+    
+    connectToWiFi();              // Connect to your home WiFi
+}
+
+
+// ==============================================================
+// MAIN LOOP — runs forever after setup()
+// ==============================================================
+
+void loop() {
+    // Check if WiFi disconnected and reconnect if needed
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println(&quot;WiFi disconnected! Reconnecting...&quot;);
+        connectToWiFi();
+    }
+    
+    // Check if it&#x27;s time to send data
+    unsigned long currentTime = millis();   // millis() = ms since device started
+    
+    if (currentTime - lastSendTime &gt;= SEND_INTERVAL_MS) {
+        // Time to take a reading and send it!
+        readAndSendData();
+        lastSendTime = currentTime;   // Reset the timer
+    }
+    
+    // Small delay to prevent watchdog timer issues
+    delay(1000);
+}
+
+
+// ==============================================================
+// FUNCTION: Connect to WiFi
+// ==============================================================
+
+void connectToWiFi() {
+    Serial.print(&quot;Connecting to WiFi: &quot;);
+    Serial.println(WIFI_SSID);
+    
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED &amp;&amp; attempts &lt; 20) {
+        delay(500);
+        Serial.print(&quot;.&quot;);
+        attempts++;
+    }
+    
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println(&quot;\nConnected!&quot;);
+        Serial.print(&quot;ESP32 IP address: &quot;);
+        Serial.println(WiFi.localIP());
+        
+        // Blink built-in LED 3 times to show successful connection
+        for (int i = 0; i &lt; 3; i++) {
+            digitalWrite(2, HIGH); delay(200);
+            digitalWrite(2, LOW);  delay(200);
+        }
+    } else {
+        Serial.println(&quot;\nFailed to connect! Check SSID and password.&quot;);
+    }
+}
+
+
+// ==============================================================
+// FUNCTION: Read sensor and send data to Flask server
+// ==============================================================
+
+void readAndSendData() {
+    Serial.println(&quot;\n--- Taking a reading... ---&quot;);
+    
+    // Read from DHT11 sensor
+    float humidity    = dht.readHumidity();
+    float temperature = dht.readTemperature();   // Celsius by default
+    
+    // Validate readings (NaN = &quot;Not a Number&quot; = sensor failed)
+    if (isnan(humidity) || isnan(temperature)) {
+        Serial.println(&quot;ERROR: DHT sensor read failed!&quot;);
+        Serial.println(&quot;Check your wiring (VCC, GND, DATA pin)&quot;);
+        return;   // Exit function early — don&#x27;t send bad data
+    }
+    
+    Serial.print(&quot;Temperature: &quot;);
+    Serial.print(temperature);
+    Serial.println(&quot;°C&quot;);
+    
+    Serial.print(&quot;Humidity: &quot;);
+    Serial.print(humidity);
+    Serial.println(&quot;%&quot;);
+    
+    // Build the server URL
+    // Example: &quot;http://192.168.1.10:5000/upload_data&quot;
+    String serverURL = &quot;http://&quot;;
+    serverURL += SERVER_IP;
+    serverURL += &quot;:&quot;;
+    serverURL += SERVER_PORT;
+    serverURL += &quot;/upload_data&quot;;
+    
+    // Create JSON payload
+    // We use the ArduinoJson library to safely build JSON
+    StaticJsonDocument&lt;200&gt; doc;
+    doc[&quot;temperature&quot;] = temperature;
+    doc[&quot;humidity&quot;]    = humidity;
+    doc[&quot;device_id&quot;]   = DEVICE_ID;
+    
+    String jsonPayload;
+    serializeJson(doc, jsonPayload);
+    // jsonPayload is now: {&quot;temperature&quot;:22.5,&quot;humidity&quot;:55.0,&quot;device_id&quot;:&quot;esp32_living_room&quot;}
+    
+    Serial.print(&quot;Sending to: &quot;);
+    Serial.println(serverURL);
+    Serial.print(&quot;Payload: &quot;);
+    Serial.println(jsonPayload);
+    
+    // Send HTTP POST request
+    HTTPClient http;
+    http.begin(serverURL);
+    http.addHeader(&quot;Content-Type&quot;, &quot;application/json&quot;);
+    
+    int responseCode = http.POST(jsonPayload);
+    
+    if (responseCode &gt; 0) {
+        String response = http.getString();
+        Serial.print(&quot;Server responded (&quot;);
+        Serial.print(responseCode);
+        Serial.print(&quot;): &quot;);
+        Serial.println(response);
+        
+        if (responseCode == 201) {
+            Serial.println(&quot;✓ Data saved successfully!&quot;);
+        }
+    } else {
+        Serial.print(&quot;ERROR: HTTP request failed. Code: &quot;);
+        Serial.println(responseCode);
+        Serial.println(&quot;Is the Flask server running? Is the IP correct?&quot;);
+    }
+    
+    http.end();   // Free resources
+}
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>
