@@ -582,5 +582,65 @@
 
     <script src="docs-manifest.js"></script>
     <script src="app.js"></script>
+
+    <!-- Password Lock -->
+    <div id="passwordLock" style="
+      position:fixed;inset:0;z-index:9999;
+      background:#0a0d0b;
+      display:flex;align-items:center;justify-content:center;
+      font-family:Inter,ui-sans-serif,system-ui,sans-serif;
+    ">
+      <div style="
+        background:#191d19;border:1px solid #34392f;border-radius:20px;
+        padding:48px 40px;width:100%;max-width:400px;text-align:center;
+        box-shadow:0 24px 70px rgba(0,0,0,0.5);
+      ">
+        <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+        <h2 style="color:#f5f1e8;margin:0 0 8px;font-size:22px;">Private Workspace</h2>
+        <p style="color:#b7b2a5;margin:0 0 28px;font-size:14px;">Enter your password to access your 12-month internship plan</p>
+        <input id="pwInput" type="password" placeholder="Enter password" style="
+          width:100%;padding:14px 16px;border-radius:10px;border:1px solid #34392f;
+          background:#111411;color:#f5f1e8;font-size:15px;
+          outline:none;box-sizing:border-box;margin-bottom:12px;
+          font-family:inherit;
+        " />
+        <button onclick="checkPassword()" style="
+          width:100%;padding:14px;border-radius:10px;border:none;
+          background:#2dd4bf;color:#06231f;font-size:15px;font-weight:700;
+          cursor:pointer;font-family:inherit;
+        ">Unlock</button>
+        <p id="pwError" style="color:#ef4444;font-size:13px;margin:12px 0 0;display:none;">Incorrect password. Try again.</p>
+      </div>
+    </div>
+
+    <script>
+      const HASH = "0a860e2cfb45c568b2273f983062a4f2f6a9722a2d7678c1918f9df75a3dbfdf";
+
+      async function sha256(str) {
+        const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
+      }
+
+      async function checkPassword() {
+        const val = document.getElementById("pwInput").value;
+        const hash = await sha256(val);
+        if (hash === HASH) {
+          sessionStorage.setItem("unlocked", "1");
+          document.getElementById("passwordLock").style.display = "none";
+        } else {
+          document.getElementById("pwError").style.display = "block";
+          document.getElementById("pwInput").value = "";
+          document.getElementById("pwInput").focus();
+        }
+      }
+
+      document.getElementById("pwInput").addEventListener("keydown", e => {
+        if (e.key === "Enter") checkPassword();
+      });
+
+      if (sessionStorage.getItem("unlocked") === "1") {
+        document.getElementById("passwordLock").style.display = "none";
+      }
+    </script>
   </body>
 </html>
