@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Model Evaluation.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Model Evaluation.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">phase-2-production-ml/month-03-docker-mlops/resources/model_evaluation.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "# ==============================================================\n# WEEK 11 (Part 2): Model Evaluation \u2014 Beyond Accuracy\n# FILE: model_evaluation.py\n#\n# TASK: Learn why \"accuracy\" alone is misleading and how to\n#       properly evaluate a classification model using:\n#       Confusion Matrix, Precision, Recall, F1, ROC-AUC.\n#\n# WHY:  This is one of the most common data science interview topics.\n#       \"What metric would you use and why?\" \u2014 you MUST know the answer.\n#\n#       Classic trap: 99% of emails are NOT spam.\n#       A model that predicts \"not spam\" for EVERY email gets 99% accuracy.\n#       But it catches ZERO spam. Accuracy lied to you.\n#\n# INSTALL: pip install scikit-learn matplotlib seaborn numpy pandas\n# HOW TO RUN: python model_evaluation.py\n# ==============================================================\n\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nfrom sklearn.datasets import make_classification\nfrom sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import (\n    confusion_matrix,\n    classification_report,\n    accuracy_score,\n    precision_score,\n    recall_score,\n    f1_score,\n    roc_auc_score,\n    roc_curve,\n    precision_recall_curve,\n    ConfusionMatrixDisplay\n)\n\nsns.set_theme(style=\"whitegrid\")\n\nprint(\"=\" * 60)\nprint(\"WEEK 11 (Part 2): Model Evaluation\")\nprint(\"=\" * 60)\n\n\n# ==============================================================\n# PART 1: THE CONFUSION MATRIX \u2014 The Foundation of Everything\n# ==============================================================\nprint(\"\\n--- PART 1: The Confusion Matrix ---\")\n\n# Manually create a small example first so the concept is crystal clear.\n# Scenario: 10 patients tested for a disease. Did the model get it right?\n\ny_true   = [1, 0, 1, 1, 0, 1, 0, 0, 1, 0]   # Actual:    1=disease, 0=healthy\ny_pred   = [1, 0, 1, 0, 0, 1, 1, 0, 1, 0]   # Predicted: model's output\n\ncm = confusion_matrix(y_true, y_pred)\n\nprint(\"Actual vs. Predicted:\")\nprint(\"  y_true:\", y_true)\nprint(\"  y_pred:\", y_pred)\nprint(f\"\\nConfusion Matrix:\")\nprint(cm)\nprint(\"\"\"\n                   Predicted Negative  Predicted Positive\nActual Negative  [ TN (True Neg)        FP (False Pos) ]\nActual Positive  [ FN (False Neg)       TP (True Pos)  ]\n\nTN = Correctly said \"no disease\"  (good)\nTP = Correctly said \"disease\"     (good)\nFP = Said \"disease\" but they're healthy  \u2014 False Alarm  (Type I error)\nFN = Said \"healthy\" but they have disease \u2014 Missed case (Type II error)\n\"\"\")\n\ntn, fp, fn, tp = cm.ravel()\nprint(f\"TN={tn}  FP={fp}  FN={fn}  TP={tp}\")\n\n\n# ==============================================================\n# PART 2: THE FOUR KEY METRICS\n# ==============================================================\nprint(\"\\n--- PART 2: Precision, Recall, F1, Accuracy ---\")\n\n# ACCURACY = (TP + TN) / Total\n# \"What fraction of ALL predictions were correct?\"\n# PROBLEM: Misleading when classes are imbalanced.\nacc = accuracy_score(y_true, y_pred)\nprint(f\"Accuracy:  {acc:.2f}  \u2190 can be misleading with imbalanced data\")\n\n# PRECISION = TP / (TP + FP)\n# \"Of all the times I said POSITIVE, how often was I right?\"\n# HIGH precision = few false alarms\n# USE WHEN: False positives are costly (e.g., spam filter wrongly blocks real email)\nprec = precision_score(y_true, y_pred)\nprint(f\"Precision: {prec:.2f}  \u2190 of positive predictions, how many are actually positive?\")\n\n# RECALL (Sensitivity) = TP / (TP + FN)\n# \"Of all the ACTUAL positives, how many did I find?\"\n# HIGH recall = few missed cases\n# USE WHEN: False negatives are costly (e.g., missing a cancer diagnosis)\nrec = recall_score(y_true, y_pred)\nprint(f\"Recall:    {rec:.2f}  \u2190 of all actual positives, how many did I catch?\")\n\n# F1 SCORE = 2 * (Precision * Recall) / (Precision + Recall)\n# Harmonic mean of Precision and Recall.\n# USE WHEN: You want to balance both \u2014 good default for imbalanced data\nf1 = f1_score(y_true, y_pred)\nprint(f\"F1 Score:  {f1:.2f}  \u2190 balance between precision and recall\")\n\nprint(\"\"\"\nCHEAT SHEET \u2014 Which metric to optimize?\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  Disease detection / fraud    \u2192 Recall   (don't miss real cases)\n  Spam filter / recommendation \u2192 Precision (don't bother wrong people)\n  Balanced classes             \u2192 Accuracy\n  Imbalanced classes           \u2192 F1 Score or AUC-ROC\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\"\"\")\n\n\n# ==============================================================\n# PART 3: REAL MODEL EVALUATION\n# ==============================================================\nprint(\"\\n--- PART 3: Evaluating a Real Model ---\")\n\n# Create an imbalanced dataset (90% class 0, 10% class 1)\nX, y = make_classification(\n    n_samples=1000,\n    n_features=10,\n    n_informative=5,\n    weights=[0.85, 0.15],   # 85% negative, 15% positive\n    random_state=42\n)\nprint(f\"Dataset: {X.shape[0]} samples, class distribution: {np.bincount(y)}\")\n\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.2, random_state=42, stratify=y\n)\n# stratify=y \u2192 keeps the same class ratio in train and test splits\n\n# Train a Random Forest\nmodel = RandomForestClassifier(n_estimators=100, random_state=42)\nmodel.fit(X_train, y_train)\ny_pred_rf = model.predict(X_test)\n\nprint(\"\\nRandom Forest \u2014 Full Evaluation:\")\nprint(classification_report(y_test, y_pred_rf, target_names=[\"Negative\", \"Positive\"]))\n# classification_report gives precision, recall, f1 for EACH class\n\nprint(f\"AUC-ROC: {roc_auc_score(y_test, model.predict_proba(X_test)[:, 1]):.3f}\")\n\n\n# ==============================================================\n# PART 4: CONFUSION MATRIX VISUALIZATION\n# ==============================================================\nprint(\"\\n--- PART 4: Confusion Matrix Plot ---\")\n\nfig, axes = plt.subplots(1, 2, figsize=(12, 5))\nfig.suptitle(\"Model Evaluation \u2014 Confusion Matrices\", fontsize=13)\n\n# Random Forest\nConfusionMatrixDisplay.from_predictions(\n    y_test, y_pred_rf,\n    display_labels=[\"Negative\", \"Positive\"],\n    cmap=\"Blues\", ax=axes[0]\n)\naxes[0].set_title(\"Random Forest\")\n\n# Logistic Regression for comparison\nlr = LogisticRegression(random_state=42)\nlr.fit(X_train, y_train)\ny_pred_lr = lr.predict(X_test)\nConfusionMatrixDisplay.from_predictions(\n    y_test, y_pred_lr,\n    display_labels=[\"Negative\", \"Positive\"],\n    cmap=\"Oranges\", ax=axes[1]\n)\naxes[1].set_title(\"Logistic Regression\")\n\nplt.tight_layout()\nplt.savefig(\"plot_eval_01_confusion.png\", dpi=150)\nplt.close()\nprint(\"Saved: plot_eval_01_confusion.png\")\n\n\n# ==============================================================\n# PART 5: ROC CURVE & AUC\n# ==============================================================\nprint(\"\\n--- PART 5: ROC Curve and AUC ---\")\n\n# ROC = Receiver Operating Characteristic\n# It plots True Positive Rate vs False Positive Rate at every threshold.\n# AUC (Area Under Curve) = overall measure of model quality.\n#   AUC = 1.0 \u2192 perfect model\n#   AUC = 0.5 \u2192 random guess (diagonal line)\n#   AUC = 0.0 \u2192 perfectly wrong\n\nprint(\"AUC-ROC interpretation:\")\nprint(\"  1.0 = perfect  |  0.8+ = good  |  0.7-0.8 = fair  |  0.5 = random\")\n\nfig, ax = plt.subplots(figsize=(7, 6))\n\nfor clf, name, color in [\n    (model, \"Random Forest\",      \"steelblue\"),\n    (lr,    \"Logistic Regression\", \"coral\"),\n]:\n    proba   = clf.predict_proba(X_test)[:, 1]\n    fpr, tpr, _ = roc_curve(y_test, proba)\n    auc = roc_auc_score(y_test, proba)\n    ax.plot(fpr, tpr, color=color, label=f\"{name} (AUC = {auc:.3f})\", linewidth=2)\n\nax.plot([0, 1], [0, 1], \"k--\", label=\"Random guess (AUC = 0.5)\")\nax.set_xlabel(\"False Positive Rate (FPR)\")\nax.set_ylabel(\"True Positive Rate (Recall / TPR)\")\nax.set_title(\"ROC Curve Comparison\")\nax.legend()\nplt.tight_layout()\nplt.savefig(\"plot_eval_02_roc.png\", dpi=150)\nplt.close()\nprint(\"Saved: plot_eval_02_roc.png\")\n\n\n# ==============================================================\n# PART 6: PRECISION-RECALL CURVE\n# ==============================================================\nprint(\"\\n--- PART 6: Precision-Recall Curve ---\")\n\n# More informative than ROC when classes are VERY imbalanced.\n# A high-precision, high-recall model is in the top-right corner.\n\nfig, ax = plt.subplots(figsize=(7, 6))\n\nfor clf, name, color in [\n    (model, \"Random Forest\",       \"steelblue\"),\n    (lr,    \"Logistic Regression\", \"coral\"),\n]:\n    proba = clf.predict_proba(X_test)[:, 1]\n    precision, recall, _ = precision_recall_curve(y_test, proba)\n    ax.plot(recall, precision, color=color, label=name, linewidth=2)\n\nax.set_xlabel(\"Recall\")\nax.set_ylabel(\"Precision\")\nax.set_title(\"Precision-Recall Curve\")\nax.legend()\nplt.tight_layout()\nplt.savefig(\"plot_eval_03_pr_curve.png\", dpi=150)\nplt.close()\nprint(\"Saved: plot_eval_03_pr_curve.png\")\n\n\n# ==============================================================\n# PART 7: CROSS-VALIDATION \u2014 More Reliable Than One Split\n# ==============================================================\nprint(\"\\n--- PART 7: Cross-Validation ---\")\n\n# Problem with a single train/test split: results depend on which 70% you\n# happened to train on. Maybe you got lucky (or unlucky).\n#\n# Cross-validation (k-fold): split the data into k folds.\n# Train on k-1 folds, test on the remaining 1. Repeat k times.\n# Average the k results \u2192 much more reliable estimate.\n\ncv   = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)\n# StratifiedKFold preserves class ratios in each fold\n\nrf_cv_scores = cross_val_score(\n    RandomForestClassifier(n_estimators=100, random_state=42),\n    X, y, cv=cv, scoring=\"f1\"\n)\nlr_cv_scores = cross_val_score(\n    LogisticRegression(random_state=42),\n    X, y, cv=cv, scoring=\"f1\"\n)\n\nprint(f\"5-Fold Cross-Validation F1 Scores:\")\nprint(f\"  Random Forest:      {rf_cv_scores.round(3)} \u2192 mean = {rf_cv_scores.mean():.3f} \u00b1 {rf_cv_scores.std():.3f}\")\nprint(f\"  Logistic Regression:{lr_cv_scores.round(3)} \u2192 mean = {lr_cv_scores.mean():.3f} \u00b1 {lr_cv_scores.std():.3f}\")\nprint(\"  \u2192 Lower std = more stable model\")\n\n\n# ==============================================================\n# COMPARISON SUMMARY\n# ==============================================================\nprint(\"\\n\" + \"=\" * 60)\nprint(\"Summary: Random Forest vs Logistic Regression\")\nprint(\"=\" * 60)\nsummary = pd.DataFrame({\n    \"Model\":     [\"Random Forest\", \"Logistic Regression\"],\n    \"Accuracy\":  [accuracy_score(y_test, y_pred_rf), accuracy_score(y_test, y_pred_lr)],\n    \"Precision\": [precision_score(y_test, y_pred_rf), precision_score(y_test, y_pred_lr)],\n    \"Recall\":    [recall_score(y_test, y_pred_rf), recall_score(y_test, y_pred_lr)],\n    \"F1\":        [f1_score(y_test, y_pred_rf), f1_score(y_test, y_pred_lr)],\n    \"AUC-ROC\":   [\n        roc_auc_score(y_test, model.predict_proba(X_test)[:, 1]),\n        roc_auc_score(y_test, lr.predict_proba(X_test)[:, 1])\n    ],\n}).set_index(\"Model\").round(3)\nprint(summary)\n\n\n# ==============================================================\n# \ud83c\udfaf YOUR TASKS\n# ==============================================================\nprint(\"\\n\" + \"=\" * 60)\nprint(\"YOUR TURN \u2014 Model Evaluation Practice\")\nprint(\"=\" * 60)\nprint(\"\"\"\nTASK 1: A model was evaluated and gave these results:\n        y_true = [1,1,1,1,1,0,0,0,0,0]\n        y_pred = [1,1,0,0,0,1,1,0,0,0]\n        Calculate manually (with paper) then verify with sklearn:\n        - TP, TN, FP, FN from the confusion matrix\n        - Precision, Recall, F1\n        Which error type (FP or FN) is bigger? What does that mean?\n\nTASK 2: Re-run the Random Forest above but change weights to [0.95, 0.05]\n        (even more imbalanced \u2014 only 5% positive).\n        Does accuracy stay high even if the model is bad? Check F1 and Recall.\n\nTASK 3: Plot the confusion matrix for BOTH models side-by-side.\n        Which model makes more False Negatives? Which makes more False Positives?\n        In a medical context, which error is worse?\n\nTASK 4: Change cross_val_score scoring from \"f1\" to \"roc_auc\".\n        Does the ranking between the two models change?\n\nTASK 5 (stretch): Use class_weight='balanced' in RandomForestClassifier.\n        Does it improve recall for the minority class?\n        HINT: RandomForestClassifier(class_weight='balanced')\n\nWrite your code below:\n\"\"\")\n\n# YOUR SOLUTIONS HERE:\n\n\nprint(\"\\nModel evaluation complete! Plots saved to current folder.\")\n";
+      const readerOutputKey = "readerRun:phase-2-production-ml/month-03-docker-mlops/resources/model_evaluation.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code># ==============================================================
+# WEEK 11 (Part 2): Model Evaluation — Beyond Accuracy
+# FILE: model_evaluation.py
+#
+# TASK: Learn why &quot;accuracy&quot; alone is misleading and how to
+#       properly evaluate a classification model using:
+#       Confusion Matrix, Precision, Recall, F1, ROC-AUC.
+#
+# WHY:  This is one of the most common data science interview topics.
+#       &quot;What metric would you use and why?&quot; — you MUST know the answer.
+#
+#       Classic trap: 99% of emails are NOT spam.
+#       A model that predicts &quot;not spam&quot; for EVERY email gets 99% accuracy.
+#       But it catches ZERO spam. Accuracy lied to you.
+#
+# INSTALL: pip install scikit-learn matplotlib seaborn numpy pandas
+# HOW TO RUN: python model_evaluation.py
+# ==============================================================
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    confusion_matrix,
+    classification_report,
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    roc_curve,
+    precision_recall_curve,
+    ConfusionMatrixDisplay
+)
+
+sns.set_theme(style=&quot;whitegrid&quot;)
+
+print(&quot;=&quot; * 60)
+print(&quot;WEEK 11 (Part 2): Model Evaluation&quot;)
+print(&quot;=&quot; * 60)
+
+
+# ==============================================================
+# PART 1: THE CONFUSION MATRIX — The Foundation of Everything
+# ==============================================================
+print(&quot;\n--- PART 1: The Confusion Matrix ---&quot;)
+
+# Manually create a small example first so the concept is crystal clear.
+# Scenario: 10 patients tested for a disease. Did the model get it right?
+
+y_true   = [1, 0, 1, 1, 0, 1, 0, 0, 1, 0]   # Actual:    1=disease, 0=healthy
+y_pred   = [1, 0, 1, 0, 0, 1, 1, 0, 1, 0]   # Predicted: model&#x27;s output
+
+cm = confusion_matrix(y_true, y_pred)
+
+print(&quot;Actual vs. Predicted:&quot;)
+print(&quot;  y_true:&quot;, y_true)
+print(&quot;  y_pred:&quot;, y_pred)
+print(f&quot;\nConfusion Matrix:&quot;)
+print(cm)
+print(&quot;&quot;&quot;
+                   Predicted Negative  Predicted Positive
+Actual Negative  [ TN (True Neg)        FP (False Pos) ]
+Actual Positive  [ FN (False Neg)       TP (True Pos)  ]
+
+TN = Correctly said &quot;no disease&quot;  (good)
+TP = Correctly said &quot;disease&quot;     (good)
+FP = Said &quot;disease&quot; but they&#x27;re healthy  — False Alarm  (Type I error)
+FN = Said &quot;healthy&quot; but they have disease — Missed case (Type II error)
+&quot;&quot;&quot;)
+
+tn, fp, fn, tp = cm.ravel()
+print(f&quot;TN={tn}  FP={fp}  FN={fn}  TP={tp}&quot;)
+
+
+# ==============================================================
+# PART 2: THE FOUR KEY METRICS
+# ==============================================================
+print(&quot;\n--- PART 2: Precision, Recall, F1, Accuracy ---&quot;)
+
+# ACCURACY = (TP + TN) / Total
+# &quot;What fraction of ALL predictions were correct?&quot;
+# PROBLEM: Misleading when classes are imbalanced.
+acc = accuracy_score(y_true, y_pred)
+print(f&quot;Accuracy:  {acc:.2f}  ← can be misleading with imbalanced data&quot;)
+
+# PRECISION = TP / (TP + FP)
+# &quot;Of all the times I said POSITIVE, how often was I right?&quot;
+# HIGH precision = few false alarms
+# USE WHEN: False positives are costly (e.g., spam filter wrongly blocks real email)
+prec = precision_score(y_true, y_pred)
+print(f&quot;Precision: {prec:.2f}  ← of positive predictions, how many are actually positive?&quot;)
+
+# RECALL (Sensitivity) = TP / (TP + FN)
+# &quot;Of all the ACTUAL positives, how many did I find?&quot;
+# HIGH recall = few missed cases
+# USE WHEN: False negatives are costly (e.g., missing a cancer diagnosis)
+rec = recall_score(y_true, y_pred)
+print(f&quot;Recall:    {rec:.2f}  ← of all actual positives, how many did I catch?&quot;)
+
+# F1 SCORE = 2 * (Precision * Recall) / (Precision + Recall)
+# Harmonic mean of Precision and Recall.
+# USE WHEN: You want to balance both — good default for imbalanced data
+f1 = f1_score(y_true, y_pred)
+print(f&quot;F1 Score:  {f1:.2f}  ← balance between precision and recall&quot;)
+
+print(&quot;&quot;&quot;
+CHEAT SHEET — Which metric to optimize?
+─────────────────────────────────────────────────────────────────
+  Disease detection / fraud    → Recall   (don&#x27;t miss real cases)
+  Spam filter / recommendation → Precision (don&#x27;t bother wrong people)
+  Balanced classes             → Accuracy
+  Imbalanced classes           → F1 Score or AUC-ROC
+─────────────────────────────────────────────────────────────────
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# PART 3: REAL MODEL EVALUATION
+# ==============================================================
+print(&quot;\n--- PART 3: Evaluating a Real Model ---&quot;)
+
+# Create an imbalanced dataset (90% class 0, 10% class 1)
+X, y = make_classification(
+    n_samples=1000,
+    n_features=10,
+    n_informative=5,
+    weights=[0.85, 0.15],   # 85% negative, 15% positive
+    random_state=42
+)
+print(f&quot;Dataset: {X.shape[0]} samples, class distribution: {np.bincount(y)}&quot;)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+# stratify=y → keeps the same class ratio in train and test splits
+
+# Train a Random Forest
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+y_pred_rf = model.predict(X_test)
+
+print(&quot;\nRandom Forest — Full Evaluation:&quot;)
+print(classification_report(y_test, y_pred_rf, target_names=[&quot;Negative&quot;, &quot;Positive&quot;]))
+# classification_report gives precision, recall, f1 for EACH class
+
+print(f&quot;AUC-ROC: {roc_auc_score(y_test, model.predict_proba(X_test)[:, 1]):.3f}&quot;)
+
+
+# ==============================================================
+# PART 4: CONFUSION MATRIX VISUALIZATION
+# ==============================================================
+print(&quot;\n--- PART 4: Confusion Matrix Plot ---&quot;)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+fig.suptitle(&quot;Model Evaluation — Confusion Matrices&quot;, fontsize=13)
+
+# Random Forest
+ConfusionMatrixDisplay.from_predictions(
+    y_test, y_pred_rf,
+    display_labels=[&quot;Negative&quot;, &quot;Positive&quot;],
+    cmap=&quot;Blues&quot;, ax=axes[0]
+)
+axes[0].set_title(&quot;Random Forest&quot;)
+
+# Logistic Regression for comparison
+lr = LogisticRegression(random_state=42)
+lr.fit(X_train, y_train)
+y_pred_lr = lr.predict(X_test)
+ConfusionMatrixDisplay.from_predictions(
+    y_test, y_pred_lr,
+    display_labels=[&quot;Negative&quot;, &quot;Positive&quot;],
+    cmap=&quot;Oranges&quot;, ax=axes[1]
+)
+axes[1].set_title(&quot;Logistic Regression&quot;)
+
+plt.tight_layout()
+plt.savefig(&quot;plot_eval_01_confusion.png&quot;, dpi=150)
+plt.close()
+print(&quot;Saved: plot_eval_01_confusion.png&quot;)
+
+
+# ==============================================================
+# PART 5: ROC CURVE &amp; AUC
+# ==============================================================
+print(&quot;\n--- PART 5: ROC Curve and AUC ---&quot;)
+
+# ROC = Receiver Operating Characteristic
+# It plots True Positive Rate vs False Positive Rate at every threshold.
+# AUC (Area Under Curve) = overall measure of model quality.
+#   AUC = 1.0 → perfect model
+#   AUC = 0.5 → random guess (diagonal line)
+#   AUC = 0.0 → perfectly wrong
+
+print(&quot;AUC-ROC interpretation:&quot;)
+print(&quot;  1.0 = perfect  |  0.8+ = good  |  0.7-0.8 = fair  |  0.5 = random&quot;)
+
+fig, ax = plt.subplots(figsize=(7, 6))
+
+for clf, name, color in [
+    (model, &quot;Random Forest&quot;,      &quot;steelblue&quot;),
+    (lr,    &quot;Logistic Regression&quot;, &quot;coral&quot;),
+]:
+    proba   = clf.predict_proba(X_test)[:, 1]
+    fpr, tpr, _ = roc_curve(y_test, proba)
+    auc = roc_auc_score(y_test, proba)
+    ax.plot(fpr, tpr, color=color, label=f&quot;{name} (AUC = {auc:.3f})&quot;, linewidth=2)
+
+ax.plot([0, 1], [0, 1], &quot;k--&quot;, label=&quot;Random guess (AUC = 0.5)&quot;)
+ax.set_xlabel(&quot;False Positive Rate (FPR)&quot;)
+ax.set_ylabel(&quot;True Positive Rate (Recall / TPR)&quot;)
+ax.set_title(&quot;ROC Curve Comparison&quot;)
+ax.legend()
+plt.tight_layout()
+plt.savefig(&quot;plot_eval_02_roc.png&quot;, dpi=150)
+plt.close()
+print(&quot;Saved: plot_eval_02_roc.png&quot;)
+
+
+# ==============================================================
+# PART 6: PRECISION-RECALL CURVE
+# ==============================================================
+print(&quot;\n--- PART 6: Precision-Recall Curve ---&quot;)
+
+# More informative than ROC when classes are VERY imbalanced.
+# A high-precision, high-recall model is in the top-right corner.
+
+fig, ax = plt.subplots(figsize=(7, 6))
+
+for clf, name, color in [
+    (model, &quot;Random Forest&quot;,       &quot;steelblue&quot;),
+    (lr,    &quot;Logistic Regression&quot;, &quot;coral&quot;),
+]:
+    proba = clf.predict_proba(X_test)[:, 1]
+    precision, recall, _ = precision_recall_curve(y_test, proba)
+    ax.plot(recall, precision, color=color, label=name, linewidth=2)
+
+ax.set_xlabel(&quot;Recall&quot;)
+ax.set_ylabel(&quot;Precision&quot;)
+ax.set_title(&quot;Precision-Recall Curve&quot;)
+ax.legend()
+plt.tight_layout()
+plt.savefig(&quot;plot_eval_03_pr_curve.png&quot;, dpi=150)
+plt.close()
+print(&quot;Saved: plot_eval_03_pr_curve.png&quot;)
+
+
+# ==============================================================
+# PART 7: CROSS-VALIDATION — More Reliable Than One Split
+# ==============================================================
+print(&quot;\n--- PART 7: Cross-Validation ---&quot;)
+
+# Problem with a single train/test split: results depend on which 70% you
+# happened to train on. Maybe you got lucky (or unlucky).
+#
+# Cross-validation (k-fold): split the data into k folds.
+# Train on k-1 folds, test on the remaining 1. Repeat k times.
+# Average the k results → much more reliable estimate.
+
+cv   = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+# StratifiedKFold preserves class ratios in each fold
+
+rf_cv_scores = cross_val_score(
+    RandomForestClassifier(n_estimators=100, random_state=42),
+    X, y, cv=cv, scoring=&quot;f1&quot;
+)
+lr_cv_scores = cross_val_score(
+    LogisticRegression(random_state=42),
+    X, y, cv=cv, scoring=&quot;f1&quot;
+)
+
+print(f&quot;5-Fold Cross-Validation F1 Scores:&quot;)
+print(f&quot;  Random Forest:      {rf_cv_scores.round(3)} → mean = {rf_cv_scores.mean():.3f} ± {rf_cv_scores.std():.3f}&quot;)
+print(f&quot;  Logistic Regression:{lr_cv_scores.round(3)} → mean = {lr_cv_scores.mean():.3f} ± {lr_cv_scores.std():.3f}&quot;)
+print(&quot;  → Lower std = more stable model&quot;)
+
+
+# ==============================================================
+# COMPARISON SUMMARY
+# ==============================================================
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;Summary: Random Forest vs Logistic Regression&quot;)
+print(&quot;=&quot; * 60)
+summary = pd.DataFrame({
+    &quot;Model&quot;:     [&quot;Random Forest&quot;, &quot;Logistic Regression&quot;],
+    &quot;Accuracy&quot;:  [accuracy_score(y_test, y_pred_rf), accuracy_score(y_test, y_pred_lr)],
+    &quot;Precision&quot;: [precision_score(y_test, y_pred_rf), precision_score(y_test, y_pred_lr)],
+    &quot;Recall&quot;:    [recall_score(y_test, y_pred_rf), recall_score(y_test, y_pred_lr)],
+    &quot;F1&quot;:        [f1_score(y_test, y_pred_rf), f1_score(y_test, y_pred_lr)],
+    &quot;AUC-ROC&quot;:   [
+        roc_auc_score(y_test, model.predict_proba(X_test)[:, 1]),
+        roc_auc_score(y_test, lr.predict_proba(X_test)[:, 1])
+    ],
+}).set_index(&quot;Model&quot;).round(3)
+print(summary)
+
+
+# ==============================================================
+# 🎯 YOUR TASKS
+# ==============================================================
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;YOUR TURN — Model Evaluation Practice&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;&quot;&quot;
+TASK 1: A model was evaluated and gave these results:
+        y_true = [1,1,1,1,1,0,0,0,0,0]
+        y_pred = [1,1,0,0,0,1,1,0,0,0]
+        Calculate manually (with paper) then verify with sklearn:
+        - TP, TN, FP, FN from the confusion matrix
+        - Precision, Recall, F1
+        Which error type (FP or FN) is bigger? What does that mean?
+
+TASK 2: Re-run the Random Forest above but change weights to [0.95, 0.05]
+        (even more imbalanced — only 5% positive).
+        Does accuracy stay high even if the model is bad? Check F1 and Recall.
+
+TASK 3: Plot the confusion matrix for BOTH models side-by-side.
+        Which model makes more False Negatives? Which makes more False Positives?
+        In a medical context, which error is worse?
+
+TASK 4: Change cross_val_score scoring from &quot;f1&quot; to &quot;roc_auc&quot;.
+        Does the ranking between the two models change?
+
+TASK 5 (stretch): Use class_weight=&#x27;balanced&#x27; in RandomForestClassifier.
+        Does it improve recall for the minority class?
+        HINT: RandomForestClassifier(class_weight=&#x27;balanced&#x27;)
+
+Write your code below:
+&quot;&quot;&quot;)
+
+# YOUR SOLUTIONS HERE:
+
+
+print(&quot;\nModel evaluation complete! Plots saved to current folder.&quot;)
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

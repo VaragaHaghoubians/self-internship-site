@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pandas Basics.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Pandas Basics.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">phase-1-software-engineering/month-02-databases-web/resources/pandas_basics.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "# ==============================================================\n# WEEK 5: Pandas & NumPy \u2014 The Core of Data Science\n# FILE: pandas_basics.py\n#\n# TASK: Load a CSV file, explore it, filter it, and calculate\n#       basic statistics using Pandas and NumPy.\n#\n# WHY:  Pandas is THE tool for working with tabular data (like Excel\n#       but with code). Every data science job requires it.\n#       NumPy provides fast math operations on arrays/numbers.\n#\n# BEFORE RUNNING: Make sure your ds-env is activated and you have\n#   pandas and numpy installed:\n#   pip install pandas numpy\n#\n# HOW TO RUN: python pandas_basics.py\n# ==============================================================\n\nimport pandas as pd    # 'pd' is the standard shortcut for pandas\nimport numpy as np     # 'np' is the standard shortcut for numpy\n\nprint(\"=\" * 60)\nprint(\"WEEK 5: Pandas & NumPy Basics\")\nprint(\"=\" * 60)\n\n\n# ==============================================================\n# PART 1: Create a DataFrame from scratch\n# ==============================================================\n\n# A DataFrame is like a spreadsheet/table with rows and columns.\n# We create one by giving it a dictionary where:\n#   - Keys   = column names\n#   - Values = lists of data (one item per row)\n\nprint(\"\\n--- PART 1: Create a DataFrame ---\")\n\ndata = {\n    \"day\":         [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"],\n    \"temperature\": [22.1,  23.5,  21.8,  24.0,  22.7,  23.1,  21.5],\n    \"humidity\":    [55,     60,    58,    52,    57,    61,    59],\n    \"sensor_ok\":   [True,  True,  True,  False, True,  True,  True]\n}\n\n# pd.DataFrame() turns our dictionary into a table\ndf = pd.DataFrame(data)\n\n# Print the full table\nprint(df)\n\n# HINT: The numbers on the left (0, 1, 2...) are the INDEX \u2014 the row numbers.\n\n\n# ==============================================================\n# PART 2: Exploring a DataFrame\n# ==============================================================\n\nprint(\"\\n--- PART 2: Exploring the DataFrame ---\")\n\n# .shape tells you (number of rows, number of columns)\nprint(\"Shape (rows, columns):\", df.shape)\n\n# .dtypes tells you the data type of each column\nprint(\"\\nColumn data types:\")\nprint(df.dtypes)\n\n# .head(n) shows the first n rows (default is 5)\nprint(\"\\nFirst 3 rows:\")\nprint(df.head(3))\n\n# .describe() gives you a statistical summary of number columns\nprint(\"\\nStatistical summary:\")\nprint(df.describe())\n\n# HINT: describe() shows: count, mean, std (standard deviation),\n# min, 25%, 50% (median), 75%, max\n\n\n# ==============================================================\n# PART 3: Selecting Columns\n# ==============================================================\n\nprint(\"\\n--- PART 3: Selecting Columns ---\")\n\n# Select ONE column \u2014 returns a Series (like a list with labels)\ntemp_column = df[\"temperature\"]\nprint(\"Temperature column:\")\nprint(temp_column)\n\n# Select MULTIPLE columns \u2014 returns a new DataFrame\ntemp_and_humidity = df[[\"temperature\", \"humidity\"]]\nprint(\"\\nTemperature and humidity together:\")\nprint(temp_and_humidity)\n\n# HINT: Single brackets df[\"col\"] \u2192 Series\n#        Double brackets df[[\"col1\", \"col2\"]] \u2192 DataFrame\n\n\n# ==============================================================\n# PART 4: Filtering Rows (This is VERY important!)\n# ==============================================================\n\nprint(\"\\n--- PART 4: Filtering Rows ---\")\n\n# Get rows where temperature is above 23 degrees\nhot_days = df[df[\"temperature\"] > 23]\nprint(\"Days where temperature > 23:\")\nprint(hot_days)\n\n# Get rows where sensor was working (sensor_ok == True)\nworking_sensor = df[df[\"sensor_ok\"] == True]\nprint(\"\\nDays where sensor was working:\")\nprint(working_sensor)\n\n# Combine two conditions with & (AND) or | (OR)\nhot_and_working = df[(df[\"temperature\"] > 23) & (df[\"sensor_ok\"] == True)]\nprint(\"\\nHot days WITH working sensor:\")\nprint(hot_and_working)\n\n# HINT: df[condition] returns only rows where condition is True\n# The condition inside df[] must use column names like df[\"col\"]\n\n\n# ==============================================================\n# PART 5: Basic Statistics\n# ==============================================================\n\nprint(\"\\n--- PART 5: Statistics ---\")\n\ntemps = df[\"temperature\"]\n\nprint(\"Average temperature:\", temps.mean())\nprint(\"Maximum temperature:\", temps.max())\nprint(\"Minimum temperature:\", temps.min())\nprint(\"Median temperature:\", temps.median())\nprint(\"Standard deviation:\", temps.std())\n\n# NumPy also works on the same data\ntemps_array = np.array(df[\"temperature\"])\nprint(\"\\nUsing NumPy:\")\nprint(\"Sum of all temperatures:\", np.sum(temps_array))\nprint(\"Variance:\", np.var(temps_array))\n\n\n# ==============================================================\n# PART 6: Adding a New Column\n# ==============================================================\n\nprint(\"\\n--- PART 6: Adding a New Column ---\")\n\n# Convert Celsius to Fahrenheit: F = (C \u00d7 9/5) + 32\n# Pandas applies this formula to EVERY row automatically!\ndf[\"temp_fahrenheit\"] = (df[\"temperature\"] * 9/5) + 32\n\nprint(\"DataFrame with new Fahrenheit column:\")\nprint(df[[\"day\", \"temperature\", \"temp_fahrenheit\"]])\n\n\n# ==============================================================\n# PART 7: Loading a Real CSV File\n# ==============================================================\n\nprint(\"\\n--- PART 7: Loading a CSV File ---\")\n\n# First, let's create and save a CSV so we have one to load\ndf.to_csv(\"week5_temperature_data.csv\", index=False)\nprint(\"Saved data to 'week5_temperature_data.csv'\")\n\n# Now load it back \u2014 this is how you'll load ANY dataset\nloaded_df = pd.read_csv(\"week5_temperature_data.csv\")\nprint(\"\\nLoaded CSV (first 3 rows):\")\nprint(loaded_df.head(3))\n\n# HINT: pd.read_csv(\"filename.csv\") is how you load almost every dataset\n# The file can be a local path OR a URL from the internet!\n\n\n# ==============================================================\n# PART 8: Sorting and Value Counts\n# ==============================================================\n\nprint(\"\\n--- PART 8: Sorting and Value Counts ---\")\n\n# Build a slightly richer dataset to work with\nsales_data = {\n    \"city\":     [\"NYC\", \"LA\", \"NYC\", \"Chicago\", \"LA\", \"NYC\", \"Chicago\", \"LA\"],\n    \"product\":  [\"A\",   \"B\",  \"B\",   \"A\",       \"A\",  \"C\",   \"B\",       \"C\"],\n    \"revenue\":  [1200,  850,  940,   1100,      760,  1350,  890,       920],\n    \"units\":    [12,    9,    10,    11,        8,    14,    9,         10],\n}\nsales = pd.DataFrame(sales_data)\nprint(\"Sales data:\")\nprint(sales)\n\n# sort_values() \u2014 sort by one or more columns\nprint(\"\\nSorted by revenue (highest first):\")\nprint(sales.sort_values(\"revenue\", ascending=False))\n\n# Sort by multiple columns: first city (A\u2192Z), then revenue within each city (high\u2192low)\nprint(\"\\nSorted by city, then revenue descending:\")\nprint(sales.sort_values([\"city\", \"revenue\"], ascending=[True, False]))\n\n# value_counts() \u2014 how many times each value appears in a column\nprint(\"\\nHow many rows per city:\")\nprint(sales[\"city\"].value_counts())\n# HINT: value_counts() always sorts from most common to least common\n\nprint(\"\\nHow many rows per product:\")\nprint(sales[\"product\"].value_counts())\n\n\n# ==============================================================\n# PART 9: GroupBy \u2014 The Most Powerful Pandas Tool\n# ==============================================================\n\nprint(\"\\n--- PART 9: GroupBy ---\")\n\n# GroupBy splits the DataFrame into groups, applies a function, then combines results.\n# Think of it like: \"For each city, calculate the total revenue.\"\n\n# Total revenue per city\nrevenue_by_city = sales.groupby(\"city\")[\"revenue\"].sum()\nprint(\"Total revenue per city:\")\nprint(revenue_by_city)\n\n# Average revenue per product\navg_by_product = sales.groupby(\"product\")[\"revenue\"].mean()\nprint(\"\\nAverage revenue per product:\")\nprint(avg_by_product)\n\n# Multiple aggregations at once using .agg()\nsummary = sales.groupby(\"city\").agg(\n    total_revenue=(\"revenue\", \"sum\"),\n    avg_revenue=(\"revenue\", \"mean\"),\n    total_units=(\"units\", \"sum\"),\n    num_orders=(\"revenue\", \"count\")\n)\nprint(\"\\nFull summary by city:\")\nprint(summary)\n\n# HINT: .agg() lets you apply different functions to different columns in one step.\n# The format is: new_col_name=(\"original_column\", \"function\")\n\n# Reset index to turn the grouped result back into a regular DataFrame\nsummary = summary.reset_index()\nprint(\"\\nAfter reset_index (city is now a regular column):\")\nprint(summary)\n\n\n# ==============================================================\n# PART 10: Merge and Concat \u2014 Joining Tables\n# ==============================================================\n\nprint(\"\\n--- PART 10: Merge and Concat ---\")\n\n# Real datasets are often split across multiple tables, just like in a database.\n# Pandas merge = SQL JOIN\n\n# Table 1: customer information\ncustomers = pd.DataFrame({\n    \"customer_id\": [1, 2, 3, 4],\n    \"name\":        [\"Alice\", \"Bob\", \"Carol\", \"Diana\"],\n    \"city\":        [\"NYC\", \"LA\", \"Chicago\", \"NYC\"],\n})\n\n# Table 2: orders\norders = pd.DataFrame({\n    \"order_id\":    [101, 102, 103, 104, 105],\n    \"customer_id\": [1,   2,   1,   3,   2],\n    \"amount\":      [250, 180, 310, 95,  420],\n})\n\nprint(\"Customers table:\")\nprint(customers)\nprint(\"\\nOrders table:\")\nprint(orders)\n\n# INNER JOIN \u2014 only rows that have a matching customer_id in BOTH tables\nmerged = pd.merge(customers, orders, on=\"customer_id\", how=\"inner\")\nprint(\"\\nInner join result (customers with their orders):\")\nprint(merged)\n\n# LEFT JOIN \u2014 all customers, even those with no orders\nleft_merged = pd.merge(customers, orders, on=\"customer_id\", how=\"left\")\nprint(\"\\nLeft join (all customers, NaN if no orders):\")\nprint(left_merged)\n\n# HINT: how=\"inner\" \u2192 only matching rows\n#        how=\"left\"  \u2192 all rows from the LEFT table, NaN where no match\n#        how=\"right\" \u2192 all rows from the RIGHT table\n#        how=\"outer\" \u2192 all rows from BOTH tables\n\n# pd.concat() \u2014 stack DataFrames vertically (like appending rows)\nweek1 = pd.DataFrame({\"day\": [\"Mon\", \"Tue\"], \"temp\": [22.1, 23.5]})\nweek2 = pd.DataFrame({\"day\": [\"Wed\", \"Thu\"], \"temp\": [21.8, 24.0]})\ncombined = pd.concat([week1, week2], ignore_index=True)\nprint(\"\\nConcatenated (stacked) result:\")\nprint(combined)\n# HINT: ignore_index=True resets the row numbers (0, 1, 2, 3...)\n# Without it, you'd see the original indexes (0, 1, 0, 1)\n\n\n# ==============================================================\n# PART 11: Working with Datetime Columns\n# ==============================================================\n\nprint(\"\\n--- PART 11: Datetime Columns ---\")\n\n# Dates look like strings when you first load data.\n# You must convert them to datetime64 type to use date math.\n\nsensor_log = pd.DataFrame({\n    \"timestamp\":   [\"2026-01-15 08:00\", \"2026-01-15 12:30\",\n                    \"2026-02-03 09:15\", \"2026-02-03 17:45\",\n                    \"2026-03-20 11:00\", \"2026-03-21 14:20\"],\n    \"temperature\": [22.1, 23.8, 21.5, 24.1, 20.9, 22.7],\n    \"device\":      [\"esp01\", \"esp01\", \"esp02\", \"esp01\", \"esp02\", \"esp01\"],\n})\n\n# Convert the string column to a real datetime type\nsensor_log[\"timestamp\"] = pd.to_datetime(sensor_log[\"timestamp\"])\nprint(\"After pd.to_datetime():\")\nprint(sensor_log.dtypes)\n\n# Extract useful parts from the datetime\nsensor_log[\"year\"]  = sensor_log[\"timestamp\"].dt.year\nsensor_log[\"month\"] = sensor_log[\"timestamp\"].dt.month\nsensor_log[\"day\"]   = sensor_log[\"timestamp\"].dt.day\nsensor_log[\"hour\"]  = sensor_log[\"timestamp\"].dt.hour\n\nprint(\"\\nWith extracted date parts:\")\nprint(sensor_log)\n\n# Calculate time differences\nsensor_log_sorted = sensor_log.sort_values(\"timestamp\")\nsensor_log_sorted[\"time_since_previous\"] = sensor_log_sorted[\"timestamp\"].diff()\nprint(\"\\nTime between consecutive readings:\")\nprint(sensor_log_sorted[[\"timestamp\", \"device\", \"temperature\", \"time_since_previous\"]])\n\n# Filter by date range\njan_readings = sensor_log[sensor_log[\"month\"] == 1]\nprint(\"\\nJanuary readings only:\")\nprint(jan_readings)\n\n# Group by month and get average temperature\nmonthly_avg = sensor_log.groupby(\"month\")[\"temperature\"].mean()\nprint(\"\\nAverage temperature by month:\")\nprint(monthly_avg)\n\n# HINT: .dt accessor unlocks all datetime operations.\n# Common ones: .dt.year .dt.month .dt.day .dt.hour .dt.weekday .dt.date\n# .diff() calculates the difference between consecutive rows.\n\n\n# ==============================================================\n# YOUR TASKS FOR WEEK 5\n# ==============================================================\n\nprint(\"\\n\" + \"=\" * 60)\nprint(\"YOUR TASKS:\")\nprint(\"=\" * 60)\nprint(\"\"\"\n1. Run this file completely and read every output carefully.\n\n2. Download the Titanic dataset from Kaggle:\n   https://www.kaggle.com/c/titanic/data  (download 'train.csv')\n   Load it with: df = pd.read_csv('train.csv')\n   Answer with code:\n     a. How many passengers? (df.shape)\n     b. Average age? (df['Age'].mean())\n     c. How many survived? (df[df['Survived']==1].shape[0])\n     d. Most expensive ticket? (df['Fare'].max())\n     e. How many passengers per class? (df['Pclass'].value_counts())\n\n3. Using the Titanic data, practice groupby:\n   a. Average fare per passenger class (groupby 'Pclass', mean of 'Fare')\n   b. Survival count per sex (groupby 'Sex', sum of 'Survived')\n   c. Average age per class AND sex (groupby ['Pclass','Sex'], mean of 'Age')\n\n4. Practice merge: create a small DataFrame with Pclass (1/2/3)\n   and class_name ('First'/'Second'/'Third'), then merge it\n   into the Titanic DataFrame so every row has a class_name column.\n\n5. CHALLENGE: The Titanic 'Name' column contains titles like \"Mr.\", \"Mrs.\", \"Miss.\".\n   Extract the title from each name using str.extract() and groupby title.\n   How many passengers of each title were there?\n\n6. Push your work to GitHub.\n\"\"\")\n";
+      const readerOutputKey = "readerRun:phase-1-software-engineering/month-02-databases-web/resources/pandas_basics.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code># ==============================================================
+# WEEK 5: Pandas &amp; NumPy — The Core of Data Science
+# FILE: pandas_basics.py
+#
+# TASK: Load a CSV file, explore it, filter it, and calculate
+#       basic statistics using Pandas and NumPy.
+#
+# WHY:  Pandas is THE tool for working with tabular data (like Excel
+#       but with code). Every data science job requires it.
+#       NumPy provides fast math operations on arrays/numbers.
+#
+# BEFORE RUNNING: Make sure your ds-env is activated and you have
+#   pandas and numpy installed:
+#   pip install pandas numpy
+#
+# HOW TO RUN: python pandas_basics.py
+# ==============================================================
+
+import pandas as pd    # &#x27;pd&#x27; is the standard shortcut for pandas
+import numpy as np     # &#x27;np&#x27; is the standard shortcut for numpy
+
+print(&quot;=&quot; * 60)
+print(&quot;WEEK 5: Pandas &amp; NumPy Basics&quot;)
+print(&quot;=&quot; * 60)
+
+
+# ==============================================================
+# PART 1: Create a DataFrame from scratch
+# ==============================================================
+
+# A DataFrame is like a spreadsheet/table with rows and columns.
+# We create one by giving it a dictionary where:
+#   - Keys   = column names
+#   - Values = lists of data (one item per row)
+
+print(&quot;\n--- PART 1: Create a DataFrame ---&quot;)
+
+data = {
+    &quot;day&quot;:         [&quot;Mon&quot;, &quot;Tue&quot;, &quot;Wed&quot;, &quot;Thu&quot;, &quot;Fri&quot;, &quot;Sat&quot;, &quot;Sun&quot;],
+    &quot;temperature&quot;: [22.1,  23.5,  21.8,  24.0,  22.7,  23.1,  21.5],
+    &quot;humidity&quot;:    [55,     60,    58,    52,    57,    61,    59],
+    &quot;sensor_ok&quot;:   [True,  True,  True,  False, True,  True,  True]
+}
+
+# pd.DataFrame() turns our dictionary into a table
+df = pd.DataFrame(data)
+
+# Print the full table
+print(df)
+
+# HINT: The numbers on the left (0, 1, 2...) are the INDEX — the row numbers.
+
+
+# ==============================================================
+# PART 2: Exploring a DataFrame
+# ==============================================================
+
+print(&quot;\n--- PART 2: Exploring the DataFrame ---&quot;)
+
+# .shape tells you (number of rows, number of columns)
+print(&quot;Shape (rows, columns):&quot;, df.shape)
+
+# .dtypes tells you the data type of each column
+print(&quot;\nColumn data types:&quot;)
+print(df.dtypes)
+
+# .head(n) shows the first n rows (default is 5)
+print(&quot;\nFirst 3 rows:&quot;)
+print(df.head(3))
+
+# .describe() gives you a statistical summary of number columns
+print(&quot;\nStatistical summary:&quot;)
+print(df.describe())
+
+# HINT: describe() shows: count, mean, std (standard deviation),
+# min, 25%, 50% (median), 75%, max
+
+
+# ==============================================================
+# PART 3: Selecting Columns
+# ==============================================================
+
+print(&quot;\n--- PART 3: Selecting Columns ---&quot;)
+
+# Select ONE column — returns a Series (like a list with labels)
+temp_column = df[&quot;temperature&quot;]
+print(&quot;Temperature column:&quot;)
+print(temp_column)
+
+# Select MULTIPLE columns — returns a new DataFrame
+temp_and_humidity = df[[&quot;temperature&quot;, &quot;humidity&quot;]]
+print(&quot;\nTemperature and humidity together:&quot;)
+print(temp_and_humidity)
+
+# HINT: Single brackets df[&quot;col&quot;] → Series
+#        Double brackets df[[&quot;col1&quot;, &quot;col2&quot;]] → DataFrame
+
+
+# ==============================================================
+# PART 4: Filtering Rows (This is VERY important!)
+# ==============================================================
+
+print(&quot;\n--- PART 4: Filtering Rows ---&quot;)
+
+# Get rows where temperature is above 23 degrees
+hot_days = df[df[&quot;temperature&quot;] &gt; 23]
+print(&quot;Days where temperature &gt; 23:&quot;)
+print(hot_days)
+
+# Get rows where sensor was working (sensor_ok == True)
+working_sensor = df[df[&quot;sensor_ok&quot;] == True]
+print(&quot;\nDays where sensor was working:&quot;)
+print(working_sensor)
+
+# Combine two conditions with &amp; (AND) or | (OR)
+hot_and_working = df[(df[&quot;temperature&quot;] &gt; 23) &amp; (df[&quot;sensor_ok&quot;] == True)]
+print(&quot;\nHot days WITH working sensor:&quot;)
+print(hot_and_working)
+
+# HINT: df[condition] returns only rows where condition is True
+# The condition inside df[] must use column names like df[&quot;col&quot;]
+
+
+# ==============================================================
+# PART 5: Basic Statistics
+# ==============================================================
+
+print(&quot;\n--- PART 5: Statistics ---&quot;)
+
+temps = df[&quot;temperature&quot;]
+
+print(&quot;Average temperature:&quot;, temps.mean())
+print(&quot;Maximum temperature:&quot;, temps.max())
+print(&quot;Minimum temperature:&quot;, temps.min())
+print(&quot;Median temperature:&quot;, temps.median())
+print(&quot;Standard deviation:&quot;, temps.std())
+
+# NumPy also works on the same data
+temps_array = np.array(df[&quot;temperature&quot;])
+print(&quot;\nUsing NumPy:&quot;)
+print(&quot;Sum of all temperatures:&quot;, np.sum(temps_array))
+print(&quot;Variance:&quot;, np.var(temps_array))
+
+
+# ==============================================================
+# PART 6: Adding a New Column
+# ==============================================================
+
+print(&quot;\n--- PART 6: Adding a New Column ---&quot;)
+
+# Convert Celsius to Fahrenheit: F = (C × 9/5) + 32
+# Pandas applies this formula to EVERY row automatically!
+df[&quot;temp_fahrenheit&quot;] = (df[&quot;temperature&quot;] * 9/5) + 32
+
+print(&quot;DataFrame with new Fahrenheit column:&quot;)
+print(df[[&quot;day&quot;, &quot;temperature&quot;, &quot;temp_fahrenheit&quot;]])
+
+
+# ==============================================================
+# PART 7: Loading a Real CSV File
+# ==============================================================
+
+print(&quot;\n--- PART 7: Loading a CSV File ---&quot;)
+
+# First, let&#x27;s create and save a CSV so we have one to load
+df.to_csv(&quot;week5_temperature_data.csv&quot;, index=False)
+print(&quot;Saved data to &#x27;week5_temperature_data.csv&#x27;&quot;)
+
+# Now load it back — this is how you&#x27;ll load ANY dataset
+loaded_df = pd.read_csv(&quot;week5_temperature_data.csv&quot;)
+print(&quot;\nLoaded CSV (first 3 rows):&quot;)
+print(loaded_df.head(3))
+
+# HINT: pd.read_csv(&quot;filename.csv&quot;) is how you load almost every dataset
+# The file can be a local path OR a URL from the internet!
+
+
+# ==============================================================
+# PART 8: Sorting and Value Counts
+# ==============================================================
+
+print(&quot;\n--- PART 8: Sorting and Value Counts ---&quot;)
+
+# Build a slightly richer dataset to work with
+sales_data = {
+    &quot;city&quot;:     [&quot;NYC&quot;, &quot;LA&quot;, &quot;NYC&quot;, &quot;Chicago&quot;, &quot;LA&quot;, &quot;NYC&quot;, &quot;Chicago&quot;, &quot;LA&quot;],
+    &quot;product&quot;:  [&quot;A&quot;,   &quot;B&quot;,  &quot;B&quot;,   &quot;A&quot;,       &quot;A&quot;,  &quot;C&quot;,   &quot;B&quot;,       &quot;C&quot;],
+    &quot;revenue&quot;:  [1200,  850,  940,   1100,      760,  1350,  890,       920],
+    &quot;units&quot;:    [12,    9,    10,    11,        8,    14,    9,         10],
+}
+sales = pd.DataFrame(sales_data)
+print(&quot;Sales data:&quot;)
+print(sales)
+
+# sort_values() — sort by one or more columns
+print(&quot;\nSorted by revenue (highest first):&quot;)
+print(sales.sort_values(&quot;revenue&quot;, ascending=False))
+
+# Sort by multiple columns: first city (A→Z), then revenue within each city (high→low)
+print(&quot;\nSorted by city, then revenue descending:&quot;)
+print(sales.sort_values([&quot;city&quot;, &quot;revenue&quot;], ascending=[True, False]))
+
+# value_counts() — how many times each value appears in a column
+print(&quot;\nHow many rows per city:&quot;)
+print(sales[&quot;city&quot;].value_counts())
+# HINT: value_counts() always sorts from most common to least common
+
+print(&quot;\nHow many rows per product:&quot;)
+print(sales[&quot;product&quot;].value_counts())
+
+
+# ==============================================================
+# PART 9: GroupBy — The Most Powerful Pandas Tool
+# ==============================================================
+
+print(&quot;\n--- PART 9: GroupBy ---&quot;)
+
+# GroupBy splits the DataFrame into groups, applies a function, then combines results.
+# Think of it like: &quot;For each city, calculate the total revenue.&quot;
+
+# Total revenue per city
+revenue_by_city = sales.groupby(&quot;city&quot;)[&quot;revenue&quot;].sum()
+print(&quot;Total revenue per city:&quot;)
+print(revenue_by_city)
+
+# Average revenue per product
+avg_by_product = sales.groupby(&quot;product&quot;)[&quot;revenue&quot;].mean()
+print(&quot;\nAverage revenue per product:&quot;)
+print(avg_by_product)
+
+# Multiple aggregations at once using .agg()
+summary = sales.groupby(&quot;city&quot;).agg(
+    total_revenue=(&quot;revenue&quot;, &quot;sum&quot;),
+    avg_revenue=(&quot;revenue&quot;, &quot;mean&quot;),
+    total_units=(&quot;units&quot;, &quot;sum&quot;),
+    num_orders=(&quot;revenue&quot;, &quot;count&quot;)
+)
+print(&quot;\nFull summary by city:&quot;)
+print(summary)
+
+# HINT: .agg() lets you apply different functions to different columns in one step.
+# The format is: new_col_name=(&quot;original_column&quot;, &quot;function&quot;)
+
+# Reset index to turn the grouped result back into a regular DataFrame
+summary = summary.reset_index()
+print(&quot;\nAfter reset_index (city is now a regular column):&quot;)
+print(summary)
+
+
+# ==============================================================
+# PART 10: Merge and Concat — Joining Tables
+# ==============================================================
+
+print(&quot;\n--- PART 10: Merge and Concat ---&quot;)
+
+# Real datasets are often split across multiple tables, just like in a database.
+# Pandas merge = SQL JOIN
+
+# Table 1: customer information
+customers = pd.DataFrame({
+    &quot;customer_id&quot;: [1, 2, 3, 4],
+    &quot;name&quot;:        [&quot;Alice&quot;, &quot;Bob&quot;, &quot;Carol&quot;, &quot;Diana&quot;],
+    &quot;city&quot;:        [&quot;NYC&quot;, &quot;LA&quot;, &quot;Chicago&quot;, &quot;NYC&quot;],
+})
+
+# Table 2: orders
+orders = pd.DataFrame({
+    &quot;order_id&quot;:    [101, 102, 103, 104, 105],
+    &quot;customer_id&quot;: [1,   2,   1,   3,   2],
+    &quot;amount&quot;:      [250, 180, 310, 95,  420],
+})
+
+print(&quot;Customers table:&quot;)
+print(customers)
+print(&quot;\nOrders table:&quot;)
+print(orders)
+
+# INNER JOIN — only rows that have a matching customer_id in BOTH tables
+merged = pd.merge(customers, orders, on=&quot;customer_id&quot;, how=&quot;inner&quot;)
+print(&quot;\nInner join result (customers with their orders):&quot;)
+print(merged)
+
+# LEFT JOIN — all customers, even those with no orders
+left_merged = pd.merge(customers, orders, on=&quot;customer_id&quot;, how=&quot;left&quot;)
+print(&quot;\nLeft join (all customers, NaN if no orders):&quot;)
+print(left_merged)
+
+# HINT: how=&quot;inner&quot; → only matching rows
+#        how=&quot;left&quot;  → all rows from the LEFT table, NaN where no match
+#        how=&quot;right&quot; → all rows from the RIGHT table
+#        how=&quot;outer&quot; → all rows from BOTH tables
+
+# pd.concat() — stack DataFrames vertically (like appending rows)
+week1 = pd.DataFrame({&quot;day&quot;: [&quot;Mon&quot;, &quot;Tue&quot;], &quot;temp&quot;: [22.1, 23.5]})
+week2 = pd.DataFrame({&quot;day&quot;: [&quot;Wed&quot;, &quot;Thu&quot;], &quot;temp&quot;: [21.8, 24.0]})
+combined = pd.concat([week1, week2], ignore_index=True)
+print(&quot;\nConcatenated (stacked) result:&quot;)
+print(combined)
+# HINT: ignore_index=True resets the row numbers (0, 1, 2, 3...)
+# Without it, you&#x27;d see the original indexes (0, 1, 0, 1)
+
+
+# ==============================================================
+# PART 11: Working with Datetime Columns
+# ==============================================================
+
+print(&quot;\n--- PART 11: Datetime Columns ---&quot;)
+
+# Dates look like strings when you first load data.
+# You must convert them to datetime64 type to use date math.
+
+sensor_log = pd.DataFrame({
+    &quot;timestamp&quot;:   [&quot;2026-01-15 08:00&quot;, &quot;2026-01-15 12:30&quot;,
+                    &quot;2026-02-03 09:15&quot;, &quot;2026-02-03 17:45&quot;,
+                    &quot;2026-03-20 11:00&quot;, &quot;2026-03-21 14:20&quot;],
+    &quot;temperature&quot;: [22.1, 23.8, 21.5, 24.1, 20.9, 22.7],
+    &quot;device&quot;:      [&quot;esp01&quot;, &quot;esp01&quot;, &quot;esp02&quot;, &quot;esp01&quot;, &quot;esp02&quot;, &quot;esp01&quot;],
+})
+
+# Convert the string column to a real datetime type
+sensor_log[&quot;timestamp&quot;] = pd.to_datetime(sensor_log[&quot;timestamp&quot;])
+print(&quot;After pd.to_datetime():&quot;)
+print(sensor_log.dtypes)
+
+# Extract useful parts from the datetime
+sensor_log[&quot;year&quot;]  = sensor_log[&quot;timestamp&quot;].dt.year
+sensor_log[&quot;month&quot;] = sensor_log[&quot;timestamp&quot;].dt.month
+sensor_log[&quot;day&quot;]   = sensor_log[&quot;timestamp&quot;].dt.day
+sensor_log[&quot;hour&quot;]  = sensor_log[&quot;timestamp&quot;].dt.hour
+
+print(&quot;\nWith extracted date parts:&quot;)
+print(sensor_log)
+
+# Calculate time differences
+sensor_log_sorted = sensor_log.sort_values(&quot;timestamp&quot;)
+sensor_log_sorted[&quot;time_since_previous&quot;] = sensor_log_sorted[&quot;timestamp&quot;].diff()
+print(&quot;\nTime between consecutive readings:&quot;)
+print(sensor_log_sorted[[&quot;timestamp&quot;, &quot;device&quot;, &quot;temperature&quot;, &quot;time_since_previous&quot;]])
+
+# Filter by date range
+jan_readings = sensor_log[sensor_log[&quot;month&quot;] == 1]
+print(&quot;\nJanuary readings only:&quot;)
+print(jan_readings)
+
+# Group by month and get average temperature
+monthly_avg = sensor_log.groupby(&quot;month&quot;)[&quot;temperature&quot;].mean()
+print(&quot;\nAverage temperature by month:&quot;)
+print(monthly_avg)
+
+# HINT: .dt accessor unlocks all datetime operations.
+# Common ones: .dt.year .dt.month .dt.day .dt.hour .dt.weekday .dt.date
+# .diff() calculates the difference between consecutive rows.
+
+
+# ==============================================================
+# YOUR TASKS FOR WEEK 5
+# ==============================================================
+
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;YOUR TASKS:&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;&quot;&quot;
+1. Run this file completely and read every output carefully.
+
+2. Download the Titanic dataset from Kaggle:
+   https://www.kaggle.com/c/titanic/data  (download &#x27;train.csv&#x27;)
+   Load it with: df = pd.read_csv(&#x27;train.csv&#x27;)
+   Answer with code:
+     a. How many passengers? (df.shape)
+     b. Average age? (df[&#x27;Age&#x27;].mean())
+     c. How many survived? (df[df[&#x27;Survived&#x27;]==1].shape[0])
+     d. Most expensive ticket? (df[&#x27;Fare&#x27;].max())
+     e. How many passengers per class? (df[&#x27;Pclass&#x27;].value_counts())
+
+3. Using the Titanic data, practice groupby:
+   a. Average fare per passenger class (groupby &#x27;Pclass&#x27;, mean of &#x27;Fare&#x27;)
+   b. Survival count per sex (groupby &#x27;Sex&#x27;, sum of &#x27;Survived&#x27;)
+   c. Average age per class AND sex (groupby [&#x27;Pclass&#x27;,&#x27;Sex&#x27;], mean of &#x27;Age&#x27;)
+
+4. Practice merge: create a small DataFrame with Pclass (1/2/3)
+   and class_name (&#x27;First&#x27;/&#x27;Second&#x27;/&#x27;Third&#x27;), then merge it
+   into the Titanic DataFrame so every row has a class_name column.
+
+5. CHALLENGE: The Titanic &#x27;Name&#x27; column contains titles like &quot;Mr.&quot;, &quot;Mrs.&quot;, &quot;Miss.&quot;.
+   Extract the title from each name using str.extract() and groupby title.
+   How many passengers of each title were there?
+
+6. Push your work to GitHub.
+&quot;&quot;&quot;)
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

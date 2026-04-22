@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Javamultithreading.Java - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Javamultithreading.Java</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/java/JavaMultithreading.java</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><pre><code>// ==============================================================================
+//  JAVA MULTITHREADING &amp; CONCURRENCY
+//  FILE: JavaMultithreading.java
+//
+//  TASK: Learn to run code in parallel — process large datasets faster
+//        and build systems that handle multiple requests simultaneously.
+//
+//  WHY:  Operations systems (Amazon routing, Uber dispatch) process
+//        thousands of records per second. One thread is not enough.
+//        As an ML Engineer, you need to:
+//          → Process ML predictions for many requests simultaneously
+//          → Run background jobs while serving live traffic
+//          → Avoid blocking your API while waiting for I/O
+//
+//        This is CORE to ML Engineer and AI Engineer roles.
+//        Interviews at Amazon/Google/Uber test multithreading knowledge.
+//
+//  PREREQ: JavaZeroToHero.java (OOP), JavaStreamsLambda.java (lambdas)
+//
+//  COMPILE: javac JavaMultithreading.java
+//  RUN:     java JavaMultithreading
+// ==============================================================================
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+import java.util.stream.*;
+
+public class JavaMultithreading {
+
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
+
+        // ==============================================================================
+        // LESSON 01 — THREADS: The Basics
+        // ==============================================================================
+        //
+        // TEACHER SAYS:
+        // A THREAD is a separate path of execution within the same program.
+        // Your JVM starts with 1 thread (the main thread). You can create more.
+        //
+        // TWO ways to create a thread:
+        //   1. Extend Thread class
+        //   2. Implement Runnable (PREFERRED — separates task from thread mechanics)
+        //
+        // Key methods:
+        //   thread.start()           → starts the thread (calls run() in a new thread)
+        //   thread.join()            → wait for thread to FINISH before continuing
+        //   Thread.sleep(ms)         → pause current thread (throws InterruptedException)
+        //   Thread.currentThread()   → reference to the running thread
+        //
+        // WARNING: thread.run() does NOT start a new thread — it runs on CURRENT thread!
+        //          Always use thread.start() to launch a new thread.
+
+        System.out.println(&quot;=== LESSON 01: Thread Basics ===&quot;);
+        System.out.println(&quot;Main thread: &quot; + Thread.currentThread().getName());
+
+        // Way 1: Implement Runnable (recommended):
+        Runnable task1 = () -&gt; {
+            System.out.println(&quot;Task1 running on: &quot; + Thread.currentThread().getName());
+            try {
+                Thread.sleep(100);      // Simulate work
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            System.out.println(&quot;Task1 done&quot;);
+        };
+
+        Runnable task2 = () -&gt; {
+            System.out.println(&quot;Task2 running on: &quot; + Thread.currentThread().getName());
+            System.out.println(&quot;Task2 done&quot;);
+        };
+
+        Thread t1 = new Thread(task1, &quot;Worker-1&quot;);
+        Thread t2 = new Thread(task2, &quot;Worker-2&quot;);
+
+        t1.start();     // Launch t1 in a NEW thread — returns immediately
+        t2.start();     // Launch t2 in another NEW thread — returns immediately
+
+        // Main thread continues here while t1 and t2 run concurrently!
+        System.out.println(&quot;Main thread continues...&quot;);
+
+        t1.join();      // Wait for t1 to finish
+        t2.join();      // Wait for t2 to finish
+        System.out.println(&quot;Both threads completed.\n&quot;);
+
+        // ==============================================================================
+        // YOUR TURN — LESSON 01:
+        // 1. Create 5 threads, each printing its thread name and a number 1-5.
+        //    Start them all, then join all. Use a for loop.
+        //    Observe: the order of output may vary each run — that&#x27;s concurrency!
+        // 2. Simulate a download: create 3 threads, each &quot;downloads&quot; (Thread.sleep)
+        //    for a random 200-500ms, then prints &quot;Download X complete&quot;.
+        //    After all 3, print total elapsed time.
+        //    HINT: long start = System.currentTimeMillis(); ... System.currentTimeMillis() - start
+        // ==============================================================================
+
+
+        // ==============================================================================
+        // LESSON 02 — EXECUTORSERVICE: Professional Thread Management
+        // ==============================================================================
+        //
+        // TEACHER SAYS:
+        // Creating threads manually is messy for large-scale work.
+        // ExecutorService manages a POOL of reusable threads — much better!
+        //
+        // Types of thread pools:
+        //   Executors.newFixedThreadPool(n)     → exactly n threads, queue extra tasks
+        //   Executors.newCachedThreadPool()     → creates threads as needed, reuses idle ones
+        //   Executors.newSingleThreadExecutor() → 1 thread, tasks run one by one
+        //
+        // submit(Runnable)   → submit task, no return value (returns Future&lt;?&gt;)
+        // submit(Callable)   → submit task WITH return value (returns Future&lt;T&gt;)
+        // future.get()       → block until result is ready, then return it
+        // shutdown()         → stop accepting new tasks, finish existing ones
+        // awaitTermination() → wait until all tasks finish
+
+        System.out.println(&quot;=== LESSON 02: ExecutorService ===&quot;);
+
+        // Fixed thread pool — 4 workers, simulate ML batch predictions:
+        ExecutorService pool = Executors.newFixedThreadPool(4);
+
+        List&lt;String&gt; customerIds = Arrays.asList(
+                &quot;CUST001&quot;, &quot;CUST002&quot;, &quot;CUST003&quot;, &quot;CUST004&quot;,
+                &quot;CUST005&quot;, &quot;CUST006&quot;, &quot;CUST007&quot;, &quot;CUST008&quot;
+        );
+
+        System.out.println(&quot;Submitting &quot; + customerIds.size() + &quot; prediction jobs to 4 workers...&quot;);
+        long startTime = System.currentTimeMillis();
+
+        for (String customerId : customerIds) {
+            pool.submit(() -&gt; {
+                // Simulate ML inference (50-100ms per prediction):
+                try {
+                    Thread.sleep(50 + (int)(Math.random() * 50));
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                System.out.printf(&quot;  Prediction done for %-8s on %s%n&quot;,
+                        customerId, Thread.currentThread().getName());
+            });
+        }
+
+        pool.shutdown();                              // No more new tasks
+        pool.awaitTermination(30, TimeUnit.SECONDS);  // Wait for all to finish
+
+        long elapsed = System.currentTimeMillis() - startTime;
+        System.out.printf(&quot;All 8 predictions done in %d ms (4 parallel workers)%n%n&quot;, elapsed);
+
+        // ==============================================================================
+        // YOUR TURN — LESSON 02:
+        // 1. Create a fixed thread pool with 3 workers.
+        //    Submit 10 tasks: each prints &quot;Processing batch [i]&quot; and sleeps 100ms.
+        //    Measure and print total wall-clock time.
+        //    Compare: ~300-400ms (parallel) vs ~1000ms (sequential estimate).
+        // 2. Why did 10 tasks × 100ms NOT take 1000ms? Explain in a comment.
+        // ==============================================================================
+
+
+        // ==============================================================================
+        // LESSON 03 — CALLABLE &amp; FUTURE: Getting Results Back
+        // ==============================================================================
+        //
+        // TEACHER SAYS:
+        // Runnable = &quot;do this&quot; — no return value.
+        // Callable&lt;T&gt; = &quot;compute this and give me a T back&quot; — has return value.
+        // submit(callable) returns a Future&lt;T&gt; — a PROMISE of a future result.
+        //
+        // Future&lt;T&gt; methods:
+        //   future.get()                         → wait and get result (blocking)
+        //   future.get(timeout, TimeUnit.SECONDS) → wait with timeout
+        //   future.isDone()                      → true if computation finished
+        //   future.cancel(true)                  → attempt to cancel
+        //
+        // Pattern: submit all → do other work → collect results later.
+
+        System.out.println(&quot;=== LESSON 03: Callable and Future ===&quot;);
+
+        ExecutorService executor = Executors.newFixedThreadPool(3);
+
+        // Simulate: compute churn score for 5 customers in parallel
+        List&lt;Callable&lt;Double&gt;&gt; scoringJobs = List.of(
+            () -&gt; computeChurnScore(&quot;CUST001&quot;, 0.85),
+            () -&gt; computeChurnScore(&quot;CUST002&quot;, 0.32),
+            () -&gt; computeChurnScore(&quot;CUST003&quot;, 0.71),
+            () -&gt; computeChurnScore(&quot;CUST004&quot;, 0.50),
+            () -&gt; computeChurnScore(&quot;CUST005&quot;, 0.95)
+        );
+
+        // Submit all and collect Futures:
+        List&lt;Future&lt;Double&gt;&gt; futures = scoringJobs.stream()
+                .map(executor::submit)
+                .collect(Collectors.toList());
+
+        System.out.println(&quot;All 5 scoring jobs submitted. Waiting for results...&quot;);
+
+        // Collect results (future.get() blocks until each is ready):
+        List&lt;Double&gt; scores = new ArrayList&lt;&gt;();
+        for (Future&lt;Double&gt; future : futures) {
+            scores.add(future.get());       // Waits if not done yet
+        }
+
+        System.out.println(&quot;Churn scores: &quot; + scores);
+        double highRiskCount = scores.stream().filter(s -&gt; s &gt; 0.7).count();
+        System.out.printf(&quot;High-risk customers: %.0f / %d%n&quot;, highRiskCount, scores.size());
+
+        executor.shutdown();
+        System.out.println();
+
+        // ==============================================================================
+        // YOUR TURN — LESSON 03:
+        // 1. Create a Callable that computes the sum of squares from 1 to N.
+        //    Submit it for N = [100, 1000, 10000, 100000] simultaneously.
+        //    Collect and print each result.
+        // 2. Add a timeout to future.get(2, TimeUnit.SECONDS).
+        //    What happens if a task takes too long? Catch TimeoutException.
+        // ==============================================================================
+
+
+        // ==============================================================================
+        // LESSON 04 — THE RACE CONDITION PROBLEM &amp; synchronized
+        // ==============================================================================
+        //
+        // TEACHER SAYS:
+        // When two threads read and write the SAME variable at the same time,
+        // results become UNPREDICTABLE. This is a RACE CONDITION — a critical bug.
+        //
+        // Example: counter++ looks atomic but is actually 3 steps:
+        //   1. Read counter from memory
+        //   2. Add 1
+        //   3. Write back to memory
+        //   If another thread jumps between steps 1 and 3, you LOSE an update!
+        //
+        // SOLUTIONS:
+        //   1. synchronized keyword      → lock the object, only one thread at a time
+        //   2. AtomicInteger             → hardware-level atomic operations (FASTER)
+        //   3. ConcurrentHashMap         → thread-safe HashMap
+        //   4. Collections.synchronizedList() → thread-safe wrapper
+
+        System.out.println(&quot;=== LESSON 04: Race Conditions &amp; Solutions ===&quot;);
+
+        // PROBLEM — unsafe counter:
+        int[] unsafeCount = {0};
+        ExecutorService racePool = Executors.newFixedThreadPool(10);
+        for (int i = 0; i &lt; 1000; i++) {
+            racePool.submit(() -&gt; unsafeCount[0]++);    // RACE CONDITION!
+        }
+        racePool.shutdown();
+        racePool.awaitTermination(5, TimeUnit.SECONDS);
+        System.out.println(&quot;Unsafe counter (should be 1000): &quot; + unsafeCount[0]);
+        // You&#x27;ll likely see &lt; 1000 — lost updates due to race condition!
+
+        // SOLUTION — AtomicInteger (preferred for simple counters):
+        AtomicInteger safeCount = new AtomicInteger(0);
+        ExecutorService safePool = Executors.newFixedThreadPool(10);
+        for (int i = 0; i &lt; 1000; i++) {
+            safePool.submit(() -&gt; safeCount.incrementAndGet());   // Atomic!
+        }
+        safePool.shutdown();
+        safePool.awaitTermination(5, TimeUnit.SECONDS);
+        System.out.println(&quot;Safe counter   (should be 1000): &quot; + safeCount.get());
+
+        // SOLUTION — synchronized method (for complex shared state):
+        SafeAggregator aggregator = new SafeAggregator();
+        ExecutorService aggPool   = Executors.newFixedThreadPool(5);
+
+        for (int i = 1; i &lt;= 100; i++) {
+            final int value = i;
+            aggPool.submit(() -&gt; aggregator.add(value));
+        }
+        aggPool.shutdown();
+        aggPool.awaitTermination(5, TimeUnit.SECONDS);
+        System.out.println(&quot;Synchronized sum(1..100) = &quot; + aggregator.getTotal()
+                + &quot; (expected: 5050)&quot;);
+
+        // ConcurrentHashMap — thread-safe Map:
+        ConcurrentHashMap&lt;String, Integer&gt; wordCount = new ConcurrentHashMap&lt;&gt;();
+        String[] words = {&quot;java&quot;, &quot;stream&quot;, &quot;lambda&quot;, &quot;java&quot;, &quot;thread&quot;, &quot;lambda&quot;, &quot;java&quot;};
+        Arrays.stream(words)
+              .parallel()   // Process in parallel!
+              .forEach(word -&gt; wordCount.merge(word, 1, Integer::sum));
+        System.out.println(&quot;Word count (concurrent): &quot; + wordCount);
+        System.out.println();
+
+        // ==============================================================================
+        // YOUR TURN — LESSON 04:
+        // 1. Without fixing it, run the &quot;unsafe counter&quot; 5 times. Do you always get 1000?
+        //    (Uncomment to run multiple times)
+        // 2. Replace AtomicInteger with a synchronized method — does it still give 1000?
+        // 3. Create a ConcurrentHashMap to count character frequency in a String.
+        //    Use parallel stream to populate it. Verify results match a sequential count.
+        // ==============================================================================
+
+
+        // ==============================================================================
+        // LESSON 05 — PARALLEL STREAMS: Easy Parallelism for Data Processing
+        // ==============================================================================
+        //
+        // TEACHER SAYS:
+        // The EASIEST way to parallelize a data pipeline in Java is:
+        // change .stream() to .parallelStream()
+        //
+        // parallelStream() splits the data across multiple CPU cores automatically.
+        // Great for: CPU-bound operations on large collections (ML batch scoring).
+        //
+        // WHEN TO USE:
+        //   ✅ Large collections (&gt;10,000 elements)
+        //   ✅ CPU-heavy operations (scoring, calculations)
+        //   ❌ Small collections (overhead &gt; gain)
+        //   ❌ Operations that must stay in ORDER (use sequential stream)
+        //   ❌ Shared mutable state (use Atomic classes if needed)
+
+        System.out.println(&quot;=== LESSON 05: Parallel Streams ===&quot;);
+
+        List&lt;Integer&gt; bigList = IntStream.rangeClosed(1, 2_000_000)
+                .boxed()
+                .collect(Collectors.toList());
+
+        // Sequential:
+        long seqStart = System.currentTimeMillis();
+        long seqSum   = bigList.stream()
+                               .mapToLong(Integer::longValue)
+                               .sum();
+        long seqTime  = System.currentTimeMillis() - seqStart;
+
+        // Parallel:
+        long parStart = System.currentTimeMillis();
+        long parSum   = bigList.parallelStream()
+                               .mapToLong(Integer::longValue)
+                               .sum();
+        long parTime  = System.currentTimeMillis() - parStart;
+
+        System.out.printf(&quot;Sequential sum: %,d in %d ms%n&quot;, seqSum, seqTime);
+        System.out.printf(&quot;Parallel sum:   %,d in %d ms%n&quot;, parSum, parTime);
+        System.out.printf(&quot;Speedup: %.1fx (on %d CPU cores)%n%n&quot;,
+                (double) seqTime / Math.max(parTime, 1),
+                Runtime.getRuntime().availableProcessors());
+
+        // Parallel batch ML simulation:
+        List&lt;String&gt; customers = IntStream.rangeClosed(1, 10_000)
+                .mapToObj(i -&gt; &quot;CUST&quot; + String.format(&quot;%05d&quot;, i))
+                .collect(Collectors.toList());
+
+        long mlStart = System.currentTimeMillis();
+        long highRisk = customers.parallelStream()
+                .mapToDouble(id -&gt; simulatePrediction(id))
+                .filter(score -&gt; score &gt; 0.7)
+                .count();
+        long mlTime = System.currentTimeMillis() - mlStart;
+        System.out.printf(&quot;Parallel ML: %,d high-risk customers out of %,d in %d ms%n%n&quot;,
+                highRisk, customers.size(), mlTime);
+
+        // ==============================================================================
+        // YOUR TURN — LESSON 05:
+        // 1. Compute the sum of squares (n²) for n from 1 to 1,000,000:
+        //    - Using sequential stream
+        //    - Using parallel stream
+        //    Print both results and times. Are they always equal?
+        //
+        // 2. Filter all prime numbers between 1 and 100,000 using:
+        //    - Stream filter with isPrime()
+        //    - Parallel stream filter with isPrime()
+        //    Which is faster? How many primes are there?
+        //
+        // 3. DANGER exercise: try to collect results with a non-thread-safe List:
+        //    List&lt;Integer&gt; results = new ArrayList&lt;&gt;();
+        //    bigList.parallelStream().forEach(results::add);
+        //    Is results.size() always equal to bigList.size()? Why not?
+        //    Fix: use .collect(Collectors.toList()) instead of forEach + add.
+        // ==============================================================================
+
+
+        // ==============================================================================
+        // LESSON 06 — CAPSTONE: Parallel Batch Scoring Engine
+        // ==============================================================================
+        //
+        // TEACHER SAYS:
+        // A real ML deployment scenario:
+        //   - You have a list of customers
+        //   - You need to compute churn scores for ALL of them
+        //   - Results must be stored with customer ID
+        //   - Compare sequential vs parallel performance
+        //
+        // This is EXACTLY what a batch scoring job does at Amazon/Uber.
+
+        System.out.println(&quot;=== LESSON 06: Capstone — Parallel Batch Scoring ===&quot;);
+
+        List&lt;String&gt; batchCustomers = IntStream.rangeClosed(1, 500)
+                .mapToObj(i -&gt; &quot;C&quot; + i)
+                .collect(Collectors.toList());
+
+        // Sequential scoring:
+        long seqBatch = System.currentTimeMillis();
+        Map&lt;String, Double&gt; seqResults = new HashMap&lt;&gt;();
+        for (String cid : batchCustomers) {
+            seqResults.put(cid, simulatePrediction(cid));
+        }
+        System.out.printf(&quot;Sequential batch: 500 customers in %d ms%n&quot;,
+                System.currentTimeMillis() - seqBatch);
+
+        // Parallel scoring with CompletableFuture (production pattern):
+        ExecutorService batchPool  = Executors.newFixedThreadPool(
+                Runtime.getRuntime().availableProcessors());
+
+        long parBatch = System.currentTimeMillis();
+        List&lt;CompletableFuture&lt;Map.Entry&lt;String, Double&gt;&gt;&gt; cfFutures = batchCustomers.stream()
+                .map(cid -&gt; CompletableFuture.supplyAsync(
+                        () -&gt; Map.entry(cid, simulatePrediction(cid)), batchPool))
+                .collect(Collectors.toList());
+
+        Map&lt;String, Double&gt; parResults = cfFutures.stream()
+                .map(CompletableFuture::join)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        System.out.printf(&quot;Parallel batch:   500 customers in %d ms%n&quot;,
+                System.currentTimeMillis() - parBatch);
+
+        // Summarize results:
+        long highRiskPar = parResults.values().stream().filter(s -&gt; s &gt; 0.7).count();
+        System.out.printf(&quot;High-risk (&gt;0.7): %d / 500%n&quot;, highRiskPar);
+        System.out.println(&quot;Both results match: &quot; + (seqResults.size() == parResults.size()));
+
+        batchPool.shutdown();
+
+        System.out.println(&quot;\nMultithreading module complete!&quot;);
+
+        // ==============================================================================
+        // YOUR TURN — LESSON 06 (Full Challenge):
+        // Build a parallel batch scoring system with these requirements:
+        //
+        // TASK 1: Create a ProductCatalog of 1000 products:
+        //   Product(id, name, price, category)
+        //   Make each product&#x27;s scoring take 1-3ms (Thread.sleep).
+        //
+        // TASK 2: Write a sequential scorer that computes a &quot;demand score&quot; for each:
+        //   demand = (random) * price / 100
+        //   Measure time.
+        //
+        // TASK 3: Write a parallel scorer using CompletableFuture (copy pattern above).
+        //   Measure time. What&#x27;s the speedup?
+        //
+        // TASK 4: Aggregate results:
+        //   - Average demand score per category
+        //   - Top 10 products by demand score
+        //   - Count products above/below mean demand
+        //
+        // Write your solutions below:
+        // ==============================================================================
+
+    } // end main()
+
+
+    // ===========================================================================
+    // HELPER METHODS
+    // ===========================================================================
+
+    /** Simulates ML model inference with artificial delay. */
+    static double computeChurnScore(String customerId, double score) {
+        try {
+            Thread.sleep(80 + (int)(Math.random() * 40));   // 80-120ms &quot;inference&quot;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        System.out.printf(&quot;  Scored %-8s → %.2f  [%s]%n&quot;,
+                customerId, score, Thread.currentThread().getName());
+        return score;
+    }
+
+    /** Simulates a fast ML prediction (no sleep — for large-scale parallel demos). */
+    static double simulatePrediction(String customerId) {
+        double hash = Math.abs(customerId.hashCode() % 100) / 100.0;
+        return 0.1 + 0.8 * hash + Math.random() * 0.1;
+    }
+
+    static boolean isPrime(int n) {
+        if (n &lt; 2) return false;
+        for (int i = 2; i &lt;= Math.sqrt(n); i++) if (n % i == 0) return false;
+        return true;
+    }
+
+
+    // ===========================================================================
+    // THREAD-SAFE AGGREGATOR (used in Lesson 04)
+    // ===========================================================================
+
+    static class SafeAggregator {
+        private long total = 0;
+
+        public synchronized void add(long value) {
+            total += value;          // synchronized: only one thread at a time
+        }
+
+        public synchronized long getTotal() {
+            return total;
+        }
+    }
+
+} // end class
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

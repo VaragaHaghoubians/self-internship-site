@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sql Zero To Hero.Sql - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Sql Zero To Hero.Sql</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">phase-1-software-engineering/month-02-databases-web/resources/sql_zero_to_hero.sql</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><pre><code>-- ==============================================================================
+--  SQL — ZERO TO HERO
+--  Your personal SQL teacher — from SELECT to advanced analytics
+--  How to use: Run each section in MySQL Workbench, DBeaver, or SQLite
+--              Read the comments, study the examples, then do YOUR TURN tasks
+--  Recommended DB: MySQL or PostgreSQL (or SQLite for beginners — no install!)
+-- ==============================================================================
+
+-- ==============================================================================
+-- DAY 01 — WHAT IS SQL? YOUR FIRST QUERY
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- SQL (Structured Query Language) talks to databases.
+-- A database holds data in TABLES (like spreadsheets but structured).
+-- Every table has COLUMNS (attributes) and ROWS (records).
+-- The 5 core SQL commands you MUST know:
+--   SELECT  → read data
+--   INSERT  → add data
+--   UPDATE  → modify data
+--   DELETE  → remove data
+--   CREATE  → build tables/databases
+--
+-- A comment in SQL starts with -- (single line) or /* */ (multi-line)
+--
+-- YOUR FIRST QUERY — selects everything from a table:
+-- SELECT * FROM table_name;
+-- The * means &quot;all columns&quot;. The ; ends the statement.
+-- ==============================================================================
+
+-- ==============================================================================
+-- DAY 02 — CREATE DATABASE &amp; TABLES
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- Before storing data you need to CREATE a database and then tables inside it.
+-- Each column needs a DATA TYPE:
+--   INT          → whole numbers (age, id, count)
+--   VARCHAR(n)   → text up to n characters (&quot;Alice&quot;, &quot;Python&quot;)
+--   TEXT         → long text (descriptions, notes)
+--   FLOAT/DECIMAL(p,s) → decimal numbers (gpa: DECIMAL(3,2) = 3 digits, 2 after point)
+--   BOOLEAN      → TRUE/FALSE
+--   DATE         → dates (2024-01-15)
+--   DATETIME     → date + time
+-- Constraints add rules:
+--   PRIMARY KEY  → unique identifier for each row — NEVER NULL
+--   NOT NULL     → this column must always have a value
+--   UNIQUE       → all values in this column must be different
+--   DEFAULT val  → if no value given, use this default
+--   FOREIGN KEY  → links this column to a primary key in another table
+--
+-- EXAMPLE:
+
+CREATE DATABASE IF NOT EXISTS university_db;
+USE university_db;
+
+-- Students table:
+CREATE TABLE IF NOT EXISTS students (
+    student_id   INT          PRIMARY KEY AUTO_INCREMENT,  -- auto-numbers: 1,2,3...
+    first_name   VARCHAR(50)  NOT NULL,
+    last_name    VARCHAR(50)  NOT NULL,
+    email        VARCHAR(100) UNIQUE NOT NULL,
+    age          INT          CHECK (age BETWEEN 16 AND 60),
+    gpa          DECIMAL(3,2) DEFAULT 0.00,
+    major        VARCHAR(100),
+    enrolled_on  DATE         DEFAULT (CURRENT_DATE),
+    is_active    BOOLEAN      DEFAULT TRUE
+);
+
+-- Courses table:
+CREATE TABLE IF NOT EXISTS courses (
+    course_id    INT         PRIMARY KEY AUTO_INCREMENT,
+    course_name  VARCHAR(100) NOT NULL,
+    credits      INT          NOT NULL CHECK (credits BETWEEN 1 AND 6),
+    department   VARCHAR(50),
+    professor    VARCHAR(100)
+);
+
+-- Enrollments — a JUNCTION TABLE linking students and courses (many-to-many):
+CREATE TABLE IF NOT EXISTS enrollments (
+    enrollment_id INT     PRIMARY KEY AUTO_INCREMENT,
+    student_id    INT     NOT NULL,
+    course_id     INT     NOT NULL,
+    grade         DECIMAL(4,2),
+    enrolled_date DATE    DEFAULT (CURRENT_DATE),
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id)  REFERENCES courses(course_id)   ON DELETE CASCADE
+);
+
+-- ==============================================================================
+-- YOUR TURN — DAY 02:
+-- 1. Create a table &#x27;professors&#x27; with: professor_id, name, email, department, salary
+--    Add appropriate data types and constraints
+-- 2. Create a table &#x27;assignments&#x27; with: assignment_id, course_id, title, due_date, max_score
+--    Add a FOREIGN KEY linking to courses
+-- ==============================================================================
+
+
+-- ==============================================================================
+-- DAY 03 — INSERT DATA
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- INSERT adds rows into a table.
+-- Syntax: INSERT INTO table (col1, col2) VALUES (val1, val2);
+-- You can insert multiple rows in one statement — much faster!
+-- String values need single quotes: &#x27;Alice&#x27; (NOT double quotes in most SQL dialects)
+--
+-- EXAMPLE:
+
+INSERT INTO students (first_name, last_name, email, age, gpa, major) VALUES
+    (&#x27;Alice&#x27;,   &#x27;Johnson&#x27;,  &#x27;alice@uni.edu&#x27;,  25, 3.80, &#x27;Data Science&#x27;),
+    (&#x27;Bob&#x27;,     &#x27;Smith&#x27;,    &#x27;bob@uni.edu&#x27;,    23, 3.50, &#x27;Computer Science&#x27;),
+    (&#x27;Carol&#x27;,   &#x27;Williams&#x27;, &#x27;carol@uni.edu&#x27;,  26, 3.90, &#x27;Statistics&#x27;),
+    (&#x27;David&#x27;,   &#x27;Brown&#x27;,    &#x27;david@uni.edu&#x27;,  24, 3.70, &#x27;Data Science&#x27;),
+    (&#x27;Eve&#x27;,     &#x27;Davis&#x27;,    &#x27;eve@uni.edu&#x27;,    22, 3.20, &#x27;Mathematics&#x27;),
+    (&#x27;Frank&#x27;,   &#x27;Miller&#x27;,   &#x27;frank@uni.edu&#x27;,  28, 2.80, &#x27;Computer Science&#x27;),
+    (&#x27;Grace&#x27;,   &#x27;Wilson&#x27;,   &#x27;grace@uni.edu&#x27;,  25, 3.60, &#x27;Data Science&#x27;),
+    (&#x27;Henry&#x27;,   &#x27;Moore&#x27;,    &#x27;henry@uni.edu&#x27;,  27, 3.10, &#x27;Statistics&#x27;);
+
+INSERT INTO courses (course_name, credits, department, professor) VALUES
+    (&#x27;Python Programming&#x27;,    3, &#x27;CS&#x27;,    &#x27;Dr. Lee&#x27;),
+    (&#x27;Machine Learning&#x27;,      4, &#x27;DS&#x27;,    &#x27;Dr. Smith&#x27;),
+    (&#x27;SQL &amp; Databases&#x27;,       3, &#x27;CS&#x27;,    &#x27;Dr. Jones&#x27;),
+    (&#x27;Statistical Methods&#x27;,   3, &#x27;Stats&#x27;, &#x27;Dr. Brown&#x27;),
+    (&#x27;Data Visualization&#x27;,    2, &#x27;DS&#x27;,    &#x27;Dr. White&#x27;),
+    (&#x27;Linear Algebra&#x27;,        3, &#x27;Math&#x27;,  &#x27;Dr. Green&#x27;);
+
+INSERT INTO enrollments (student_id, course_id, grade) VALUES
+    (1, 1, 92.5), (1, 2, 88.0), (1, 5, 95.0),
+    (2, 1, 85.0), (2, 3, 78.0),
+    (3, 4, 96.0), (3, 5, 91.0), (3, 2, 89.0),
+    (4, 1, 90.0), (4, 2, 84.0), (4, 3, 87.0),
+    (5, 4, 76.0), (5, 6, 82.0),
+    (6, 1, 70.0), (6, 3, 65.0),
+    (7, 2, 93.0), (7, 5, 88.0),
+    (8, 4, 79.0), (8, 6, 72.0);
+
+-- ==============================================================================
+-- YOUR TURN — DAY 03:
+-- 1. Insert 3 more students of your choice
+-- 2. Insert 2 more courses
+-- 3. Insert enrollments for your new students
+-- ==============================================================================
+
+
+-- ==============================================================================
+-- DAY 04 — SELECT: Reading Data
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- SELECT is the MOST USED SQL command — you&#x27;ll write this hundreds of times daily.
+-- Always think: WHAT columns do I need? WHERE should I filter?
+-- SELECT * fetches ALL columns — avoid it in production (slow, wastes bandwidth)
+--
+-- Syntax:
+--   SELECT col1, col2 FROM table WHERE condition ORDER BY col LIMIT n;
+--
+-- EXAMPLE:
+
+-- All columns from all rows:
+SELECT * FROM students;
+
+-- Specific columns only:
+SELECT first_name, last_name, gpa FROM students;
+
+-- Filter with WHERE:
+SELECT * FROM students WHERE major = &#x27;Data Science&#x27;;
+SELECT * FROM students WHERE gpa &gt;= 3.5;
+SELECT * FROM students WHERE age BETWEEN 23 AND 26;
+SELECT * FROM students WHERE major IN (&#x27;Data Science&#x27;, &#x27;Statistics&#x27;);
+SELECT * FROM students WHERE major LIKE &#x27;%Science%&#x27;;   -- contains &#x27;Science&#x27;
+SELECT * FROM students WHERE email LIKE &#x27;%@uni.edu&#x27;;   -- ends with @uni.edu
+
+-- Multiple conditions:
+SELECT * FROM students WHERE major = &#x27;Data Science&#x27; AND gpa &gt;= 3.7;
+SELECT * FROM students WHERE age &lt; 24 OR gpa &gt; 3.8;
+
+-- NULL checks:
+SELECT * FROM students WHERE major IS NULL;
+SELECT * FROM students WHERE major IS NOT NULL;
+
+-- ORDER BY:
+SELECT first_name, gpa FROM students ORDER BY gpa DESC;    -- highest first
+SELECT first_name, age FROM students ORDER BY age ASC;     -- youngest first
+SELECT * FROM students ORDER BY major ASC, gpa DESC;       -- sort by 2 columns
+
+-- LIMIT — take only first N rows:
+SELECT * FROM students ORDER BY gpa DESC LIMIT 3;          -- Top 3 students
+
+-- DISTINCT — unique values only:
+SELECT DISTINCT major FROM students;
+
+-- ==============================================================================
+-- YOUR TURN — DAY 04:
+-- 1. Select all students older than 25
+-- 2. Select name and GPA of students with GPA between 3.6 and 3.9
+-- 3. Find all students whose name starts with &#x27;A&#x27; (HINT: LIKE &#x27;A%&#x27;)
+-- 4. Get the top 5 students by GPA
+-- 5. List all unique majors
+-- ==============================================================================
+
+
+-- ==============================================================================
+-- DAY 05 — AGGREGATE FUNCTIONS &amp; GROUP BY
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- Aggregate functions compute a SINGLE value from MANY rows:
+--   COUNT(*)        → total number of rows
+--   COUNT(col)      → count non-NULL values in a column
+--   SUM(col)        → total sum
+--   AVG(col)        → average
+--   MIN(col)        → minimum value
+--   MAX(col)        → maximum value
+--
+-- GROUP BY → splits rows into groups BEFORE aggregating
+-- HAVING   → filters AFTER grouping (WHERE filters BEFORE grouping)
+-- Rule: every column in SELECT must be either in GROUP BY or inside an aggregate function!
+--
+-- EXAMPLE:
+
+-- Count all students:
+SELECT COUNT(*) AS total_students FROM students;
+
+-- Average GPA:
+SELECT ROUND(AVG(gpa), 2) AS avg_gpa FROM students;
+
+-- Count students per major:
+SELECT major, COUNT(*) AS student_count
+FROM students
+GROUP BY major
+ORDER BY student_count DESC;
+
+-- Average GPA per major:
+SELECT major, ROUND(AVG(gpa), 2) AS avg_gpa, MAX(gpa) AS top_gpa
+FROM students
+GROUP BY major
+ORDER BY avg_gpa DESC;
+
+-- HAVING — only show majors with more than 2 students:
+SELECT major, COUNT(*) AS count
+FROM students
+GROUP BY major
+HAVING count &gt; 2
+ORDER BY count DESC;
+
+-- Statistics per major:
+SELECT
+    major,
+    COUNT(*)           AS num_students,
+    ROUND(AVG(gpa),2)  AS avg_gpa,
+    MIN(gpa)           AS min_gpa,
+    MAX(gpa)           AS max_gpa
+FROM students
+GROUP BY major;
+
+-- ==============================================================================
+-- YOUR TURN — DAY 05:
+-- 1. Find the total number of enrollments in each course
+-- 2. Find the average grade per course, sorted by avg grade descending
+-- 3. Find majors where the average GPA is above 3.5
+-- 4. Count how many students are in each age group (HINT: use age)
+-- 5. Find the course with the highest average grade
+-- ==============================================================================
+
+
+-- ==============================================================================
+-- DAY 06 — JOINS (Combining Tables)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- JOINS are the heart of SQL — they combine data from multiple tables.
+-- Think of JOIN like a Venn diagram:
+--
+--   INNER JOIN  → only rows that match in BOTH tables
+--   LEFT JOIN   → ALL rows from LEFT table + matching rows from right (NULLs if no match)
+--   RIGHT JOIN  → ALL rows from RIGHT table + matching rows from left
+--   FULL OUTER JOIN → ALL rows from BOTH tables (NULLs where no match)
+--
+-- Use table aliases (short names): students s, courses c
+-- Link on the FOREIGN KEY relationship
+--
+-- EXAMPLE:
+
+-- INNER JOIN — students with their enrolled courses:
+SELECT
+    s.first_name,
+    s.last_name,
+    c.course_name,
+    e.grade
+FROM enrollments e
+INNER JOIN students s ON e.student_id = s.student_id
+INNER JOIN courses  c ON e.course_id  = c.course_id
+ORDER BY s.last_name, c.course_name;
+
+-- LEFT JOIN — all students, even if not enrolled in any course:
+SELECT
+    s.first_name,
+    s.last_name,
+    c.course_name,
+    e.grade
+FROM students s
+LEFT JOIN enrollments e ON s.student_id = e.student_id
+LEFT JOIN courses     c ON e.course_id  = c.course_id
+ORDER BY s.last_name;
+
+-- Aggregate with JOIN — average grade per student:
+SELECT
+    s.first_name,
+    s.last_name,
+    s.major,
+    COUNT(e.course_id)        AS courses_taken,
+    ROUND(AVG(e.grade), 2)    AS avg_grade
+FROM students s
+LEFT JOIN enrollments e ON s.student_id = e.student_id
+GROUP BY s.student_id, s.first_name, s.last_name, s.major
+ORDER BY avg_grade DESC;
+
+-- ==============================================================================
+-- YOUR TURN — DAY 06:
+-- 1. List all courses with the number of enrolled students
+-- 2. Find students who are NOT enrolled in any course (HINT: LEFT JOIN + IS NULL)
+-- 3. List student name, course name, and grade for all grades above 90
+-- 4. For each major, show average grade (joining all 3 tables)
+-- ==============================================================================
+
+
+-- ==============================================================================
+-- DAY 07 — SUBQUERIES &amp; CTEs
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- A SUBQUERY is a query INSIDE another query — think nested questions.
+-- A CTE (Common Table Expression) uses WITH keyword to create a named, temporary result.
+-- CTEs make complex queries readable — ALWAYS prefer CTE over deeply nested subqueries.
+--
+-- EXAMPLE:
+
+-- Subquery — students with GPA above average:
+SELECT first_name, last_name, gpa
+FROM students
+WHERE gpa &gt; (SELECT AVG(gpa) FROM students)
+ORDER BY gpa DESC;
+
+-- Subquery in FROM (inline view):
+SELECT major, avg_gpa
+FROM (
+    SELECT major, ROUND(AVG(gpa), 2) AS avg_gpa
+    FROM students
+    GROUP BY major
+) AS major_averages
+WHERE avg_gpa &gt;= 3.6;
+
+-- CTE — same result but MUCH more readable:
+WITH major_averages AS (
+    SELECT major, ROUND(AVG(gpa), 2) AS avg_gpa
+    FROM students
+    GROUP BY major
+)
+SELECT major, avg_gpa
+FROM major_averages
+WHERE avg_gpa &gt;= 3.6
+ORDER BY avg_gpa DESC;
+
+-- Multi-CTE — chain multiple CTEs:
+WITH
+enrollment_counts AS (
+    SELECT student_id, COUNT(*) AS num_courses
+    FROM enrollments
+    GROUP BY student_id
+),
+student_grades AS (
+    SELECT student_id, ROUND(AVG(grade), 2) AS avg_grade
+    FROM enrollments
+    GROUP BY student_id
+)
+SELECT
+    s.first_name,
+    s.last_name,
+    ec.num_courses,
+    sg.avg_grade
+FROM students s
+JOIN enrollment_counts ec ON s.student_id = ec.student_id
+JOIN student_grades    sg ON s.student_id = sg.student_id
+ORDER BY sg.avg_grade DESC;
+
+-- ==============================================================================
+-- YOUR TURN — DAY 07:
+-- 1. Find courses that have above-average enrollment count (use subquery or CTE)
+-- 2. Find the top student per major (highest GPA in each major)
+--    HINT: Use CTE + ROW_NUMBER() or a correlated subquery
+-- 3. List students who scored above the average grade for EACH course they took
+-- ==============================================================================
+
+
+-- ==============================================================================
+-- DAY 08 — WINDOW FUNCTIONS
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- Window functions perform calculations ACROSS rows related to the current row,
+-- WITHOUT collapsing them into groups like GROUP BY does.
+-- They are incredibly powerful for ranking, running totals, and comparisons.
+-- Syntax: function() OVER (PARTITION BY col ORDER BY col)
+--   PARTITION BY → groups (like GROUP BY but keeps all rows)
+--   ORDER BY     → order within the window
+--
+-- KEY WINDOW FUNCTIONS:
+--   ROW_NUMBER()  → 1,2,3... unique sequential number
+--   RANK()        → 1,2,2,4 — ties get same rank, gap after
+--   DENSE_RANK()  → 1,2,2,3 — ties get same rank, no gap
+--   LAG(col, n)   → value of &#x27;col&#x27; from n rows BEFORE current
+--   LEAD(col, n)  → value of &#x27;col&#x27; from n rows AFTER current
+--   SUM() OVER()  → running total
+--   AVG() OVER()  → moving average
+--
+-- EXAMPLE:
+
+-- Rank students by GPA within each major:
+SELECT
+    first_name,
+    last_name,
+    major,
+    gpa,
+    RANK()       OVER (PARTITION BY major ORDER BY gpa DESC) AS rank_in_major,
+    DENSE_RANK() OVER (ORDER BY gpa DESC)                    AS overall_rank,
+    ROW_NUMBER() OVER (ORDER BY gpa DESC)                    AS row_num
+FROM students;
+
+-- Running total of enrollments by date:
+SELECT
+    enrollment_id,
+    student_id,
+    enrolled_date,
+    COUNT(*) OVER (ORDER BY enrolled_date) AS running_count
+FROM enrollments;
+
+-- Compare each student&#x27;s GPA to their major average:
+SELECT
+    first_name,
+    major,
+    gpa,
+    ROUND(AVG(gpa) OVER (PARTITION BY major), 2) AS major_avg_gpa,
+    ROUND(gpa - AVG(gpa) OVER (PARTITION BY major), 2) AS diff_from_avg
+FROM students
+ORDER BY major, gpa DESC;
+
+-- ==============================================================================
+-- YOUR TURN — DAY 08:
+-- 1. Rank students by their average grade in enrollments (across all courses)
+-- 2. For each enrollment, show the student&#x27;s grade and the previous grade using LAG()
+-- 3. Calculate each student&#x27;s grade as a percentage of the maximum grade in that course
+-- ==============================================================================
+
+
+-- ==============================================================================
+-- DAY 09 — UPDATE &amp; DELETE
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- UPDATE modifies existing rows. DELETE removes rows.
+-- ⚠️  ALWAYS add a WHERE clause! Without it you change/delete EVERY row!
+-- ⚠️  ALWAYS run a SELECT first to preview which rows will be affected.
+-- Use transactions (BEGIN/COMMIT/ROLLBACK) to safely test changes.
+--
+-- EXAMPLE:
+
+-- Safe process:
+-- Step 1: Preview first
+SELECT * FROM students WHERE student_id = 1;
+
+-- Step 2: Then update
+UPDATE students
+SET gpa = 3.85
+WHERE student_id = 1;
+
+-- Update multiple columns:
+UPDATE students
+SET gpa   = 3.75,
+    major = &#x27;Machine Learning&#x27;
+WHERE student_id = 2;
+
+-- Update with calculation:
+UPDATE enrollments
+SET grade = grade * 1.05     -- Give 5% curve to all grades
+WHERE course_id = 3;
+
+-- Delete a specific row:
+DELETE FROM students WHERE student_id = 8;
+
+-- Delete with condition:
+DELETE FROM enrollments WHERE grade &lt; 50;
+
+-- TRANSACTION — safe update/delete with rollback option:
+BEGIN;
+    UPDATE students SET gpa = 0.0 WHERE major = &#x27;Mathematics&#x27;;
+    -- Oops! Let&#x27;s check:
+    SELECT * FROM students WHERE major = &#x27;Mathematics&#x27;;
+ROLLBACK;   -- Undo everything — nothing actually changed!
+-- Use COMMIT instead of ROLLBACK to actually save the changes.
+
+-- ==============================================================================
+-- YOUR TURN — DAY 09:
+-- 1. Update Alice&#x27;s GPA to 3.95
+-- 2. Update all Data Science students: add 0.1 to their GPA (cap at 4.0)
+--    HINT: SET gpa = LEAST(gpa + 0.1, 4.0)
+-- 3. Delete all enrollments where grade is NULL
+-- 4. Use a transaction to safely test deleting a major group, then ROLLBACK
+-- ==============================================================================
+
+
+-- ==============================================================================
+-- DAY 10 — VIEWS, INDEXES &amp; STORED PROCEDURES
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- VIEW → a saved SELECT query you can use like a table — great for reusable queries
+-- INDEX → speeds up lookups on large tables (like a book index)
+-- STORED PROCEDURE → reusable block of SQL code (like a function)
+--
+-- EXAMPLE:
+
+-- VIEW — create a reusable &quot;student report card&quot; view:
+CREATE OR REPLACE VIEW student_report AS
+SELECT
+    s.student_id,
+    CONCAT(s.first_name, &#x27; &#x27;, s.last_name) AS full_name,
+    s.major,
+    s.gpa,
+    COUNT(e.course_id)      AS courses_enrolled,
+    ROUND(AVG(e.grade), 2)  AS avg_grade
+FROM students s
+LEFT JOIN enrollments e ON s.student_id = e.student_id
+GROUP BY s.student_id, full_name, s.major, s.gpa;
+
+-- Now use it like a table:
+SELECT * FROM student_report ORDER BY avg_grade DESC;
+SELECT * FROM student_report WHERE major = &#x27;Data Science&#x27;;
+
+-- INDEX — speed up queries on frequently searched columns:
+CREATE INDEX idx_students_major ON students(major);
+CREATE INDEX idx_students_gpa   ON students(gpa);
+CREATE INDEX idx_enroll_student ON enrollments(student_id);
+
+-- STORED PROCEDURE — reusable SQL with parameters:
+DELIMITER $$
+CREATE PROCEDURE get_students_by_major(IN p_major VARCHAR(100))
+BEGIN
+    SELECT student_id, first_name, last_name, gpa
+    FROM students
+    WHERE major = p_major
+    ORDER BY gpa DESC;
+END$$
+DELIMITER ;
+
+-- Call the procedure:
+CALL get_students_by_major(&#x27;Data Science&#x27;);
+CALL get_students_by_major(&#x27;Statistics&#x27;);
+
+-- ==============================================================================
+-- YOUR TURN — DAY 10:
+-- 1. Create a VIEW &#x27;course_summary&#x27; showing: course name, enrolled students, avg grade
+-- 2. Create an index on the email column of students
+-- 3. Create a stored procedure &#x27;get_top_students(min_gpa)&#x27; that returns students above a GPA
+-- ==============================================================================
+
+
+-- ==============================================================================
+-- DAY 11 — CAPSTONE PROJECT: University Analytics Dashboard
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- Build a complete analytics report using everything you&#x27;ve learned.
+-- These are real-world business intelligence queries.
+--
+-- YOUR TASKS:
+
+-- TASK 1: Executive Summary
+-- Show total students, average GPA, total courses, total enrollments
+
+-- TASK 2: Major Performance Report
+-- For each major: student count, avg GPA, avg grade, top student name
+
+-- TASK 3: Course Popularity Report
+-- For each course: enrolled students, avg grade, pass rate (grade &gt;= 60)
+
+-- TASK 4: At-Risk Students
+-- Students with GPA &lt; 3.0 OR average grade &lt; 70 — list with contact info
+
+-- TASK 5: Top Performers
+-- Top 3 students per major by GPA (use window function)
+
+-- TASK 6: Grade Distribution
+-- Count students in each grade bracket: A(90+), B(80-89), C(70-79), D(60-69), F(&lt;60)
+-- HINT: Use CASE WHEN expression
+
+-- TASK 7: Workload Analysis  
+-- Students taking more than 2 courses — list with course count and avg grade
+
+-- HINT FOR TASK 6:
+-- SELECT
+--     CASE
+--         WHEN grade &gt;= 90 THEN &#x27;A&#x27;
+--         WHEN grade &gt;= 80 THEN &#x27;B&#x27;
+--         WHEN grade &gt;= 70 THEN &#x27;C&#x27;
+--         WHEN grade &gt;= 60 THEN &#x27;D&#x27;
+--         ELSE &#x27;F&#x27;
+--     END AS letter_grade,
+--     COUNT(*) AS count
+-- FROM enrollments
+-- GROUP BY letter_grade
+-- ORDER BY letter_grade;
+
+-- Write your solutions below:
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

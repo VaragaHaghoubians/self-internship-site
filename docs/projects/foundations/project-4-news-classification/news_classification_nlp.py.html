@@ -1,0 +1,1024 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>News Classification Nlp.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>News Classification Nlp.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">projects/foundations/project-4-news-classification/news_classification_nlp.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "\"\"\"\n=============================================================================\nPROJECT 4 \u2014 NEWS ARTICLE CLASSIFICATION WITH NLP & TRANSFORMERS\nRole       : AI Engineer\nDataset    : AG News Classification Dataset\n            HuggingFace: load_dataset(\"ag_news\")\n            Kaggle: https://www.kaggle.com/datasets/amananandrai/ag-news-classification-dataset\nAuthor     : [Your Name]\nDate       : [Date]\n=============================================================================\n\nDESCRIPTION:\n    Two-part NLP classification project:\n\n    PART 1 \u2014 Classical NLP Baseline:\n        Text preprocessing \u2192 TF-IDF vectorization \u2192 Logistic Regression / SVM\n        Fast, interpretable, strong baseline\n\n    PART 2 \u2014 BERT Fine-Tuning (Advanced):\n        Load pre-trained bert-base-uncased \u2192 Tokenize \u2192 Fine-tune \u2192\n        Compare with baseline\n\nCATEGORIES (4 classes):\n    0: World News\n    1: Sports\n    2: Business\n    3: Science / Technology\n\nRECOMMENDATION:\n    Run Part 1 on your local machine.\n    For Part 2 (BERT), consider using Google Colab with a free GPU:\n    https://colab.research.google.com\n\nHOW TO USE:\n    1. Read INSTRUCTIONS.md thoroughly before starting\n    2. Understand each step before writing code\n    3. Work section by section \u2014 run and verify at each step\n    4. For BERT: read the HuggingFace documentation for concepts you don't understand\n\n=============================================================================\n\"\"\"\n\n\n# =============================================================================\n# STEP 0 \u2014 IMPORTS\n# =============================================================================\n# HINT: Import everything at the top.\n#       Some of these may not be installed yet \u2014 see INSTRUCTIONS.md for install commands.\n#\n# Standard libraries:\n#   - os, re (built-in, no install needed)\n#   - warnings\n#\n# Core data libraries:\n#   - pandas (as pd)\n#   - numpy (as np)\n#\n# Visualization:\n#   - matplotlib.pyplot (as plt)\n#   - seaborn (as sns)\n#   - from wordcloud import WordCloud\n#\n# NLTK (text preprocessing):\n#   - from nltk.corpus import stopwords\n#   - from nltk.stem import WordNetLemmatizer\n#   - from nltk.tokenize import word_tokenize\n#   (After importing, run: nltk.download('stopwords'), nltk.download('punkt'),\n#                           nltk.download('wordnet'))\n#\n# Scikit-learn (TF-IDF and classical models):\n#   - from sklearn.feature_extraction.text import TfidfVectorizer\n#   - from sklearn.linear_model import LogisticRegression\n#   - from sklearn.svm import LinearSVC\n#   - from sklearn.metrics import classification_report, confusion_matrix, accuracy_score\n#   - from sklearn.model_selection import train_test_split\n#   - from sklearn.pipeline import Pipeline\n#\n# HuggingFace (for BERT \u2014 Part 2):\n#   - from datasets import load_dataset\n#   - from transformers import (BertTokenizer, BertForSequenceClassification,\n#                                TrainingArguments, Trainer)\n#   - import evaluate\n#\n# PyTorch (for BERT \u2014 Part 2):\n#   - import torch\n#   - from torch.utils.data import Dataset, DataLoader\n#   - from torch.optim import AdamW\n\n# === YOUR IMPORT CODE HERE ===\n\n\n# =============================================================================\n# STEP 1 \u2014 CONFIGURATION\n# =============================================================================\n# HINT: Define your constants and configuration at the top.\n#       This makes it easy to change values without hunting through the code.\n#\n# Configuration to set:\n#   RANDOM_SEED     = 42          # for reproducibility everywhere\n#   TRAIN_SAMPLE_SIZE = 20000     # how many training examples for TF-IDF\n#   TEST_SAMPLE_SIZE  = 4000      # how many test examples\n#   BERT_TRAIN_SIZE   = 3000      # smaller sample for BERT (CPU) or 30000 (GPU)\n#   MAX_LENGTH        = 128       # max token length for BERT\n#   BATCH_SIZE        = 16        # batch size for BERT training\n#   NUM_EPOCHS        = 3         # training epochs for BERT\n#\n# Label mapping dictionary:\n#   label_names = {0: 'World', 1: 'Sports', 2: 'Business', 3: 'Science/Tech'}\n#\n# Output directories:\n#   os.makedirs('outputs/figures', exist_ok=True)\n#   os.makedirs('outputs/models', exist_ok=True)\n#   os.makedirs('outputs/results', exist_ok=True)\n\n# === YOUR CONFIGURATION CODE HERE ===\n\n\n# =============================================================================\n# STEP 2 \u2014 LOAD THE DATASET\n# =============================================================================\n# HINT: Load the AG News dataset. Use Option A (HuggingFace) or Option B (Kaggle CSV).\n#       See INSTRUCTIONS.md Phase 2 for detailed code examples.\n#\n# OPTION A \u2014 HuggingFace (recommended):\n#   from datasets import load_dataset\n#   raw_dataset = load_dataset(\"ag_news\")\n#   Then convert to pandas: raw_dataset['train'].to_pandas()\n#\n# OPTION B \u2014 Kaggle CSV:\n#   train_df = pd.read_csv('data/train.csv', header=None, names=['label','title','description'])\n#   train_df['text'] = train_df['title'] + ' ' + train_df['description']\n#   train_df['label'] = train_df['label'] - 1   # convert 1-4 to 0-3\n#\n# AFTER LOADING (do this for either option):\n#   - Print dataset info: shape, column names, dtypes\n#   - Print class distribution: value_counts() for label column\n#   - Print 2 examples from EACH class (read them \u2014 understand what you're classifying!)\n#   - Compute: average text length in words and characters\n#\n# SAMPLE THE DATA (to keep training fast):\n#   Use train_test_split or df.sample() to create:\n#     - train_df_sample: TRAIN_SAMPLE_SIZE rows, stratified by label\n#     - test_df_sample:  TEST_SAMPLE_SIZE rows, stratified by label\n#   Set random_state=RANDOM_SEED everywhere.\n\n# === YOUR DATA LOADING CODE HERE ===\n\n\n# =============================================================================\n# STEP 3 \u2014 EXPLORATORY VISUALIZATION\n# =============================================================================\n# HINT: Create visualizations to understand the dataset before modeling.\n#\n# --------------------------------------------------------------------------\n# PLOT 1 \u2014 Class Distribution Bar Chart\n# --------------------------------------------------------------------------\n# HINT:\n#   Count examples per label: train_df['label'].value_counts().sort_index()\n#   Map label numbers to names for the x-axis\n#   Create a bar chart with percentage labels on top of each bar\n#   Is the dataset balanced? AG News is perfectly balanced (30k per class).\n#   Save as 'outputs/figures/01_class_distribution.png'\n\n# === YOUR PLOT 1 CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# PLOT 2 \u2014 Article Length Distribution\n# --------------------------------------------------------------------------\n# HINT:\n#   Compute: train_df['word_count'] = train_df['text'].apply(lambda x: len(x.split()))\n#   Plot a histogram of word_count\n#   Optionally: add a vertical line at the mean word count (plt.axvline)\n#   Also create a boxplot of word_count grouped by class to see if any class\n#   has systematically longer/shorter articles\n#   Save as 'outputs/figures/02_article_lengths.png'\n\n# === YOUR PLOT 2 CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# PLOT 3 \u2014 Word Clouds (2x2 Grid, One Per Class)\n# --------------------------------------------------------------------------\n# HINT:\n#   Create a 2x2 subplot grid using plt.subplots(2, 2, figsize=(16, 12))\n#\n#   For each class (0, 1, 2, 3):\n#     1. Filter the training data for that class:\n#        class_texts = ' '.join(train_df[train_df['label']==class_idx]['text'].values)\n#     2. Create a WordCloud:\n#        wc = WordCloud(width=800, height=400, max_words=100,\n#                       background_color='white', colormap='viridis')\n#        wc.generate(class_texts)\n#     3. Display in the subplot:\n#        axes[i][j].imshow(wc, interpolation='bilinear')\n#        axes[i][j].axis('off')\n#        axes[i][j].set_title(label_names[class_idx], fontsize=16)\n#\n#   Save as 'outputs/figures/03_word_clouds.png'\n#\n# OBSERVATION: What words are unique to each category?\n#              What words appear in ALL clouds? (Those are often stop words\n#              or general news vocabulary \u2014 worth noting.)\n\n# === YOUR WORD CLOUDS CODE HERE ===\n\n\n# =============================================================================\n# STEP 4 \u2014 TEXT PREPROCESSING\n# =============================================================================\n# HINT: Write a function to clean raw text for the TF-IDF model.\n#       DO NOT apply this preprocessing to the BERT version.\n#       BERT works better with lightly processed text.\n#\n# Write a function called clean_text(text) that:\n#   1. Converts to lowercase\n#   2. Removes HTML/XML tags: re.sub('<.*?>', '', text)\n#   3. Removes URLs: re.sub(r'http\\S+|www\\S+', '', text)\n#   4. Removes special characters, keeping only letters:\n#      re.sub('[^a-zA-Z\\s]', '', text)\n#   5. Tokenizes (splits into words): text.split()\n#   6. Removes stop words:\n#      stop_words = set(stopwords.words('english'))\n#      filtered_words = [w for w in words if w not in stop_words]\n#   7. Lemmatizes:\n#      lemmatizer = WordNetLemmatizer()\n#      lemmatized = [lemmatizer.lemmatize(w) for w in filtered_words]\n#   8. Rejoins: ' '.join(lemmatized)\n#   9. Returns the cleaned string\n#\n# APPLY IT:\n#   train_df['clean_text'] = train_df['text'].apply(clean_text)\n#   test_df['clean_text']  = test_df['text'].apply(clean_text)\n#\n# VERIFY:\n#   Print an original and cleaned version of the same article.\n#   How many words were removed? Is the meaning preserved?\n\n# === YOUR TEXT PREPROCESSING CODE HERE ===\n\n\n# =============================================================================\n# =============================================================================\n# PART 1 \u2014 CLASSICAL NLP BASELINE\n# =============================================================================\n# =============================================================================\n# HINT: Section marker \u2014 everything from here to Part 2 is the classical approach.\n#       This is your baseline. BERT should (and usually will) beat this.\n\n\n# =============================================================================\n# STEP 5 \u2014 TF-IDF VECTORIZATION\n# =============================================================================\n# HINT: Convert text to numerical feature vectors using TF-IDF.\n#\n# Create and fit the TF-IDF vectorizer:\n#   tfidf = TfidfVectorizer(\n#       max_features=50000,    # keep top 50,000 words by TF-IDF score\n#       ngram_range=(1, 2),    # use unigrams (single words) AND bigrams (word pairs)\n#       min_df=2,              # ignore terms appearing in fewer than 2 documents\n#       max_df=0.95,           # ignore terms appearing in >95% of documents\n#       sublinear_tf=True      # apply log(1 + tf) instead of raw tf\n#   )\n#\n# FIT ON TRAIN, TRANSFORM BOTH:\n#   X_train_tfidf = tfidf.fit_transform(train_df['clean_text'])\n#   X_test_tfidf  = tfidf.transform(test_df['clean_text'])\n#   y_train = train_df['label']\n#   y_test  = test_df['label']\n#\n# PRINT:\n#   - Shape of X_train_tfidf (rows = documents, cols = vocabulary size)\n#   - Vocabulary size: len(tfidf.vocabulary_)\n#   - Example: print the TF-IDF representation of the first article\n#\n# EXPLAIN THE OUTPUT:\n#   X_train_tfidf is a sparse matrix (most values are 0).\n#   Each row is an article, each column is a word, each value is the TF-IDF score.\n\n# === YOUR TF-IDF CODE HERE ===\n\n\n# =============================================================================\n# STEP 6 \u2014 TRAIN CLASSICAL MODELS\n# =============================================================================\n# HINT: Train and evaluate two classifiers. Compare them.\n#\n# --------------------------------------------------------------------------\n# MODEL 1 \u2014 Logistic Regression\n# --------------------------------------------------------------------------\n# HINT:\n#   lr = LogisticRegression(C=5.0, max_iter=1000, solver='saga',\n#                           multi_class='multinomial', random_state=RANDOM_SEED)\n#   lr.fit(X_train_tfidf, y_train)\n#   y_pred_lr = lr.predict(X_test_tfidf)\n#\n# EVALUATE:\n#   1. print(classification_report(y_test, y_pred_lr,\n#                                   target_names=['World','Sports','Business','Sci/Tech']))\n#      \u2192 precision, recall, F1 for each class and overall accuracy\n#\n#   2. Plot confusion matrix as heatmap:\n#      cm = confusion_matrix(y_test, y_pred_lr)\n#      sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',\n#                  xticklabels=['World','Sports','Business','Sci/Tech'],\n#                  yticklabels=['World','Sports','Business','Sci/Tech'])\n#      Save as 'outputs/figures/04_lr_confusion_matrix.png'\n#\n#   3. Store the accuracy for the comparison table later:\n#      lr_accuracy = accuracy_score(y_test, y_pred_lr)\n\n# === YOUR LOGISTIC REGRESSION CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# MODEL 2 \u2014 LinearSVC (Support Vector Machine for Text)\n# --------------------------------------------------------------------------\n# HINT: LinearSVC is often the best-performing classical model for text.\n#\n#   svm = LinearSVC(C=1.0, max_iter=2000, random_state=RANDOM_SEED)\n#   svm.fit(X_train_tfidf, y_train)\n#   y_pred_svm = svm.predict(X_test_tfidf)\n#\n# EVALUATE: same 3 steps as Logistic Regression.\n# Store: svm_accuracy = accuracy_score(y_test, y_pred_svm)\n\n# === YOUR SVM CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# STEP 6.3 \u2014 Most Informative Words Per Class\n# --------------------------------------------------------------------------\n# HINT: For Logistic Regression, the model's coefficients tell you\n#       which words are most predictive for each category.\n#\n#   feature_names = tfidf.get_feature_names_out()\n#\n#   For each class index (0, 1, 2, 3):\n#     coef = lr.coef_[class_index]   <- coefficient array for this class\n#     top_indices = np.argsort(coef)[-15:]   <- indices of top 15 features\n#     top_words = feature_names[top_indices][::-1]\n#     top_scores = coef[top_indices][::-1]\n#     print(f\"\\nTop words for class '{label_names[class_index]}':\")\n#     for word, score in zip(top_words, top_scores):\n#         print(f\"  {word:25s} {score:.4f}\")\n#\n# QUESTION: Do the top words make intuitive sense for each category?\n#           If you see \"quarterback\" in Sports and \"nasdaq\" in Business,\n#           your model learned something real about language!\n\n# === YOUR FEATURE IMPORTANCE CODE HERE ===\n\n\n# =============================================================================\n# =============================================================================\n# PART 2 \u2014 BERT FINE-TUNING (ADVANCED)\n# =============================================================================\n# =============================================================================\n# HINT: This is the deep learning part. Read INSTRUCTIONS.md Phase 6 carefully.\n#\n# PREREQUISITE:\n#   - You should have completed Part 1 successfully\n#   - You should understand what a tokenizer does\n#   - You should understand what fine-tuning means (adapting pre-trained model)\n#   - For slow machines: use Google Colab with GPU\n#\n# IMPORTANT:\n#   For BERT, use the ORIGINAL text (not the heavily cleaned version).\n#   BERT was pre-trained on normal text with punctuation and capitalization.\n#   Use: train_df['text'] \u2014 not train_df['clean_text']\n\n\n# =============================================================================\n# STEP 7 \u2014 SAMPLE DATA FOR BERT\n# =============================================================================\n# HINT: BERT is much slower than TF-IDF. Use a smaller sample.\n#\n#   If you have a GPU (Colab): use 30,000 training examples\n#   If you have only CPU:      use 3,000 training examples\n#\n#   BERT_SAMPLE_SIZE = 3000   # or 30000 with GPU\n#\n#   bert_train_df, bert_val_df = train_test_split(\n#       train_df_sample,\n#       test_size=0.15,\n#       stratify=train_df_sample['label'],\n#       random_state=RANDOM_SEED\n#   )\n#\n#   bert_test_df = test_df.sample(n=1000, random_state=RANDOM_SEED)\n#\n# PRINT: sizes of bert_train_df, bert_val_df, bert_test_df\n\n# === YOUR BERT SAMPLING CODE HERE ===\n\n\n# =============================================================================\n# STEP 8 \u2014 LOAD BERT TOKENIZER\n# =============================================================================\n# HINT: Load the tokenizer for 'bert-base-uncased'\n#       'uncased' means it converts all text to lowercase internally.\n#\n#   from transformers import BertTokenizer\n#   tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')\n#\n# TEST THE TOKENIZER with a sample sentence:\n#   test_sentence = \"Apple stock surged after announcing record quarterly earnings.\"\n#   tokens = tokenizer(test_sentence, return_tensors='pt',\n#                      padding=True, truncation=True, max_length=MAX_LENGTH)\n#   print(\"Input IDs shape:\", tokens['input_ids'].shape)\n#   print(\"Tokens:\", tokenizer.convert_ids_to_tokens(tokens['input_ids'][0]))\n#\n# UNDERSTAND THE OUTPUT:\n#   - [CLS] token is always first \u2014 BERT uses its representation for classification\n#   - [SEP] token marks end of text\n#   - [PAD] tokens are added to make all sequences the same length\n#   - 'attention_mask': 1 for real tokens, 0 for padding \u2014 tells BERT to ignore padding\n#\n# COMPUTE MAX TOKEN LENGTH (optional but informative):\n#   token_counts = [len(tokenizer.encode(t, truncation=True, max_length=512))\n#                   for t in bert_train_df['text'].head(500)]\n#   print(f\"Max tokens: {max(token_counts)}, Mean: {np.mean(token_counts):.0f}\")\n#   This helps you choose an appropriate MAX_LENGTH value.\n\n# === YOUR TOKENIZER CODE HERE ===\n\n\n# =============================================================================\n# STEP 9 \u2014 CREATE PYTORCH DATASET CLASS\n# =============================================================================\n# HINT: PyTorch needs data in a specific format.\n#       You define a Dataset class that loads one example at a time.\n#\n# Create a class called NewsDataset that inherits from torch.utils.data.Dataset:\n#\n#   class NewsDataset(Dataset):\n#       def __init__(self, texts, labels, tokenizer, max_length):\n#           # Store all 4 parameters as self.texts, self.labels, etc.\n#           pass\n#\n#       def __len__(self):\n#           # Return the number of examples (len of texts)\n#           pass\n#\n#       def __getitem__(self, idx):\n#           # Get the text and label at index idx\n#           # Tokenize the text:\n#           #   encoding = self.tokenizer(\n#           #       self.texts[idx],\n#           #       max_length=self.max_length,\n#           #       padding='max_length',\n#           #       truncation=True,\n#           #       return_tensors='pt'\n#           #   )\n#           # Return a dictionary:\n#           #   {\n#           #     'input_ids':      encoding['input_ids'].squeeze(),       <- shape: [max_length]\n#           #     'attention_mask': encoding['attention_mask'].squeeze(),   <- shape: [max_length]\n#           #     'labels':         torch.tensor(self.labels[idx], dtype=torch.long)\n#           #   }\n#           pass\n#\n# CREATE DATASET OBJECTS:\n#   train_dataset = NewsDataset(\n#       texts=bert_train_df['text'].tolist(),\n#       labels=bert_train_df['label'].tolist(),\n#       tokenizer=tokenizer,\n#       max_length=MAX_LENGTH\n#   )\n#   val_dataset  = NewsDataset(...)\n#   test_dataset = NewsDataset(...)\n#\n# VERIFY: print(train_dataset[0])  <- should show dict with tensor values\n\n# === YOUR DATASET CLASS CODE HERE ===\n\n\n# =============================================================================\n# STEP 10 \u2014 LOAD BERT MODEL FOR CLASSIFICATION\n# =============================================================================\n# HINT: Load a pre-trained BERT model with a classification head.\n#\n#   from transformers import BertForSequenceClassification\n#   model = BertForSequenceClassification.from_pretrained(\n#       'bert-base-uncased',\n#       num_labels=4    # 4 news categories\n#   )\n#\n# MOVE TO GPU IF AVAILABLE:\n#   device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\n#   model = model.to(device)\n#   print(f\"Using device: {device}\")\n#\n# PRINT MODEL INFO:\n#   total_params = sum(p.numel() for p in model.parameters())\n#   trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)\n#   print(f\"Total parameters:     {total_params:,}\")\n#   print(f\"Trainable parameters: {trainable_params:,}\")\n#   (BERT-base has ~110 million parameters!)\n\n# === YOUR MODEL LOADING CODE HERE ===\n\n\n# =============================================================================\n# STEP 11 \u2014 FINE-TUNE BERT (TRAINING)\n# =============================================================================\n# HINT: Use the HuggingFace Trainer API \u2014 it handles the training loop for you.\n#       Read INSTRUCTIONS.md Phase 6.5 for detailed setup.\n#\n# DEFINE METRICS FUNCTION:\n#   import evaluate\n#   accuracy_metric = evaluate.load(\"accuracy\")\n#   f1_metric = evaluate.load(\"f1\")\n#\n#   def compute_metrics(eval_pred):\n#       logits, labels = eval_pred\n#       # Convert logits to predictions: predictions = np.argmax(logits, axis=-1)\n#       # Compute accuracy: accuracy_metric.compute(predictions=..., references=labels)\n#       # Compute macro F1: f1_metric.compute(predictions=..., references=labels, average='macro')\n#       # Return: {'accuracy': ..., 'f1': ...}\n#       pass\n#\n# DEFINE TRAINING ARGUMENTS:\n#   training_args = TrainingArguments(\n#       output_dir='./outputs/models/bert_news',\n#       num_train_epochs=NUM_EPOCHS,       # 3 epochs is standard for BERT fine-tuning\n#       per_device_train_batch_size=BATCH_SIZE,\n#       per_device_eval_batch_size=BATCH_SIZE * 2,\n#       learning_rate=2e-5,               # BERT uses very small learning rates (2e-5 to 5e-5)\n#       weight_decay=0.01,\n#       evaluation_strategy='epoch',      # evaluate after every epoch\n#       save_strategy='epoch',\n#       load_best_model_at_end=True,\n#       metric_for_best_model='f1',\n#       logging_dir='./outputs/logs',\n#       logging_steps=50\n#   )\n#\n# CREATE TRAINER AND TRAIN:\n#   trainer = Trainer(\n#       model=model,\n#       args=training_args,\n#       train_dataset=train_dataset,\n#       eval_dataset=val_dataset,\n#       compute_metrics=compute_metrics\n#   )\n#   trainer.train()\n#\n# PRINT TRAINING RESULTS:\n#   The trainer will print loss and metrics after every epoch.\n#   Training loss should decrease each epoch.\n#   Validation accuracy should increase.\n#\n# TRAINING TIME ESTIMATE:\n#   - CPU, 3k examples, 3 epochs: ~30\u201360 minutes (very slow)\n#   - Colab GPU, 30k examples, 3 epochs: ~15\u201320 minutes\n\n# === YOUR BERT TRAINING CODE HERE ===\n\n\n# =============================================================================\n# STEP 12 \u2014 EVALUATE BERT\n# =============================================================================\n# HINT: Evaluate your fine-tuned BERT on the test set.\n#\n#   eval_results = trainer.evaluate(test_dataset)\n#   print(\"BERT Test Results:\", eval_results)\n#\n# GENERATE PREDICTIONS FOR DETAILED REPORT:\n#   predictions = trainer.predict(test_dataset)\n#   y_pred_bert = np.argmax(predictions.predictions, axis=-1)\n#   y_true_bert = predictions.label_ids\n#\n#   print(classification_report(y_true_bert, y_pred_bert,\n#                                target_names=['World','Sports','Business','Sci/Tech']))\n#\n#   Plot confusion matrix (same as Step 6 but for BERT):\n#   Save as 'outputs/figures/06_bert_confusion_matrix.png'\n#\n# STORE:\n#   bert_accuracy = accuracy_score(y_true_bert, y_pred_bert)\n\n# === YOUR BERT EVALUATION CODE HERE ===\n\n\n# =============================================================================\n# STEP 13 \u2014 PLOT TRAINING CURVES\n# =============================================================================\n# HINT: Visualize how the model improved during training.\n#\n#   The trainer stores training history in: trainer.state.log_history\n#   This is a list of dictionaries with keys like 'loss', 'eval_loss',\n#   'eval_accuracy', 'epoch', etc.\n#\n#   Parse it to get:\n#     - Training loss per step\n#     - Validation loss per epoch\n#     - Validation accuracy per epoch\n#     - Validation F1 per epoch\n#\n#   Create a 2-subplot figure:\n#     Left:  Training loss over steps (should decrease)\n#     Right: Validation accuracy and F1 over epochs (should increase)\n#\n#   Save as 'outputs/figures/07_bert_training_curves.png'\n#\n# WHAT GOOD TRAINING LOOKS LIKE:\n#   - Training loss steadily decreases\n#   - Validation metrics improve each epoch\n#   - If validation loss increases while training loss decreases = overfitting\n\n# === YOUR TRAINING CURVES CODE HERE ===\n\n\n# =============================================================================\n# STEP 14 \u2014 MODEL COMPARISON\n# =============================================================================\n# HINT: Compare all three models in a single table.\n#\n#   Create a comparison DataFrame:\n#   results = {\n#       'Model': ['TF-IDF + Logistic Regression', 'TF-IDF + LinearSVC', 'BERT (fine-tuned)'],\n#       'Accuracy': [lr_accuracy, svm_accuracy, bert_accuracy],\n#       'Approach': ['Classical NLP', 'Classical NLP', 'Deep Learning'],\n#       'Training Speed': ['Fast', 'Fast', 'Slow'],\n#       'Interpretable': ['Yes (coef)', 'Partial', 'No (black box)']\n#   }\n#   comparison_df = pd.DataFrame(results)\n#   comparison_df['Accuracy (%)'] = (comparison_df['Accuracy'] * 100).round(2)\n#   print(comparison_df.to_string(index=False))\n#\n# PLOT: Bar chart comparing accuracies of the three models\n#   Save as 'outputs/figures/08_model_comparison.png'\n#\n# REFLECTION QUESTIONS (print your answers as comments or prints):\n#   1. How much better is BERT than TF-IDF? Is the improvement worth the extra compute?\n#   2. For which classes does each model struggle most?\n#   3. If you had to deploy ONE model to production today, which would you choose?\n#      (Consider: accuracy, speed, memory, interpretability, maintenance)\n\n# === YOUR MODEL COMPARISON CODE HERE ===\n\n\n# =============================================================================\n# STEP 15 \u2014 ERROR ANALYSIS\n# =============================================================================\n# HINT: Understanding WHERE and WHY a model fails is as important as its accuracy.\n#       This is a key skill for production AI engineers.\n#\n# For your best model (probably BERT):\n#\n#   wrong_indices = np.where(y_pred_bert != y_true_bert)[0]\n#   wrong_examples = bert_test_df.iloc[wrong_indices]\n#   wrong_examples['predicted'] = [label_names[p] for p in y_pred_bert[wrong_indices]]\n#   wrong_examples['true'] = [label_names[t] for t in y_true_bert[wrong_indices]]\n#\n# PRINT 5 MISCLASSIFIED EXAMPLES:\n#   For each wrong example, print:\n#     - Article text (first 200 characters)\n#     - True label\n#     - Predicted label\n#     - Why might the model have gotten it wrong?\n#\n# ANALYZE PATTERNS:\n#   - Which pairs of classes are most confused? (Look at confusion matrix)\n#   - Are the misclassified articles truly ambiguous?\n#   - What would you do to improve the model? (More data? Different model? Better labels?)\n#\n# TIP: This kind of qualitative error analysis is what differentiates a\n#      mediocre AI engineer from a great one.\n\n# === YOUR ERROR ANALYSIS CODE HERE ===\n\n\n# =============================================================================\n# STEP 16 \u2014 SAVE THE FINE-TUNED BERT MODEL\n# =============================================================================\n# HINT: Save the trained model so it can be loaded later without retraining.\n#\n# Save HuggingFace model:\n#   trainer.save_model('outputs/models/bert_news_classifier')\n#   tokenizer.save_pretrained('outputs/models/bert_news_classifier')\n#   print(\"Model saved to outputs/models/bert_news_classifier\")\n#\n# LOAD AND TEST:\n#   from transformers import pipeline\n#   classifier = pipeline(\n#       'text-classification',\n#       model='outputs/models/bert_news_classifier',\n#       tokenizer='outputs/models/bert_news_classifier'\n#   )\n#   result = classifier(\"Apple's stock price rose 5% after strong iPhone sales report.\")\n#   print(result)\n#   \u2192 Should predict class 3 (Business or Science/Tech)\n#\n# WHY THIS MATTERS:\n#   The saved model can be deployed as a REST API using FastAPI or Flask,\n#   or published to HuggingFace Hub for others to use.\n\n# === YOUR MODEL SAVING CODE HERE ===\n\n\n# =============================================================================\n# END OF PROJECT 4\n# =============================================================================\n# NEXT STEPS (after completing this project):\n#   - Try a different pre-trained model: 'distilbert-base-uncased'\n#     (50% smaller, 60% faster, 97% of BERT's performance)\n#   - Try 'roberta-base' \u2014 often outperforms BERT\n#   - Upload your model to HuggingFace Hub:\n#     from huggingface_hub import notebook_login\n#     trainer.push_to_hub(\"your-username/ag-news-bert\")\n#   - Build a FastAPI app that serves predictions:\n#     pip install fastapi uvicorn\n#     from fastapi import FastAPI\n#     app = FastAPI()\n#     @app.post(\"/classify\")\n#     def classify(text: str): ...\n#   - Try zero-shot classification (no fine-tuning needed):\n#     from transformers import pipeline\n#     classifier = pipeline(\"zero-shot-classification\", model=\"facebook/bart-large-mnli\")\n# =============================================================================\n";
+      const readerOutputKey = "readerRun:projects/foundations/project-4-news-classification/news_classification_nlp.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code>&quot;&quot;&quot;
+=============================================================================
+PROJECT 4 — NEWS ARTICLE CLASSIFICATION WITH NLP &amp; TRANSFORMERS
+Role       : AI Engineer
+Dataset    : AG News Classification Dataset
+            HuggingFace: load_dataset(&quot;ag_news&quot;)
+            Kaggle: https://www.kaggle.com/datasets/amananandrai/ag-news-classification-dataset
+Author     : [Your Name]
+Date       : [Date]
+=============================================================================
+
+DESCRIPTION:
+    Two-part NLP classification project:
+
+    PART 1 — Classical NLP Baseline:
+        Text preprocessing → TF-IDF vectorization → Logistic Regression / SVM
+        Fast, interpretable, strong baseline
+
+    PART 2 — BERT Fine-Tuning (Advanced):
+        Load pre-trained bert-base-uncased → Tokenize → Fine-tune →
+        Compare with baseline
+
+CATEGORIES (4 classes):
+    0: World News
+    1: Sports
+    2: Business
+    3: Science / Technology
+
+RECOMMENDATION:
+    Run Part 1 on your local machine.
+    For Part 2 (BERT), consider using Google Colab with a free GPU:
+    https://colab.research.google.com
+
+HOW TO USE:
+    1. Read INSTRUCTIONS.md thoroughly before starting
+    2. Understand each step before writing code
+    3. Work section by section — run and verify at each step
+    4. For BERT: read the HuggingFace documentation for concepts you don&#x27;t understand
+
+=============================================================================
+&quot;&quot;&quot;
+
+
+# =============================================================================
+# STEP 0 — IMPORTS
+# =============================================================================
+# HINT: Import everything at the top.
+#       Some of these may not be installed yet — see INSTRUCTIONS.md for install commands.
+#
+# Standard libraries:
+#   - os, re (built-in, no install needed)
+#   - warnings
+#
+# Core data libraries:
+#   - pandas (as pd)
+#   - numpy (as np)
+#
+# Visualization:
+#   - matplotlib.pyplot (as plt)
+#   - seaborn (as sns)
+#   - from wordcloud import WordCloud
+#
+# NLTK (text preprocessing):
+#   - from nltk.corpus import stopwords
+#   - from nltk.stem import WordNetLemmatizer
+#   - from nltk.tokenize import word_tokenize
+#   (After importing, run: nltk.download(&#x27;stopwords&#x27;), nltk.download(&#x27;punkt&#x27;),
+#                           nltk.download(&#x27;wordnet&#x27;))
+#
+# Scikit-learn (TF-IDF and classical models):
+#   - from sklearn.feature_extraction.text import TfidfVectorizer
+#   - from sklearn.linear_model import LogisticRegression
+#   - from sklearn.svm import LinearSVC
+#   - from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+#   - from sklearn.model_selection import train_test_split
+#   - from sklearn.pipeline import Pipeline
+#
+# HuggingFace (for BERT — Part 2):
+#   - from datasets import load_dataset
+#   - from transformers import (BertTokenizer, BertForSequenceClassification,
+#                                TrainingArguments, Trainer)
+#   - import evaluate
+#
+# PyTorch (for BERT — Part 2):
+#   - import torch
+#   - from torch.utils.data import Dataset, DataLoader
+#   - from torch.optim import AdamW
+
+# === YOUR IMPORT CODE HERE ===
+
+
+# =============================================================================
+# STEP 1 — CONFIGURATION
+# =============================================================================
+# HINT: Define your constants and configuration at the top.
+#       This makes it easy to change values without hunting through the code.
+#
+# Configuration to set:
+#   RANDOM_SEED     = 42          # for reproducibility everywhere
+#   TRAIN_SAMPLE_SIZE = 20000     # how many training examples for TF-IDF
+#   TEST_SAMPLE_SIZE  = 4000      # how many test examples
+#   BERT_TRAIN_SIZE   = 3000      # smaller sample for BERT (CPU) or 30000 (GPU)
+#   MAX_LENGTH        = 128       # max token length for BERT
+#   BATCH_SIZE        = 16        # batch size for BERT training
+#   NUM_EPOCHS        = 3         # training epochs for BERT
+#
+# Label mapping dictionary:
+#   label_names = {0: &#x27;World&#x27;, 1: &#x27;Sports&#x27;, 2: &#x27;Business&#x27;, 3: &#x27;Science/Tech&#x27;}
+#
+# Output directories:
+#   os.makedirs(&#x27;outputs/figures&#x27;, exist_ok=True)
+#   os.makedirs(&#x27;outputs/models&#x27;, exist_ok=True)
+#   os.makedirs(&#x27;outputs/results&#x27;, exist_ok=True)
+
+# === YOUR CONFIGURATION CODE HERE ===
+
+
+# =============================================================================
+# STEP 2 — LOAD THE DATASET
+# =============================================================================
+# HINT: Load the AG News dataset. Use Option A (HuggingFace) or Option B (Kaggle CSV).
+#       See INSTRUCTIONS.md Phase 2 for detailed code examples.
+#
+# OPTION A — HuggingFace (recommended):
+#   from datasets import load_dataset
+#   raw_dataset = load_dataset(&quot;ag_news&quot;)
+#   Then convert to pandas: raw_dataset[&#x27;train&#x27;].to_pandas()
+#
+# OPTION B — Kaggle CSV:
+#   train_df = pd.read_csv(&#x27;data/train.csv&#x27;, header=None, names=[&#x27;label&#x27;,&#x27;title&#x27;,&#x27;description&#x27;])
+#   train_df[&#x27;text&#x27;] = train_df[&#x27;title&#x27;] + &#x27; &#x27; + train_df[&#x27;description&#x27;]
+#   train_df[&#x27;label&#x27;] = train_df[&#x27;label&#x27;] - 1   # convert 1-4 to 0-3
+#
+# AFTER LOADING (do this for either option):
+#   - Print dataset info: shape, column names, dtypes
+#   - Print class distribution: value_counts() for label column
+#   - Print 2 examples from EACH class (read them — understand what you&#x27;re classifying!)
+#   - Compute: average text length in words and characters
+#
+# SAMPLE THE DATA (to keep training fast):
+#   Use train_test_split or df.sample() to create:
+#     - train_df_sample: TRAIN_SAMPLE_SIZE rows, stratified by label
+#     - test_df_sample:  TEST_SAMPLE_SIZE rows, stratified by label
+#   Set random_state=RANDOM_SEED everywhere.
+
+# === YOUR DATA LOADING CODE HERE ===
+
+
+# =============================================================================
+# STEP 3 — EXPLORATORY VISUALIZATION
+# =============================================================================
+# HINT: Create visualizations to understand the dataset before modeling.
+#
+# --------------------------------------------------------------------------
+# PLOT 1 — Class Distribution Bar Chart
+# --------------------------------------------------------------------------
+# HINT:
+#   Count examples per label: train_df[&#x27;label&#x27;].value_counts().sort_index()
+#   Map label numbers to names for the x-axis
+#   Create a bar chart with percentage labels on top of each bar
+#   Is the dataset balanced? AG News is perfectly balanced (30k per class).
+#   Save as &#x27;outputs/figures/01_class_distribution.png&#x27;
+
+# === YOUR PLOT 1 CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# PLOT 2 — Article Length Distribution
+# --------------------------------------------------------------------------
+# HINT:
+#   Compute: train_df[&#x27;word_count&#x27;] = train_df[&#x27;text&#x27;].apply(lambda x: len(x.split()))
+#   Plot a histogram of word_count
+#   Optionally: add a vertical line at the mean word count (plt.axvline)
+#   Also create a boxplot of word_count grouped by class to see if any class
+#   has systematically longer/shorter articles
+#   Save as &#x27;outputs/figures/02_article_lengths.png&#x27;
+
+# === YOUR PLOT 2 CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# PLOT 3 — Word Clouds (2x2 Grid, One Per Class)
+# --------------------------------------------------------------------------
+# HINT:
+#   Create a 2x2 subplot grid using plt.subplots(2, 2, figsize=(16, 12))
+#
+#   For each class (0, 1, 2, 3):
+#     1. Filter the training data for that class:
+#        class_texts = &#x27; &#x27;.join(train_df[train_df[&#x27;label&#x27;]==class_idx][&#x27;text&#x27;].values)
+#     2. Create a WordCloud:
+#        wc = WordCloud(width=800, height=400, max_words=100,
+#                       background_color=&#x27;white&#x27;, colormap=&#x27;viridis&#x27;)
+#        wc.generate(class_texts)
+#     3. Display in the subplot:
+#        axes[i][j].imshow(wc, interpolation=&#x27;bilinear&#x27;)
+#        axes[i][j].axis(&#x27;off&#x27;)
+#        axes[i][j].set_title(label_names[class_idx], fontsize=16)
+#
+#   Save as &#x27;outputs/figures/03_word_clouds.png&#x27;
+#
+# OBSERVATION: What words are unique to each category?
+#              What words appear in ALL clouds? (Those are often stop words
+#              or general news vocabulary — worth noting.)
+
+# === YOUR WORD CLOUDS CODE HERE ===
+
+
+# =============================================================================
+# STEP 4 — TEXT PREPROCESSING
+# =============================================================================
+# HINT: Write a function to clean raw text for the TF-IDF model.
+#       DO NOT apply this preprocessing to the BERT version.
+#       BERT works better with lightly processed text.
+#
+# Write a function called clean_text(text) that:
+#   1. Converts to lowercase
+#   2. Removes HTML/XML tags: re.sub(&#x27;&lt;.*?&gt;&#x27;, &#x27;&#x27;, text)
+#   3. Removes URLs: re.sub(r&#x27;http\S+|www\S+&#x27;, &#x27;&#x27;, text)
+#   4. Removes special characters, keeping only letters:
+#      re.sub(&#x27;[^a-zA-Z\s]&#x27;, &#x27;&#x27;, text)
+#   5. Tokenizes (splits into words): text.split()
+#   6. Removes stop words:
+#      stop_words = set(stopwords.words(&#x27;english&#x27;))
+#      filtered_words = [w for w in words if w not in stop_words]
+#   7. Lemmatizes:
+#      lemmatizer = WordNetLemmatizer()
+#      lemmatized = [lemmatizer.lemmatize(w) for w in filtered_words]
+#   8. Rejoins: &#x27; &#x27;.join(lemmatized)
+#   9. Returns the cleaned string
+#
+# APPLY IT:
+#   train_df[&#x27;clean_text&#x27;] = train_df[&#x27;text&#x27;].apply(clean_text)
+#   test_df[&#x27;clean_text&#x27;]  = test_df[&#x27;text&#x27;].apply(clean_text)
+#
+# VERIFY:
+#   Print an original and cleaned version of the same article.
+#   How many words were removed? Is the meaning preserved?
+
+# === YOUR TEXT PREPROCESSING CODE HERE ===
+
+
+# =============================================================================
+# =============================================================================
+# PART 1 — CLASSICAL NLP BASELINE
+# =============================================================================
+# =============================================================================
+# HINT: Section marker — everything from here to Part 2 is the classical approach.
+#       This is your baseline. BERT should (and usually will) beat this.
+
+
+# =============================================================================
+# STEP 5 — TF-IDF VECTORIZATION
+# =============================================================================
+# HINT: Convert text to numerical feature vectors using TF-IDF.
+#
+# Create and fit the TF-IDF vectorizer:
+#   tfidf = TfidfVectorizer(
+#       max_features=50000,    # keep top 50,000 words by TF-IDF score
+#       ngram_range=(1, 2),    # use unigrams (single words) AND bigrams (word pairs)
+#       min_df=2,              # ignore terms appearing in fewer than 2 documents
+#       max_df=0.95,           # ignore terms appearing in &gt;95% of documents
+#       sublinear_tf=True      # apply log(1 + tf) instead of raw tf
+#   )
+#
+# FIT ON TRAIN, TRANSFORM BOTH:
+#   X_train_tfidf = tfidf.fit_transform(train_df[&#x27;clean_text&#x27;])
+#   X_test_tfidf  = tfidf.transform(test_df[&#x27;clean_text&#x27;])
+#   y_train = train_df[&#x27;label&#x27;]
+#   y_test  = test_df[&#x27;label&#x27;]
+#
+# PRINT:
+#   - Shape of X_train_tfidf (rows = documents, cols = vocabulary size)
+#   - Vocabulary size: len(tfidf.vocabulary_)
+#   - Example: print the TF-IDF representation of the first article
+#
+# EXPLAIN THE OUTPUT:
+#   X_train_tfidf is a sparse matrix (most values are 0).
+#   Each row is an article, each column is a word, each value is the TF-IDF score.
+
+# === YOUR TF-IDF CODE HERE ===
+
+
+# =============================================================================
+# STEP 6 — TRAIN CLASSICAL MODELS
+# =============================================================================
+# HINT: Train and evaluate two classifiers. Compare them.
+#
+# --------------------------------------------------------------------------
+# MODEL 1 — Logistic Regression
+# --------------------------------------------------------------------------
+# HINT:
+#   lr = LogisticRegression(C=5.0, max_iter=1000, solver=&#x27;saga&#x27;,
+#                           multi_class=&#x27;multinomial&#x27;, random_state=RANDOM_SEED)
+#   lr.fit(X_train_tfidf, y_train)
+#   y_pred_lr = lr.predict(X_test_tfidf)
+#
+# EVALUATE:
+#   1. print(classification_report(y_test, y_pred_lr,
+#                                   target_names=[&#x27;World&#x27;,&#x27;Sports&#x27;,&#x27;Business&#x27;,&#x27;Sci/Tech&#x27;]))
+#      → precision, recall, F1 for each class and overall accuracy
+#
+#   2. Plot confusion matrix as heatmap:
+#      cm = confusion_matrix(y_test, y_pred_lr)
+#      sns.heatmap(cm, annot=True, fmt=&#x27;d&#x27;, cmap=&#x27;Blues&#x27;,
+#                  xticklabels=[&#x27;World&#x27;,&#x27;Sports&#x27;,&#x27;Business&#x27;,&#x27;Sci/Tech&#x27;],
+#                  yticklabels=[&#x27;World&#x27;,&#x27;Sports&#x27;,&#x27;Business&#x27;,&#x27;Sci/Tech&#x27;])
+#      Save as &#x27;outputs/figures/04_lr_confusion_matrix.png&#x27;
+#
+#   3. Store the accuracy for the comparison table later:
+#      lr_accuracy = accuracy_score(y_test, y_pred_lr)
+
+# === YOUR LOGISTIC REGRESSION CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# MODEL 2 — LinearSVC (Support Vector Machine for Text)
+# --------------------------------------------------------------------------
+# HINT: LinearSVC is often the best-performing classical model for text.
+#
+#   svm = LinearSVC(C=1.0, max_iter=2000, random_state=RANDOM_SEED)
+#   svm.fit(X_train_tfidf, y_train)
+#   y_pred_svm = svm.predict(X_test_tfidf)
+#
+# EVALUATE: same 3 steps as Logistic Regression.
+# Store: svm_accuracy = accuracy_score(y_test, y_pred_svm)
+
+# === YOUR SVM CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# STEP 6.3 — Most Informative Words Per Class
+# --------------------------------------------------------------------------
+# HINT: For Logistic Regression, the model&#x27;s coefficients tell you
+#       which words are most predictive for each category.
+#
+#   feature_names = tfidf.get_feature_names_out()
+#
+#   For each class index (0, 1, 2, 3):
+#     coef = lr.coef_[class_index]   &lt;- coefficient array for this class
+#     top_indices = np.argsort(coef)[-15:]   &lt;- indices of top 15 features
+#     top_words = feature_names[top_indices][::-1]
+#     top_scores = coef[top_indices][::-1]
+#     print(f&quot;\nTop words for class &#x27;{label_names[class_index]}&#x27;:&quot;)
+#     for word, score in zip(top_words, top_scores):
+#         print(f&quot;  {word:25s} {score:.4f}&quot;)
+#
+# QUESTION: Do the top words make intuitive sense for each category?
+#           If you see &quot;quarterback&quot; in Sports and &quot;nasdaq&quot; in Business,
+#           your model learned something real about language!
+
+# === YOUR FEATURE IMPORTANCE CODE HERE ===
+
+
+# =============================================================================
+# =============================================================================
+# PART 2 — BERT FINE-TUNING (ADVANCED)
+# =============================================================================
+# =============================================================================
+# HINT: This is the deep learning part. Read INSTRUCTIONS.md Phase 6 carefully.
+#
+# PREREQUISITE:
+#   - You should have completed Part 1 successfully
+#   - You should understand what a tokenizer does
+#   - You should understand what fine-tuning means (adapting pre-trained model)
+#   - For slow machines: use Google Colab with GPU
+#
+# IMPORTANT:
+#   For BERT, use the ORIGINAL text (not the heavily cleaned version).
+#   BERT was pre-trained on normal text with punctuation and capitalization.
+#   Use: train_df[&#x27;text&#x27;] — not train_df[&#x27;clean_text&#x27;]
+
+
+# =============================================================================
+# STEP 7 — SAMPLE DATA FOR BERT
+# =============================================================================
+# HINT: BERT is much slower than TF-IDF. Use a smaller sample.
+#
+#   If you have a GPU (Colab): use 30,000 training examples
+#   If you have only CPU:      use 3,000 training examples
+#
+#   BERT_SAMPLE_SIZE = 3000   # or 30000 with GPU
+#
+#   bert_train_df, bert_val_df = train_test_split(
+#       train_df_sample,
+#       test_size=0.15,
+#       stratify=train_df_sample[&#x27;label&#x27;],
+#       random_state=RANDOM_SEED
+#   )
+#
+#   bert_test_df = test_df.sample(n=1000, random_state=RANDOM_SEED)
+#
+# PRINT: sizes of bert_train_df, bert_val_df, bert_test_df
+
+# === YOUR BERT SAMPLING CODE HERE ===
+
+
+# =============================================================================
+# STEP 8 — LOAD BERT TOKENIZER
+# =============================================================================
+# HINT: Load the tokenizer for &#x27;bert-base-uncased&#x27;
+#       &#x27;uncased&#x27; means it converts all text to lowercase internally.
+#
+#   from transformers import BertTokenizer
+#   tokenizer = BertTokenizer.from_pretrained(&#x27;bert-base-uncased&#x27;)
+#
+# TEST THE TOKENIZER with a sample sentence:
+#   test_sentence = &quot;Apple stock surged after announcing record quarterly earnings.&quot;
+#   tokens = tokenizer(test_sentence, return_tensors=&#x27;pt&#x27;,
+#                      padding=True, truncation=True, max_length=MAX_LENGTH)
+#   print(&quot;Input IDs shape:&quot;, tokens[&#x27;input_ids&#x27;].shape)
+#   print(&quot;Tokens:&quot;, tokenizer.convert_ids_to_tokens(tokens[&#x27;input_ids&#x27;][0]))
+#
+# UNDERSTAND THE OUTPUT:
+#   - [CLS] token is always first — BERT uses its representation for classification
+#   - [SEP] token marks end of text
+#   - [PAD] tokens are added to make all sequences the same length
+#   - &#x27;attention_mask&#x27;: 1 for real tokens, 0 for padding — tells BERT to ignore padding
+#
+# COMPUTE MAX TOKEN LENGTH (optional but informative):
+#   token_counts = [len(tokenizer.encode(t, truncation=True, max_length=512))
+#                   for t in bert_train_df[&#x27;text&#x27;].head(500)]
+#   print(f&quot;Max tokens: {max(token_counts)}, Mean: {np.mean(token_counts):.0f}&quot;)
+#   This helps you choose an appropriate MAX_LENGTH value.
+
+# === YOUR TOKENIZER CODE HERE ===
+
+
+# =============================================================================
+# STEP 9 — CREATE PYTORCH DATASET CLASS
+# =============================================================================
+# HINT: PyTorch needs data in a specific format.
+#       You define a Dataset class that loads one example at a time.
+#
+# Create a class called NewsDataset that inherits from torch.utils.data.Dataset:
+#
+#   class NewsDataset(Dataset):
+#       def __init__(self, texts, labels, tokenizer, max_length):
+#           # Store all 4 parameters as self.texts, self.labels, etc.
+#           pass
+#
+#       def __len__(self):
+#           # Return the number of examples (len of texts)
+#           pass
+#
+#       def __getitem__(self, idx):
+#           # Get the text and label at index idx
+#           # Tokenize the text:
+#           #   encoding = self.tokenizer(
+#           #       self.texts[idx],
+#           #       max_length=self.max_length,
+#           #       padding=&#x27;max_length&#x27;,
+#           #       truncation=True,
+#           #       return_tensors=&#x27;pt&#x27;
+#           #   )
+#           # Return a dictionary:
+#           #   {
+#           #     &#x27;input_ids&#x27;:      encoding[&#x27;input_ids&#x27;].squeeze(),       &lt;- shape: [max_length]
+#           #     &#x27;attention_mask&#x27;: encoding[&#x27;attention_mask&#x27;].squeeze(),   &lt;- shape: [max_length]
+#           #     &#x27;labels&#x27;:         torch.tensor(self.labels[idx], dtype=torch.long)
+#           #   }
+#           pass
+#
+# CREATE DATASET OBJECTS:
+#   train_dataset = NewsDataset(
+#       texts=bert_train_df[&#x27;text&#x27;].tolist(),
+#       labels=bert_train_df[&#x27;label&#x27;].tolist(),
+#       tokenizer=tokenizer,
+#       max_length=MAX_LENGTH
+#   )
+#   val_dataset  = NewsDataset(...)
+#   test_dataset = NewsDataset(...)
+#
+# VERIFY: print(train_dataset[0])  &lt;- should show dict with tensor values
+
+# === YOUR DATASET CLASS CODE HERE ===
+
+
+# =============================================================================
+# STEP 10 — LOAD BERT MODEL FOR CLASSIFICATION
+# =============================================================================
+# HINT: Load a pre-trained BERT model with a classification head.
+#
+#   from transformers import BertForSequenceClassification
+#   model = BertForSequenceClassification.from_pretrained(
+#       &#x27;bert-base-uncased&#x27;,
+#       num_labels=4    # 4 news categories
+#   )
+#
+# MOVE TO GPU IF AVAILABLE:
+#   device = torch.device(&#x27;cuda&#x27; if torch.cuda.is_available() else &#x27;cpu&#x27;)
+#   model = model.to(device)
+#   print(f&quot;Using device: {device}&quot;)
+#
+# PRINT MODEL INFO:
+#   total_params = sum(p.numel() for p in model.parameters())
+#   trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+#   print(f&quot;Total parameters:     {total_params:,}&quot;)
+#   print(f&quot;Trainable parameters: {trainable_params:,}&quot;)
+#   (BERT-base has ~110 million parameters!)
+
+# === YOUR MODEL LOADING CODE HERE ===
+
+
+# =============================================================================
+# STEP 11 — FINE-TUNE BERT (TRAINING)
+# =============================================================================
+# HINT: Use the HuggingFace Trainer API — it handles the training loop for you.
+#       Read INSTRUCTIONS.md Phase 6.5 for detailed setup.
+#
+# DEFINE METRICS FUNCTION:
+#   import evaluate
+#   accuracy_metric = evaluate.load(&quot;accuracy&quot;)
+#   f1_metric = evaluate.load(&quot;f1&quot;)
+#
+#   def compute_metrics(eval_pred):
+#       logits, labels = eval_pred
+#       # Convert logits to predictions: predictions = np.argmax(logits, axis=-1)
+#       # Compute accuracy: accuracy_metric.compute(predictions=..., references=labels)
+#       # Compute macro F1: f1_metric.compute(predictions=..., references=labels, average=&#x27;macro&#x27;)
+#       # Return: {&#x27;accuracy&#x27;: ..., &#x27;f1&#x27;: ...}
+#       pass
+#
+# DEFINE TRAINING ARGUMENTS:
+#   training_args = TrainingArguments(
+#       output_dir=&#x27;./outputs/models/bert_news&#x27;,
+#       num_train_epochs=NUM_EPOCHS,       # 3 epochs is standard for BERT fine-tuning
+#       per_device_train_batch_size=BATCH_SIZE,
+#       per_device_eval_batch_size=BATCH_SIZE * 2,
+#       learning_rate=2e-5,               # BERT uses very small learning rates (2e-5 to 5e-5)
+#       weight_decay=0.01,
+#       evaluation_strategy=&#x27;epoch&#x27;,      # evaluate after every epoch
+#       save_strategy=&#x27;epoch&#x27;,
+#       load_best_model_at_end=True,
+#       metric_for_best_model=&#x27;f1&#x27;,
+#       logging_dir=&#x27;./outputs/logs&#x27;,
+#       logging_steps=50
+#   )
+#
+# CREATE TRAINER AND TRAIN:
+#   trainer = Trainer(
+#       model=model,
+#       args=training_args,
+#       train_dataset=train_dataset,
+#       eval_dataset=val_dataset,
+#       compute_metrics=compute_metrics
+#   )
+#   trainer.train()
+#
+# PRINT TRAINING RESULTS:
+#   The trainer will print loss and metrics after every epoch.
+#   Training loss should decrease each epoch.
+#   Validation accuracy should increase.
+#
+# TRAINING TIME ESTIMATE:
+#   - CPU, 3k examples, 3 epochs: ~30–60 minutes (very slow)
+#   - Colab GPU, 30k examples, 3 epochs: ~15–20 minutes
+
+# === YOUR BERT TRAINING CODE HERE ===
+
+
+# =============================================================================
+# STEP 12 — EVALUATE BERT
+# =============================================================================
+# HINT: Evaluate your fine-tuned BERT on the test set.
+#
+#   eval_results = trainer.evaluate(test_dataset)
+#   print(&quot;BERT Test Results:&quot;, eval_results)
+#
+# GENERATE PREDICTIONS FOR DETAILED REPORT:
+#   predictions = trainer.predict(test_dataset)
+#   y_pred_bert = np.argmax(predictions.predictions, axis=-1)
+#   y_true_bert = predictions.label_ids
+#
+#   print(classification_report(y_true_bert, y_pred_bert,
+#                                target_names=[&#x27;World&#x27;,&#x27;Sports&#x27;,&#x27;Business&#x27;,&#x27;Sci/Tech&#x27;]))
+#
+#   Plot confusion matrix (same as Step 6 but for BERT):
+#   Save as &#x27;outputs/figures/06_bert_confusion_matrix.png&#x27;
+#
+# STORE:
+#   bert_accuracy = accuracy_score(y_true_bert, y_pred_bert)
+
+# === YOUR BERT EVALUATION CODE HERE ===
+
+
+# =============================================================================
+# STEP 13 — PLOT TRAINING CURVES
+# =============================================================================
+# HINT: Visualize how the model improved during training.
+#
+#   The trainer stores training history in: trainer.state.log_history
+#   This is a list of dictionaries with keys like &#x27;loss&#x27;, &#x27;eval_loss&#x27;,
+#   &#x27;eval_accuracy&#x27;, &#x27;epoch&#x27;, etc.
+#
+#   Parse it to get:
+#     - Training loss per step
+#     - Validation loss per epoch
+#     - Validation accuracy per epoch
+#     - Validation F1 per epoch
+#
+#   Create a 2-subplot figure:
+#     Left:  Training loss over steps (should decrease)
+#     Right: Validation accuracy and F1 over epochs (should increase)
+#
+#   Save as &#x27;outputs/figures/07_bert_training_curves.png&#x27;
+#
+# WHAT GOOD TRAINING LOOKS LIKE:
+#   - Training loss steadily decreases
+#   - Validation metrics improve each epoch
+#   - If validation loss increases while training loss decreases = overfitting
+
+# === YOUR TRAINING CURVES CODE HERE ===
+
+
+# =============================================================================
+# STEP 14 — MODEL COMPARISON
+# =============================================================================
+# HINT: Compare all three models in a single table.
+#
+#   Create a comparison DataFrame:
+#   results = {
+#       &#x27;Model&#x27;: [&#x27;TF-IDF + Logistic Regression&#x27;, &#x27;TF-IDF + LinearSVC&#x27;, &#x27;BERT (fine-tuned)&#x27;],
+#       &#x27;Accuracy&#x27;: [lr_accuracy, svm_accuracy, bert_accuracy],
+#       &#x27;Approach&#x27;: [&#x27;Classical NLP&#x27;, &#x27;Classical NLP&#x27;, &#x27;Deep Learning&#x27;],
+#       &#x27;Training Speed&#x27;: [&#x27;Fast&#x27;, &#x27;Fast&#x27;, &#x27;Slow&#x27;],
+#       &#x27;Interpretable&#x27;: [&#x27;Yes (coef)&#x27;, &#x27;Partial&#x27;, &#x27;No (black box)&#x27;]
+#   }
+#   comparison_df = pd.DataFrame(results)
+#   comparison_df[&#x27;Accuracy (%)&#x27;] = (comparison_df[&#x27;Accuracy&#x27;] * 100).round(2)
+#   print(comparison_df.to_string(index=False))
+#
+# PLOT: Bar chart comparing accuracies of the three models
+#   Save as &#x27;outputs/figures/08_model_comparison.png&#x27;
+#
+# REFLECTION QUESTIONS (print your answers as comments or prints):
+#   1. How much better is BERT than TF-IDF? Is the improvement worth the extra compute?
+#   2. For which classes does each model struggle most?
+#   3. If you had to deploy ONE model to production today, which would you choose?
+#      (Consider: accuracy, speed, memory, interpretability, maintenance)
+
+# === YOUR MODEL COMPARISON CODE HERE ===
+
+
+# =============================================================================
+# STEP 15 — ERROR ANALYSIS
+# =============================================================================
+# HINT: Understanding WHERE and WHY a model fails is as important as its accuracy.
+#       This is a key skill for production AI engineers.
+#
+# For your best model (probably BERT):
+#
+#   wrong_indices = np.where(y_pred_bert != y_true_bert)[0]
+#   wrong_examples = bert_test_df.iloc[wrong_indices]
+#   wrong_examples[&#x27;predicted&#x27;] = [label_names[p] for p in y_pred_bert[wrong_indices]]
+#   wrong_examples[&#x27;true&#x27;] = [label_names[t] for t in y_true_bert[wrong_indices]]
+#
+# PRINT 5 MISCLASSIFIED EXAMPLES:
+#   For each wrong example, print:
+#     - Article text (first 200 characters)
+#     - True label
+#     - Predicted label
+#     - Why might the model have gotten it wrong?
+#
+# ANALYZE PATTERNS:
+#   - Which pairs of classes are most confused? (Look at confusion matrix)
+#   - Are the misclassified articles truly ambiguous?
+#   - What would you do to improve the model? (More data? Different model? Better labels?)
+#
+# TIP: This kind of qualitative error analysis is what differentiates a
+#      mediocre AI engineer from a great one.
+
+# === YOUR ERROR ANALYSIS CODE HERE ===
+
+
+# =============================================================================
+# STEP 16 — SAVE THE FINE-TUNED BERT MODEL
+# =============================================================================
+# HINT: Save the trained model so it can be loaded later without retraining.
+#
+# Save HuggingFace model:
+#   trainer.save_model(&#x27;outputs/models/bert_news_classifier&#x27;)
+#   tokenizer.save_pretrained(&#x27;outputs/models/bert_news_classifier&#x27;)
+#   print(&quot;Model saved to outputs/models/bert_news_classifier&quot;)
+#
+# LOAD AND TEST:
+#   from transformers import pipeline
+#   classifier = pipeline(
+#       &#x27;text-classification&#x27;,
+#       model=&#x27;outputs/models/bert_news_classifier&#x27;,
+#       tokenizer=&#x27;outputs/models/bert_news_classifier&#x27;
+#   )
+#   result = classifier(&quot;Apple&#x27;s stock price rose 5% after strong iPhone sales report.&quot;)
+#   print(result)
+#   → Should predict class 3 (Business or Science/Tech)
+#
+# WHY THIS MATTERS:
+#   The saved model can be deployed as a REST API using FastAPI or Flask,
+#   or published to HuggingFace Hub for others to use.
+
+# === YOUR MODEL SAVING CODE HERE ===
+
+
+# =============================================================================
+# END OF PROJECT 4
+# =============================================================================
+# NEXT STEPS (after completing this project):
+#   - Try a different pre-trained model: &#x27;distilbert-base-uncased&#x27;
+#     (50% smaller, 60% faster, 97% of BERT&#x27;s performance)
+#   - Try &#x27;roberta-base&#x27; — often outperforms BERT
+#   - Upload your model to HuggingFace Hub:
+#     from huggingface_hub import notebook_login
+#     trainer.push_to_hub(&quot;your-username/ag-news-bert&quot;)
+#   - Build a FastAPI app that serves predictions:
+#     pip install fastapi uvicorn
+#     from fastapi import FastAPI
+#     app = FastAPI()
+#     @app.post(&quot;/classify&quot;)
+#     def classify(text: str): ...
+#   - Try zero-shot classification (no fine-tuning needed):
+#     from transformers import pipeline
+#     classifier = pipeline(&quot;zero-shot-classification&quot;, model=&quot;facebook/bart-large-mnli&quot;)
+# =============================================================================
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

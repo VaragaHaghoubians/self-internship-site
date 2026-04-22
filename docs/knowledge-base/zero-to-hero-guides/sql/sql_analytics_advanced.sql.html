@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sql Analytics Advanced.Sql - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Sql Analytics Advanced.Sql</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/sql/sql_analytics_advanced.sql</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><pre><code>-- ==============================================================================
+--  SQL — ANALYTICS &amp; ADVANCED PATTERNS
+--  FILE: sql_analytics_advanced.sql
+--
+--  TASK: Master the SQL skills that separate a data analyst from a junior.
+--        These are the queries you&#x27;ll write on day 1 at Amazon, Uber, Flexport.
+--
+--  WHY:  The basics (SELECT/JOIN/GROUP BY) get you in the door.
+--        What gets you PROMOTED is: NULL safety, business KPIs,
+--        date math, JOIN variants, and SQL-based feature engineering.
+--        Every analytics interview will test at least 2 of these sections.
+--
+--  PREREQ: sql_zero_to_hero.sql (you know SELECT, JOIN, GROUP BY, window functions)
+--
+--  HOW TO USE:
+--    Run in DBeaver, MySQL Workbench, or any SQLite client.
+--    Or: use sql_basics.py pattern — load this into sqlite3 from Python.
+--    READ each comment section before running.
+-- ==============================================================================
+
+
+-- ==============================================================================
+-- SETUP — Logistics/Operations Schema (real-world context)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- We switch from university data to a LOGISTICS dataset — this is exactly the
+-- kind of data you&#x27;ll see at Amazon Logistics, Uber Freight, Flexport.
+-- Understand the schema before writing any query — that&#x27;s what senior analysts do.
+
+CREATE TABLE IF NOT EXISTS customers (
+    customer_id   INT         PRIMARY KEY,
+    name          VARCHAR(100) NOT NULL,
+    city          VARCHAR(50),
+    signup_date   DATE,
+    tier          VARCHAR(20)  DEFAULT &#x27;standard&#x27;   -- &#x27;standard&#x27;, &#x27;premium&#x27;, &#x27;enterprise&#x27;
+);
+
+CREATE TABLE IF NOT EXISTS shipments (
+    shipment_id      INT     PRIMARY KEY,
+    customer_id      INT     REFERENCES customers(customer_id),
+    origin_city      VARCHAR(50),
+    dest_city        VARCHAR(50),
+    weight_kg        DECIMAL(8,2),
+    cost_usd         DECIMAL(10,2),
+    shipped_date     DATE,
+    delivered_date   DATE,
+    status           VARCHAR(20)   -- &#x27;delivered&#x27;, &#x27;in_transit&#x27;, &#x27;delayed&#x27;, &#x27;cancelled&#x27;
+);
+
+CREATE TABLE IF NOT EXISTS support_tickets (
+    ticket_id      INT     PRIMARY KEY,
+    customer_id    INT     REFERENCES customers(customer_id),
+    shipment_id    INT     REFERENCES shipments(shipment_id),
+    created_date   DATE,
+    resolved_date  DATE,           -- NULL if still open
+    category       VARCHAR(50),    -- &#x27;damage&#x27;, &#x27;delay&#x27;, &#x27;lost&#x27;, &#x27;billing&#x27;
+    priority       VARCHAR(20)     -- &#x27;low&#x27;, &#x27;medium&#x27;, &#x27;high&#x27;, &#x27;critical&#x27;
+);
+
+-- Sample data:
+INSERT INTO customers VALUES
+    (1, &#x27;TechCorp&#x27;,      &#x27;Seattle&#x27;,      &#x27;2023-01-15&#x27;, &#x27;enterprise&#x27;),
+    (2, &#x27;SmallBiz LLC&#x27;,  &#x27;Portland&#x27;,     &#x27;2023-03-01&#x27;, &#x27;standard&#x27;),
+    (3, &#x27;MegaRetail&#x27;,    &#x27;San Francisco&#x27;,&#x27;2022-11-20&#x27;, &#x27;enterprise&#x27;),
+    (4, &#x27;StartupCo&#x27;,     &#x27;Austin&#x27;,       &#x27;2023-06-10&#x27;, &#x27;premium&#x27;),
+    (5, &#x27;GlobalTrade&#x27;,   &#x27;Chicago&#x27;,      &#x27;2022-08-05&#x27;, &#x27;enterprise&#x27;),
+    (6, &#x27;LocalShop&#x27;,     &#x27;Denver&#x27;,       &#x27;2024-01-02&#x27;, &#x27;standard&#x27;),
+    (7, &#x27;FastMover&#x27;,     &#x27;Seattle&#x27;,      &#x27;2023-09-15&#x27;, &#x27;premium&#x27;),
+    (8, &#x27;NeverShipped&#x27;,  &#x27;Boston&#x27;,       &#x27;2024-02-01&#x27;, &#x27;standard&#x27;);   -- no shipments!
+
+INSERT INTO shipments VALUES
+    (101, 1, &#x27;Seattle&#x27;,       &#x27;Chicago&#x27;,      50.0,  450.00, &#x27;2023-02-01&#x27;, &#x27;2023-02-05&#x27;, &#x27;delivered&#x27;),
+    (102, 1, &#x27;Seattle&#x27;,       &#x27;New York&#x27;,    120.0, 1100.00, &#x27;2023-04-10&#x27;, &#x27;2023-04-16&#x27;, &#x27;delivered&#x27;),
+    (103, 2, &#x27;Portland&#x27;,      &#x27;Los Angeles&#x27;,  30.0,  280.00, &#x27;2023-03-15&#x27;, &#x27;2023-03-18&#x27;, &#x27;delivered&#x27;),
+    (104, 3, &#x27;San Francisco&#x27;, &#x27;Chicago&#x27;,     200.0, 1800.00, &#x27;2023-01-05&#x27;, NULL,          &#x27;delayed&#x27;),
+    (105, 3, &#x27;San Francisco&#x27;, &#x27;Seattle&#x27;,     150.0, 1350.00, &#x27;2023-05-20&#x27;, &#x27;2023-05-25&#x27;, &#x27;delivered&#x27;),
+    (106, 4, &#x27;Austin&#x27;,        &#x27;Dallas&#x27;,       25.0,  220.00, &#x27;2023-07-01&#x27;, &#x27;2023-07-03&#x27;, &#x27;delivered&#x27;),
+    (107, 4, &#x27;Austin&#x27;,        &#x27;Houston&#x27;,      40.0,  360.00, &#x27;2023-08-15&#x27;, NULL,          &#x27;in_transit&#x27;),
+    (108, 5, &#x27;Chicago&#x27;,       &#x27;Miami&#x27;,       300.0, 2700.00, &#x27;2022-09-01&#x27;, &#x27;2022-09-08&#x27;, &#x27;delivered&#x27;),
+    (109, 5, &#x27;Chicago&#x27;,       &#x27;Boston&#x27;,      180.0, 1620.00, &#x27;2023-02-28&#x27;, &#x27;2023-03-06&#x27;, &#x27;delivered&#x27;),
+    (110, 5, &#x27;Chicago&#x27;,       &#x27;Seattle&#x27;,     220.0, 1980.00, &#x27;2023-07-10&#x27;, NULL,          &#x27;cancelled&#x27;),
+    (111, 7, &#x27;Seattle&#x27;,       &#x27;Denver&#x27;,       75.0,  675.00, &#x27;2023-10-01&#x27;, &#x27;2023-10-04&#x27;, &#x27;delivered&#x27;),
+    (112, 1, &#x27;Seattle&#x27;,       &#x27;Austin&#x27;,       90.0,  810.00, &#x27;2024-01-15&#x27;, &#x27;2024-01-20&#x27;, &#x27;delivered&#x27;);
+
+INSERT INTO support_tickets VALUES
+    (1001, 3, 104, &#x27;2023-01-10&#x27;, NULL,          &#x27;delay&#x27;,   &#x27;critical&#x27;),
+    (1002, 1, 101, &#x27;2023-02-06&#x27;, &#x27;2023-02-08&#x27;,  &#x27;billing&#x27;, &#x27;low&#x27;),
+    (1003, 5, 110, &#x27;2023-07-12&#x27;, &#x27;2023-07-14&#x27;,  &#x27;damage&#x27;,  &#x27;high&#x27;),
+    (1004, 4, 107, &#x27;2023-08-20&#x27;, NULL,           &#x27;delay&#x27;,   &#x27;medium&#x27;),
+    (1005, 2, 103, &#x27;2023-03-19&#x27;, &#x27;2023-03-20&#x27;,  &#x27;billing&#x27;, &#x27;low&#x27;),
+    (1006, 1, 102, &#x27;2023-04-17&#x27;, &#x27;2023-04-18&#x27;,  &#x27;delay&#x27;,   &#x27;medium&#x27;);
+
+
+-- ==============================================================================
+-- LESSON 01 — NULL HANDLING (The #1 Source of Silent Bugs)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- NULLs are dangerous because they SPREAD silently:
+--   NULL + 5 = NULL
+--   NULL = NULL is FALSE (use IS NULL, not = NULL)
+--   AVG() ignores NULLs — your average might be wrong without you knowing!
+--
+-- THREE FUNCTIONS to tame NULLs:
+--   COALESCE(a, b, c) → return first non-NULL value
+--   NULLIF(a, b)      → return NULL if a = b, else return a
+--   IFNULL(a, default) → return default if a is NULL (MySQL only; use COALESCE in Postgres)
+--
+-- REAL SCENARIO: delivered_date is NULL for unfinished shipments.
+-- If you compute transit days without handling this, you get NULL for half your data!
+
+-- ❌ WRONG: NULL where you wanted &quot;in transit&quot; text
+SELECT
+    shipment_id,
+    status,
+    delivered_date - shipped_date AS transit_days    -- NULL for undelivered!
+FROM shipments;
+
+-- ✅ CORRECT: COALESCE handles missing values
+SELECT
+    shipment_id,
+    status,
+    COALESCE(delivered_date, CURRENT_DATE) AS effective_delivery,
+    DATEDIFF(
+        COALESCE(delivered_date, CURRENT_DATE),
+        shipped_date
+    ) AS transit_days,
+    COALESCE(delivered_date, &#x27;Still in transit&#x27;) AS delivery_status_text
+FROM shipments
+ORDER BY transit_days DESC;
+
+-- COALESCE chained: try column A, then column B, then hardcoded default
+SELECT
+    ticket_id,
+    COALESCE(resolved_date, &#x27;9999-12-31&#x27;) AS close_date,   -- unresolved → far future
+    COALESCE(shipment_id, 0)              AS shipment_ref   -- no shipment → 0
+FROM support_tickets;
+
+-- NULLIF: avoid divide-by-zero (returns NULL instead of error)
+SELECT
+    customer_id,
+    SUM(cost_usd) AS total_revenue,
+    COUNT(*)      AS num_shipments,
+    SUM(cost_usd) / NULLIF(COUNT(*), 0) AS avg_shipment_value  -- safe division!
+FROM shipments
+GROUP BY customer_id;
+
+-- COALESCE for NULL in GROUP BY results:
+SELECT
+    COALESCE(dest_city, &#x27;Unknown&#x27;) AS destination,
+    COUNT(*) AS shipments
+FROM shipments
+GROUP BY dest_city;
+
+
+-- ==============================================================================
+-- LESSON 02 — JOIN VARIANTS (The Complete Picture)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- You know INNER and LEFT. But three more JOIN types solve specific problems:
+--   RIGHT JOIN   → all rows from right table (mirror of LEFT JOIN — rare in practice)
+--   FULL OUTER   → all rows from BOTH tables (NULLs where no match)
+--   SELF JOIN    → join a table to ITSELF — for hierarchies or comparisons
+--   CROSS JOIN   → every row × every row — use carefully (can be huge!)
+--
+-- In real analytics:
+--   LEFT JOIN for &quot;show all X even if no Y&quot;  ← most common
+--   FULL OUTER for &quot;show everything, flag mismatches&quot;
+--   SELF JOIN for &quot;compare rows in the same table&quot;
+
+-- LEFT JOIN — all customers, even those with no shipments:
+SELECT
+    c.customer_id,
+    c.name,
+    c.tier,
+    COUNT(s.shipment_id)     AS total_shipments,
+    SUM(s.cost_usd)          AS total_revenue,
+    MIN(s.shipped_date)      AS first_shipment,
+    MAX(s.shipped_date)      AS last_shipment
+FROM customers c
+LEFT JOIN shipments s ON c.customer_id = s.customer_id
+GROUP BY c.customer_id, c.name, c.tier
+ORDER BY total_revenue DESC NULLS LAST;   -- NULL (no shipments) goes last
+
+-- Find customers with ZERO shipments using LEFT JOIN + IS NULL:
+SELECT c.name, c.tier, c.signup_date
+FROM customers c
+LEFT JOIN shipments s ON c.customer_id = s.customer_id
+WHERE s.shipment_id IS NULL;   -- these never shipped anything!
+
+-- SELF JOIN — compare shipment cost to the SAME customer&#x27;s average:
+SELECT
+    s1.shipment_id,
+    s1.customer_id,
+    s1.cost_usd                                   AS this_shipment_cost,
+    ROUND(AVG(s2.cost_usd), 2)                    AS customer_avg_cost,
+    ROUND(s1.cost_usd - AVG(s2.cost_usd), 2)      AS deviation_from_avg
+FROM shipments s1
+JOIN shipments s2 ON s1.customer_id = s2.customer_id   -- same customer, any shipment
+GROUP BY s1.shipment_id, s1.customer_id, s1.cost_usd
+HAVING ABS(s1.cost_usd - AVG(s2.cost_usd)) &gt; 500       -- unusually big/small shipments
+ORDER BY deviation_from_avg DESC;
+
+-- FULL OUTER JOIN pattern (SQLite/MySQL don&#x27;t support it — simulate with UNION):
+-- Shows: customers with no shipments + shipments with no customer (orphans)
+SELECT c.customer_id, c.name, s.shipment_id, s.cost_usd
+FROM customers c
+LEFT JOIN shipments s ON c.customer_id = s.customer_id
+
+UNION
+
+SELECT c.customer_id, c.name, s.shipment_id, s.cost_usd
+FROM shipments s
+LEFT JOIN customers c ON s.customer_id = c.customer_id
+WHERE c.customer_id IS NULL;
+
+
+-- ==============================================================================
+-- LESSON 03 — DATE &amp; TIME FUNCTIONS (Analyst Superpower)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- Almost every business question involves time:
+--   &quot;How many shipments last month?&quot; → you need date filtering
+--   &quot;What&#x27;s our 7-day rolling revenue?&quot; → you need date arithmetic
+--   &quot;Which cohort (signup month) retained best?&quot; → you need date extraction
+--
+-- KEY DATE FUNCTIONS (MySQL/MariaDB syntax; Postgres uses similar but :: for casting):
+--   DATEDIFF(end, start)          → days between two dates
+--   DATE_ADD(date, INTERVAL n DAY) → add N days
+--   DATE_FORMAT(date, &#x27;%Y-%m&#x27;)    → format as YYYY-MM (for month grouping!)
+--   YEAR(date), MONTH(date), DAY(date) → extract parts
+--   DAYOFWEEK(date)               → 1=Sunday ... 7=Saturday
+--   NOW() / CURRENT_DATE          → today&#x27;s datetime / today&#x27;s date
+--
+-- SQLite equivalents:
+--   DATE(&#x27;now&#x27;)                   → today
+--   strftime(&#x27;%Y-%m&#x27;, date_col)   → YYYY-MM format
+--   julianday(end) - julianday(start) → days between dates
+
+-- Transit time analysis:
+SELECT
+    shipment_id,
+    shipped_date,
+    delivered_date,
+    DATEDIFF(delivered_date, shipped_date)  AS transit_days,
+    CASE
+        WHEN DATEDIFF(delivered_date, shipped_date) &lt;= 3  THEN &#x27;Express (&lt;= 3 days)&#x27;
+        WHEN DATEDIFF(delivered_date, shipped_date) &lt;= 7  THEN &#x27;Standard (4-7 days)&#x27;
+        ELSE                                                   &#x27;Slow (&gt; 7 days)&#x27;
+    END AS speed_tier
+FROM shipments
+WHERE delivered_date IS NOT NULL
+ORDER BY transit_days;
+
+-- Monthly revenue trend (group by month):
+SELECT
+    DATE_FORMAT(shipped_date, &#x27;%Y-%m&#x27;)  AS month,      -- &#x27;2023-02&#x27;, &#x27;2023-04&#x27;, etc.
+    COUNT(*)                            AS shipments,
+    ROUND(SUM(cost_usd), 2)            AS revenue,
+    ROUND(AVG(cost_usd), 2)            AS avg_shipment_value
+FROM shipments
+GROUP BY DATE_FORMAT(shipped_date, &#x27;%Y-%m&#x27;)
+ORDER BY month;
+
+-- SQLite version (same logic, different function):
+-- SELECT strftime(&#x27;%Y-%m&#x27;, shipped_date) AS month, COUNT(*), ROUND(SUM(cost_usd),2)
+-- FROM shipments GROUP BY strftime(&#x27;%Y-%m&#x27;, shipped_date) ORDER BY month;
+
+-- Day-of-week analysis (are Monday shipments slower?):
+SELECT
+    DAYOFWEEK(shipped_date)  AS day_num,       -- 1=Sun, 2=Mon, ..., 7=Sat
+    DAYNAME(shipped_date)    AS day_name,
+    COUNT(*)                 AS shipments,
+    ROUND(AVG(DATEDIFF(COALESCE(delivered_date, CURRENT_DATE), shipped_date)), 1) AS avg_transit_days
+FROM shipments
+GROUP BY DAYOFWEEK(shipped_date), DAYNAME(shipped_date)
+ORDER BY day_num;
+
+-- How long are unresolved tickets open?
+SELECT
+    ticket_id,
+    category,
+    priority,
+    created_date,
+    resolved_date,
+    CASE
+        WHEN resolved_date IS NOT NULL THEN DATEDIFF(resolved_date, created_date)
+        ELSE DATEDIFF(CURRENT_DATE, created_date)
+    END AS days_open,
+    CASE
+        WHEN resolved_date IS NOT NULL THEN &#x27;Resolved&#x27;
+        ELSE &#x27;Open&#x27;
+    END AS ticket_status
+FROM support_tickets
+ORDER BY days_open DESC;
+
+-- Customers who signed up in the last 12 months:
+SELECT name, signup_date, tier
+FROM customers
+WHERE signup_date &gt;= DATE_SUB(CURRENT_DATE, INTERVAL 12 MONTH);
+
+-- SQLite version:
+-- WHERE signup_date &gt;= DATE(&#x27;now&#x27;, &#x27;-12 months&#x27;)
+
+
+-- ==============================================================================
+-- LESSON 04 — BUSINESS KPIs (What You&#x27;ll Build in Real Jobs)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- Business KPIs are the reason SQL exists in analytics.
+-- &quot;Revenue&quot;, &quot;retention&quot;, &quot;churn&quot;, &quot;cohort analysis&quot; — these are SQL patterns
+-- that every ops data analyst writes in their first week.
+--
+-- PATTERN 1: REVENUE METRICS
+-- PATTERN 2: ON-TIME DELIVERY RATE
+-- PATTERN 3: CUSTOMER RETENTION (month-over-month active customers)
+-- PATTERN 4: COHORT ANALYSIS (do June signups retain better than May signups?)
+-- PATTERN 5: CHURN DETECTION (customers who were active but went silent)
+
+-- PATTERN 1: Revenue by customer tier
+SELECT
+    c.tier,
+    COUNT(DISTINCT c.customer_id)   AS customers,
+    COUNT(s.shipment_id)            AS total_shipments,
+    ROUND(SUM(s.cost_usd), 2)       AS total_revenue,
+    ROUND(AVG(s.cost_usd), 2)       AS avg_per_shipment,
+    ROUND(SUM(s.cost_usd) / COUNT(DISTINCT c.customer_id), 2) AS revenue_per_customer
+FROM customers c
+LEFT JOIN shipments s ON c.customer_id = s.customer_id
+GROUP BY c.tier
+ORDER BY total_revenue DESC;
+
+-- PATTERN 2: On-Time Delivery Rate (SLA metric)
+-- Assume SLA = delivered within 7 days of shipped
+SELECT
+    COUNT(*)  AS total_delivered,
+    SUM(CASE WHEN DATEDIFF(delivered_date, shipped_date) &lt;= 7 THEN 1 ELSE 0 END) AS on_time,
+    SUM(CASE WHEN DATEDIFF(delivered_date, shipped_date) &gt; 7  THEN 1 ELSE 0 END) AS late,
+    ROUND(
+        100.0 * SUM(CASE WHEN DATEDIFF(delivered_date, shipped_date) &lt;= 7 THEN 1 ELSE 0 END)
+        / COUNT(*),
+        1
+    ) AS on_time_pct
+FROM shipments
+WHERE status = &#x27;delivered&#x27;;
+
+-- PATTERN 3: Shipment status breakdown (operational dashboard query)
+SELECT
+    status,
+    COUNT(*)                              AS count,
+    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1) AS pct_of_total,
+    ROUND(SUM(cost_usd), 2)              AS revenue_at_stake
+FROM shipments
+GROUP BY status
+ORDER BY count DESC;
+
+-- PATTERN 4: Cohort Analysis — which signup month&#x27;s customers ship most?
+-- Step 1: assign each customer to their signup cohort (YYYY-MM)
+WITH customer_cohorts AS (
+    SELECT
+        c.customer_id,
+        c.name,
+        DATE_FORMAT(c.signup_date, &#x27;%Y-%m&#x27;)  AS signup_cohort,
+        COUNT(s.shipment_id)                 AS total_shipments,
+        SUM(s.cost_usd)                      AS total_spend
+    FROM customers c
+    LEFT JOIN shipments s ON c.customer_id = s.customer_id
+    GROUP BY c.customer_id, c.name, DATE_FORMAT(c.signup_date, &#x27;%Y-%m&#x27;)
+),
+-- Step 2: aggregate by cohort
+cohort_summary AS (
+    SELECT
+        signup_cohort,
+        COUNT(customer_id)                   AS cohort_size,
+        SUM(total_shipments)                 AS total_shipments,
+        ROUND(AVG(total_spend), 2)           AS avg_spend_per_customer,
+        SUM(CASE WHEN total_shipments &gt; 0 THEN 1 ELSE 0 END) AS active_customers
+    FROM customer_cohorts
+    GROUP BY signup_cohort
+)
+SELECT
+    signup_cohort,
+    cohort_size,
+    active_customers,
+    ROUND(100.0 * active_customers / cohort_size, 0) AS activation_rate_pct,
+    total_shipments,
+    avg_spend_per_customer
+FROM cohort_summary
+ORDER BY signup_cohort;
+
+-- PATTERN 5: Identify &quot;at-risk&quot; customers — had shipments, but nothing recently
+WITH last_shipment AS (
+    SELECT
+        customer_id,
+        MAX(shipped_date)  AS last_ship_date
+    FROM shipments
+    GROUP BY customer_id
+)
+SELECT
+    c.name,
+    c.tier,
+    ls.last_ship_date,
+    DATEDIFF(CURRENT_DATE, ls.last_ship_date)  AS days_since_last_shipment
+FROM customers c
+JOIN last_shipment ls ON c.customer_id = ls.customer_id
+WHERE DATEDIFF(CURRENT_DATE, ls.last_ship_date) &gt; 180   -- 6 months inactive
+ORDER BY days_since_last_shipment DESC;
+
+-- PATTERN 6: Support ticket resolution performance by category
+SELECT
+    category,
+    priority,
+    COUNT(*)                                                          AS total_tickets,
+    SUM(CASE WHEN resolved_date IS NOT NULL THEN 1 ELSE 0 END)       AS resolved,
+    SUM(CASE WHEN resolved_date IS NULL     THEN 1 ELSE 0 END)       AS open,
+    ROUND(AVG(CASE WHEN resolved_date IS NOT NULL
+                   THEN DATEDIFF(resolved_date, created_date) END), 1) AS avg_resolution_days
+FROM support_tickets
+GROUP BY category, priority
+ORDER BY open DESC, avg_resolution_days DESC;
+
+
+-- ==============================================================================
+-- LESSON 05 — SQL FEATURE ENGINEERING (Data Scientist Path)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- Feature engineering in SQL is done BEFORE you pull data into Python.
+-- Why? Because SQL can handle billions of rows — pandas can&#x27;t.
+-- Create features in SQL → load clean, ready features into your model.
+--
+-- KEY TECHNIQUES:
+--   1. Binning with CASE WHEN
+--   2. Ratio features
+--   3. Rolling window aggregations
+--   4. Flag features (is_X columns: 0 or 1)
+--   5. Lag features (previous value)
+
+-- FEATURE ENGINEERING for a churn prediction model:
+-- Each row = one customer, columns = features
+WITH customer_features AS (
+    SELECT
+        c.customer_id,
+        c.tier,
+
+        -- Numeric features
+        COUNT(s.shipment_id)                                AS total_shipments,
+        COALESCE(SUM(s.cost_usd), 0)                       AS lifetime_value,
+        COALESCE(AVG(s.cost_usd), 0)                       AS avg_shipment_value,
+        COALESCE(AVG(s.weight_kg), 0)                      AS avg_weight_kg,
+        DATEDIFF(CURRENT_DATE, MIN(s.shipped_date))        AS customer_age_days,
+        DATEDIFF(CURRENT_DATE, MAX(s.shipped_date))        AS days_since_last_shipment,
+
+        -- Ratio features
+        COALESCE(
+            SUM(s.cost_usd) / NULLIF(COUNT(s.shipment_id), 0),
+            0
+        ) AS revenue_per_shipment,
+
+        -- Flag features (0/1 binary)
+        MAX(CASE WHEN s.status = &#x27;delayed&#x27;   THEN 1 ELSE 0 END) AS had_delay,
+        MAX(CASE WHEN s.status = &#x27;cancelled&#x27; THEN 1 ELSE 0 END) AS had_cancellation,
+
+        -- Support ticket features
+        COUNT(DISTINCT t.ticket_id)              AS total_tickets,
+        SUM(CASE WHEN t.priority = &#x27;critical&#x27;
+                 THEN 1 ELSE 0 END)              AS critical_tickets
+
+    FROM customers c
+    LEFT JOIN shipments s       ON c.customer_id = s.customer_id
+    LEFT JOIN support_tickets t ON c.customer_id = t.customer_id
+    GROUP BY c.customer_id, c.tier
+),
+-- Bin continuous features into categories:
+features_with_bins AS (
+    SELECT
+        customer_id,
+        tier,
+        total_shipments,
+        lifetime_value,
+        avg_shipment_value,
+        days_since_last_shipment,
+        had_delay,
+        had_cancellation,
+        total_tickets,
+        critical_tickets,
+
+        -- Binned features (useful for tree models and human interpretation)
+        CASE
+            WHEN lifetime_value = 0        THEN &#x27;no_revenue&#x27;
+            WHEN lifetime_value &lt; 500      THEN &#x27;low&#x27;
+            WHEN lifetime_value &lt; 2000     THEN &#x27;medium&#x27;
+            ELSE                                &#x27;high&#x27;
+        END AS revenue_tier,
+
+        CASE
+            WHEN days_since_last_shipment IS NULL OR days_since_last_shipment &gt; 365 THEN &#x27;churned&#x27;
+            WHEN days_since_last_shipment &gt; 180                                     THEN &#x27;at_risk&#x27;
+            WHEN days_since_last_shipment &gt; 60                                      THEN &#x27;cooling&#x27;
+            ELSE                                                                         &#x27;active&#x27;
+        END AS recency_label,
+
+        -- Engagement score (simple weighted composite feature):
+        ROUND(
+            (COALESCE(total_shipments, 0) * 2)
+            + (CASE WHEN lifetime_value &gt; 1000 THEN 5 ELSE 0 END)
+            - (had_delay * 2)
+            - (critical_tickets * 3),
+            1
+        ) AS engagement_score
+
+    FROM customer_features
+)
+SELECT * FROM features_with_bins ORDER BY engagement_score DESC;
+
+
+-- ==============================================================================
+-- LESSON 06 — SAMPLING IN SQL (Data Scientist Skill)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- When your table has 100M rows but you only need 10K for a quick model,
+-- you SAMPLE. Don&#x27;t load the full table into pandas — sample in SQL first.
+--
+-- THREE SAMPLING METHODS:
+--   1. Random sample with RAND() — simple, slightly biased for large tables
+--   2. Deterministic sample with MOD — reproducible (good for train/test split)
+--   3. Stratified sample — sample proportionally by group (tier, city, etc.)
+
+-- METHOD 1: Random 50% sample (good for exploration):
+SELECT *
+FROM shipments
+WHERE RAND() &lt; 0.5;   -- approximately 50% of rows, randomly selected
+
+-- METHOD 2: Deterministic sample — same result every run (use customer_id % N):
+-- 20% sample: take every 5th customer
+SELECT *
+FROM customers
+WHERE MOD(customer_id, 5) = 0;   -- always same rows — reproducible!
+
+-- Train/Test split (80/20) using MOD:
+SELECT *,
+    CASE WHEN MOD(customer_id, 10) &lt; 8 THEN &#x27;train&#x27; ELSE &#x27;test&#x27; END AS split
+FROM customers;
+
+-- METHOD 3: Stratified sampling — same proportion from each tier:
+-- &quot;I need 2 customers from each tier&quot;
+WITH ranked AS (
+    SELECT
+        customer_id, name, tier,
+        ROW_NUMBER() OVER (PARTITION BY tier ORDER BY RAND()) AS rn
+    FROM customers
+)
+SELECT customer_id, name, tier
+FROM ranked
+WHERE rn &lt;= 2   -- top 2 from each tier (proportional if you use percentage)
+ORDER BY tier;
+
+-- Stratified percentage sample (10% from each tier):
+WITH tier_counts AS (
+    SELECT tier, COUNT(*) AS total FROM customers GROUP BY tier
+),
+tier_sample_sizes AS (
+    SELECT tier, CEIL(total * 0.10) AS sample_size FROM tier_counts
+),
+ranked AS (
+    SELECT
+        c.customer_id, c.name, c.tier,
+        ROW_NUMBER() OVER (PARTITION BY c.tier ORDER BY RAND()) AS rn,
+        ts.sample_size
+    FROM customers c
+    JOIN tier_sample_sizes ts ON c.tier = ts.tier
+)
+SELECT customer_id, name, tier
+FROM ranked
+WHERE rn &lt;= sample_size;
+
+
+-- ==============================================================================
+-- LESSON 07 — ADVANCED CASE WHEN PATTERNS
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- CASE WHEN is SQL&#x27;s if/elif/else — but it can do much more than assign labels.
+-- Use it inside: SELECT, WHERE (via subquery), GROUP BY, ORDER BY, aggregates.
+-- Pivot tables in SQL use CASE WHEN inside SUM() — this is huge!
+
+-- PIVOT TABLE — show shipment count by status × tier in one query:
+SELECT
+    c.tier,
+    COUNT(s.shipment_id)                                              AS total,
+    SUM(CASE WHEN s.status = &#x27;delivered&#x27;   THEN 1 ELSE 0 END)        AS delivered,
+    SUM(CASE WHEN s.status = &#x27;delayed&#x27;     THEN 1 ELSE 0 END)        AS delayed,
+    SUM(CASE WHEN s.status = &#x27;in_transit&#x27;  THEN 1 ELSE 0 END)        AS in_transit,
+    SUM(CASE WHEN s.status = &#x27;cancelled&#x27;   THEN 1 ELSE 0 END)        AS cancelled,
+    ROUND(
+        100.0 * SUM(CASE WHEN s.status = &#x27;delivered&#x27; THEN 1 ELSE 0 END)
+        / NULLIF(COUNT(s.shipment_id), 0),
+        1
+    ) AS delivery_success_rate
+FROM customers c
+LEFT JOIN shipments s ON c.customer_id = s.customer_id
+GROUP BY c.tier;
+
+-- CONDITIONAL AGGREGATION — revenue split by weight tier:
+SELECT
+    DATE_FORMAT(shipped_date, &#x27;%Y-%m&#x27;) AS month,
+    ROUND(SUM(CASE WHEN weight_kg &lt; 50  THEN cost_usd ELSE 0 END), 2) AS light_revenue,
+    ROUND(SUM(CASE WHEN weight_kg &lt; 150 AND weight_kg &gt;= 50  THEN cost_usd ELSE 0 END), 2) AS medium_revenue,
+    ROUND(SUM(CASE WHEN weight_kg &gt;= 150 THEN cost_usd ELSE 0 END), 2) AS heavy_revenue
+FROM shipments
+GROUP BY DATE_FORMAT(shipped_date, &#x27;%Y-%m&#x27;)
+ORDER BY month;
+
+-- CASE WHEN in ORDER BY (custom sort):
+SELECT name, tier
+FROM customers
+ORDER BY
+    CASE tier
+        WHEN &#x27;enterprise&#x27; THEN 1
+        WHEN &#x27;premium&#x27;    THEN 2
+        WHEN &#x27;standard&#x27;   THEN 3
+        ELSE                   4
+    END;   -- sorts by tier priority, not alphabetically
+
+
+-- ==============================================================================
+-- 🎯 YOUR TASKS
+-- ==============================================================================
+--
+-- YOUR TURN — Run these against the logistics schema above.
+-- These mirror real analyst interview questions at Amazon, Uber, Flexport.
+
+-- TASK 1 — NULL SAFETY:
+--    Write a query showing all shipments with:
+--    a) Transit days (use COALESCE so in-transit/cancelled show days so far, not NULL)
+--    b) A label: &#x27;Completed&#x27;, &#x27;In Progress&#x27;, or &#x27;Cancelled&#x27;
+--    c) Revenue per kg (NULLIF to avoid divide-by-zero for 0-weight shipments)
+--    Sort by transit_days descending.
+
+-- TASK 2 — BUSINESS KPI:
+--    Calculate the &quot;Delivery Report Card&quot; for each customer:
+--    - Total shipments
+--    - On-time rate % (delivered in &lt;= 7 days)
+--    - Average transit time (delivered shipments only)
+--    - Total revenue
+--    - Number of support tickets
+--    Sort by on-time rate ascending (worst performers first).
+--    HINT: Use LEFT JOIN across all 3 tables + CASE WHEN inside SUM()
+
+-- TASK 3 — COHORT ANALYSIS:
+--    Find the average shipment value per month for customers in each tier.
+--    Show columns: month, tier, shipments, avg_value.
+--    HINT: DATE_FORMAT(shipped_date, &#x27;%Y-%m&#x27;) for month grouping.
+
+-- TASK 4 — FEATURE ENGINEERING:
+--    Build a &quot;risk score&quot; table for support tickets:
+--    - customer_id, customer_name
+--    - open_tickets (resolved_date IS NULL)
+--    - critical_open_tickets
+--    - avg_days_open_for_unresolved (COALESCE resolved_date with CURRENT_DATE)
+--    - risk_label: &#x27;HIGH RISK&#x27; if critical_open &gt; 0 OR avg_days_open &gt; 10, else &#x27;OK&#x27;
+--    Order by risk_label DESC, then avg_days_open DESC.
+
+-- TASK 5 — PIVOT TABLE:
+--    Create a pivot table showing, for each month:
+--    - Month (YYYY-MM)
+--    - Revenue from &#x27;enterprise&#x27; customers
+--    - Revenue from &#x27;premium&#x27; customers
+--    - Revenue from &#x27;standard&#x27; customers
+--    - Total revenue
+--    HINT: JOIN customers + shipments, then SUM(CASE WHEN tier = &#x27;X&#x27; ...) by month.
+
+-- TASK 6 — SAMPLING:
+--    Create a reproducible 50% train / 50% test split of shipments.
+--    Show: shipment_id, customer_id, cost_usd, split (&#x27;train&#x27;/&#x27;test&#x27;).
+--    HINT: MOD(shipment_id, 2) = 0 → train, else test.
+--    Verify the split is roughly 50/50 with a GROUP BY split COUNT(*).
+
+-- Write your solutions below:
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

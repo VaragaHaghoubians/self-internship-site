@@ -1,0 +1,1103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Time Series Analysis.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../../index.html">Back to website</a>
+      <a href="../../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Time Series Analysis.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/learning-journey/month-03-machine-learning/week-09-time-series/time_series_analysis.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "# ==============================================================\n# WEEK 9 (supplementary): Time Series Analysis\n# FILE: time_series_analysis.py\n#\n# TASK: Understand how to analyse, decompose, and forecast\n#       data that changes over time.\n#\n# WHY:  Time series data is everywhere in data science:\n#         - Your IoT sensor: temperature every 5 minutes\n#         - Finance: stock price every second\n#         - Business: monthly sales revenue\n#         - Manufacturing: machine vibration over time (RUL!)\n#         - Meteorology: daily weather readings\n#       The ai_ie_portfolio projects (predictive maintenance &\n#       supply chain) both require these exact skills.\n#\n# PRE-REQUISITE:\n#   Finished pandas_basics.py \u2014 especially Part 11 (datetime columns)\n#\n# INSTALL:\n#   pip install pandas numpy matplotlib seaborn statsmodels\n#\n# HOW TO RUN: python time_series_analysis.py\n# ==============================================================\n\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport matplotlib.dates as mdates\nimport seaborn as sns\nfrom datetime import datetime, timedelta\n\nprint(\"=\" * 60)\nprint(\"WEEK 9 (extra): Time Series Analysis\")\nprint(\"=\" * 60)\n\n\n# ==============================================================\n# PART 1: What Makes Time Series Data Special?\n# ==============================================================\n\nprint(\"\\n--- PART 1: What is Time Series Data? ---\")\nprint(\"\"\"\nRegular tabular data: each row is INDEPENDENT.\n  Knowing row 5 tells you nothing about row 6.\n\nTime series data: each row DEPENDS on previous rows.\n  Today's temperature is related to yesterday's.\n  This week's sales are related to last week's.\n\nThat dependency is both the main challenge AND the main\nsource of signal in time series analysis.\n\nKey concepts:\n  Trend:       the long-term direction (going up, going down, flat)\n  Seasonality: repeating patterns at fixed intervals\n               (higher sales every December, lower temps every winter)\n  Noise:       random fluctuations with no pattern\n  Stationarity: a series is stationary if its statistical properties\n               (mean, variance) don't change over time.\n               Most forecasting models REQUIRE stationarity.\n\"\"\")\n\n\n# ==============================================================\n# PART 2: Creating a Realistic Time Series\n# ==============================================================\n\nprint(\"\\n--- PART 2: Synthetic Sensor Dataset ---\")\n\n# Build 2 years of daily temperature + humidity readings\n# (same concept as your Arduino/ESP32 data, just at daily scale)\nrng = np.random.default_rng(seed=42)\ndates = pd.date_range(start=\"2024-01-01\", end=\"2025-12-31\", freq=\"D\")\nn = len(dates)\n\n# Trend component: slight warming over 2 years (+2\u00b0C total)\ntrend = np.linspace(0, 2, n)\n\n# Yearly seasonality: colder in winter, hotter in summer\n# sin wave with period = 365 days\nyearly_season = 8 * np.sin(2 * np.pi * np.arange(n) / 365 - np.pi / 2)\n\n# Weekly seasonality: slightly higher readings on weekdays (heating on)\nweekly_season = 1.5 * np.sin(2 * np.pi * np.arange(n) / 7)\n\n# Random noise\nnoise = rng.normal(0, 1.2, n)\n\n# Combine all components\ntemperature = 18 + trend + yearly_season + weekly_season + noise\nhumidity    = 60 - 0.3 * temperature + rng.normal(0, 3, n)\nhumidity    = np.clip(humidity, 20, 95)\n\ndf = pd.DataFrame({\n    \"temperature\": temperature.round(2),\n    \"humidity\":    humidity.round(1),\n}, index=dates)\ndf.index.name = \"date\"\n\nprint(f\"Dataset: {len(df)} daily readings from {df.index[0].date()} to {df.index[-1].date()}\")\nprint(df.describe().round(2))\n\n\n# ==============================================================\n# PART 3: Indexing and Slicing Time Series\n# ==============================================================\n\nprint(\"\\n--- PART 3: DatetimeIndex Slicing ---\")\n\n# Pandas DatetimeIndex supports very convenient slicing\nprint(\"January 2024 only:\")\njan_2024 = df[\"2024-01\"]\nprint(f\"  {len(jan_2024)} rows  |  mean temp: {jan_2024['temperature'].mean():.2f}\u00b0C\")\n\nprint(\"\\nAll of 2024:\")\nyear_2024 = df[\"2024\"]\nprint(f\"  {len(year_2024)} rows  |  mean temp: {year_2024['temperature'].mean():.2f}\u00b0C\")\n\nprint(\"\\nSummer 2024 (June\u2013August):\")\nsummer = df[\"2024-06\":\"2024-08\"]\nprint(f\"  {len(summer)} rows  |  mean temp: {summer['temperature'].mean():.2f}\u00b0C\")\n\n# Shift: compare today's value with yesterday's\ndf[\"temp_yesterday\"]    = df[\"temperature\"].shift(1)      # lag 1\ndf[\"temp_change\"]       = df[\"temperature\"] - df[\"temp_yesterday\"]\ndf[\"temp_7d_ago\"]       = df[\"temperature\"].shift(7)      # lag 7 (same weekday last week)\n\nprint(\"\\nFirst 5 rows with lag features:\")\nprint(df[[\"temperature\", \"temp_yesterday\", \"temp_change\"]].head())\nprint(\"\\nHINT: 'shift(n)' moves values DOWN n rows. Row 0 gets NaN because there is no row -1.\")\n\n# Drop lag columns (we added them for demonstration only)\ndf = df.drop(columns=[\"temp_yesterday\", \"temp_change\", \"temp_7d_ago\"])\n\n\n# ==============================================================\n# PART 4: Resampling and Rolling Windows\n# ==============================================================\n\nprint(\"\\n--- PART 4: Resampling and Rolling Windows ---\")\n\n# Resampling: change the time frequency of the data\n# D=daily, W=weekly, ME=month-end, QE=quarter-end, YE=year-end\nmonthly = df[\"temperature\"].resample(\"ME\").agg([\"mean\", \"min\", \"max\"])\nmonthly.columns = [\"monthly_mean\", \"monthly_min\", \"monthly_max\"]\nprint(\"Monthly temperature summary:\")\nprint(monthly.head(6).round(2))\n\n# Rolling window: compute statistics over a sliding window of the last N observations\n# This is the core tool for smoothing noisy sensor data\ndf[\"rolling_7d_mean\"]  = df[\"temperature\"].rolling(window=7,  center=False).mean()\ndf[\"rolling_30d_mean\"] = df[\"temperature\"].rolling(window=30, center=False).mean()\n\n# center=False (default): window uses the PAST N rows (no future data \u2014 realistic)\n# center=True:            window is centred (uses future data \u2014 only for retrospective analysis)\n\nprint(\"\\nRolling windows (first 35 rows):\")\nprint(df[[\"temperature\", \"rolling_7d_mean\", \"rolling_30d_mean\"]].head(35).tail(5).round(2))\nprint(\"HINT: The first N-1 rows are NaN because there aren't enough past values yet.\")\n\n# Rolling std \u2014 spot when volatility is increasing\ndf[\"rolling_7d_std\"] = df[\"temperature\"].rolling(7).std()\n\n# Exponentially Weighted Moving Average (EWMA)\n# Gives more weight to recent values \u2014 reacts faster than simple rolling mean\ndf[\"ewm_14d\"] = df[\"temperature\"].ewm(span=14, adjust=False).mean()\n\nprint(\"\\nEWM vs. rolling mean (first 40 rows, last 5):\")\nprint(df[[\"temperature\", \"rolling_7d_mean\", \"ewm_14d\"]].head(40).tail(5).round(2))\n\n\n# ==============================================================\n# PART 5: Visualising Time Series\n# ==============================================================\n\nprint(\"\\n--- PART 5: Visualisations ---\")\n\nfig, axes = plt.subplots(3, 1, figsize=(14, 12))\n\n# Plot 1: Raw data + rolling means\nax = axes[0]\nax.plot(df.index, df[\"temperature\"],     alpha=0.4, color=\"steelblue\", label=\"Daily temp\")\nax.plot(df.index, df[\"rolling_7d_mean\"], color=\"orange\",    linewidth=1.5, label=\"7-day rolling mean\")\nax.plot(df.index, df[\"rolling_30d_mean\"],color=\"red\",       linewidth=2,   label=\"30-day rolling mean\")\nax.set_title(\"Temperature: Raw vs. Smoothed\", fontsize=13)\nax.set_ylabel(\"\u00b0C\")\nax.legend()\nax.grid(True, alpha=0.3)\nax.xaxis.set_major_formatter(mdates.DateFormatter(\"%b %Y\"))\n\n# Plot 2: Monthly aggregation\nax = axes[1]\nax.fill_between(monthly.index, monthly[\"monthly_min\"], monthly[\"monthly_max\"],\n                alpha=0.3, color=\"steelblue\", label=\"Min\u2013Max range\")\nax.plot(monthly.index, monthly[\"monthly_mean\"], marker=\"o\", color=\"steelblue\",\n        linewidth=2, label=\"Monthly mean\")\nax.set_title(\"Monthly Temperature Summary\", fontsize=13)\nax.set_ylabel(\"\u00b0C\")\nax.legend()\nax.grid(True, alpha=0.3)\nax.xaxis.set_major_formatter(mdates.DateFormatter(\"%b %Y\"))\n\n# Plot 3: Rolling volatility (std)\nax = axes[2]\nax.plot(df.index, df[\"rolling_7d_std\"], color=\"purple\", linewidth=1.2)\nax.set_title(\"Rolling 7-Day Standard Deviation (Volatility)\", fontsize=13)\nax.set_ylabel(\"Std Dev (\u00b0C)\")\nax.grid(True, alpha=0.3)\nax.xaxis.set_major_formatter(mdates.DateFormatter(\"%b %Y\"))\n\nplt.tight_layout()\nplt.savefig(\"ts_overview.png\", bbox_inches=\"tight\", dpi=100)\nplt.show()\nplt.close()\nprint(\"Saved: ts_overview.png\")\n\n\n# ==============================================================\n# PART 6: Time Series Decomposition\n# ==============================================================\n\nprint(\"\\n--- PART 6: Decomposition (Trend + Seasonality + Residual) ---\")\n\nfrom statsmodels.tsa.seasonal import seasonal_decompose\n\n# Decompose the monthly mean (less noisy than daily for illustration)\nmonthly_mean = df[\"temperature\"].resample(\"ME\").mean()\n\n# model='additive': series = trend + seasonality + residual\n# model='multiplicative': series = trend \u00d7 seasonality \u00d7 residual\n# Use additive when the amplitude of seasonality is CONSTANT over time\n# Use multiplicative when seasonality grows proportionally with the trend\n\nresult = seasonal_decompose(monthly_mean, model=\"additive\", period=12)\n\nfig, axes = plt.subplots(4, 1, figsize=(14, 10), sharex=True)\ntitles = [\"Observed\", \"Trend\", \"Seasonality\", \"Residual (Noise)\"]\ncomponents = [result.observed, result.trend, result.seasonal, result.resid]\n\nfor ax, title, component in zip(axes, titles, components):\n    ax.plot(monthly_mean.index, component, color=\"steelblue\")\n    ax.set_title(title, fontsize=12)\n    ax.grid(True, alpha=0.3)\n\nplt.tight_layout()\nplt.savefig(\"ts_decomposition.png\", bbox_inches=\"tight\", dpi=100)\nplt.show()\nplt.close()\nprint(\"Saved: ts_decomposition.png\")\nprint(\"\"\"\nDecomposition reveals:\n  Trend:      the underlying direction without seasonality or noise\n  Seasonality: the repeating pattern (period=12 for monthly data)\n  Residual:   whatever is left \u2014 pure noise, or unexplained patterns\n\nIf the residual shows patterns, your model is missing something important.\n\"\"\")\n\n\n# ==============================================================\n# PART 7: Stationarity \u2014 The Core Requirement for Forecasting\n# ==============================================================\n\nprint(\"\\n--- PART 7: Stationarity Test (Augmented Dickey-Fuller) ---\")\n\nfrom statsmodels.tsa.stattools import adfuller\n\ndef adf_test(series: pd.Series, name: str = \"\"):\n    \"\"\"\n    Augmented Dickey-Fuller test.\n    H0: the series has a unit root (non-stationary)\n    H1: the series is stationary\n\n    If p-value < 0.05: reject H0 \u2192 series IS stationary \u2713\n    If p-value \u2265 0.05: fail to reject H0 \u2192 series is NOT stationary \u2717\n    \"\"\"\n    result = adfuller(series.dropna(), autolag=\"AIC\")\n    label = name or \"Series\"\n    print(f\"\\nADF test \u2014 {label}\")\n    print(f\"  ADF Statistic : {result[0]:.4f}\")\n    print(f\"  p-value       : {result[1]:.4f}\")\n    print(f\"  Result        : {'STATIONARY \u2713' if result[1] < 0.05 else 'NON-STATIONARY \u2717'}\")\n\nadf_test(monthly_mean, \"Monthly temperature (original)\")\n\n# Differencing: subtract each value from the previous one\n# This removes trend and often achieves stationarity\nmonthly_diff = monthly_mean.diff().dropna()\nadf_test(monthly_diff, \"Monthly temperature (1st difference)\")\n\nprint(\"\"\"\nWhy does stationarity matter?\n  ARIMA and similar models assume the series has constant statistical properties.\n  A trending series (e.g., steadily rising sales) violates this.\n  Differencing (diff()) removes the trend by looking at CHANGES rather than levels.\n  If one diff isn't enough, apply it again: series.diff().diff()\n\"\"\")\n\n\n# ==============================================================\n# PART 8: ACF and PACF Plots \u2014 How Much Does the Past Matter?\n# ==============================================================\n\nprint(\"\\n--- PART 8: ACF and PACF ---\")\n\nfrom statsmodels.graphics.tsaplots import plot_acf, plot_pacf\n\nfig, axes = plt.subplots(2, 1, figsize=(12, 7))\n\n# ACF (Autocorrelation Function):\n# Shows correlation of the series with itself at lag k.\n# Helps identify MA (moving average) order.\n# If ACF cuts off after lag q \u2192 MA(q) component.\nplot_acf(monthly_diff, lags=24, ax=axes[0], color=\"steelblue\")\naxes[0].set_title(\"ACF \u2014 Autocorrelation (how correlated is today with k days ago?)\")\naxes[0].grid(True, alpha=0.3)\n\n# PACF (Partial Autocorrelation Function):\n# Shows correlation at lag k after removing the effect of shorter lags.\n# Helps identify AR (autoregressive) order.\n# If PACF cuts off after lag p \u2192 AR(p) component.\nplot_pacf(monthly_diff, lags=24, ax=axes[1], color=\"tomato\", method=\"ywm\")\naxes[1].set_title(\"PACF \u2014 Partial Autocorrelation (effect of lag k, controlling for shorter lags)\")\naxes[1].grid(True, alpha=0.3)\n\nplt.tight_layout()\nplt.savefig(\"ts_acf_pacf.png\", bbox_inches=\"tight\", dpi=100)\nplt.show()\nplt.close()\nprint(\"Saved: ts_acf_pacf.png\")\nprint(\"\"\"\nReading ACF/PACF plots:\n  Blue shaded area = 95% confidence interval\n  Bars inside the band = not statistically significant (ignore them)\n  Bars outside the band = significant correlation at that lag\n\n  AR(p): PACF cuts off sharply after lag p; ACF decays slowly\n  MA(q): ACF cuts off sharply after lag q; PACF decays slowly\n  ARMA:  both decay slowly \u2192 need both p and q terms\n\"\"\")\n\n\n# ==============================================================\n# PART 9: Forecasting \u2014 Three Models\n# ==============================================================\n\nprint(\"\\n--- PART 9: Forecasting ---\")\n\n# Use the last 24 months of monthly data\n# Train: first 20 months | Test: last 4 months\ntrain = monthly_mean.iloc[:-4]\ntest  = monthly_mean.iloc[-4:]\nhorizon = len(test)\n\nprint(f\"Train: {len(train)} months | Test: {len(test)} months\")\n\n# ---- MODEL 1: Baseline \u2014 Na\u00efve Forecast (last known value) ----\n# The simplest possible forecast: predict the last observed value for all future steps.\n# Any model worth using must BEAT this baseline.\nnaive_forecast = pd.Series(\n    [train.iloc[-1]] * horizon,\n    index=test.index\n)\n\n# ---- MODEL 2: Simple Exponential Smoothing ----\n# Weighted average of ALL past values, with exponentially decaying weights.\n# \u03b1 (alpha) controls how fast old observations are forgotten.\n# \u03b1 close to 1 \u2192 very responsive, mostly just last observation\n# \u03b1 close to 0 \u2192 very smooth, mostly the long-run average\nfrom statsmodels.tsa.holtwinters import SimpleExpSmoothing, ExponentialSmoothing\n\nses_model = SimpleExpSmoothing(train, initialization_method=\"estimated\").fit()\nses_forecast = ses_model.forecast(horizon)\n\n# ---- MODEL 3: Holt-Winters Exponential Smoothing ----\n# Extends SES to handle TREND and SEASONALITY.\n# trend='add':  linear trend (additive)\n# seasonal='add': additive seasonality\n# seasonal_periods=12: one cycle = 12 months\nhw_model = ExponentialSmoothing(\n    train,\n    trend=\"add\",\n    seasonal=\"add\",\n    seasonal_periods=12,\n    initialization_method=\"estimated\"\n).fit()\nhw_forecast = hw_model.forecast(horizon)\n\n# ---- Evaluate: Mean Absolute Error ----\ndef mae(actual, predicted):\n    return np.abs(actual.values - predicted.values).mean()\n\nprint(f\"\\nForecast accuracy (MAE \u2014 lower is better):\")\nprint(f\"  Na\u00efve (baseline):           {mae(test, naive_forecast):.3f}\u00b0C\")\nprint(f\"  Simple Exponential Smoothing: {mae(test, ses_forecast):.3f}\u00b0C\")\nprint(f\"  Holt-Winters:               {mae(test, hw_forecast):.3f}\u00b0C\")\n\n# ---- Plot ----\nplt.figure(figsize=(14, 5))\nplt.plot(train.index, train, label=\"Train\", color=\"steelblue\", linewidth=1.5)\nplt.plot(test.index,  test,  label=\"Actual (test)\", color=\"black\",\n         linewidth=2, marker=\"o\")\nplt.plot(test.index, naive_forecast, label=\"Na\u00efve\",          color=\"grey\",\n         linestyle=\"--\", marker=\"s\")\nplt.plot(test.index, ses_forecast,   label=\"Simple Exp Smoothing\", color=\"orange\",\n         linestyle=\"--\", marker=\"^\")\nplt.plot(test.index, hw_forecast,    label=\"Holt-Winters\",    color=\"tomato\",\n         linestyle=\"--\", marker=\"D\")\nplt.title(\"Monthly Temperature Forecast \u2014 3 Models\", fontsize=13)\nplt.ylabel(\"\u00b0C\")\nplt.legend()\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.savefig(\"ts_forecast.png\", bbox_inches=\"tight\", dpi=100)\nplt.show()\nplt.close()\nprint(\"Saved: ts_forecast.png\")\n\n\n# ==============================================================\n# PART 10: ARIMA \u2014 The Classic Forecasting Model\n# ==============================================================\n\nprint(\"\\n--- PART 10: ARIMA ---\")\nprint(\"\"\"\nARIMA stands for:\n  AR(p)  \u2014 AutoRegressive: today's value is a linear combination\n             of the past p values\n  I(d)   \u2014 Integrated: the series was differenced d times to achieve stationarity\n  MA(q)  \u2014 Moving Average: today's value depends on past q forecast ERRORS\n\nChoosing p, d, q:\n  d: how many times you had to difference to pass the ADF test (usually 0 or 1)\n  p: look at PACF \u2014 how many lags are significant?\n  q: look at ACF  \u2014 how many lags are significant?\n\nSARIMA adds S for Seasonal: SARIMA(p,d,q)(P,D,Q,m)\n  P, D, Q are the seasonal AR, differencing, MA orders\n  m is the seasonal period (12 for monthly, 7 for daily-with-weekly-cycle)\n\nFor this dataset:\n  d=1  (one differencing achieved stationarity)\n  p=1  (one significant PACF spike)\n  q=1  (one significant ACF spike)\n  Seasonal: P=1, D=1, Q=1, m=12\n\"\"\")\n\nfrom statsmodels.tsa.statespace.sarimax import SARIMAX\n\nsarima_model = SARIMAX(\n    train,\n    order=(1, 1, 1),                  # (p, d, q)\n    seasonal_order=(1, 1, 1, 12),     # (P, D, Q, m)\n    enforce_stationarity=False,\n    enforce_invertibility=False\n).fit(disp=False)                     # disp=False silences the fitting log\n\nsarima_forecast = sarima_model.forecast(steps=horizon)\nprint(f\"\\nSARIMA MAE: {mae(test, sarima_forecast):.3f}\u00b0C\")\n\n# Confidence intervals\nforecast_result = sarima_model.get_forecast(steps=horizon)\nconf_int = forecast_result.conf_int(alpha=0.05)   # 95% confidence interval\n\nplt.figure(figsize=(14, 5))\nplt.plot(train.index, train,          label=\"Train\",        color=\"steelblue\", linewidth=1.5)\nplt.plot(test.index,  test,           label=\"Actual (test)\",color=\"black\",     linewidth=2, marker=\"o\")\nplt.plot(test.index,  sarima_forecast,label=\"SARIMA forecast\", color=\"tomato\", linewidth=2, marker=\"D\")\nplt.fill_between(test.index,\n                 conf_int.iloc[:, 0],\n                 conf_int.iloc[:, 1],\n                 color=\"tomato\", alpha=0.2, label=\"95% confidence interval\")\nplt.title(\"SARIMA(1,1,1)(1,1,1,12) Forecast with Confidence Interval\", fontsize=13)\nplt.ylabel(\"\u00b0C\")\nplt.legend()\nplt.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.savefig(\"ts_sarima.png\", bbox_inches=\"tight\", dpi=100)\nplt.show()\nplt.close()\nprint(\"Saved: ts_sarima.png\")\nprint(\"\"\"\nConfidence interval: the shaded region shows the 95% prediction interval.\nThe further out you forecast, the wider it gets \u2014 honest uncertainty.\nAlways show this to stakeholders, not just a single line!\n\"\"\")\n\n\n# ==============================================================\n# PART 11: Lag Features for ML Models (Bridge to sklearn/XGBoost)\n# ==============================================================\n\nprint(\"\\n--- PART 11: Turning Time Series into ML Features ---\")\nprint(\"\"\"\nARIMA is great for classical forecasting, but XGBoost/sklearn don't\nunderstand time. The trick: convert temporal patterns into plain features.\n\nInstead of: \"predict tomorrow from the history\"\nWe do:      \"predict tomorrow from engineered features of the past\"\n\nThis approach lets you use ANY regression model for forecasting,\nand it's often more accurate than ARIMA on large datasets.\n\"\"\")\n\n# Use daily data, create lag features and rolling statistics\nml_df = df[[\"temperature\"]].copy()\n\n# Lag features: the value N steps ago\nfor lag in [1, 2, 3, 7, 14, 30]:\n    ml_df[f\"lag_{lag}d\"] = ml_df[\"temperature\"].shift(lag)\n\n# Rolling statistics\nml_df[\"roll_7d_mean\"]  = ml_df[\"temperature\"].shift(1).rolling(7).mean()\nml_df[\"roll_7d_std\"]   = ml_df[\"temperature\"].shift(1).rolling(7).std()\nml_df[\"roll_30d_mean\"] = ml_df[\"temperature\"].shift(1).rolling(30).mean()\n\n# Calendar features (extracted from the DatetimeIndex)\nml_df[\"month\"]       = ml_df.index.month\nml_df[\"day_of_week\"] = ml_df.index.dayofweek  # 0=Monday, 6=Sunday\nml_df[\"day_of_year\"] = ml_df.index.dayofyear\nml_df[\"week\"]        = ml_df.index.isocalendar().week.astype(int)\n\n# Target: next day's temperature\nml_df[\"target\"] = ml_df[\"temperature\"].shift(-1)\n\n# Drop rows with NaN (from lag/rolling creation)\nml_df = ml_df.dropna()\nprint(f\"Feature matrix shape: {ml_df.shape}\")\nprint(\"\\nFeatures used:\")\nfeature_cols = [c for c in ml_df.columns if c not in [\"temperature\", \"target\"]]\nfor f in feature_cols:\n    print(f\"  {f}\")\n\n# Train/test split \u2014 ALWAYS split chronologically, NEVER randomly!\n# Random splitting would let the model see \"future\" data during training.\ncutoff = int(len(ml_df) * 0.8)\nX_train = ml_df[feature_cols].iloc[:cutoff]\nX_test  = ml_df[feature_cols].iloc[cutoff:]\ny_train = ml_df[\"target\"].iloc[:cutoff]\ny_test  = ml_df[\"target\"].iloc[cutoff:]\n\nfrom sklearn.ensemble import RandomForestRegressor\nfrom sklearn.metrics import mean_absolute_error\n\nrf = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)\nrf.fit(X_train, y_train)\npreds = rf.predict(X_test)\nprint(f\"\\nRandom Forest next-day temperature forecast MAE: {mean_absolute_error(y_test, preds):.3f}\u00b0C\")\n\n# Feature importances\nimportances = pd.Series(rf.feature_importances_, index=feature_cols).sort_values(ascending=False)\nprint(\"\\nTop feature importances:\")\nprint(importances.head(8).round(4))\nprint(\"\"\"\nHINT: lag_1d (yesterday's temperature) is almost always the most important\nfeature for next-day forecasting. This is the \"persistence\" baseline.\nRolling features capture medium-term trends.\nCalendar features capture seasonality.\n\"\"\")\n\n\n# ==============================================================\n# PART 12: Connecting to Your IoT Data\n# ==============================================================\n\nprint(\"\\n--- PART 12: Applying This to Your ESP32 Data ---\")\nprint(\"\"\"\nWhen your Flask server (week-14) is running and your ESP32 (week-15) is\nsending readings, you will have a real time series in SQLite.\n\nTo load it for analysis:\n\n    import sqlite3\n    import pandas as pd\n\n    conn = sqlite3.connect(\"sensor_data.db\")\n    df = pd.read_sql(\n        \"SELECT timestamp, temperature, humidity FROM sensor_readings ORDER BY timestamp\",\n        conn, parse_dates=[\"timestamp\"]\n    )\n    conn.close()\n    df = df.set_index(\"timestamp\")\n\nThen apply everything from this file:\n    - df.resample(\"5min\").mean()          \u2192 smooth out single spikes\n    - df[\"temperature\"].rolling(12).mean() \u2192 1-hour rolling average (12 \u00d7 5min)\n    - seasonal_decompose(...)             \u2192 find daily heating/cooling cycles\n    - Build lag features + RandomForest   \u2192 predict temperature in 30 min\n\nThis is exactly what industrial IoT systems do \u2014 your project will\nbe indistinguishable from real production code.\n\"\"\")\n\n\n# ==============================================================\n# PART 13: Cheatsheet\n# ==============================================================\n\nprint(\"\"\"\n=================================================================\nTIME SERIES CHEATSHEET\n=================================================================\n\nINDEXING / SLICING:\n  df[\"2024\"]              \u2192 full year\n  df[\"2024-06\":\"2024-08\"] \u2192 date range\n  df.resample(\"ME\").mean()  \u2192 monthly mean\n  df.resample(\"W\").agg({\"temp\": \"mean\", \"humidity\": \"max\"})\n\nROLLING / SMOOTHING:\n  df.rolling(7).mean()    \u2192 7-period simple moving average\n  df.ewm(span=14).mean()  \u2192 exponentially weighted moving average\n  df.shift(1)             \u2192 lag by 1 (yesterday's value)\n  df.diff(1)              \u2192 1st difference (change vs. yesterday)\n\nDECOMPOSITION:\n  from statsmodels.tsa.seasonal import seasonal_decompose\n  result = seasonal_decompose(series, model=\"additive\", period=12)\n  result.trend / result.seasonal / result.resid\n\nSTATIONARITY:\n  from statsmodels.tsa.stattools import adfuller\n  adfuller(series)        \u2192 p < 0.05 means stationary\n  series.diff()           \u2192 make non-stationary series stationary\n\nFORECASTING:\n  Holt-Winters            \u2192 handles trend + seasonality (fast, interpretable)\n  SARIMA(p,d,q)(P,D,Q,m) \u2192 classical statistical model\n  Lag features + XGBoost  \u2192 ML approach (often best on large datasets)\n\nTRAIN/TEST SPLIT:\n  NEVER use train_test_split(shuffle=True) on time series!\n  Always split chronologically:\n  train = df.iloc[:cutoff]\n  test  = df.iloc[cutoff:]\n\nEVALUATION METRICS:\n  MAE  = mean(|actual - predicted|)       \u2192 interpretable in original units\n  RMSE = sqrt(mean((actual - predicted)\u00b2)) \u2192 penalises large errors more\n  MAPE = mean(|actual - predicted| / |actual|) \u00d7 100  \u2192 % error (avoid if actuals \u2248 0)\n=================================================================\n\"\"\")\n\n\n# ==============================================================\n# PART 14: Prophet \u2014 Modern Forecasting for Supply Chain\n# ==============================================================\n\nprint(\"\\n--- PART 14: Prophet (Meta's Forecasting Library) ---\")\nprint(\"\"\"\nProphet vs. SARIMA \u2014 when to use each:\n\n  SARIMA:\n    + Best when you have <2 years of data\n    + Best when seasonality is clean and regular\n    + Requires manual selection of (p, d, q) from ACF/PACF plots\n    - Breaks with missing dates; needs manual imputation\n    - Slow to fit on long series\n\n  Prophet:\n    + Handles multiple seasonalities simultaneously (daily + weekly + yearly)\n    + Handles missing data and outliers automatically\n    + Handles public holidays with one parameter (add_country_holidays)\n    + No manual parameter selection \u2014 just fit and forecast\n    - Requires pip install prophet (heavier install than statsmodels)\n    - Less interpretable than ARIMA for statisticians\n    - Can overfit on short series (<1 year)\n\nFor retail demand forecasting with weekly + yearly patterns: use Prophet first.\nFor monthly industrial sensor data with one clear season: SARIMA is simpler.\n\"\"\")\n\n# ------------------------------------------------------------------\n# WINDOWS INSTALLATION NOTE:\n# Prophet requires a C++ compiler. On Windows, the easiest path is:\n#\n#   Option A (recommended): use conda\n#     conda install -c conda-forge prophet\n#\n#   Option B: use pip after installing Microsoft C++ Build Tools\n#     pip install prophet\n#\n# If you get a \"pystan\" build error, install build tools first:\n#   https://visualstudio.microsoft.com/visual-cpp-build-tools/\n#   Select \"Desktop development with C++\" workload\n#\n# On Linux/Mac (including WSL on Windows):\n#   pip install prophet   \u2190 works without extra steps\n# ------------------------------------------------------------------\n\ntry:\n    from prophet import Prophet\n\n    # Prophet expects a DataFrame with exactly two columns:\n    #   ds: the datestamp (datetime or string)\n    #   y:  the value to forecast\n    prophet_df = monthly_mean.reset_index()\n    prophet_df.columns = [\"ds\", \"y\"]\n\n    # Split: train on all but last 4 months, test on last 4\n    prophet_train = prophet_df.iloc[:-4]\n    prophet_test  = prophet_df.iloc[-4:]\n\n    m = Prophet(\n        seasonality_mode=\"additive\",    # additive: seasonality is constant in amplitude\n                                        # multiplicative: seasonality scales with trend\n        yearly_seasonality=True,\n        weekly_seasonality=False,       # monthly data has no weekly cycle\n        daily_seasonality=False,\n    )\n    m.fit(prophet_train)\n\n    # make_future_dataframe extends the date range by `periods` steps\n    future   = m.make_future_dataframe(periods=4, freq=\"ME\")\n    forecast = m.predict(future)\n\n    # forecast columns:\n    #   ds:          date\n    #   yhat:        point forecast\n    #   yhat_lower:  lower bound of 80% uncertainty interval\n    #   yhat_upper:  upper bound of 80% uncertainty interval\n    #   trend:       trend component\n    #   yearly:      yearly seasonality component\n\n    prophet_preds = forecast.set_index(\"ds\")[\"yhat\"].loc[prophet_test[\"ds\"].values]\n    prophet_mae   = np.abs(prophet_test[\"y\"].values - prophet_preds.values).mean()\n\n    print(f\"Prophet MAE:    {prophet_mae:.3f}\u00b0C\")\n    print(f\"SARIMA MAE:     {mae(test, sarima_forecast):.3f}\u00b0C\")\n    print(f\"Holt-Winters MAE: {mae(test, hw_forecast):.3f}\u00b0C\")\n    print(\"\"\"\nOn this synthetic dataset all three models perform similarly because\nthe data has clean, regular seasonality. On real retail or supply chain\ndata with holidays and irregular patterns, Prophet usually wins.\n\"\"\")\n\n    # Plot Prophet components (trend + seasonality separated)\n    fig_comp = m.plot_components(forecast)\n    fig_comp.savefig(\"ts_prophet_components.png\", bbox_inches=\"tight\", dpi=100)\n    import matplotlib.pyplot as plt\n    plt.close(\"all\")\n    print(\"Saved: ts_prophet_components.png\")\n    print(\"HINT: The components plot shows trend and yearly seasonality separately.\")\n    print(\"      This is the clearest way to explain your model to a non-technical manager.\")\n\nexcept ImportError:\n    print(\"\"\"\nProphet is not installed. To install it:\n\n  On Linux/Mac/WSL:\n    pip install prophet\n\n  On Windows (native):\n    conda install -c conda-forge prophet\n    OR install Microsoft C++ Build Tools first, then: pip install prophet\n\nAfter installing, re-run this file to see Part 14 output.\n\nFor now, study the code above \u2014 the API is simple and you will use it\nin Capstone 3 (supply-chain-forecasting) on the Kaggle demand dataset.\n\"\"\")\n\n\n# ==============================================================\n# YOUR TASKS\n# ==============================================================\n\nprint(\"=\" * 60)\nprint(\"YOUR TASKS:\")\nprint(\"=\" * 60)\nprint(\"\"\"\n1. Run this file completely and examine every saved PNG.\n   Check: does the Holt-Winters forecast follow the seasonal pattern?\n   Check: does the SARIMA confidence interval widen for later steps?\n\n2. Modify the synthetic data:\n   Change the trend from +2\u00b0C to +5\u00b0C (more aggressive warming).\n   Does the ADF test still show stationarity after one diff()?\n   How does it affect the Holt-Winters forecast?\n\n3. Anomaly detection with rolling statistics:\n   Compute: z_score = (temperature - rolling_30d_mean) / rolling_30d_std\n   Flag any day where |z_score| > 2.5 as an anomaly.\n   Plot the flagged points as red dots on the temperature line chart.\n   HINT: This is \"rolling window Z-score\" from the ai_ie_portfolio hints!\n\n4. Cross-validation for time series (TimeSeriesSplit):\n   Regular k-fold shuffle would contaminate future into past \u2014 wrong!\n   sklearn has a correct version:\n     from sklearn.model_selection import TimeSeriesSplit\n     tscv = TimeSeriesSplit(n_splits=5)\n   Use it to cross-validate the Random Forest lag-feature model.\n   Print the MAE for each fold and the average.\n\n5. CHALLENGE: load data from your real ESP32 SQLite database\n   (when month-04 is done) and:\n   a. Compute hourly resampling and plot temperature over 7 days\n   b. Detect any anomalous readings with Z-score\n   c. Forecast the next 6 hours with Holt-Winters\n\"\"\")\n";
+      const readerOutputKey = "readerRun:knowledge-base/learning-journey/month-03-machine-learning/week-09-time-series/time_series_analysis.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code># ==============================================================
+# WEEK 9 (supplementary): Time Series Analysis
+# FILE: time_series_analysis.py
+#
+# TASK: Understand how to analyse, decompose, and forecast
+#       data that changes over time.
+#
+# WHY:  Time series data is everywhere in data science:
+#         - Your IoT sensor: temperature every 5 minutes
+#         - Finance: stock price every second
+#         - Business: monthly sales revenue
+#         - Manufacturing: machine vibration over time (RUL!)
+#         - Meteorology: daily weather readings
+#       The ai_ie_portfolio projects (predictive maintenance &amp;
+#       supply chain) both require these exact skills.
+#
+# PRE-REQUISITE:
+#   Finished pandas_basics.py — especially Part 11 (datetime columns)
+#
+# INSTALL:
+#   pip install pandas numpy matplotlib seaborn statsmodels
+#
+# HOW TO RUN: python time_series_analysis.py
+# ==============================================================
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import seaborn as sns
+from datetime import datetime, timedelta
+
+print(&quot;=&quot; * 60)
+print(&quot;WEEK 9 (extra): Time Series Analysis&quot;)
+print(&quot;=&quot; * 60)
+
+
+# ==============================================================
+# PART 1: What Makes Time Series Data Special?
+# ==============================================================
+
+print(&quot;\n--- PART 1: What is Time Series Data? ---&quot;)
+print(&quot;&quot;&quot;
+Regular tabular data: each row is INDEPENDENT.
+  Knowing row 5 tells you nothing about row 6.
+
+Time series data: each row DEPENDS on previous rows.
+  Today&#x27;s temperature is related to yesterday&#x27;s.
+  This week&#x27;s sales are related to last week&#x27;s.
+
+That dependency is both the main challenge AND the main
+source of signal in time series analysis.
+
+Key concepts:
+  Trend:       the long-term direction (going up, going down, flat)
+  Seasonality: repeating patterns at fixed intervals
+               (higher sales every December, lower temps every winter)
+  Noise:       random fluctuations with no pattern
+  Stationarity: a series is stationary if its statistical properties
+               (mean, variance) don&#x27;t change over time.
+               Most forecasting models REQUIRE stationarity.
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# PART 2: Creating a Realistic Time Series
+# ==============================================================
+
+print(&quot;\n--- PART 2: Synthetic Sensor Dataset ---&quot;)
+
+# Build 2 years of daily temperature + humidity readings
+# (same concept as your Arduino/ESP32 data, just at daily scale)
+rng = np.random.default_rng(seed=42)
+dates = pd.date_range(start=&quot;2024-01-01&quot;, end=&quot;2025-12-31&quot;, freq=&quot;D&quot;)
+n = len(dates)
+
+# Trend component: slight warming over 2 years (+2°C total)
+trend = np.linspace(0, 2, n)
+
+# Yearly seasonality: colder in winter, hotter in summer
+# sin wave with period = 365 days
+yearly_season = 8 * np.sin(2 * np.pi * np.arange(n) / 365 - np.pi / 2)
+
+# Weekly seasonality: slightly higher readings on weekdays (heating on)
+weekly_season = 1.5 * np.sin(2 * np.pi * np.arange(n) / 7)
+
+# Random noise
+noise = rng.normal(0, 1.2, n)
+
+# Combine all components
+temperature = 18 + trend + yearly_season + weekly_season + noise
+humidity    = 60 - 0.3 * temperature + rng.normal(0, 3, n)
+humidity    = np.clip(humidity, 20, 95)
+
+df = pd.DataFrame({
+    &quot;temperature&quot;: temperature.round(2),
+    &quot;humidity&quot;:    humidity.round(1),
+}, index=dates)
+df.index.name = &quot;date&quot;
+
+print(f&quot;Dataset: {len(df)} daily readings from {df.index[0].date()} to {df.index[-1].date()}&quot;)
+print(df.describe().round(2))
+
+
+# ==============================================================
+# PART 3: Indexing and Slicing Time Series
+# ==============================================================
+
+print(&quot;\n--- PART 3: DatetimeIndex Slicing ---&quot;)
+
+# Pandas DatetimeIndex supports very convenient slicing
+print(&quot;January 2024 only:&quot;)
+jan_2024 = df[&quot;2024-01&quot;]
+print(f&quot;  {len(jan_2024)} rows  |  mean temp: {jan_2024[&#x27;temperature&#x27;].mean():.2f}°C&quot;)
+
+print(&quot;\nAll of 2024:&quot;)
+year_2024 = df[&quot;2024&quot;]
+print(f&quot;  {len(year_2024)} rows  |  mean temp: {year_2024[&#x27;temperature&#x27;].mean():.2f}°C&quot;)
+
+print(&quot;\nSummer 2024 (June–August):&quot;)
+summer = df[&quot;2024-06&quot;:&quot;2024-08&quot;]
+print(f&quot;  {len(summer)} rows  |  mean temp: {summer[&#x27;temperature&#x27;].mean():.2f}°C&quot;)
+
+# Shift: compare today&#x27;s value with yesterday&#x27;s
+df[&quot;temp_yesterday&quot;]    = df[&quot;temperature&quot;].shift(1)      # lag 1
+df[&quot;temp_change&quot;]       = df[&quot;temperature&quot;] - df[&quot;temp_yesterday&quot;]
+df[&quot;temp_7d_ago&quot;]       = df[&quot;temperature&quot;].shift(7)      # lag 7 (same weekday last week)
+
+print(&quot;\nFirst 5 rows with lag features:&quot;)
+print(df[[&quot;temperature&quot;, &quot;temp_yesterday&quot;, &quot;temp_change&quot;]].head())
+print(&quot;\nHINT: &#x27;shift(n)&#x27; moves values DOWN n rows. Row 0 gets NaN because there is no row -1.&quot;)
+
+# Drop lag columns (we added them for demonstration only)
+df = df.drop(columns=[&quot;temp_yesterday&quot;, &quot;temp_change&quot;, &quot;temp_7d_ago&quot;])
+
+
+# ==============================================================
+# PART 4: Resampling and Rolling Windows
+# ==============================================================
+
+print(&quot;\n--- PART 4: Resampling and Rolling Windows ---&quot;)
+
+# Resampling: change the time frequency of the data
+# D=daily, W=weekly, ME=month-end, QE=quarter-end, YE=year-end
+monthly = df[&quot;temperature&quot;].resample(&quot;ME&quot;).agg([&quot;mean&quot;, &quot;min&quot;, &quot;max&quot;])
+monthly.columns = [&quot;monthly_mean&quot;, &quot;monthly_min&quot;, &quot;monthly_max&quot;]
+print(&quot;Monthly temperature summary:&quot;)
+print(monthly.head(6).round(2))
+
+# Rolling window: compute statistics over a sliding window of the last N observations
+# This is the core tool for smoothing noisy sensor data
+df[&quot;rolling_7d_mean&quot;]  = df[&quot;temperature&quot;].rolling(window=7,  center=False).mean()
+df[&quot;rolling_30d_mean&quot;] = df[&quot;temperature&quot;].rolling(window=30, center=False).mean()
+
+# center=False (default): window uses the PAST N rows (no future data — realistic)
+# center=True:            window is centred (uses future data — only for retrospective analysis)
+
+print(&quot;\nRolling windows (first 35 rows):&quot;)
+print(df[[&quot;temperature&quot;, &quot;rolling_7d_mean&quot;, &quot;rolling_30d_mean&quot;]].head(35).tail(5).round(2))
+print(&quot;HINT: The first N-1 rows are NaN because there aren&#x27;t enough past values yet.&quot;)
+
+# Rolling std — spot when volatility is increasing
+df[&quot;rolling_7d_std&quot;] = df[&quot;temperature&quot;].rolling(7).std()
+
+# Exponentially Weighted Moving Average (EWMA)
+# Gives more weight to recent values — reacts faster than simple rolling mean
+df[&quot;ewm_14d&quot;] = df[&quot;temperature&quot;].ewm(span=14, adjust=False).mean()
+
+print(&quot;\nEWM vs. rolling mean (first 40 rows, last 5):&quot;)
+print(df[[&quot;temperature&quot;, &quot;rolling_7d_mean&quot;, &quot;ewm_14d&quot;]].head(40).tail(5).round(2))
+
+
+# ==============================================================
+# PART 5: Visualising Time Series
+# ==============================================================
+
+print(&quot;\n--- PART 5: Visualisations ---&quot;)
+
+fig, axes = plt.subplots(3, 1, figsize=(14, 12))
+
+# Plot 1: Raw data + rolling means
+ax = axes[0]
+ax.plot(df.index, df[&quot;temperature&quot;],     alpha=0.4, color=&quot;steelblue&quot;, label=&quot;Daily temp&quot;)
+ax.plot(df.index, df[&quot;rolling_7d_mean&quot;], color=&quot;orange&quot;,    linewidth=1.5, label=&quot;7-day rolling mean&quot;)
+ax.plot(df.index, df[&quot;rolling_30d_mean&quot;],color=&quot;red&quot;,       linewidth=2,   label=&quot;30-day rolling mean&quot;)
+ax.set_title(&quot;Temperature: Raw vs. Smoothed&quot;, fontsize=13)
+ax.set_ylabel(&quot;°C&quot;)
+ax.legend()
+ax.grid(True, alpha=0.3)
+ax.xaxis.set_major_formatter(mdates.DateFormatter(&quot;%b %Y&quot;))
+
+# Plot 2: Monthly aggregation
+ax = axes[1]
+ax.fill_between(monthly.index, monthly[&quot;monthly_min&quot;], monthly[&quot;monthly_max&quot;],
+                alpha=0.3, color=&quot;steelblue&quot;, label=&quot;Min–Max range&quot;)
+ax.plot(monthly.index, monthly[&quot;monthly_mean&quot;], marker=&quot;o&quot;, color=&quot;steelblue&quot;,
+        linewidth=2, label=&quot;Monthly mean&quot;)
+ax.set_title(&quot;Monthly Temperature Summary&quot;, fontsize=13)
+ax.set_ylabel(&quot;°C&quot;)
+ax.legend()
+ax.grid(True, alpha=0.3)
+ax.xaxis.set_major_formatter(mdates.DateFormatter(&quot;%b %Y&quot;))
+
+# Plot 3: Rolling volatility (std)
+ax = axes[2]
+ax.plot(df.index, df[&quot;rolling_7d_std&quot;], color=&quot;purple&quot;, linewidth=1.2)
+ax.set_title(&quot;Rolling 7-Day Standard Deviation (Volatility)&quot;, fontsize=13)
+ax.set_ylabel(&quot;Std Dev (°C)&quot;)
+ax.grid(True, alpha=0.3)
+ax.xaxis.set_major_formatter(mdates.DateFormatter(&quot;%b %Y&quot;))
+
+plt.tight_layout()
+plt.savefig(&quot;ts_overview.png&quot;, bbox_inches=&quot;tight&quot;, dpi=100)
+plt.show()
+plt.close()
+print(&quot;Saved: ts_overview.png&quot;)
+
+
+# ==============================================================
+# PART 6: Time Series Decomposition
+# ==============================================================
+
+print(&quot;\n--- PART 6: Decomposition (Trend + Seasonality + Residual) ---&quot;)
+
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+# Decompose the monthly mean (less noisy than daily for illustration)
+monthly_mean = df[&quot;temperature&quot;].resample(&quot;ME&quot;).mean()
+
+# model=&#x27;additive&#x27;: series = trend + seasonality + residual
+# model=&#x27;multiplicative&#x27;: series = trend × seasonality × residual
+# Use additive when the amplitude of seasonality is CONSTANT over time
+# Use multiplicative when seasonality grows proportionally with the trend
+
+result = seasonal_decompose(monthly_mean, model=&quot;additive&quot;, period=12)
+
+fig, axes = plt.subplots(4, 1, figsize=(14, 10), sharex=True)
+titles = [&quot;Observed&quot;, &quot;Trend&quot;, &quot;Seasonality&quot;, &quot;Residual (Noise)&quot;]
+components = [result.observed, result.trend, result.seasonal, result.resid]
+
+for ax, title, component in zip(axes, titles, components):
+    ax.plot(monthly_mean.index, component, color=&quot;steelblue&quot;)
+    ax.set_title(title, fontsize=12)
+    ax.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.savefig(&quot;ts_decomposition.png&quot;, bbox_inches=&quot;tight&quot;, dpi=100)
+plt.show()
+plt.close()
+print(&quot;Saved: ts_decomposition.png&quot;)
+print(&quot;&quot;&quot;
+Decomposition reveals:
+  Trend:      the underlying direction without seasonality or noise
+  Seasonality: the repeating pattern (period=12 for monthly data)
+  Residual:   whatever is left — pure noise, or unexplained patterns
+
+If the residual shows patterns, your model is missing something important.
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# PART 7: Stationarity — The Core Requirement for Forecasting
+# ==============================================================
+
+print(&quot;\n--- PART 7: Stationarity Test (Augmented Dickey-Fuller) ---&quot;)
+
+from statsmodels.tsa.stattools import adfuller
+
+def adf_test(series: pd.Series, name: str = &quot;&quot;):
+    &quot;&quot;&quot;
+    Augmented Dickey-Fuller test.
+    H0: the series has a unit root (non-stationary)
+    H1: the series is stationary
+
+    If p-value &lt; 0.05: reject H0 → series IS stationary ✓
+    If p-value ≥ 0.05: fail to reject H0 → series is NOT stationary ✗
+    &quot;&quot;&quot;
+    result = adfuller(series.dropna(), autolag=&quot;AIC&quot;)
+    label = name or &quot;Series&quot;
+    print(f&quot;\nADF test — {label}&quot;)
+    print(f&quot;  ADF Statistic : {result[0]:.4f}&quot;)
+    print(f&quot;  p-value       : {result[1]:.4f}&quot;)
+    print(f&quot;  Result        : {&#x27;STATIONARY ✓&#x27; if result[1] &lt; 0.05 else &#x27;NON-STATIONARY ✗&#x27;}&quot;)
+
+adf_test(monthly_mean, &quot;Monthly temperature (original)&quot;)
+
+# Differencing: subtract each value from the previous one
+# This removes trend and often achieves stationarity
+monthly_diff = monthly_mean.diff().dropna()
+adf_test(monthly_diff, &quot;Monthly temperature (1st difference)&quot;)
+
+print(&quot;&quot;&quot;
+Why does stationarity matter?
+  ARIMA and similar models assume the series has constant statistical properties.
+  A trending series (e.g., steadily rising sales) violates this.
+  Differencing (diff()) removes the trend by looking at CHANGES rather than levels.
+  If one diff isn&#x27;t enough, apply it again: series.diff().diff()
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# PART 8: ACF and PACF Plots — How Much Does the Past Matter?
+# ==============================================================
+
+print(&quot;\n--- PART 8: ACF and PACF ---&quot;)
+
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+
+fig, axes = plt.subplots(2, 1, figsize=(12, 7))
+
+# ACF (Autocorrelation Function):
+# Shows correlation of the series with itself at lag k.
+# Helps identify MA (moving average) order.
+# If ACF cuts off after lag q → MA(q) component.
+plot_acf(monthly_diff, lags=24, ax=axes[0], color=&quot;steelblue&quot;)
+axes[0].set_title(&quot;ACF — Autocorrelation (how correlated is today with k days ago?)&quot;)
+axes[0].grid(True, alpha=0.3)
+
+# PACF (Partial Autocorrelation Function):
+# Shows correlation at lag k after removing the effect of shorter lags.
+# Helps identify AR (autoregressive) order.
+# If PACF cuts off after lag p → AR(p) component.
+plot_pacf(monthly_diff, lags=24, ax=axes[1], color=&quot;tomato&quot;, method=&quot;ywm&quot;)
+axes[1].set_title(&quot;PACF — Partial Autocorrelation (effect of lag k, controlling for shorter lags)&quot;)
+axes[1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.savefig(&quot;ts_acf_pacf.png&quot;, bbox_inches=&quot;tight&quot;, dpi=100)
+plt.show()
+plt.close()
+print(&quot;Saved: ts_acf_pacf.png&quot;)
+print(&quot;&quot;&quot;
+Reading ACF/PACF plots:
+  Blue shaded area = 95% confidence interval
+  Bars inside the band = not statistically significant (ignore them)
+  Bars outside the band = significant correlation at that lag
+
+  AR(p): PACF cuts off sharply after lag p; ACF decays slowly
+  MA(q): ACF cuts off sharply after lag q; PACF decays slowly
+  ARMA:  both decay slowly → need both p and q terms
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# PART 9: Forecasting — Three Models
+# ==============================================================
+
+print(&quot;\n--- PART 9: Forecasting ---&quot;)
+
+# Use the last 24 months of monthly data
+# Train: first 20 months | Test: last 4 months
+train = monthly_mean.iloc[:-4]
+test  = monthly_mean.iloc[-4:]
+horizon = len(test)
+
+print(f&quot;Train: {len(train)} months | Test: {len(test)} months&quot;)
+
+# ---- MODEL 1: Baseline — Naïve Forecast (last known value) ----
+# The simplest possible forecast: predict the last observed value for all future steps.
+# Any model worth using must BEAT this baseline.
+naive_forecast = pd.Series(
+    [train.iloc[-1]] * horizon,
+    index=test.index
+)
+
+# ---- MODEL 2: Simple Exponential Smoothing ----
+# Weighted average of ALL past values, with exponentially decaying weights.
+# α (alpha) controls how fast old observations are forgotten.
+# α close to 1 → very responsive, mostly just last observation
+# α close to 0 → very smooth, mostly the long-run average
+from statsmodels.tsa.holtwinters import SimpleExpSmoothing, ExponentialSmoothing
+
+ses_model = SimpleExpSmoothing(train, initialization_method=&quot;estimated&quot;).fit()
+ses_forecast = ses_model.forecast(horizon)
+
+# ---- MODEL 3: Holt-Winters Exponential Smoothing ----
+# Extends SES to handle TREND and SEASONALITY.
+# trend=&#x27;add&#x27;:  linear trend (additive)
+# seasonal=&#x27;add&#x27;: additive seasonality
+# seasonal_periods=12: one cycle = 12 months
+hw_model = ExponentialSmoothing(
+    train,
+    trend=&quot;add&quot;,
+    seasonal=&quot;add&quot;,
+    seasonal_periods=12,
+    initialization_method=&quot;estimated&quot;
+).fit()
+hw_forecast = hw_model.forecast(horizon)
+
+# ---- Evaluate: Mean Absolute Error ----
+def mae(actual, predicted):
+    return np.abs(actual.values - predicted.values).mean()
+
+print(f&quot;\nForecast accuracy (MAE — lower is better):&quot;)
+print(f&quot;  Naïve (baseline):           {mae(test, naive_forecast):.3f}°C&quot;)
+print(f&quot;  Simple Exponential Smoothing: {mae(test, ses_forecast):.3f}°C&quot;)
+print(f&quot;  Holt-Winters:               {mae(test, hw_forecast):.3f}°C&quot;)
+
+# ---- Plot ----
+plt.figure(figsize=(14, 5))
+plt.plot(train.index, train, label=&quot;Train&quot;, color=&quot;steelblue&quot;, linewidth=1.5)
+plt.plot(test.index,  test,  label=&quot;Actual (test)&quot;, color=&quot;black&quot;,
+         linewidth=2, marker=&quot;o&quot;)
+plt.plot(test.index, naive_forecast, label=&quot;Naïve&quot;,          color=&quot;grey&quot;,
+         linestyle=&quot;--&quot;, marker=&quot;s&quot;)
+plt.plot(test.index, ses_forecast,   label=&quot;Simple Exp Smoothing&quot;, color=&quot;orange&quot;,
+         linestyle=&quot;--&quot;, marker=&quot;^&quot;)
+plt.plot(test.index, hw_forecast,    label=&quot;Holt-Winters&quot;,    color=&quot;tomato&quot;,
+         linestyle=&quot;--&quot;, marker=&quot;D&quot;)
+plt.title(&quot;Monthly Temperature Forecast — 3 Models&quot;, fontsize=13)
+plt.ylabel(&quot;°C&quot;)
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig(&quot;ts_forecast.png&quot;, bbox_inches=&quot;tight&quot;, dpi=100)
+plt.show()
+plt.close()
+print(&quot;Saved: ts_forecast.png&quot;)
+
+
+# ==============================================================
+# PART 10: ARIMA — The Classic Forecasting Model
+# ==============================================================
+
+print(&quot;\n--- PART 10: ARIMA ---&quot;)
+print(&quot;&quot;&quot;
+ARIMA stands for:
+  AR(p)  — AutoRegressive: today&#x27;s value is a linear combination
+             of the past p values
+  I(d)   — Integrated: the series was differenced d times to achieve stationarity
+  MA(q)  — Moving Average: today&#x27;s value depends on past q forecast ERRORS
+
+Choosing p, d, q:
+  d: how many times you had to difference to pass the ADF test (usually 0 or 1)
+  p: look at PACF — how many lags are significant?
+  q: look at ACF  — how many lags are significant?
+
+SARIMA adds S for Seasonal: SARIMA(p,d,q)(P,D,Q,m)
+  P, D, Q are the seasonal AR, differencing, MA orders
+  m is the seasonal period (12 for monthly, 7 for daily-with-weekly-cycle)
+
+For this dataset:
+  d=1  (one differencing achieved stationarity)
+  p=1  (one significant PACF spike)
+  q=1  (one significant ACF spike)
+  Seasonal: P=1, D=1, Q=1, m=12
+&quot;&quot;&quot;)
+
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+
+sarima_model = SARIMAX(
+    train,
+    order=(1, 1, 1),                  # (p, d, q)
+    seasonal_order=(1, 1, 1, 12),     # (P, D, Q, m)
+    enforce_stationarity=False,
+    enforce_invertibility=False
+).fit(disp=False)                     # disp=False silences the fitting log
+
+sarima_forecast = sarima_model.forecast(steps=horizon)
+print(f&quot;\nSARIMA MAE: {mae(test, sarima_forecast):.3f}°C&quot;)
+
+# Confidence intervals
+forecast_result = sarima_model.get_forecast(steps=horizon)
+conf_int = forecast_result.conf_int(alpha=0.05)   # 95% confidence interval
+
+plt.figure(figsize=(14, 5))
+plt.plot(train.index, train,          label=&quot;Train&quot;,        color=&quot;steelblue&quot;, linewidth=1.5)
+plt.plot(test.index,  test,           label=&quot;Actual (test)&quot;,color=&quot;black&quot;,     linewidth=2, marker=&quot;o&quot;)
+plt.plot(test.index,  sarima_forecast,label=&quot;SARIMA forecast&quot;, color=&quot;tomato&quot;, linewidth=2, marker=&quot;D&quot;)
+plt.fill_between(test.index,
+                 conf_int.iloc[:, 0],
+                 conf_int.iloc[:, 1],
+                 color=&quot;tomato&quot;, alpha=0.2, label=&quot;95% confidence interval&quot;)
+plt.title(&quot;SARIMA(1,1,1)(1,1,1,12) Forecast with Confidence Interval&quot;, fontsize=13)
+plt.ylabel(&quot;°C&quot;)
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig(&quot;ts_sarima.png&quot;, bbox_inches=&quot;tight&quot;, dpi=100)
+plt.show()
+plt.close()
+print(&quot;Saved: ts_sarima.png&quot;)
+print(&quot;&quot;&quot;
+Confidence interval: the shaded region shows the 95% prediction interval.
+The further out you forecast, the wider it gets — honest uncertainty.
+Always show this to stakeholders, not just a single line!
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# PART 11: Lag Features for ML Models (Bridge to sklearn/XGBoost)
+# ==============================================================
+
+print(&quot;\n--- PART 11: Turning Time Series into ML Features ---&quot;)
+print(&quot;&quot;&quot;
+ARIMA is great for classical forecasting, but XGBoost/sklearn don&#x27;t
+understand time. The trick: convert temporal patterns into plain features.
+
+Instead of: &quot;predict tomorrow from the history&quot;
+We do:      &quot;predict tomorrow from engineered features of the past&quot;
+
+This approach lets you use ANY regression model for forecasting,
+and it&#x27;s often more accurate than ARIMA on large datasets.
+&quot;&quot;&quot;)
+
+# Use daily data, create lag features and rolling statistics
+ml_df = df[[&quot;temperature&quot;]].copy()
+
+# Lag features: the value N steps ago
+for lag in [1, 2, 3, 7, 14, 30]:
+    ml_df[f&quot;lag_{lag}d&quot;] = ml_df[&quot;temperature&quot;].shift(lag)
+
+# Rolling statistics
+ml_df[&quot;roll_7d_mean&quot;]  = ml_df[&quot;temperature&quot;].shift(1).rolling(7).mean()
+ml_df[&quot;roll_7d_std&quot;]   = ml_df[&quot;temperature&quot;].shift(1).rolling(7).std()
+ml_df[&quot;roll_30d_mean&quot;] = ml_df[&quot;temperature&quot;].shift(1).rolling(30).mean()
+
+# Calendar features (extracted from the DatetimeIndex)
+ml_df[&quot;month&quot;]       = ml_df.index.month
+ml_df[&quot;day_of_week&quot;] = ml_df.index.dayofweek  # 0=Monday, 6=Sunday
+ml_df[&quot;day_of_year&quot;] = ml_df.index.dayofyear
+ml_df[&quot;week&quot;]        = ml_df.index.isocalendar().week.astype(int)
+
+# Target: next day&#x27;s temperature
+ml_df[&quot;target&quot;] = ml_df[&quot;temperature&quot;].shift(-1)
+
+# Drop rows with NaN (from lag/rolling creation)
+ml_df = ml_df.dropna()
+print(f&quot;Feature matrix shape: {ml_df.shape}&quot;)
+print(&quot;\nFeatures used:&quot;)
+feature_cols = [c for c in ml_df.columns if c not in [&quot;temperature&quot;, &quot;target&quot;]]
+for f in feature_cols:
+    print(f&quot;  {f}&quot;)
+
+# Train/test split — ALWAYS split chronologically, NEVER randomly!
+# Random splitting would let the model see &quot;future&quot; data during training.
+cutoff = int(len(ml_df) * 0.8)
+X_train = ml_df[feature_cols].iloc[:cutoff]
+X_test  = ml_df[feature_cols].iloc[cutoff:]
+y_train = ml_df[&quot;target&quot;].iloc[:cutoff]
+y_test  = ml_df[&quot;target&quot;].iloc[cutoff:]
+
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error
+
+rf = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+rf.fit(X_train, y_train)
+preds = rf.predict(X_test)
+print(f&quot;\nRandom Forest next-day temperature forecast MAE: {mean_absolute_error(y_test, preds):.3f}°C&quot;)
+
+# Feature importances
+importances = pd.Series(rf.feature_importances_, index=feature_cols).sort_values(ascending=False)
+print(&quot;\nTop feature importances:&quot;)
+print(importances.head(8).round(4))
+print(&quot;&quot;&quot;
+HINT: lag_1d (yesterday&#x27;s temperature) is almost always the most important
+feature for next-day forecasting. This is the &quot;persistence&quot; baseline.
+Rolling features capture medium-term trends.
+Calendar features capture seasonality.
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# PART 12: Connecting to Your IoT Data
+# ==============================================================
+
+print(&quot;\n--- PART 12: Applying This to Your ESP32 Data ---&quot;)
+print(&quot;&quot;&quot;
+When your Flask server (week-14) is running and your ESP32 (week-15) is
+sending readings, you will have a real time series in SQLite.
+
+To load it for analysis:
+
+    import sqlite3
+    import pandas as pd
+
+    conn = sqlite3.connect(&quot;sensor_data.db&quot;)
+    df = pd.read_sql(
+        &quot;SELECT timestamp, temperature, humidity FROM sensor_readings ORDER BY timestamp&quot;,
+        conn, parse_dates=[&quot;timestamp&quot;]
+    )
+    conn.close()
+    df = df.set_index(&quot;timestamp&quot;)
+
+Then apply everything from this file:
+    - df.resample(&quot;5min&quot;).mean()          → smooth out single spikes
+    - df[&quot;temperature&quot;].rolling(12).mean() → 1-hour rolling average (12 × 5min)
+    - seasonal_decompose(...)             → find daily heating/cooling cycles
+    - Build lag features + RandomForest   → predict temperature in 30 min
+
+This is exactly what industrial IoT systems do — your project will
+be indistinguishable from real production code.
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# PART 13: Cheatsheet
+# ==============================================================
+
+print(&quot;&quot;&quot;
+=================================================================
+TIME SERIES CHEATSHEET
+=================================================================
+
+INDEXING / SLICING:
+  df[&quot;2024&quot;]              → full year
+  df[&quot;2024-06&quot;:&quot;2024-08&quot;] → date range
+  df.resample(&quot;ME&quot;).mean()  → monthly mean
+  df.resample(&quot;W&quot;).agg({&quot;temp&quot;: &quot;mean&quot;, &quot;humidity&quot;: &quot;max&quot;})
+
+ROLLING / SMOOTHING:
+  df.rolling(7).mean()    → 7-period simple moving average
+  df.ewm(span=14).mean()  → exponentially weighted moving average
+  df.shift(1)             → lag by 1 (yesterday&#x27;s value)
+  df.diff(1)              → 1st difference (change vs. yesterday)
+
+DECOMPOSITION:
+  from statsmodels.tsa.seasonal import seasonal_decompose
+  result = seasonal_decompose(series, model=&quot;additive&quot;, period=12)
+  result.trend / result.seasonal / result.resid
+
+STATIONARITY:
+  from statsmodels.tsa.stattools import adfuller
+  adfuller(series)        → p &lt; 0.05 means stationary
+  series.diff()           → make non-stationary series stationary
+
+FORECASTING:
+  Holt-Winters            → handles trend + seasonality (fast, interpretable)
+  SARIMA(p,d,q)(P,D,Q,m) → classical statistical model
+  Lag features + XGBoost  → ML approach (often best on large datasets)
+
+TRAIN/TEST SPLIT:
+  NEVER use train_test_split(shuffle=True) on time series!
+  Always split chronologically:
+  train = df.iloc[:cutoff]
+  test  = df.iloc[cutoff:]
+
+EVALUATION METRICS:
+  MAE  = mean(|actual - predicted|)       → interpretable in original units
+  RMSE = sqrt(mean((actual - predicted)²)) → penalises large errors more
+  MAPE = mean(|actual - predicted| / |actual|) × 100  → % error (avoid if actuals ≈ 0)
+=================================================================
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# PART 14: Prophet — Modern Forecasting for Supply Chain
+# ==============================================================
+
+print(&quot;\n--- PART 14: Prophet (Meta&#x27;s Forecasting Library) ---&quot;)
+print(&quot;&quot;&quot;
+Prophet vs. SARIMA — when to use each:
+
+  SARIMA:
+    + Best when you have &lt;2 years of data
+    + Best when seasonality is clean and regular
+    + Requires manual selection of (p, d, q) from ACF/PACF plots
+    - Breaks with missing dates; needs manual imputation
+    - Slow to fit on long series
+
+  Prophet:
+    + Handles multiple seasonalities simultaneously (daily + weekly + yearly)
+    + Handles missing data and outliers automatically
+    + Handles public holidays with one parameter (add_country_holidays)
+    + No manual parameter selection — just fit and forecast
+    - Requires pip install prophet (heavier install than statsmodels)
+    - Less interpretable than ARIMA for statisticians
+    - Can overfit on short series (&lt;1 year)
+
+For retail demand forecasting with weekly + yearly patterns: use Prophet first.
+For monthly industrial sensor data with one clear season: SARIMA is simpler.
+&quot;&quot;&quot;)
+
+# ------------------------------------------------------------------
+# WINDOWS INSTALLATION NOTE:
+# Prophet requires a C++ compiler. On Windows, the easiest path is:
+#
+#   Option A (recommended): use conda
+#     conda install -c conda-forge prophet
+#
+#   Option B: use pip after installing Microsoft C++ Build Tools
+#     pip install prophet
+#
+# If you get a &quot;pystan&quot; build error, install build tools first:
+#   https://visualstudio.microsoft.com/visual-cpp-build-tools/
+#   Select &quot;Desktop development with C++&quot; workload
+#
+# On Linux/Mac (including WSL on Windows):
+#   pip install prophet   ← works without extra steps
+# ------------------------------------------------------------------
+
+try:
+    from prophet import Prophet
+
+    # Prophet expects a DataFrame with exactly two columns:
+    #   ds: the datestamp (datetime or string)
+    #   y:  the value to forecast
+    prophet_df = monthly_mean.reset_index()
+    prophet_df.columns = [&quot;ds&quot;, &quot;y&quot;]
+
+    # Split: train on all but last 4 months, test on last 4
+    prophet_train = prophet_df.iloc[:-4]
+    prophet_test  = prophet_df.iloc[-4:]
+
+    m = Prophet(
+        seasonality_mode=&quot;additive&quot;,    # additive: seasonality is constant in amplitude
+                                        # multiplicative: seasonality scales with trend
+        yearly_seasonality=True,
+        weekly_seasonality=False,       # monthly data has no weekly cycle
+        daily_seasonality=False,
+    )
+    m.fit(prophet_train)
+
+    # make_future_dataframe extends the date range by `periods` steps
+    future   = m.make_future_dataframe(periods=4, freq=&quot;ME&quot;)
+    forecast = m.predict(future)
+
+    # forecast columns:
+    #   ds:          date
+    #   yhat:        point forecast
+    #   yhat_lower:  lower bound of 80% uncertainty interval
+    #   yhat_upper:  upper bound of 80% uncertainty interval
+    #   trend:       trend component
+    #   yearly:      yearly seasonality component
+
+    prophet_preds = forecast.set_index(&quot;ds&quot;)[&quot;yhat&quot;].loc[prophet_test[&quot;ds&quot;].values]
+    prophet_mae   = np.abs(prophet_test[&quot;y&quot;].values - prophet_preds.values).mean()
+
+    print(f&quot;Prophet MAE:    {prophet_mae:.3f}°C&quot;)
+    print(f&quot;SARIMA MAE:     {mae(test, sarima_forecast):.3f}°C&quot;)
+    print(f&quot;Holt-Winters MAE: {mae(test, hw_forecast):.3f}°C&quot;)
+    print(&quot;&quot;&quot;
+On this synthetic dataset all three models perform similarly because
+the data has clean, regular seasonality. On real retail or supply chain
+data with holidays and irregular patterns, Prophet usually wins.
+&quot;&quot;&quot;)
+
+    # Plot Prophet components (trend + seasonality separated)
+    fig_comp = m.plot_components(forecast)
+    fig_comp.savefig(&quot;ts_prophet_components.png&quot;, bbox_inches=&quot;tight&quot;, dpi=100)
+    import matplotlib.pyplot as plt
+    plt.close(&quot;all&quot;)
+    print(&quot;Saved: ts_prophet_components.png&quot;)
+    print(&quot;HINT: The components plot shows trend and yearly seasonality separately.&quot;)
+    print(&quot;      This is the clearest way to explain your model to a non-technical manager.&quot;)
+
+except ImportError:
+    print(&quot;&quot;&quot;
+Prophet is not installed. To install it:
+
+  On Linux/Mac/WSL:
+    pip install prophet
+
+  On Windows (native):
+    conda install -c conda-forge prophet
+    OR install Microsoft C++ Build Tools first, then: pip install prophet
+
+After installing, re-run this file to see Part 14 output.
+
+For now, study the code above — the API is simple and you will use it
+in Capstone 3 (supply-chain-forecasting) on the Kaggle demand dataset.
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# YOUR TASKS
+# ==============================================================
+
+print(&quot;=&quot; * 60)
+print(&quot;YOUR TASKS:&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;&quot;&quot;
+1. Run this file completely and examine every saved PNG.
+   Check: does the Holt-Winters forecast follow the seasonal pattern?
+   Check: does the SARIMA confidence interval widen for later steps?
+
+2. Modify the synthetic data:
+   Change the trend from +2°C to +5°C (more aggressive warming).
+   Does the ADF test still show stationarity after one diff()?
+   How does it affect the Holt-Winters forecast?
+
+3. Anomaly detection with rolling statistics:
+   Compute: z_score = (temperature - rolling_30d_mean) / rolling_30d_std
+   Flag any day where |z_score| &gt; 2.5 as an anomaly.
+   Plot the flagged points as red dots on the temperature line chart.
+   HINT: This is &quot;rolling window Z-score&quot; from the ai_ie_portfolio hints!
+
+4. Cross-validation for time series (TimeSeriesSplit):
+   Regular k-fold shuffle would contaminate future into past — wrong!
+   sklearn has a correct version:
+     from sklearn.model_selection import TimeSeriesSplit
+     tscv = TimeSeriesSplit(n_splits=5)
+   Use it to cross-validate the Random Forest lag-feature model.
+   Print the MAE for each fold and the average.
+
+5. CHALLENGE: load data from your real ESP32 SQLite database
+   (when month-04 is done) and:
+   a. Compute hourly resampling and plot temperature over 7 days
+   b. Detect any anomalous readings with Z-score
+   c. Forecast the next 6 hours with Holt-Winters
+&quot;&quot;&quot;)
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

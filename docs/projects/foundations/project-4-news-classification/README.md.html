@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Project 4 News Classification - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Project 4 News Classification</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">projects/foundations/project-4-news-classification/README.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="project-4-news-article-classification-with-nlp-amp-transformers">Project 4 — News Article Classification with NLP &amp; Transformers</h2>
+<p><strong>Role:</strong> AI Engineer <strong>Difficulty:</strong> Advanced <strong>Estimated Time:</strong> 12–18 hours</p>
+<h3 id="problem-statement">Problem Statement</h3>
+<p>You are an <strong>AI Engineer</strong> at a digital news aggregation company. The platform receives thousands of news articles every day and needs to automatically categorize them into topics (Sports, Technology, Business, World News, etc.) so they can be routed to the correct section of the website.</p>
+<p>Manually labeling articles is slow and expensive. Your job is to build an <strong>AI-powered text classification system</strong> using state-of-the-art Natural Language Processing (NLP) techniques. Specifically:</p>
+<ol>
+<li>Build a <strong>classical NLP baseline</strong> using TF-IDF + Logistic Regression</li>
+<li>Build an <strong>advanced model</strong> using BERT (a pre-trained Transformer) fine-tuned on the news data</li>
+<li>Evaluate both approaches and compare them</li>
+<li>Understand how the model makes predictions using attention visualization</li>
+</ol>
+<p>This project represents the cutting edge of what companies deploy in production AI systems today.</p>
+<h3 id="dataset">Dataset</h3>
+<p><strong>Name:</strong> AG News Classification Dataset <strong>Source:</strong> Hugging Face Datasets (easiest) or Kaggle <strong>Size:</strong> 120,000 training articles, 7,600 test articles, 4 categories</p>
+<h4 id="option-a-hugging-face-recommended-no-download-needed">Option A — Hugging Face (Recommended, no download needed):</h4>
+<pre><code class="language-python">from datasets import load_dataset
+dataset = load_dataset(&quot;ag_news&quot;)</code></pre>
+<p>Install first: <code>pip install datasets</code></p>
+<h4 id="option-b-kaggle-download">Option B — Kaggle Download:</h4>
+<p><strong>Link:</strong> https://www.kaggle.com/datasets/amananandrai/ag-news-classification-dataset <strong>Files:</strong> <code>train.csv</code>, <code>test.csv</code> Place in <code>data/</code> folder.</p>
+<h4 id="the-4-classes">The 4 Classes:</h4>
+<table><thead><tr><th>Label</th><th>Category</th><th>Description</th></tr></thead><tbody><tr><td>0</td><td>World</td><td>International news and geopolitics</td></tr><tr><td>1</td><td>Sports</td><td>All sports news</td></tr><tr><td>2</td><td>Business</td><td>Finance, markets, business news</td></tr><tr><td>3</td><td>Science/Technology</td><td>Tech and science news</td></tr></tbody></table>
+<h3 id="project-structure">Project Structure</h3>
+<pre><code class="language-">project_4_ai_engineer/
+│
+├── README.md                      &lt;- Project overview (this file)
+├── INSTRUCTIONS.md                &lt;- Step-by-step AI engineering guide
+├── news_classification_nlp.py     &lt;- Main Python script
+│
+├── data/                          &lt;- Put dataset here if using Kaggle version
+│   ├── train.csv
+│   └── test.csv
+│
+└── outputs/
+    ├── figures/                   &lt;- Save all plots here
+    ├── models/                    &lt;- Save fine-tuned models here
+    └── results/                   &lt;- Save evaluation results here</code></pre>
+<h3 id="tech-stack">Tech Stack</h3>
+<h4 id="classical-nlp-part-1">Classical NLP (Part 1):</h4>
+<table><thead><tr><th>Library</th><th>Purpose</th></tr></thead><tbody><tr><td><code>pandas</code>, <code>numpy</code></td><td>Data manipulation</td></tr><tr><td><code>sklearn</code></td><td>TF-IDF, Logistic Regression, evaluation</td></tr><tr><td><code>nltk</code></td><td>Text preprocessing (stopwords, stemming)</td></tr><tr><td><code>matplotlib</code>, <code>seaborn</code></td><td>Visualization</td></tr><tr><td><code>wordcloud</code></td><td>Word cloud visualization</td></tr></tbody></table>
+<h4 id="deep-learning-transformers-part-2">Deep Learning / Transformers (Part 2):</h4>
+<table><thead><tr><th>Library</th><th>Purpose</th></tr></thead><tbody><tr><td><code>transformers</code></td><td>HuggingFace Transformers (BERT model + tokenizer)</td></tr><tr><td><code>datasets</code></td><td>HuggingFace datasets library</td></tr><tr><td><code>torch</code></td><td>PyTorch (deep learning backend)</td></tr><tr><td><code>evaluate</code></td><td>HuggingFace evaluation metrics</td></tr></tbody></table>
+<h4 id="install-all-dependencies">Install All Dependencies:</h4>
+<pre><code class="language-bash">pip install pandas numpy scikit-learn nltk matplotlib seaborn wordcloud
+pip install transformers datasets torch evaluate</code></pre>
+<blockquote>Note: PyTorch installation depends on your system. If you have an NVIDIA GPU:</blockquote>
+<blockquote>Visit https://pytorch.org/get-started/locally/ for the exact command.</blockquote>
+<blockquote>For CPU-only: <code>pip install torch --index-url https://download.pytorch.org/whl/cpu</code></blockquote>
+<h3 id="two-part-approach">Two-Part Approach</h3>
+<h4 id="part-1-classical-nlp-tf-idf-baseline">Part 1 — Classical NLP (TF-IDF Baseline):</h4>
+<ul>
+<li>Text cleaning and preprocessing</li>
+<li>TF-IDF vectorization</li>
+<li>Logistic Regression / SVM classifier</li>
+<li>Evaluation: accuracy, F1-score, confusion matrix</li>
+</ul>
+<h4 id="part-2-transformer-fine-tuning-bert">Part 2 — Transformer Fine-Tuning (BERT):</h4>
+<ul>
+<li>Load pre-trained <code>bert-base-uncased</code> from HuggingFace</li>
+<li>Tokenize data with BertTokenizer</li>
+<li>Fine-tune the model on AG News for 3 epochs</li>
+<li>Evaluate and compare with baseline</li>
+</ul>
+<h3 id="skills-demonstrated">Skills Demonstrated</h3>
+<ul>
+<li>Text preprocessing (cleaning, tokenization, stopwords, stemming/lemmatization)</li>
+<li>TF-IDF vectorization and N-gram features</li>
+<li>Training classical NLP classifiers</li>
+<li>Loading and using HuggingFace pre-trained models</li>
+<li>Tokenizing text for Transformer models</li>
+<li>Fine-tuning BERT with a classification head</li>
+<li>Visualizing attention weights</li>
+<li>Comparing classical vs. deep learning NLP approaches</li>
+<li>Understanding what BERT &quot;sees&quot; in text</li>
+</ul>
+<h3 id="key-concepts-to-understand">Key Concepts to Understand</h3>
+<table><thead><tr><th>Concept</th><th>What It Is</th></tr></thead><tbody><tr><td><strong>TF-IDF</strong></td><td>Term Frequency-Inverse Document Frequency — numerical representation of text</td></tr><tr><td><strong>BERT</strong></td><td>Bidirectional Encoder Representations from Transformers — pre-trained on massive text</td></tr><tr><td><strong>Tokenization</strong></td><td>Breaking text into tokens (sub-words) that the model understands</td></tr><tr><td><strong>Fine-tuning</strong></td><td>Taking a pre-trained model and training it further on your specific task</td></tr><tr><td><strong>Attention</strong></td><td>Mechanism that lets BERT focus on relevant words when classifying</td></tr><tr><td><strong>Transfer Learning</strong></td><td>Reusing knowledge from a model trained on a large dataset</td></tr></tbody></table>
+<h3 id="expected-outputs">Expected Outputs</h3>
+<ol>
+<li><strong>5+ NLP visualizations</strong> — class distribution, word clouds, confusion matrices</li>
+<li><strong>TF-IDF Baseline model</strong> with full classification report</li>
+<li><strong>Fine-tuned BERT model</strong> with training curves</li>
+<li><strong>Comparison table</strong>: TF-IDF vs BERT accuracy and F1-score</li>
+<li><strong>Error analysis</strong> — what types of articles does the model misclassify?</li>
+<li><strong>Saved fine-tuned model</strong> in <code>outputs/models/</code></li>
+</ol>
+<h3 id="results-summary">Results Summary</h3>
+<p><em>(Fill this in after completing the project)</em></p>
+<table><thead><tr><th>Model</th><th>Accuracy</th><th>Macro F1</th></tr></thead><tbody><tr><td>TF-IDF + Logistic Regression</td><td>___%</td><td>___</td></tr><tr><td>TF-IDF + SVM</td><td>___%</td><td>___</td></tr><tr><td>BERT (fine-tuned, 3 epochs)</td><td>___%</td><td>___</td></tr></tbody></table>
+<p>Best Model: ___ Most Confused Classes: ___ and ___ Key Insight: ___</p></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#project-4-news-article-classification-with-nlp-amp-transformers">Project 4 — News Article Classification with NLP &amp; Transformers</a><a style="margin-left:12px" href="#problem-statement">Problem Statement</a><a style="margin-left:12px" href="#dataset">Dataset</a><a style="margin-left:24px" href="#option-a-hugging-face-recommended-no-download-needed">Option A — Hugging Face (Recommended, no download needed):</a><a style="margin-left:24px" href="#option-b-kaggle-download">Option B — Kaggle Download:</a><a style="margin-left:24px" href="#the-4-classes">The 4 Classes:</a><a style="margin-left:12px" href="#project-structure">Project Structure</a><a style="margin-left:12px" href="#tech-stack">Tech Stack</a><a style="margin-left:24px" href="#classical-nlp-part-1">Classical NLP (Part 1):</a><a style="margin-left:24px" href="#deep-learning-transformers-part-2">Deep Learning / Transformers (Part 2):</a><a style="margin-left:24px" href="#install-all-dependencies">Install All Dependencies:</a><a style="margin-left:12px" href="#two-part-approach">Two-Part Approach</a><a style="margin-left:24px" href="#part-1-classical-nlp-tf-idf-baseline">Part 1 — Classical NLP (TF-IDF Baseline):</a><a style="margin-left:24px" href="#part-2-transformer-fine-tuning-bert">Part 2 — Transformer Fine-Tuning (BERT):</a><a style="margin-left:12px" href="#skills-demonstrated">Skills Demonstrated</a><a style="margin-left:12px" href="#key-concepts-to-understand">Key Concepts to Understand</a><a style="margin-left:12px" href="#expected-outputs">Expected Outputs</a><a style="margin-left:12px" href="#results-summary">Results Summary</a></aside>
+    </main>
+  </body>
+</html>

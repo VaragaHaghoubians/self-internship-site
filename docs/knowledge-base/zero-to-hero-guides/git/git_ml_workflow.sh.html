@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Git Ml Workflow.Sh - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Git Ml Workflow.Sh</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/git/git_ml_workflow.sh</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><pre><code>#!/bin/bash
+# ==============================================================================
+#  GIT FOR ML/AI ENGINEERS — CI/CD, Hooks, DVC
+#  FILE: git_ml_workflow.sh
+#
+#  TASK: Master Git practices specific to ML Engineering and AI Engineering roles.
+#        This is the most advanced Git level — used at Amazon, Uber, Flexport.
+#
+#  WHY:  ML projects have unique Git challenges Python/web projects don&#x27;t:
+#          → Large data files that Git can&#x27;t handle (DVC solves this)
+#          → Models that need versioning alongside code
+#          → Automated testing of ML pipelines (GitHub Actions)
+#          → Pre-commit hooks for formatting and notebook cleanup
+#          → Experiment tracking that integrates with Git commits
+#
+#  PREREQ: git_commands.sh + git_conflict_resolution.sh + git_advanced.sh
+# ==============================================================================
+
+
+# ==============================================================================
+# LESSON 01 — THE ML PROJECT GIT STRUCTURE
+# ==============================================================================
+
+echo &quot;=== LESSON 01: Ideal ML Project Git Structure ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+A well-structured ML project that works well with Git:
+
+  my-ml-project/
+  ├── .github/
+  │   └── workflows/
+  │       ├── ci.yml              ← GitHub Actions: run tests on every push
+  │       └── deploy.yml          ← GitHub Actions: deploy model on tag
+  ├── .gitignore                  ← CRITICAL — never commit data/models/secrets
+  ├── .pre-commit-config.yaml     ← pre-commit hooks: format, lint, strip notebooks
+  ├── dvc.yaml                    ← DVC pipeline definition
+  ├── dvc.lock                    ← DVC lock file (COMMIT THIS — it&#x27;s like requirements)
+  ├── data/
+  │   ├── .gitignore              ← ignore all data files
+  │   └── .dvc/                   ← DVC pointers (small files — commit these)
+  ├── models/
+  │   ├── .gitignore              ← ignore .pkl, .joblib, .onnx files
+  │   └── model_v1.dvc            ← DVC pointer to model (commit this)
+  ├── notebooks/
+  │   └── exploration.ipynb       ← should be stripped of outputs before commit
+  ├── src/
+  │   ├── data_loader.py
+  │   ├── features.py
+  │   ├── model.py
+  │   └── evaluate.py
+  ├── tests/
+  │   └── test_pipeline.py
+  ├── requirements.txt
+  └── README.md
+
+KEY RULE: Git tracks CODE. DVC tracks DATA and MODELS.
+          Code is small. Data can be gigabytes. Git chokes on large files.
+
+EOF
+
+
+# ==============================================================================
+# LESSON 02 — THE PERFECT .GITIGNORE FOR ML PROJECTS
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 02: ML-Specific .gitignore ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+# ==========================================
+# ML PROJECT .gitignore
+# Save this as .gitignore in your repo root
+# ==========================================
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.spec
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Secrets — NEVER COMMIT THESE
+.env
+.env.local
+.env.production
+*.key
+*.pem
+*_secret*
+config_private.py
+credentials.json
+
+# Data files (use DVC instead)
+data/raw/
+data/processed/
+data/external/
+*.csv
+*.tsv
+*.json
+*.parquet
+*.feather
+*.arrow
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.pkl
+*.pickle
+
+# Models (use DVC or model registry)
+models/*.pkl
+models/*.joblib
+models/*.onnx
+models/*.pt
+models/*.pth
+models/*.bin
+models/*.safetensors
+
+# Jupyter — NEVER commit outputs
+.ipynb_checkpoints/
+# (or use nbstripout pre-commit hook to strip outputs automatically)
+
+# Experiment tracking
+mlruns/
+mlflow.db
+wandb/
+
+# Logs and monitoring
+*.log
+logs/
+tensorboard_logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage and test artifacts
+.coverage
+htmlcov/
+.pytest_cache/
+*.xml
+
+IMPORTANT: Use &#x27;git rm --cached &lt;file&gt;&#x27; to stop tracking files already committed.
+  Example: git rm --cached data/train.csv  → stops tracking, file stays on disk
+
+EOF
+
+
+# ==============================================================================
+# LESSON 03 — GIT HOOKS: Automated Code Quality
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Git hooks are scripts that run AUTOMATICALLY at key moments:
+#   pre-commit  → runs BEFORE a commit completes
+#   pre-push    → runs BEFORE a push completes
+#   commit-msg  → validates the commit message format
+#
+# Use case: prevent bad code from EVER entering the repo.
+# If the hook fails → commit is BLOCKED until you fix the issue.
+
+echo &quot;&quot;
+echo &quot;=== LESSON 03: Git Hooks with pre-commit ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+SETUP (one-time):
+  pip install pre-commit
+  pre-commit install          ← installs hooks into .git/hooks/
+
+CREATE .pre-commit-config.yaml in your project root:
+EOF
+
+cat &lt;&lt; &#x27;YAML&#x27;
+# ==========================================
+# .pre-commit-config.yaml
+# ==========================================
+repos:
+  # 1. Basic file hygiene:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace      # Remove trailing spaces
+      - id: end-of-file-fixer        # Ensure files end with newline
+      - id: check-yaml               # Validate YAML files
+      - id: check-json               # Validate JSON files
+      - id: check-merge-conflict     # Block commits with conflict markers
+      - id: detect-private-key       # NEVER commit private keys
+      - id: no-commit-to-branch      # Prevent direct commits to main
+        args: [&#x27;--branch&#x27;, &#x27;main&#x27;]
+
+  # 2. Python formatting (Black):
+  - repo: https://github.com/psf/black
+    rev: 24.1.0
+    hooks:
+      - id: black
+        language_version: python3.11
+
+  # 3. Python imports sorting (isort):
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: [&quot;--profile&quot;, &quot;black&quot;]
+
+  # 4. Python linting (flake8 — catches bugs):
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args: [&quot;--max-line-length=100&quot;]
+
+  # 5. Strip Jupyter notebook outputs (CRITICAL for ML projects):
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.7.1
+    hooks:
+      - id: nbstripout   # Removes cell outputs before commit — keeps notebooks clean
+YAML
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+USAGE after setup:
+  git add .
+  git commit -m &quot;feat: add model&quot;
+
+  → pre-commit RUNS AUTOMATICALLY:
+    [black] Reformatting model.py...
+    [isort] Sorting imports in features.py...
+    [nbstripout] Stripping outputs from exploration.ipynb...
+    [check-merge-conflict] ✓ passed
+    [detect-private-key] ✓ passed
+
+  If any hook FAILS → commit is BLOCKED → fix the issue → commit again
+
+RUN MANUALLY (useful to check before committing):
+  pre-commit run --all-files        ← check every file in the repo
+
+BYPASS (emergency only, add a comment explaining why):
+  git commit --no-verify -m &quot;emergency: hotfix bypassing hooks&quot;
+
+EOF
+
+
+# ==============================================================================
+# LESSON 04 — GITHUB ACTIONS: CI/CD for ML Projects
+# ==============================================================================
+#
+# TEACHER SAYS:
+# CI = Continuous Integration: automatically test code on every push
+# CD = Continuous Deployment: automatically deploy when tests pass
+#
+# GitHub Actions runs YAML files in .github/workflows/
+# It starts a fresh virtual machine and runs your commands.
+# FREE for public repos. Limited free minutes for private repos.
+
+echo &quot;&quot;
+echo &quot;=== LESSON 04: GitHub Actions CI/CD ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+Create: .github/workflows/ci.yml
+EOF
+
+cat &lt;&lt; &#x27;YAML&#x27;
+# ==========================================
+# .github/workflows/ci.yml
+# Runs on every push and pull request
+# ==========================================
+name: CI — Test ML Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest       # Fresh Linux VM for each run
+    strategy:
+      matrix:
+        python-version: [&quot;3.11&quot;, &quot;3.12&quot;]   # Test on multiple versions!
+
+    steps:
+      # 1. Download your code:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Install Python:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # 3. Cache pip packages (speeds up future runs):
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles(&#x27;requirements.txt&#x27;) }}
+
+      # 4. Install dependencies:
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+
+      # 5. Run pre-commit checks (same hooks as local):
+      - name: Run pre-commit hooks
+        uses: pre-commit/action@v3.0.1
+
+      # 6. Run tests with coverage:
+      - name: Run tests
+        run: |
+          pytest tests/ -v --cov=src --cov-report=xml
+
+      # 7. Fail if coverage drops below 80%:
+      - name: Check coverage threshold
+        run: |
+          pip install coverage
+          coverage report --fail-under=80
+
+      # 8. Upload coverage report (visible in GitHub PR):
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+YAML
+
+echo &quot;&quot;
+echo &quot;--- Deploy workflow on tag/release ---&quot;
+
+cat &lt;&lt; &#x27;YAML&#x27;
+# .github/workflows/deploy.yml
+# Only runs when you push a tag like v1.0.0
+name: Deploy Model on Release
+
+on:
+  push:
+    tags:
+      - &#x27;v*&#x27;              # Trigger on any tag starting with &#x27;v&#x27;
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: &quot;3.11&quot;
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Train and evaluate model
+        run: python src/train.py
+
+      - name: Run integration tests
+        run: pytest tests/integration/ -v
+
+      - name: Deploy to production
+        run: |
+          echo &quot;Deploying version ${{ github.ref_name }}&quot;
+          # Add your deployment command here:
+          # - Push to AWS S3, EC2, or ECS
+          # - Update a FastAPI/Spring service
+          # - Register in MLflow model registry
+YAML
+
+
+# ==============================================================================
+# LESSON 05 — DVC: Data Version Control
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Git can&#x27;t handle large files (CSVs, model weights, datasets — GBs of data).
+# DVC (Data Version Control) solves this:
+#   → Git tracks CODE and DVC POINTER FILES (.dvc)
+#   → DVC stores the ACTUAL large files in remote storage (S3, Google Drive, etc.)
+#   → Together: you can reproduce ANY experiment by checking out code + pulling data
+
+echo &quot;&quot;
+echo &quot;=== LESSON 05: DVC — Data Version Control ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+INSTALL:
+  pip install dvc
+  pip install dvc-s3      ← if using Amazon S3 as remote storage
+  pip install dvc-gdrive  ← if using Google Drive
+
+INITIALIZE (inside your Git repo):
+  git init                        # (if not already)
+  dvc init                        # Creates .dvc/ directory
+  git add .dvc/
+  git commit -m &quot;chore: initialize DVC&quot;
+
+CONFIGURE REMOTE STORAGE (where DVC uploads your data):
+  # Google Drive (free, easy to start):
+  dvc remote add myremote gdrive://YOUR_FOLDER_ID
+  dvc remote default myremote
+  git add .dvc/config
+  git commit -m &quot;chore: configure DVC remote&quot;
+
+  # Amazon S3 (for production):
+  dvc remote add s3remote s3://my-bucket/dvc-data
+  dvc remote default s3remote
+
+TRACK LARGE FILES:
+  dvc add data/train.csv          # DVC tracks it, creates data/train.csv.dvc
+  git add data/train.csv.dvc data/.gitignore
+  git commit -m &quot;data: add training dataset v1&quot;
+  dvc push                        # Upload actual CSV to remote storage
+
+  dvc add models/churn_model.pkl  # Same for model files
+  git add models/churn_model.pkl.dvc
+  git commit -m &quot;model: save trained churn model v1&quot;
+  dvc push
+
+REPRODUCE ON ANOTHER MACHINE (or after git clone):
+  git clone &lt;your-repo&gt;
+  pip install dvc
+  dvc pull                        # Download all tracked data + models from remote
+
+THE BEAUTIFUL RESULT:
+  git checkout v1.0.0             # Code at v1.0.0
+  dvc pull                        # Data and model that match that code version
+  → Perfectly reproducible experiment!
+
+DVC PIPELINES (automate training):
+  # Create dvc.yaml to define your pipeline stages:
+EOF
+
+cat &lt;&lt; &#x27;YAML&#x27;
+# dvc.yaml — ML pipeline definition
+stages:
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+      - src/preprocess.py
+      - data/raw/customers.csv       # if this changes → re-run stage
+    outs:
+      - data/processed/features.csv
+
+  train:
+    cmd: python src/train.py
+    deps:
+      - src/train.py
+      - data/processed/features.csv
+    outs:
+      - models/churn_model.pkl
+    metrics:
+      - metrics/train_metrics.json   # DVC tracks these metrics!
+
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - models/churn_model.pkl
+    metrics:
+      - metrics/eval_metrics.json
+YAML
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+RUN THE PIPELINE:
+  dvc repro                       # Runs only stages whose deps changed
+  git add dvc.lock                # Commit the lock file (captures exact versions)
+  git commit -m &quot;data: update pipeline run v2&quot;
+
+COMPARE EXPERIMENT METRICS:
+  dvc metrics show                # Show current metrics
+  dvc metrics diff                # Compare metrics: current vs last commit
+  dvc metrics diff v1.0.0         # Compare current vs a tag
+
+EOF
+
+
+# ==============================================================================
+# LESSON 06 — ML EXPERIMENT BRANCHING STRATEGY
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 06: Git Branching for ML Experiments ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+PROBLEM: Data Scientists run MANY experiments (different models, features, hyperparams).
+         Which ones are worth keeping? Which branch is the &quot;best model&quot;?
+
+RECOMMENDED STRATEGY (combines GitHub Flow + DVC):
+
+BRANCHES:
+  main             → only PROVEN, production-ready code + models
+  develop          → integration: all finished experiments merged here
+  exp/lr-0.001     → experiment: try learning rate 0.001
+  exp/xgboost      → experiment: try XGBoost instead of RF
+  exp/add-features → experiment: add 3 new features
+
+WORKFLOW PER EXPERIMENT:
+  git checkout -b exp/dropout-0.3 develop
+  # ... modify model.py, train, evaluate ...
+  dvc push                          # Push data/model artifacts
+
+  # Document results in commit message:
+  git commit -m &quot;exp: dropout=0.3 → F1=0.82 (prev best: 0.79)&quot;
+  # ↑ Include metric in commit message — searchable later!
+
+  git push origin exp/dropout-0.3
+
+  # If experiment WINS → PR to develop, then develop to main with tag
+  # If experiment LOSES → branch stays for reference, you learned from it
+
+FINDING YOUR BEST EXPERIMENT:
+  git log --oneline --grep=&quot;exp:&quot;  # Find all experiment commits
+  git log --oneline | grep &quot;F1&quot;    # Find commits mentioning F1 score
+  dvc metrics diff exp/dropout-0.3 exp/lr-0.001  # Compare two experiments!
+
+NAMING CONVENTIONS FOR ML BRANCHES:
+  exp/&lt;description&gt;        → experiments (will be deleted if not promoted)
+  model/&lt;version&gt;          → model updates (e.g., model/xgboost-v2)
+  data/&lt;description&gt;       → data pipeline changes
+  feature/&lt;name&gt;           → code features
+  fix/&lt;description&gt;        → bug fixes
+
+EOF
+
+
+# ==============================================================================
+# LESSON 07 — COMMIT MESSAGE CONVENTIONS FOR ML PROJECTS
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 07: ML-Specific Commit Messages ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+Standard Conventional Commits + ML extensions:
+
+PREFIXES:
+  feat:     code: new feature (API endpoint, preprocessing step)
+  fix:      code: bug fix
+  data:     data pipeline change (new dataset, cleaning step)
+  model:    model architecture or training change
+  exp:      experiment result (include metrics in message!)
+  eval:     evaluation or metrics update
+  refactor: code cleanup (no behavior change)
+  test:     adding or fixing tests
+  ci:       GitHub Actions / CI change
+  docs:     documentation
+  chore:    dependencies, config, tooling
+
+ML-SPECIFIC EXAMPLES:
+  &quot;feat: add StandardScaler to numeric preprocessing pipeline&quot;
+  &quot;fix: handle NaN values in age column during imputation&quot;
+  &quot;data: add 50K new customer records from Q1 2026 export&quot;
+  &quot;model: switch from RandomForest to GradientBoosting&quot;
+  &quot;exp: lr=0.001 batch=64 → F1=0.847 AUC=0.921 (best so far)&quot;
+  &quot;eval: v2 model outperforms v1 on holdout — AUC +0.04&quot;
+  &quot;ci: add model performance check to GitHub Actions pipeline&quot;
+  &quot;chore: update scikit-learn to 1.4.0 for pipeline compatibility&quot;
+
+WHY INCLUDE METRICS IN COMMIT MESSAGES?
+  → git log --oneline | grep &quot;F1&quot;   finds your best experiments instantly
+  → teammates see results without running code
+  → proves progress over time — great for portfolio/performance reviews
+  → DVC can also store metrics files — but commit messages = human-readable log
+
+GOOD COMMIT MESSAGE ANATOMY:
+  exp: add attention mechanism to churn model
+
+  - Architecture: BiLSTM + self-attention (512 units)
+  - Training: 50 epochs, lr=0.001, batch=128 (GPU)
+  - Results:
+      AUC-ROC:  0.931 (prev: 0.892, +4.4%)
+      F1-score: 0.864 (prev: 0.823, +5.0%)
+      Precision: 0.871, Recall: 0.858
+  - Data: 450K customers, 80/20 split, stratified
+  - Next: try adding engineered features (see exp/feature-eng branch)
+
+  Closes #42
+
+EOF
+
+
+# ==============================================================================
+# QUICK REFERENCE — ML/AI GIT CHEAT SHEET
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;==================================================================&quot;
+echo &quot;ML/AI GIT QUICK REFERENCE&quot;
+echo &quot;==================================================================&quot;
+cat &lt;&lt; &#x27;EOF&#x27;
+
+PRE-COMMIT HOOKS
+  pip install pre-commit          Install tool
+  pre-commit install              Enable hooks in this repo
+  pre-commit run --all-files      Test hooks manually
+
+GITHUB ACTIONS
+  .github/workflows/ci.yml        Auto-test on every push/PR
+  .github/workflows/deploy.yml    Auto-deploy on tagged release
+  github.com/&lt;repo&gt;/actions       See run results
+
+DVC
+  dvc init                        Initialize DVC
+  dvc add data/train.csv          Track a large file
+  dvc push                        Upload to remote storage
+  dvc pull                        Download from remote storage
+  dvc repro                       Run pipeline (only changed stages)
+  dvc metrics show                Show current metrics
+  dvc metrics diff                Compare current vs last commit
+  dvc metrics diff v1.0..v2.0     Compare two versions
+
+ML BRANCHING
+  exp/&lt;name&gt;     → experiments
+  model/&lt;ver&gt;    → model versions
+  data/&lt;name&gt;    → data changes
+
+METRIC COMMIT MESSAGES
+  &quot;exp: gradient-boost → F1=0.847 AUC=0.921&quot;
+  &quot;model: retrain with Q1 data → AUC +0.02&quot;
+
+EOF
+
+
+# ==============================================================================
+# 🎯 YOUR TASKS
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;==================================================================&quot;
+echo &quot;YOUR TURN — ML/AI Git Workflow Practice&quot;
+echo &quot;==================================================================&quot;
+cat &lt;&lt; &#x27;EOF&#x27;
+
+TASK 1 — GITIGNORE FOR ML:
+    Create a new project folder and add the ML .gitignore from LESSON 02.
+    a) Create: data/train.csv (add some dummy data)
+    b) git status → is train.csv ignored?
+    c) Create: .env with API_KEY=secret123
+    d) git status → is .env ignored?
+    e) Create: model.pkl (empty file)
+    f) git status → is model.pkl ignored?
+    ALL THREE should be ignored. Fix .gitignore if any appear.
+
+TASK 2 — PRE-COMMIT HOOKS:
+    In any Python project:
+    a) pip install pre-commit
+    b) Create .pre-commit-config.yaml with at least:
+         - trailing-whitespace hook
+         - black hook
+         - nbstripout hook (if you have notebooks)
+    c) pre-commit install
+    d) Create a Python file with bad formatting (inconsistent indentation, trailing spaces)
+    e) git add + git commit → hooks should BLOCK and fix the issues automatically
+    f) git add + git commit again → should succeed now
+
+TASK 3 — GITHUB ACTIONS:
+    a) Create a GitHub repo with a simple Python project.
+    b) Add tests/test_model.py with 2 simple pytest tests.
+    c) Create .github/workflows/ci.yml from LESSON 04.
+    d) Push to GitHub.
+    e) Go to your repo → Actions tab → watch the CI run.
+    f) Intentionally break a test, push again → CI should FAIL (red).
+    g) Fix the test, push → CI should PASS (green).
+
+TASK 4 — DVC BASICS:
+    a) pip install dvc
+    b) In a Git repo: dvc init → git add .dvc → git commit &quot;chore: init DVC&quot;
+    c) Add a CSV file: dvc add data.csv
+    d) git add data.csv.dvc data/.gitignore
+    e) git commit -m &quot;data: add initial dataset&quot;
+    f) Modify the CSV (add a row), dvc add it again, git commit with metrics in message
+    g) dvc diff → see what data changed between commits
+
+TASK 5 — EXPERIMENT TRACKING:
+    a) Create branch: exp/random-forest
+    b) Train a RandomForest on any dataset, save F1 to metrics.json
+    c) Commit: &quot;exp: random-forest → F1=0.XXX&quot;
+    b) Create branch: exp/gradient-boosting
+    d) Train a GradientBoosting, save F1 to metrics.json
+    e) Commit: &quot;exp: gradient-boosting → F1=0.YYY&quot;
+    f) Compare:
+         git log --oneline | grep &quot;exp:&quot;     → see both experiments
+         git diff exp/random-forest..exp/gradient-boosting -- metrics.json
+    g) Which experiment won? PR the winner to develop.
+
+Write your solutions in: ml_git_practice.md
+EOF
+
+echo &quot;&quot;
+echo &quot;git_ml_workflow.sh complete!&quot;
+echo &quot;&quot;
+echo &quot;==================================================================&quot;
+echo &quot;FULL GIT CURRICULUM SUMMARY&quot;
+echo &quot;==================================================================&quot;
+echo &quot;  git_commands.sh          → Day 1-7: Core Git (setup through PRs)&quot;
+echo &quot;  git_conflict_resolution.sh → Conflicts: markers, resolve, abort, VS Code&quot;
+echo &quot;  git_advanced.sh          → ML Engineer: stash, rebase, squash, blame, bisect&quot;
+echo &quot;  git_ml_workflow.sh       → AI/ML Engineer: hooks, CI/CD, DVC, experiment tracking&quot;
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

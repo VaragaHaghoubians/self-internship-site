@@ -1,0 +1,1228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Django Advanced.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Django Advanced.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/django/django_advanced.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "# ==============================================================================\n#  DJANGO \u2014 ADVANCED PATTERNS\n#  FILE: django_advanced.py\n#\n#  TASK: Master the patterns that real Django projects use in production:\n#        Class-Based Views, Celery async tasks, testing, production settings,\n#        signals, pagination, and file uploads.\n#\n#  WHY:  django_zero_to_hero.py gave you the foundation.\n#        But 90% of real Django codebases use Class-Based Views \u2014 not FBVs.\n#        And every ML platform uses Celery for async model training/inference jobs.\n#        This file bridges the gap from \"learning Django\" to \"shipping Django.\"\n#\n#  PREREQ: django_zero_to_hero.py (models, FBV views, forms, ORM, DRF basics)\n#\n#  HOW TO USE:\n#    This is a reference guide \u2014 each section is a standalone pattern.\n#    Read the TEACHER SAYS section, then implement the pattern in your own project.\n#    All code assumes the 'students' app from the zero_to_hero file.\n# ==============================================================================\n\n\n# ==============================================================================\n# LESSON 01 \u2014 CLASS-BASED VIEWS (CBVs)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Function-Based Views (FBV) are explicit and easy to understand.\n# Class-Based Views (CBV) handle the BOILERPLATE automatically.\n# - ListView:     query + paginate + render a list template\n# - DetailView:   get one object by pk + render a detail template\n# - CreateView:   render form, validate, save, redirect\n# - UpdateView:   load existing object + form, validate, save, redirect\n# - DeleteView:   confirm + delete\n#\n# COMPARISON \u2014 the same \"create student\" in FBV vs CBV:\n#\n# FBV (20 lines):\n#   def create_student(request):\n#       if request.method == 'POST':\n#           form = StudentForm(request.POST)\n#           if form.is_valid():\n#               form.save()\n#               return redirect('students:list')\n#       else:\n#           form = StudentForm()\n#       return render(request, 'students/form.html', {'form': form})\n#\n# CBV (5 lines):\n#   class StudentCreateView(LoginRequiredMixin, CreateView):\n#       model = Student\n#       fields = ['first_name', 'last_name', 'email', 'gpa']\n#       success_url = reverse_lazy('students:list')\n#\n# The CBV does ALL of that FBV logic automatically. Less repetition = fewer bugs.\n\nfrom django.views.generic import (\n    ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView\n)\nfrom django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin\nfrom django.urls import reverse_lazy\n# from .models import Student, Course, Enrollment\n\n\n# ---- ListView: show all students ----\nclass StudentListView(LoginRequiredMixin, ListView):\n    # model = Student                        # Which model to query\n    template_name = 'students/student_list.html'\n    context_object_name = 'students'         # Name in template: {{ students }}\n    paginate_by = 20                         # Built-in pagination! 20 per page\n    ordering = ['-gpa']                      # Default sort\n\n    def get_queryset(self):\n        \"\"\"Override to add filtering by search query.\"\"\"\n        # queryset = super().get_queryset().select_related('major')\n        # q = self.request.GET.get('q', '')  # ?q=Alice\n        # if q:\n        #     queryset = queryset.filter(\n        #         first_name__icontains=q) | queryset.filter(last_name__icontains=q\n        #     )\n        # return queryset\n        return []  # Placeholder\n\n    def get_context_data(self, **kwargs):\n        \"\"\"Add extra data to the template context.\"\"\"\n        context = super().get_context_data(**kwargs)\n        # context['search_query'] = self.request.GET.get('q', '')\n        # context['total_count']  = Student.objects.count()\n        return context\n\n\n# ---- DetailView: one student ----\nclass StudentDetailView(LoginRequiredMixin, DetailView):\n    # model = Student\n    template_name = 'students/student_detail.html'\n    context_object_name = 'student'\n\n    def get_context_data(self, **kwargs):\n        context = super().get_context_data(**kwargs)\n        # student = self.get_object()\n        # context['courses']       = student.courses.all()\n        # context['avg_grade']     = student.enrollment_set.aggregate(avg=Avg('grade'))['avg']\n        # context['can_edit']      = self.request.user.is_staff\n        return context\n\n\n# ---- CreateView: new student form ----\nclass StudentCreateView(LoginRequiredMixin, CreateView):\n    # model = Student\n    fields = ['first_name', 'last_name', 'email', 'age', 'gpa', 'major', 'year']\n    template_name = 'students/student_form.html'\n    success_url = reverse_lazy('students:list')  # Redirect after save\n\n    def form_valid(self, form):\n        \"\"\"Called when form is valid \u2014 good place to add extra logic.\"\"\"\n        response = super().form_valid(form)\n        # Send welcome email, log activity, etc.\n        # send_welcome_email.delay(self.object.email)   \u2190 Celery task (see Lesson 02)\n        return response\n\n\n# ---- UpdateView: edit existing student ----\nclass StudentUpdateView(LoginRequiredMixin, UpdateView):\n    # model = Student\n    fields = ['first_name', 'last_name', 'email', 'gpa', 'major', 'year']\n    template_name = 'students/student_form.html'\n\n    def get_success_url(self):\n        return reverse_lazy('students:detail', kwargs={'pk': self.object.pk})\n\n    def get_object(self, queryset=None):\n        \"\"\"Can override to add custom permission check.\"\"\"\n        obj = super().get_object(queryset)\n        # if obj.created_by != self.request.user and not self.request.user.is_staff:\n        #     raise PermissionDenied\n        return obj\n\n\n# ---- DeleteView: confirm + delete ----\nclass StudentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):\n    # model = Student\n    template_name = 'students/student_confirm_delete.html'\n    success_url = reverse_lazy('students:list')\n\n    def test_func(self):\n        \"\"\"UserPassesTestMixin: only staff can delete.\"\"\"\n        return self.request.user.is_staff\n\n\n# ---- Wire up in urls.py ----\nURLS_CBV_EXAMPLE = '''\n# students/urls.py\nfrom django.urls import path\nfrom .views import StudentListView, StudentDetailView, StudentCreateView, StudentUpdateView, StudentDeleteView\n\napp_name = 'students'\n\nurlpatterns = [\n    path('',                   StudentListView.as_view(),   name='list'),\n    path('<int:pk>/',          StudentDetailView.as_view(), name='detail'),\n    path('new/',               StudentCreateView.as_view(), name='create'),\n    path('<int:pk>/edit/',     StudentUpdateView.as_view(), name='update'),\n    path('<int:pk>/delete/',   StudentDeleteView.as_view(), name='delete'),\n]\n'''\n\n# ---- Template for ListView with pagination ----\nSTUDENT_LIST_TEMPLATE = '''\n<!-- students/templates/students/student_list.html -->\n{% extends \"students/base.html\" %}\n\n{% block content %}\n<div class=\"d-flex justify-content-between align-items-center mb-3\">\n    <h2>Students ({{ paginator.count }} total)</h2>\n    <a href=\"{% url 'students:create' %}\" class=\"btn btn-primary\">+ Add Student</a>\n</div>\n\n<!-- Search form -->\n<form method=\"get\" class=\"mb-3\">\n    <input type=\"text\" name=\"q\" value=\"{{ search_query }}\" class=\"form-control\" placeholder=\"Search students...\">\n</form>\n\n<table class=\"table table-hover\">\n    <thead><tr><th>Name</th><th>Major</th><th>GPA</th><th>Status</th><th></th></tr></thead>\n    <tbody>\n    {% for student in students %}\n        <tr>\n            <td><a href=\"{% url 'students:detail' student.pk %}\">{{ student.get_full_name }}</a></td>\n            <td>{{ student.major|default:\"\u2013\" }}</td>\n            <td>{{ student.gpa }}</td>\n            <td>{{ student.status }}</td>\n            <td>\n                <a href=\"{% url 'students:update' student.pk %}\">Edit</a>\n                {% if user.is_staff %}\n                    | <a href=\"{% url 'students:delete' student.pk %}\" class=\"text-danger\">Delete</a>\n                {% endif %}\n            </td>\n        </tr>\n    {% empty %}\n        <tr><td colspan=\"5\" class=\"text-center\">No students found.</td></tr>\n    {% endfor %}\n    </tbody>\n</table>\n\n<!-- Pagination controls \u2014 built in! page_obj comes from ListView automatically -->\n{% if page_obj.has_other_pages %}\n<nav>\n    <ul class=\"pagination\">\n        {% if page_obj.has_previous %}\n            <li class=\"page-item\">\n                <a class=\"page-link\" href=\"?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}\">Previous</a>\n            </li>\n        {% endif %}\n        <li class=\"page-item active\">\n            <span class=\"page-link\">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>\n        </li>\n        {% if page_obj.has_next %}\n            <li class=\"page-item\">\n                <a class=\"page-link\" href=\"?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}\">Next</a>\n            </li>\n        {% endif %}\n    </ul>\n</nav>\n{% endif %}\n{% endblock %}\n'''\n\n\n# ==============================================================================\n# LESSON 02 \u2014 CELERY (Async Tasks \u2014 Critical for ML Job Queuing)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Scenario: User uploads a CSV, you need to train a model on it.\n# If you train SYNCHRONOUSLY in the view: the HTTP request hangs for 10 minutes.\n# The browser times out. The user is furious.\n#\n# Celery solves this:\n# 1. Request comes in \u2192 view immediately returns \"your job is queued!\"\n# 2. A CELERY WORKER (separate process) picks up the job\n# 3. Worker trains the model in the background\n# 4. When done: saves result, sends email, updates status\n#\n# COMPONENTS:\n#   Celery worker  \u2192 the process that executes tasks (run separately from Django)\n#   Broker         \u2192 message queue: tasks go IN here (Redis is most common)\n#   Backend        \u2192 stores results (Redis or database)\n#\n# INSTALL:\n#   pip install celery redis\n#   pip install django-celery-results   (optional \u2014 store results in Django DB)\n\n# ---- Setup in university_portal/celery.py ----\nCELERY_CONFIG = '''\n# university_portal/celery.py\nimport os\nfrom celery import Celery\n\nos.environ.setdefault('DJANGO_SETTINGS_MODULE', 'university_portal.settings')\n\napp = Celery('university_portal')\napp.config_from_object('django.conf:settings', namespace='CELERY')\napp.autodiscover_tasks()    # Auto-discovers tasks in every installed app\n'''\n\n# ---- Add to university_portal/__init__.py ----\nCELERY_INIT = '''\n# university_portal/__init__.py\nfrom .celery import app as celery_app\n__all__ = ('celery_app',)\n'''\n\n# ---- Settings additions ----\nCELERY_SETTINGS = '''\n# settings.py additions:\nCELERY_BROKER_URL = 'redis://localhost:6379/0'   # Redis as message broker\nCELERY_RESULT_BACKEND = 'redis://localhost:6379/0'\nCELERY_ACCEPT_CONTENT = ['json']\nCELERY_TASK_SERIALIZER = 'json'\nCELERY_RESULT_SERIALIZER = 'json'\nCELERY_TIMEZONE = 'UTC'\n\n# Optional: store results in Django DB\nINSTALLED_APPS += ['django_celery_results']\nCELERY_RESULT_BACKEND = 'django-db'\n'''\n\n# ---- Create tasks in students/tasks.py ----\n# import time\n# from celery import shared_task\n# from django.core.mail import send_mail\n\n\n# @shared_task(bind=True, max_retries=3)\n# def train_model_task(self, student_id: int, dataset_path: str):\n#     \"\"\"Long-running ML training job \u2014 runs in background worker.\"\"\"\n#     try:\n#         # student = Student.objects.get(pk=student_id)\n#\n#         # Simulate model training (real: call your train.py)\n#         time.sleep(10)\n#\n#         # Save results\n#         # student.model_accuracy = 0.847\n#         # student.save()\n#\n#         return {'status': 'success', 'accuracy': 0.847}\n#\n#     except Exception as exc:\n#         # Retry up to 3 times with 60s delay on failure:\n#         raise self.retry(exc=exc, countdown=60)\n\n\n# @shared_task\n# def send_welcome_email(student_email: str):\n#     \"\"\"Send async email \u2014 doesn't block the HTTP response.\"\"\"\n#     send_mail(\n#         subject='Welcome to University Portal',\n#         message='Your account is ready!',\n#         from_email='no-reply@university.edu',\n#         recipient_list=[student_email],\n#     )\n\n\n# @shared_task\n# def generate_monthly_report():\n#     \"\"\"Scheduled task \u2014 run every month (configured in settings).\"\"\"\n#     # students = Student.objects.filter(is_active=True)\n#     # ... generate report, save to file, email to admin\n#     pass\n\n\n# ---- Using tasks in views ----\nTASKS_IN_VIEWS = '''\n# In any view or CBV:\nfrom students.tasks import train_model_task, send_welcome_email\n\n# Kick off async task \u2014 returns IMMEDIATELY:\ndef upload_dataset(request):\n    # ... save uploaded file ...\n    job = train_model_task.delay(student_id=1, dataset_path='/data/upload.csv')\n    return JsonResponse({\n        'status': 'queued',\n        'job_id': job.id,   # Use this to check progress\n    })\n\n# Check task status:\ndef job_status(request, job_id):\n    from celery.result import AsyncResult\n    result = AsyncResult(job_id)\n    return JsonResponse({\n        'state':  result.state,      # PENDING, STARTED, SUCCESS, FAILURE\n        'result': result.result if result.successful() else None,\n    })\n'''\n\n# ---- Running Celery ----\nCELERY_RUN_COMMANDS = '''\n# Terminal 1: Start Redis (via Docker):\ndocker run -d -p 6379:6379 redis:7-alpine\n\n# Terminal 2: Start Django server:\npython manage.py runserver\n\n# Terminal 3: Start Celery worker:\ncelery -A university_portal worker --loglevel=info\n\n# Terminal 4 (optional): Celery flower \u2014 web UI to monitor tasks:\npip install flower\ncelery -A university_portal flower\n# Open: http://localhost:5555\n\n# For scheduled tasks (like cron): start Celery beat:\ncelery -A university_portal beat --loglevel=info\n'''\n\n# ---- Scheduled tasks (Celery beat) ----\nBEAT_SCHEDULE = '''\n# settings.py \u2014 schedule tasks like cron:\nfrom celery.schedules import crontab\n\nCELERY_BEAT_SCHEDULE = {\n    'monthly-report': {\n        'task': 'students.tasks.generate_monthly_report',\n        'schedule': crontab(hour=2, minute=0, day_of_month=1),  # 1st of month at 2 AM\n    },\n    'daily-cleanup': {\n        'task': 'students.tasks.cleanup_old_logs',\n        'schedule': crontab(hour=3, minute=30),  # Every day at 3:30 AM\n    },\n}\n'''\n\n\n# ==============================================================================\n# LESSON 03 \u2014 SIGNALS (React to Model Events)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Signals let one part of your code react when something happens in another part.\n# Without signals: you'd have to call email-sending code from the view \u2014 coupling!\n# With signals: the email code LISTENS for \"new student created\" and runs itself.\n#\n# COMMON SIGNALS:\n#   post_save    \u2192 after a model is saved (created OR updated)\n#   pre_save     \u2192 before a model is saved\n#   post_delete  \u2192 after a model is deleted\n#   pre_delete   \u2192 before a model is deleted\n#   m2m_changed  \u2192 when a ManyToManyField is changed\n\n# from django.db.models.signals import post_save, post_delete\n# from django.dispatch import receiver\n# from .models import Student, Enrollment\n# from .tasks import send_welcome_email\n\n\n# @receiver(post_save, sender=Student)\n# def on_student_created(sender, instance, created, **kwargs):\n#     \"\"\"Runs after EVERY Student save. 'created' = True only on first save.\"\"\"\n#     if created:\n#         # New student \u2014 send welcome email asynchronously:\n#         send_welcome_email.delay(instance.email)\n#         print(f\"[SIGNAL] New student created: {instance.get_full_name()}\")\n#     else:\n#         # Updated \u2014 log the change:\n#         print(f\"[SIGNAL] Student updated: {instance.get_full_name()}\")\n\n\n# @receiver(post_delete, sender=Student)\n# def on_student_deleted(sender, instance, **kwargs):\n#     \"\"\"Cleanup after student is deleted.\"\"\"\n#     print(f\"[SIGNAL] Student deleted: {instance.get_full_name()}\")\n#     # Could: archive their data, revoke API tokens, etc.\n\n\n# @receiver(post_save, sender=Enrollment)\n# def on_enrollment_saved(sender, instance, created, **kwargs):\n#     \"\"\"Recalculate student GPA whenever an enrollment grade is saved.\"\"\"\n#     if not created and instance.grade is not None:\n#         student = instance.student\n#         # avg = student.enrollment_set.aggregate(avg=Avg('grade'))['avg']\n#         # student.gpa = avg / 25  # Convert 100-scale to 4.0 scale\n#         # student.save()\n#         pass\n\n\n# Register signals by importing them in the app's ready() method:\nSIGNALS_REGISTER = '''\n# students/apps.py\nfrom django.apps import AppConfig\n\nclass StudentsConfig(AppConfig):\n    name = 'students'\n\n    def ready(self):\n        import students.signals   # This imports the file and registers all @receiver decorators\n'''\n\n\n# ==============================================================================\n# LESSON 04 \u2014 CUSTOM MANAGEMENT COMMANDS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# python manage.py migrate, python manage.py createsuperuser\n# These are \"management commands\" \u2014 you can CREATE YOUR OWN.\n# Use them for: seeding data, running batch jobs, maintenance tasks, ETL.\n# They're like cron scripts but with full access to Django ORM!\n\n# Create the folder structure:\n# students/management/commands/seed_data.py\n\nSEED_COMMAND_EXAMPLE = '''\n# students/management/commands/seed_data.py\nfrom django.core.management.base import BaseCommand, CommandError\nfrom django.db import transaction\nfrom students.models import Student, Major, Course, Enrollment\nimport random\n\n\nclass Command(BaseCommand):\n    help = \"Seed the database with realistic fake data for development/testing\"\n\n    def add_arguments(self, parser):\n        \"\"\"Define command-line arguments: python manage.py seed_data --students 50\"\"\"\n        parser.add_argument('--students', type=int, default=20, help='Number of students to create')\n        parser.add_argument('--clear',    action='store_true',   help='Clear all data before seeding')\n\n    def handle(self, *args, **options):\n        n_students = options['students']\n\n        if options['clear']:\n            self.stdout.write(\"Clearing existing data...\")\n            Enrollment.objects.all().delete()\n            Student.objects.all().delete()\n            Major.objects.all().delete()\n            Course.objects.all().delete()\n\n        self.stdout.write(\"Seeding data...\")\n\n        # Create majors:\n        majors = []\n        for name in ['Data Science', 'Computer Science', 'Statistics', 'Mathematics']:\n            major, _ = Major.objects.get_or_create(name=name, defaults={'department': 'Engineering'})\n            majors.append(major)\n\n        # Create students:\n        first_names = ['Alice', 'Bob', 'Carol', 'David', 'Eve', 'Frank', 'Grace', 'Henry']\n        last_names  = ['Smith', 'Jones', 'Brown', 'Davis', 'Wilson', 'Moore', 'Taylor']\n\n        with transaction.atomic():   # All-or-nothing \u2014 rollback if any insert fails\n            for i in range(n_students):\n                first = random.choice(first_names)\n                last  = random.choice(last_names)\n                Student.objects.get_or_create(\n                    email=f\"{first.lower()}.{last.lower()}{i}@uni.edu\",\n                    defaults={\n                        'first_name': first,\n                        'last_name':  last,\n                        'age':        random.randint(20, 30),\n                        'gpa':        round(random.uniform(2.5, 4.0), 2),\n                        'major':      random.choice(majors),\n                    }\n                )\n\n        count = Student.objects.count()\n        self.stdout.write(self.style.SUCCESS(f\"\u2713 Created {count} students\"))\n\n        # Print a warning:\n        if options['clear']:\n            self.stdout.write(self.style.WARNING(\"WARNING: Production data was cleared!\"))\n'''\n\n# Run it:\n# python manage.py seed_data                    # 20 students (default)\n# python manage.py seed_data --students 100     # 100 students\n# python manage.py seed_data --students 50 --clear  # Clear and reseed\n\n\n# ==============================================================================\n# LESSON 05 \u2014 TESTING (django.test.TestCase)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Django comes with a testing framework built on Python's unittest.\n# Tests run against a SEPARATE test database (created fresh for every test run).\n# The Client simulates HTTP requests \u2014 you can test views without a browser.\n#\n# TYPES OF TESTS:\n#   Unit tests    \u2192 test one function/method in isolation\n#   Integration   \u2192 test a view + model + database together\n#   API tests     \u2192 test REST endpoints\n#\n# RUN TESTS:\n#   python manage.py test              # All tests\n#   python manage.py test students     # Only students app\n#   python manage.py test students.tests.StudentModelTest  # One class\n\n# from django.test import TestCase, Client\n# from django.urls import reverse\n# from django.contrib.auth.models import User\n# from .models import Student, Major\n\n\n# class StudentModelTest(TestCase):\n#     \"\"\"Unit tests for the Student model.\"\"\"\n#\n#     @classmethod\n#     def setUpTestData(cls):\n#         \"\"\"Create test data ONCE for all tests in this class (faster).\"\"\"\n#         cls.major = Major.objects.create(name='Data Science', department='Engineering')\n#         cls.student = Student.objects.create(\n#             first_name='Alice', last_name='Test',\n#             email='alice@test.edu', age=22, gpa=3.8, major=cls.major\n#         )\n#\n#     def test_full_name(self):\n#         \"\"\"Student.get_full_name() returns 'First Last'.\"\"\"\n#         self.assertEqual(self.student.get_full_name(), 'Alice Test')\n#\n#     def test_status_good_standing(self):\n#         \"\"\"Students with GPA >= 3.0 are in good standing.\"\"\"\n#         self.assertEqual(self.student.status, 'Good Standing')\n#\n#     def test_status_probation(self):\n#         \"\"\"Students with GPA < 3.0 are on probation.\"\"\"\n#         low_gpa_student = Student(gpa=2.5)\n#         self.assertEqual(low_gpa_student.status, 'Probation')\n#\n#     def test_str_representation(self):\n#         \"\"\"Student __str__ includes email.\"\"\"\n#         self.assertIn('alice@test.edu', str(self.student))\n#\n#\n# class StudentViewTest(TestCase):\n#     \"\"\"Integration tests for Student views.\"\"\"\n#\n#     def setUp(self):\n#         \"\"\"Called before EACH test method. Create fresh state.\"\"\"\n#         self.client = Client()\n#         self.user = User.objects.create_user(username='testuser', password='testpass123')\n#         self.major = Major.objects.create(name='Data Science', department='Eng')\n#         self.student = Student.objects.create(\n#             first_name='Bob', last_name='View', email='bob@test.edu', age=23, gpa=3.5, major=self.major\n#         )\n#\n#     def test_list_view_requires_login(self):\n#         \"\"\"Unauthenticated users are redirected to login.\"\"\"\n#         response = self.client.get(reverse('students:list'))\n#         self.assertRedirects(response, '/login/?next=/students/')\n#\n#     def test_list_view_authenticated(self):\n#         \"\"\"Authenticated users see the student list.\"\"\"\n#         self.client.login(username='testuser', password='testpass123')\n#         response = self.client.get(reverse('students:list'))\n#         self.assertEqual(response.status_code, 200)\n#         self.assertContains(response, 'Bob View')\n#         self.assertTemplateUsed(response, 'students/student_list.html')\n#\n#     def test_create_student(self):\n#         \"\"\"POST to create view saves a new student.\"\"\"\n#         self.client.login(username='testuser', password='testpass123')\n#         data = {\n#             'first_name': 'Carol', 'last_name': 'New',\n#             'email': 'carol@test.edu', 'age': 24, 'gpa': 3.7,\n#             'major': self.major.pk, 'year': 1,\n#         }\n#         response = self.client.post(reverse('students:create'), data)\n#         self.assertEqual(response.status_code, 302)      # Redirected after save\n#         self.assertTrue(Student.objects.filter(email='carol@test.edu').exists())\n#\n#     def test_search_filters_results(self):\n#         \"\"\"?q= parameter filters the student list.\"\"\"\n#         self.client.login(username='testuser', password='testpass123')\n#         response = self.client.get(reverse('students:list') + '?q=Bob')\n#         self.assertContains(response, 'Bob View')\n#\n#\n# class StudentAPITest(TestCase):\n#     \"\"\"Test DRF API endpoints.\"\"\"\n#\n#     def setUp(self):\n#         self.client = Client()\n#         self.user = User.objects.create_user(username='api_user', password='pass')\n#         self.client.force_login(self.user)\n#         self.major = Major.objects.create(name='CS', department='Engineering')\n#         self.student = Student.objects.create(\n#             first_name='Eve', last_name='API', email='eve@test.edu', age=25, gpa=3.9, major=self.major\n#         )\n#\n#     def test_get_students_list(self):\n#         \"\"\"GET /api/students/ returns 200 with students.\"\"\"\n#         response = self.client.get('/api/students/')\n#         self.assertEqual(response.status_code, 200)\n#         data = response.json()\n#         self.assertIn('results', data)       # DRF paginates by default\n#\n#     def test_get_student_detail(self):\n#         \"\"\"GET /api/students/{id}/ returns one student.\"\"\"\n#         response = self.client.get(f'/api/students/{self.student.pk}/')\n#         self.assertEqual(response.status_code, 200)\n#         self.assertEqual(response.json()['email'], 'eve@test.edu')\n\n\n# ==============================================================================\n# LESSON 06 \u2014 FILE UPLOADS (ImageField, Profile Pictures, CSV Import)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# File uploads appear in every real app:\n#   - Profile pictures for students\n#   - Dataset CSV upload for batch import\n#   - Report PDFs for download\n#\n# Key settings: MEDIA_URL, MEDIA_ROOT (where uploaded files are stored)\n\nFILE_UPLOAD_SETTINGS = '''\n# settings.py\nimport os\n\nMEDIA_URL  = '/media/'                              # URL prefix for serving files\nMEDIA_ROOT = os.path.join(BASE_DIR, 'media')       # Physical storage location\n\n# Allow image uploads (needs Pillow):\n# pip install Pillow\n'''\n\nFILE_UPLOAD_MODEL = '''\n# students/models.py \u2014 add to Student model\nclass Student(models.Model):\n    # ... existing fields ...\n\n    profile_picture = models.ImageField(\n        upload_to='student_photos/%Y/%m/',  # Organizes by year/month\n        null=True,\n        blank=True\n    )\n    resume = models.FileField(\n        upload_to='resumes/',\n        null=True,\n        blank=True\n    )\n\n    def get_photo_url(self):\n        if self.profile_picture:\n            return self.profile_picture.url\n        return '/static/students/img/default-avatar.png'  # fallback\n'''\n\nFILE_UPLOAD_URLS = '''\n# university_portal/urls.py \u2014 serve media files in DEVELOPMENT only:\nfrom django.conf import settings\nfrom django.conf.urls.static import static\n\nurlpatterns = [\n    # ... your URL patterns ...\n] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)\n# NOTE: In production, serve media via Nginx or S3, NOT Django!\n'''\n\n# CSV Import view:\nCSV_IMPORT_VIEW = '''\nimport csv\nimport io\nfrom django.shortcuts import render, redirect\nfrom django.contrib import messages\n\ndef import_students_csv(request):\n    \"\"\"Accept a CSV upload and bulk-create students.\"\"\"\n    if request.method == 'POST' and request.FILES.get('csv_file'):\n        csv_file = request.FILES['csv_file']\n\n        # Validate file type:\n        if not csv_file.name.endswith('.csv'):\n            messages.error(request, 'Please upload a CSV file.')\n            return redirect('students:import')\n\n        # Read and parse:\n        decoded = csv_file.read().decode('utf-8')\n        reader = csv.DictReader(io.StringIO(decoded))\n\n        created = 0\n        errors  = []\n        for i, row in enumerate(reader):\n            try:\n                Student.objects.create(\n                    first_name = row['first_name'].strip(),\n                    last_name  = row['last_name'].strip(),\n                    email      = row['email'].strip(),\n                    age        = int(row['age']),\n                    gpa        = float(row['gpa']),\n                )\n                created += 1\n            except (KeyError, ValueError) as e:\n                errors.append(f\"Row {i+2}: {e}\")\n\n        if errors:\n            messages.warning(request, f\"Created {created} students. {len(errors)} errors: {errors[:3]}\")\n        else:\n            messages.success(request, f\"Successfully imported {created} students!\")\n\n        return redirect('students:list')\n\n    return render(request, 'students/import.html')\n'''\n\n\n# ==============================================================================\n# LESSON 07 \u2014 PRODUCTION SETTINGS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# settings.py has a HUGE security checklist for production.\n# Never run with DEBUG=True in production \u2014 it exposes stack traces!\n# Use environment variables for ALL secrets. Use django-environ for clean config.\n#\n# Install: pip install django-environ\n\nPRODUCTION_SETTINGS = '''\n# settings.py \u2014 production-ready configuration with django-environ\n\nimport environ\nfrom pathlib import Path\n\nBASE_DIR = Path(__file__).resolve().parent.parent\n\n# Initialize environ \u2014 reads .env file automatically\nenv = environ.Env(\n    DEBUG=(bool, False),      # Default to False in production\n    ALLOWED_HOSTS=(list, []),\n)\nenviron.Env.read_env(BASE_DIR / '.env')\n\n# Core settings:\nSECRET_KEY    = env('SECRET_KEY')                       # NEVER hardcode this!\nDEBUG         = env('DEBUG')                            # .env: DEBUG=False in prod\nALLOWED_HOSTS = env('ALLOWED_HOSTS')                    # .env: ALLOWED_HOSTS=mysite.com\n\n# Database \u2014 supports PostgreSQL, MySQL, SQLite via URL:\nDATABASES = {\n    'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3')\n}\n# .env: DATABASE_URL=postgresql://user:pass@localhost:5432/mydb\n\n# Static files (CSS, JS, images):\nSTATIC_URL  = '/static/'\nSTATIC_ROOT = BASE_DIR / 'staticfiles'  # Where collectstatic puts files for nginx/whitenoise\n\n# Media files (uploads):\nMEDIA_URL  = '/media/'\nMEDIA_ROOT = BASE_DIR / 'media'\n\n# Security settings (add these in production!):\nSECURE_SSL_REDIRECT          = env.bool('SECURE_SSL_REDIRECT', default=False)\nSECURE_HSTS_SECONDS          = 3600\nSECURE_HSTS_INCLUDE_SUBDOMAINS = True\nSESSION_COOKIE_SECURE        = True   # Only send cookies over HTTPS\nCSRF_COOKIE_SECURE           = True\nX_FRAME_OPTIONS              = 'DENY' # Prevent clickjacking\n\n# Email:\nEMAIL_BACKEND  = 'django.core.mail.backends.smtp.EmailBackend'\nEMAIL_HOST     = env('EMAIL_HOST', default='smtp.gmail.com')\nEMAIL_PORT     = 587\nEMAIL_USE_TLS  = True\nEMAIL_HOST_USER     = env('EMAIL_HOST_USER', default='')\nEMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')\n\n# Logging:\nLOGGING = {\n    'version': 1,\n    'disable_existing_loggers': False,\n    'handlers': {\n        'file': {\n            'class': 'logging.FileHandler',\n            'filename': BASE_DIR / 'logs/django.log',\n        },\n    },\n    'root': {\n        'handlers': ['file'],\n        'level': 'WARNING',\n    },\n}\n'''\n\nPRODUCTION_CHECKLIST = '''\n# python manage.py check --deploy\n# Django's built-in deployment checklist \u2014 run this before going live!\n#\n# Other production steps:\n# 1. pip install gunicorn whitenoise\n# 2. Add 'whitenoise.middleware.WhiteNoiseMiddleware' to MIDDLEWARE (serves static files)\n# 3. python manage.py collectstatic  (copies static files to STATIC_ROOT)\n# 4. gunicorn university_portal.wsgi:application  (start production server)\n# 5. Set up Nginx in front of Gunicorn\n# 6. Set up SSL certificate (Let's Encrypt \u2014 free)\n'''\n\n\n# ==============================================================================\n# \ud83c\udfaf YOUR TASKS\n# ==============================================================================\n\nprint(\"=\" * 60)\nprint(\"YOUR TURN \u2014 Django Advanced Practice\")\nprint(\"=\" * 60)\nprint(\"\"\"\nTASK 1 \u2014 CLASS-BASED VIEWS:\n    In your existing students project:\n    a) Convert your student_list FBV to a StudentListView(ListView) with paginate_by=5\n    b) Convert student_detail to StudentDetailView\n    c) Convert create_student to StudentCreateView\n    d) Test each URL \u2014 behavior should be identical to your FBV version\n    e) Add a search input to StudentListView by overriding get_queryset()\n       and filtering by ?q= parameter\n\nTASK 2 \u2014 PAGINATION:\n    a) Add paginate_by = 3 to your StudentListView (so you can test with few records)\n    b) Create a template that shows \"Page X of Y\" and Previous/Next links\n    c) Verify that URLs like ?page=2 work correctly\n    d) Make search + pagination work together (keep ?q= in pagination links)\n\nTASK 3 \u2014 CELERY:\n    a) Set up Redis: docker run -d -p 6379:6379 redis:7-alpine\n    b) Install: pip install celery redis\n    c) Create university_portal/celery.py from LESSON 02\n    d) Create students/tasks.py with a send_welcome_email task\n    e) Call .delay() on the task from StudentCreateView.form_valid()\n    f) Start worker: celery -A university_portal worker --loglevel=info\n    g) Create a new student \u2014 watch the worker log to see the task run!\n\nTASK 4 \u2014 SIGNALS:\n    a) Create students/signals.py with @receiver(post_save, sender=Student)\n    b) On 'created' \u2192 print a message (or call send_welcome_email.delay())\n    c) Register signals in students/apps.py ready() method\n    d) Create a student through the admin panel \u2014 verify signal fires\n\nTASK 5 \u2014 CUSTOM MANAGEMENT COMMAND:\n    a) Create students/management/commands/seed_data.py from LESSON 04\n    b) Add an --export argument: when passed, export all students to students.csv\n       HINT: python manage.py seed_data --export \u2192 writes CSV using Python's csv module\n    c) Run: python manage.py seed_data --students 30 --clear\n    d) Run: python manage.py seed_data --export\n    e) Verify the CSV contains all 30 students\n\nTASK 6 \u2014 TESTING:\n    a) Create students/tests.py with:\n       - One model test: verify Student.status returns 'Probation' for GPA < 3.0\n       - One view test: verify list view requires login\n       - One API test: verify GET /api/students/ returns 200\n    b) Run: python manage.py test students -v 2\n    c) Add a test that fails intentionally (assertFalse(True)) to see failure output\n    d) Fix it and run again \u2014 all green!\n\nTASK 7 \u2014 PRODUCTION SETTINGS:\n    a) Install django-environ: pip install django-environ\n    b) Create a .env file with: SECRET_KEY, DEBUG=False, DATABASE_URL\n    c) Update settings.py to use env() for all secrets\n    d) Run: python manage.py check --deploy\n    e) Fix any warnings it reports\n\nWrite your experience and lessons learned in a comment below:\n\"\"\")\n\nprint(\"django_advanced.py complete!\")\nprint(\"You now have the complete Django toolkit for building production ML platforms.\")\n";
+      const readerOutputKey = "readerRun:knowledge-base/zero-to-hero-guides/django/django_advanced.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code># ==============================================================================
+#  DJANGO — ADVANCED PATTERNS
+#  FILE: django_advanced.py
+#
+#  TASK: Master the patterns that real Django projects use in production:
+#        Class-Based Views, Celery async tasks, testing, production settings,
+#        signals, pagination, and file uploads.
+#
+#  WHY:  django_zero_to_hero.py gave you the foundation.
+#        But 90% of real Django codebases use Class-Based Views — not FBVs.
+#        And every ML platform uses Celery for async model training/inference jobs.
+#        This file bridges the gap from &quot;learning Django&quot; to &quot;shipping Django.&quot;
+#
+#  PREREQ: django_zero_to_hero.py (models, FBV views, forms, ORM, DRF basics)
+#
+#  HOW TO USE:
+#    This is a reference guide — each section is a standalone pattern.
+#    Read the TEACHER SAYS section, then implement the pattern in your own project.
+#    All code assumes the &#x27;students&#x27; app from the zero_to_hero file.
+# ==============================================================================
+
+
+# ==============================================================================
+# LESSON 01 — CLASS-BASED VIEWS (CBVs)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Function-Based Views (FBV) are explicit and easy to understand.
+# Class-Based Views (CBV) handle the BOILERPLATE automatically.
+# - ListView:     query + paginate + render a list template
+# - DetailView:   get one object by pk + render a detail template
+# - CreateView:   render form, validate, save, redirect
+# - UpdateView:   load existing object + form, validate, save, redirect
+# - DeleteView:   confirm + delete
+#
+# COMPARISON — the same &quot;create student&quot; in FBV vs CBV:
+#
+# FBV (20 lines):
+#   def create_student(request):
+#       if request.method == &#x27;POST&#x27;:
+#           form = StudentForm(request.POST)
+#           if form.is_valid():
+#               form.save()
+#               return redirect(&#x27;students:list&#x27;)
+#       else:
+#           form = StudentForm()
+#       return render(request, &#x27;students/form.html&#x27;, {&#x27;form&#x27;: form})
+#
+# CBV (5 lines):
+#   class StudentCreateView(LoginRequiredMixin, CreateView):
+#       model = Student
+#       fields = [&#x27;first_name&#x27;, &#x27;last_name&#x27;, &#x27;email&#x27;, &#x27;gpa&#x27;]
+#       success_url = reverse_lazy(&#x27;students:list&#x27;)
+#
+# The CBV does ALL of that FBV logic automatically. Less repetition = fewer bugs.
+
+from django.views.generic import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+)
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.urls import reverse_lazy
+# from .models import Student, Course, Enrollment
+
+
+# ---- ListView: show all students ----
+class StudentListView(LoginRequiredMixin, ListView):
+    # model = Student                        # Which model to query
+    template_name = &#x27;students/student_list.html&#x27;
+    context_object_name = &#x27;students&#x27;         # Name in template: {{ students }}
+    paginate_by = 20                         # Built-in pagination! 20 per page
+    ordering = [&#x27;-gpa&#x27;]                      # Default sort
+
+    def get_queryset(self):
+        &quot;&quot;&quot;Override to add filtering by search query.&quot;&quot;&quot;
+        # queryset = super().get_queryset().select_related(&#x27;major&#x27;)
+        # q = self.request.GET.get(&#x27;q&#x27;, &#x27;&#x27;)  # ?q=Alice
+        # if q:
+        #     queryset = queryset.filter(
+        #         first_name__icontains=q) | queryset.filter(last_name__icontains=q
+        #     )
+        # return queryset
+        return []  # Placeholder
+
+    def get_context_data(self, **kwargs):
+        &quot;&quot;&quot;Add extra data to the template context.&quot;&quot;&quot;
+        context = super().get_context_data(**kwargs)
+        # context[&#x27;search_query&#x27;] = self.request.GET.get(&#x27;q&#x27;, &#x27;&#x27;)
+        # context[&#x27;total_count&#x27;]  = Student.objects.count()
+        return context
+
+
+# ---- DetailView: one student ----
+class StudentDetailView(LoginRequiredMixin, DetailView):
+    # model = Student
+    template_name = &#x27;students/student_detail.html&#x27;
+    context_object_name = &#x27;student&#x27;
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # student = self.get_object()
+        # context[&#x27;courses&#x27;]       = student.courses.all()
+        # context[&#x27;avg_grade&#x27;]     = student.enrollment_set.aggregate(avg=Avg(&#x27;grade&#x27;))[&#x27;avg&#x27;]
+        # context[&#x27;can_edit&#x27;]      = self.request.user.is_staff
+        return context
+
+
+# ---- CreateView: new student form ----
+class StudentCreateView(LoginRequiredMixin, CreateView):
+    # model = Student
+    fields = [&#x27;first_name&#x27;, &#x27;last_name&#x27;, &#x27;email&#x27;, &#x27;age&#x27;, &#x27;gpa&#x27;, &#x27;major&#x27;, &#x27;year&#x27;]
+    template_name = &#x27;students/student_form.html&#x27;
+    success_url = reverse_lazy(&#x27;students:list&#x27;)  # Redirect after save
+
+    def form_valid(self, form):
+        &quot;&quot;&quot;Called when form is valid — good place to add extra logic.&quot;&quot;&quot;
+        response = super().form_valid(form)
+        # Send welcome email, log activity, etc.
+        # send_welcome_email.delay(self.object.email)   ← Celery task (see Lesson 02)
+        return response
+
+
+# ---- UpdateView: edit existing student ----
+class StudentUpdateView(LoginRequiredMixin, UpdateView):
+    # model = Student
+    fields = [&#x27;first_name&#x27;, &#x27;last_name&#x27;, &#x27;email&#x27;, &#x27;gpa&#x27;, &#x27;major&#x27;, &#x27;year&#x27;]
+    template_name = &#x27;students/student_form.html&#x27;
+
+    def get_success_url(self):
+        return reverse_lazy(&#x27;students:detail&#x27;, kwargs={&#x27;pk&#x27;: self.object.pk})
+
+    def get_object(self, queryset=None):
+        &quot;&quot;&quot;Can override to add custom permission check.&quot;&quot;&quot;
+        obj = super().get_object(queryset)
+        # if obj.created_by != self.request.user and not self.request.user.is_staff:
+        #     raise PermissionDenied
+        return obj
+
+
+# ---- DeleteView: confirm + delete ----
+class StudentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    # model = Student
+    template_name = &#x27;students/student_confirm_delete.html&#x27;
+    success_url = reverse_lazy(&#x27;students:list&#x27;)
+
+    def test_func(self):
+        &quot;&quot;&quot;UserPassesTestMixin: only staff can delete.&quot;&quot;&quot;
+        return self.request.user.is_staff
+
+
+# ---- Wire up in urls.py ----
+URLS_CBV_EXAMPLE = &#x27;&#x27;&#x27;
+# students/urls.py
+from django.urls import path
+from .views import StudentListView, StudentDetailView, StudentCreateView, StudentUpdateView, StudentDeleteView
+
+app_name = &#x27;students&#x27;
+
+urlpatterns = [
+    path(&#x27;&#x27;,                   StudentListView.as_view(),   name=&#x27;list&#x27;),
+    path(&#x27;&lt;int:pk&gt;/&#x27;,          StudentDetailView.as_view(), name=&#x27;detail&#x27;),
+    path(&#x27;new/&#x27;,               StudentCreateView.as_view(), name=&#x27;create&#x27;),
+    path(&#x27;&lt;int:pk&gt;/edit/&#x27;,     StudentUpdateView.as_view(), name=&#x27;update&#x27;),
+    path(&#x27;&lt;int:pk&gt;/delete/&#x27;,   StudentDeleteView.as_view(), name=&#x27;delete&#x27;),
+]
+&#x27;&#x27;&#x27;
+
+# ---- Template for ListView with pagination ----
+STUDENT_LIST_TEMPLATE = &#x27;&#x27;&#x27;
+&lt;!-- students/templates/students/student_list.html --&gt;
+{% extends &quot;students/base.html&quot; %}
+
+{% block content %}
+&lt;div class=&quot;d-flex justify-content-between align-items-center mb-3&quot;&gt;
+    &lt;h2&gt;Students ({{ paginator.count }} total)&lt;/h2&gt;
+    &lt;a href=&quot;{% url &#x27;students:create&#x27; %}&quot; class=&quot;btn btn-primary&quot;&gt;+ Add Student&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;!-- Search form --&gt;
+&lt;form method=&quot;get&quot; class=&quot;mb-3&quot;&gt;
+    &lt;input type=&quot;text&quot; name=&quot;q&quot; value=&quot;{{ search_query }}&quot; class=&quot;form-control&quot; placeholder=&quot;Search students...&quot;&gt;
+&lt;/form&gt;
+
+&lt;table class=&quot;table table-hover&quot;&gt;
+    &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Major&lt;/th&gt;&lt;th&gt;GPA&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+    &lt;tbody&gt;
+    {% for student in students %}
+        &lt;tr&gt;
+            &lt;td&gt;&lt;a href=&quot;{% url &#x27;students:detail&#x27; student.pk %}&quot;&gt;{{ student.get_full_name }}&lt;/a&gt;&lt;/td&gt;
+            &lt;td&gt;{{ student.major|default:&quot;–&quot; }}&lt;/td&gt;
+            &lt;td&gt;{{ student.gpa }}&lt;/td&gt;
+            &lt;td&gt;{{ student.status }}&lt;/td&gt;
+            &lt;td&gt;
+                &lt;a href=&quot;{% url &#x27;students:update&#x27; student.pk %}&quot;&gt;Edit&lt;/a&gt;
+                {% if user.is_staff %}
+                    | &lt;a href=&quot;{% url &#x27;students:delete&#x27; student.pk %}&quot; class=&quot;text-danger&quot;&gt;Delete&lt;/a&gt;
+                {% endif %}
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    {% empty %}
+        &lt;tr&gt;&lt;td colspan=&quot;5&quot; class=&quot;text-center&quot;&gt;No students found.&lt;/td&gt;&lt;/tr&gt;
+    {% endfor %}
+    &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;!-- Pagination controls — built in! page_obj comes from ListView automatically --&gt;
+{% if page_obj.has_other_pages %}
+&lt;nav&gt;
+    &lt;ul class=&quot;pagination&quot;&gt;
+        {% if page_obj.has_previous %}
+            &lt;li class=&quot;page-item&quot;&gt;
+                &lt;a class=&quot;page-link&quot; href=&quot;?page={{ page_obj.previous_page_number }}{% if search_query %}&amp;q={{ search_query }}{% endif %}&quot;&gt;Previous&lt;/a&gt;
+            &lt;/li&gt;
+        {% endif %}
+        &lt;li class=&quot;page-item active&quot;&gt;
+            &lt;span class=&quot;page-link&quot;&gt;Page {{ page_obj.number }} of {{ paginator.num_pages }}&lt;/span&gt;
+        &lt;/li&gt;
+        {% if page_obj.has_next %}
+            &lt;li class=&quot;page-item&quot;&gt;
+                &lt;a class=&quot;page-link&quot; href=&quot;?page={{ page_obj.next_page_number }}{% if search_query %}&amp;q={{ search_query }}{% endif %}&quot;&gt;Next&lt;/a&gt;
+            &lt;/li&gt;
+        {% endif %}
+    &lt;/ul&gt;
+&lt;/nav&gt;
+{% endif %}
+{% endblock %}
+&#x27;&#x27;&#x27;
+
+
+# ==============================================================================
+# LESSON 02 — CELERY (Async Tasks — Critical for ML Job Queuing)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Scenario: User uploads a CSV, you need to train a model on it.
+# If you train SYNCHRONOUSLY in the view: the HTTP request hangs for 10 minutes.
+# The browser times out. The user is furious.
+#
+# Celery solves this:
+# 1. Request comes in → view immediately returns &quot;your job is queued!&quot;
+# 2. A CELERY WORKER (separate process) picks up the job
+# 3. Worker trains the model in the background
+# 4. When done: saves result, sends email, updates status
+#
+# COMPONENTS:
+#   Celery worker  → the process that executes tasks (run separately from Django)
+#   Broker         → message queue: tasks go IN here (Redis is most common)
+#   Backend        → stores results (Redis or database)
+#
+# INSTALL:
+#   pip install celery redis
+#   pip install django-celery-results   (optional — store results in Django DB)
+
+# ---- Setup in university_portal/celery.py ----
+CELERY_CONFIG = &#x27;&#x27;&#x27;
+# university_portal/celery.py
+import os
+from celery import Celery
+
+os.environ.setdefault(&#x27;DJANGO_SETTINGS_MODULE&#x27;, &#x27;university_portal.settings&#x27;)
+
+app = Celery(&#x27;university_portal&#x27;)
+app.config_from_object(&#x27;django.conf:settings&#x27;, namespace=&#x27;CELERY&#x27;)
+app.autodiscover_tasks()    # Auto-discovers tasks in every installed app
+&#x27;&#x27;&#x27;
+
+# ---- Add to university_portal/__init__.py ----
+CELERY_INIT = &#x27;&#x27;&#x27;
+# university_portal/__init__.py
+from .celery import app as celery_app
+__all__ = (&#x27;celery_app&#x27;,)
+&#x27;&#x27;&#x27;
+
+# ---- Settings additions ----
+CELERY_SETTINGS = &#x27;&#x27;&#x27;
+# settings.py additions:
+CELERY_BROKER_URL = &#x27;redis://localhost:6379/0&#x27;   # Redis as message broker
+CELERY_RESULT_BACKEND = &#x27;redis://localhost:6379/0&#x27;
+CELERY_ACCEPT_CONTENT = [&#x27;json&#x27;]
+CELERY_TASK_SERIALIZER = &#x27;json&#x27;
+CELERY_RESULT_SERIALIZER = &#x27;json&#x27;
+CELERY_TIMEZONE = &#x27;UTC&#x27;
+
+# Optional: store results in Django DB
+INSTALLED_APPS += [&#x27;django_celery_results&#x27;]
+CELERY_RESULT_BACKEND = &#x27;django-db&#x27;
+&#x27;&#x27;&#x27;
+
+# ---- Create tasks in students/tasks.py ----
+# import time
+# from celery import shared_task
+# from django.core.mail import send_mail
+
+
+# @shared_task(bind=True, max_retries=3)
+# def train_model_task(self, student_id: int, dataset_path: str):
+#     &quot;&quot;&quot;Long-running ML training job — runs in background worker.&quot;&quot;&quot;
+#     try:
+#         # student = Student.objects.get(pk=student_id)
+#
+#         # Simulate model training (real: call your train.py)
+#         time.sleep(10)
+#
+#         # Save results
+#         # student.model_accuracy = 0.847
+#         # student.save()
+#
+#         return {&#x27;status&#x27;: &#x27;success&#x27;, &#x27;accuracy&#x27;: 0.847}
+#
+#     except Exception as exc:
+#         # Retry up to 3 times with 60s delay on failure:
+#         raise self.retry(exc=exc, countdown=60)
+
+
+# @shared_task
+# def send_welcome_email(student_email: str):
+#     &quot;&quot;&quot;Send async email — doesn&#x27;t block the HTTP response.&quot;&quot;&quot;
+#     send_mail(
+#         subject=&#x27;Welcome to University Portal&#x27;,
+#         message=&#x27;Your account is ready!&#x27;,
+#         from_email=&#x27;no-reply@university.edu&#x27;,
+#         recipient_list=[student_email],
+#     )
+
+
+# @shared_task
+# def generate_monthly_report():
+#     &quot;&quot;&quot;Scheduled task — run every month (configured in settings).&quot;&quot;&quot;
+#     # students = Student.objects.filter(is_active=True)
+#     # ... generate report, save to file, email to admin
+#     pass
+
+
+# ---- Using tasks in views ----
+TASKS_IN_VIEWS = &#x27;&#x27;&#x27;
+# In any view or CBV:
+from students.tasks import train_model_task, send_welcome_email
+
+# Kick off async task — returns IMMEDIATELY:
+def upload_dataset(request):
+    # ... save uploaded file ...
+    job = train_model_task.delay(student_id=1, dataset_path=&#x27;/data/upload.csv&#x27;)
+    return JsonResponse({
+        &#x27;status&#x27;: &#x27;queued&#x27;,
+        &#x27;job_id&#x27;: job.id,   # Use this to check progress
+    })
+
+# Check task status:
+def job_status(request, job_id):
+    from celery.result import AsyncResult
+    result = AsyncResult(job_id)
+    return JsonResponse({
+        &#x27;state&#x27;:  result.state,      # PENDING, STARTED, SUCCESS, FAILURE
+        &#x27;result&#x27;: result.result if result.successful() else None,
+    })
+&#x27;&#x27;&#x27;
+
+# ---- Running Celery ----
+CELERY_RUN_COMMANDS = &#x27;&#x27;&#x27;
+# Terminal 1: Start Redis (via Docker):
+docker run -d -p 6379:6379 redis:7-alpine
+
+# Terminal 2: Start Django server:
+python manage.py runserver
+
+# Terminal 3: Start Celery worker:
+celery -A university_portal worker --loglevel=info
+
+# Terminal 4 (optional): Celery flower — web UI to monitor tasks:
+pip install flower
+celery -A university_portal flower
+# Open: http://localhost:5555
+
+# For scheduled tasks (like cron): start Celery beat:
+celery -A university_portal beat --loglevel=info
+&#x27;&#x27;&#x27;
+
+# ---- Scheduled tasks (Celery beat) ----
+BEAT_SCHEDULE = &#x27;&#x27;&#x27;
+# settings.py — schedule tasks like cron:
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    &#x27;monthly-report&#x27;: {
+        &#x27;task&#x27;: &#x27;students.tasks.generate_monthly_report&#x27;,
+        &#x27;schedule&#x27;: crontab(hour=2, minute=0, day_of_month=1),  # 1st of month at 2 AM
+    },
+    &#x27;daily-cleanup&#x27;: {
+        &#x27;task&#x27;: &#x27;students.tasks.cleanup_old_logs&#x27;,
+        &#x27;schedule&#x27;: crontab(hour=3, minute=30),  # Every day at 3:30 AM
+    },
+}
+&#x27;&#x27;&#x27;
+
+
+# ==============================================================================
+# LESSON 03 — SIGNALS (React to Model Events)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Signals let one part of your code react when something happens in another part.
+# Without signals: you&#x27;d have to call email-sending code from the view — coupling!
+# With signals: the email code LISTENS for &quot;new student created&quot; and runs itself.
+#
+# COMMON SIGNALS:
+#   post_save    → after a model is saved (created OR updated)
+#   pre_save     → before a model is saved
+#   post_delete  → after a model is deleted
+#   pre_delete   → before a model is deleted
+#   m2m_changed  → when a ManyToManyField is changed
+
+# from django.db.models.signals import post_save, post_delete
+# from django.dispatch import receiver
+# from .models import Student, Enrollment
+# from .tasks import send_welcome_email
+
+
+# @receiver(post_save, sender=Student)
+# def on_student_created(sender, instance, created, **kwargs):
+#     &quot;&quot;&quot;Runs after EVERY Student save. &#x27;created&#x27; = True only on first save.&quot;&quot;&quot;
+#     if created:
+#         # New student — send welcome email asynchronously:
+#         send_welcome_email.delay(instance.email)
+#         print(f&quot;[SIGNAL] New student created: {instance.get_full_name()}&quot;)
+#     else:
+#         # Updated — log the change:
+#         print(f&quot;[SIGNAL] Student updated: {instance.get_full_name()}&quot;)
+
+
+# @receiver(post_delete, sender=Student)
+# def on_student_deleted(sender, instance, **kwargs):
+#     &quot;&quot;&quot;Cleanup after student is deleted.&quot;&quot;&quot;
+#     print(f&quot;[SIGNAL] Student deleted: {instance.get_full_name()}&quot;)
+#     # Could: archive their data, revoke API tokens, etc.
+
+
+# @receiver(post_save, sender=Enrollment)
+# def on_enrollment_saved(sender, instance, created, **kwargs):
+#     &quot;&quot;&quot;Recalculate student GPA whenever an enrollment grade is saved.&quot;&quot;&quot;
+#     if not created and instance.grade is not None:
+#         student = instance.student
+#         # avg = student.enrollment_set.aggregate(avg=Avg(&#x27;grade&#x27;))[&#x27;avg&#x27;]
+#         # student.gpa = avg / 25  # Convert 100-scale to 4.0 scale
+#         # student.save()
+#         pass
+
+
+# Register signals by importing them in the app&#x27;s ready() method:
+SIGNALS_REGISTER = &#x27;&#x27;&#x27;
+# students/apps.py
+from django.apps import AppConfig
+
+class StudentsConfig(AppConfig):
+    name = &#x27;students&#x27;
+
+    def ready(self):
+        import students.signals   # This imports the file and registers all @receiver decorators
+&#x27;&#x27;&#x27;
+
+
+# ==============================================================================
+# LESSON 04 — CUSTOM MANAGEMENT COMMANDS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# python manage.py migrate, python manage.py createsuperuser
+# These are &quot;management commands&quot; — you can CREATE YOUR OWN.
+# Use them for: seeding data, running batch jobs, maintenance tasks, ETL.
+# They&#x27;re like cron scripts but with full access to Django ORM!
+
+# Create the folder structure:
+# students/management/commands/seed_data.py
+
+SEED_COMMAND_EXAMPLE = &#x27;&#x27;&#x27;
+# students/management/commands/seed_data.py
+from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
+from students.models import Student, Major, Course, Enrollment
+import random
+
+
+class Command(BaseCommand):
+    help = &quot;Seed the database with realistic fake data for development/testing&quot;
+
+    def add_arguments(self, parser):
+        &quot;&quot;&quot;Define command-line arguments: python manage.py seed_data --students 50&quot;&quot;&quot;
+        parser.add_argument(&#x27;--students&#x27;, type=int, default=20, help=&#x27;Number of students to create&#x27;)
+        parser.add_argument(&#x27;--clear&#x27;,    action=&#x27;store_true&#x27;,   help=&#x27;Clear all data before seeding&#x27;)
+
+    def handle(self, *args, **options):
+        n_students = options[&#x27;students&#x27;]
+
+        if options[&#x27;clear&#x27;]:
+            self.stdout.write(&quot;Clearing existing data...&quot;)
+            Enrollment.objects.all().delete()
+            Student.objects.all().delete()
+            Major.objects.all().delete()
+            Course.objects.all().delete()
+
+        self.stdout.write(&quot;Seeding data...&quot;)
+
+        # Create majors:
+        majors = []
+        for name in [&#x27;Data Science&#x27;, &#x27;Computer Science&#x27;, &#x27;Statistics&#x27;, &#x27;Mathematics&#x27;]:
+            major, _ = Major.objects.get_or_create(name=name, defaults={&#x27;department&#x27;: &#x27;Engineering&#x27;})
+            majors.append(major)
+
+        # Create students:
+        first_names = [&#x27;Alice&#x27;, &#x27;Bob&#x27;, &#x27;Carol&#x27;, &#x27;David&#x27;, &#x27;Eve&#x27;, &#x27;Frank&#x27;, &#x27;Grace&#x27;, &#x27;Henry&#x27;]
+        last_names  = [&#x27;Smith&#x27;, &#x27;Jones&#x27;, &#x27;Brown&#x27;, &#x27;Davis&#x27;, &#x27;Wilson&#x27;, &#x27;Moore&#x27;, &#x27;Taylor&#x27;]
+
+        with transaction.atomic():   # All-or-nothing — rollback if any insert fails
+            for i in range(n_students):
+                first = random.choice(first_names)
+                last  = random.choice(last_names)
+                Student.objects.get_or_create(
+                    email=f&quot;{first.lower()}.{last.lower()}{i}@uni.edu&quot;,
+                    defaults={
+                        &#x27;first_name&#x27;: first,
+                        &#x27;last_name&#x27;:  last,
+                        &#x27;age&#x27;:        random.randint(20, 30),
+                        &#x27;gpa&#x27;:        round(random.uniform(2.5, 4.0), 2),
+                        &#x27;major&#x27;:      random.choice(majors),
+                    }
+                )
+
+        count = Student.objects.count()
+        self.stdout.write(self.style.SUCCESS(f&quot;✓ Created {count} students&quot;))
+
+        # Print a warning:
+        if options[&#x27;clear&#x27;]:
+            self.stdout.write(self.style.WARNING(&quot;WARNING: Production data was cleared!&quot;))
+&#x27;&#x27;&#x27;
+
+# Run it:
+# python manage.py seed_data                    # 20 students (default)
+# python manage.py seed_data --students 100     # 100 students
+# python manage.py seed_data --students 50 --clear  # Clear and reseed
+
+
+# ==============================================================================
+# LESSON 05 — TESTING (django.test.TestCase)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Django comes with a testing framework built on Python&#x27;s unittest.
+# Tests run against a SEPARATE test database (created fresh for every test run).
+# The Client simulates HTTP requests — you can test views without a browser.
+#
+# TYPES OF TESTS:
+#   Unit tests    → test one function/method in isolation
+#   Integration   → test a view + model + database together
+#   API tests     → test REST endpoints
+#
+# RUN TESTS:
+#   python manage.py test              # All tests
+#   python manage.py test students     # Only students app
+#   python manage.py test students.tests.StudentModelTest  # One class
+
+# from django.test import TestCase, Client
+# from django.urls import reverse
+# from django.contrib.auth.models import User
+# from .models import Student, Major
+
+
+# class StudentModelTest(TestCase):
+#     &quot;&quot;&quot;Unit tests for the Student model.&quot;&quot;&quot;
+#
+#     @classmethod
+#     def setUpTestData(cls):
+#         &quot;&quot;&quot;Create test data ONCE for all tests in this class (faster).&quot;&quot;&quot;
+#         cls.major = Major.objects.create(name=&#x27;Data Science&#x27;, department=&#x27;Engineering&#x27;)
+#         cls.student = Student.objects.create(
+#             first_name=&#x27;Alice&#x27;, last_name=&#x27;Test&#x27;,
+#             email=&#x27;alice@test.edu&#x27;, age=22, gpa=3.8, major=cls.major
+#         )
+#
+#     def test_full_name(self):
+#         &quot;&quot;&quot;Student.get_full_name() returns &#x27;First Last&#x27;.&quot;&quot;&quot;
+#         self.assertEqual(self.student.get_full_name(), &#x27;Alice Test&#x27;)
+#
+#     def test_status_good_standing(self):
+#         &quot;&quot;&quot;Students with GPA &gt;= 3.0 are in good standing.&quot;&quot;&quot;
+#         self.assertEqual(self.student.status, &#x27;Good Standing&#x27;)
+#
+#     def test_status_probation(self):
+#         &quot;&quot;&quot;Students with GPA &lt; 3.0 are on probation.&quot;&quot;&quot;
+#         low_gpa_student = Student(gpa=2.5)
+#         self.assertEqual(low_gpa_student.status, &#x27;Probation&#x27;)
+#
+#     def test_str_representation(self):
+#         &quot;&quot;&quot;Student __str__ includes email.&quot;&quot;&quot;
+#         self.assertIn(&#x27;alice@test.edu&#x27;, str(self.student))
+#
+#
+# class StudentViewTest(TestCase):
+#     &quot;&quot;&quot;Integration tests for Student views.&quot;&quot;&quot;
+#
+#     def setUp(self):
+#         &quot;&quot;&quot;Called before EACH test method. Create fresh state.&quot;&quot;&quot;
+#         self.client = Client()
+#         self.user = User.objects.create_user(username=&#x27;testuser&#x27;, password=&#x27;testpass123&#x27;)
+#         self.major = Major.objects.create(name=&#x27;Data Science&#x27;, department=&#x27;Eng&#x27;)
+#         self.student = Student.objects.create(
+#             first_name=&#x27;Bob&#x27;, last_name=&#x27;View&#x27;, email=&#x27;bob@test.edu&#x27;, age=23, gpa=3.5, major=self.major
+#         )
+#
+#     def test_list_view_requires_login(self):
+#         &quot;&quot;&quot;Unauthenticated users are redirected to login.&quot;&quot;&quot;
+#         response = self.client.get(reverse(&#x27;students:list&#x27;))
+#         self.assertRedirects(response, &#x27;/login/?next=/students/&#x27;)
+#
+#     def test_list_view_authenticated(self):
+#         &quot;&quot;&quot;Authenticated users see the student list.&quot;&quot;&quot;
+#         self.client.login(username=&#x27;testuser&#x27;, password=&#x27;testpass123&#x27;)
+#         response = self.client.get(reverse(&#x27;students:list&#x27;))
+#         self.assertEqual(response.status_code, 200)
+#         self.assertContains(response, &#x27;Bob View&#x27;)
+#         self.assertTemplateUsed(response, &#x27;students/student_list.html&#x27;)
+#
+#     def test_create_student(self):
+#         &quot;&quot;&quot;POST to create view saves a new student.&quot;&quot;&quot;
+#         self.client.login(username=&#x27;testuser&#x27;, password=&#x27;testpass123&#x27;)
+#         data = {
+#             &#x27;first_name&#x27;: &#x27;Carol&#x27;, &#x27;last_name&#x27;: &#x27;New&#x27;,
+#             &#x27;email&#x27;: &#x27;carol@test.edu&#x27;, &#x27;age&#x27;: 24, &#x27;gpa&#x27;: 3.7,
+#             &#x27;major&#x27;: self.major.pk, &#x27;year&#x27;: 1,
+#         }
+#         response = self.client.post(reverse(&#x27;students:create&#x27;), data)
+#         self.assertEqual(response.status_code, 302)      # Redirected after save
+#         self.assertTrue(Student.objects.filter(email=&#x27;carol@test.edu&#x27;).exists())
+#
+#     def test_search_filters_results(self):
+#         &quot;&quot;&quot;?q= parameter filters the student list.&quot;&quot;&quot;
+#         self.client.login(username=&#x27;testuser&#x27;, password=&#x27;testpass123&#x27;)
+#         response = self.client.get(reverse(&#x27;students:list&#x27;) + &#x27;?q=Bob&#x27;)
+#         self.assertContains(response, &#x27;Bob View&#x27;)
+#
+#
+# class StudentAPITest(TestCase):
+#     &quot;&quot;&quot;Test DRF API endpoints.&quot;&quot;&quot;
+#
+#     def setUp(self):
+#         self.client = Client()
+#         self.user = User.objects.create_user(username=&#x27;api_user&#x27;, password=&#x27;pass&#x27;)
+#         self.client.force_login(self.user)
+#         self.major = Major.objects.create(name=&#x27;CS&#x27;, department=&#x27;Engineering&#x27;)
+#         self.student = Student.objects.create(
+#             first_name=&#x27;Eve&#x27;, last_name=&#x27;API&#x27;, email=&#x27;eve@test.edu&#x27;, age=25, gpa=3.9, major=self.major
+#         )
+#
+#     def test_get_students_list(self):
+#         &quot;&quot;&quot;GET /api/students/ returns 200 with students.&quot;&quot;&quot;
+#         response = self.client.get(&#x27;/api/students/&#x27;)
+#         self.assertEqual(response.status_code, 200)
+#         data = response.json()
+#         self.assertIn(&#x27;results&#x27;, data)       # DRF paginates by default
+#
+#     def test_get_student_detail(self):
+#         &quot;&quot;&quot;GET /api/students/{id}/ returns one student.&quot;&quot;&quot;
+#         response = self.client.get(f&#x27;/api/students/{self.student.pk}/&#x27;)
+#         self.assertEqual(response.status_code, 200)
+#         self.assertEqual(response.json()[&#x27;email&#x27;], &#x27;eve@test.edu&#x27;)
+
+
+# ==============================================================================
+# LESSON 06 — FILE UPLOADS (ImageField, Profile Pictures, CSV Import)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# File uploads appear in every real app:
+#   - Profile pictures for students
+#   - Dataset CSV upload for batch import
+#   - Report PDFs for download
+#
+# Key settings: MEDIA_URL, MEDIA_ROOT (where uploaded files are stored)
+
+FILE_UPLOAD_SETTINGS = &#x27;&#x27;&#x27;
+# settings.py
+import os
+
+MEDIA_URL  = &#x27;/media/&#x27;                              # URL prefix for serving files
+MEDIA_ROOT = os.path.join(BASE_DIR, &#x27;media&#x27;)       # Physical storage location
+
+# Allow image uploads (needs Pillow):
+# pip install Pillow
+&#x27;&#x27;&#x27;
+
+FILE_UPLOAD_MODEL = &#x27;&#x27;&#x27;
+# students/models.py — add to Student model
+class Student(models.Model):
+    # ... existing fields ...
+
+    profile_picture = models.ImageField(
+        upload_to=&#x27;student_photos/%Y/%m/&#x27;,  # Organizes by year/month
+        null=True,
+        blank=True
+    )
+    resume = models.FileField(
+        upload_to=&#x27;resumes/&#x27;,
+        null=True,
+        blank=True
+    )
+
+    def get_photo_url(self):
+        if self.profile_picture:
+            return self.profile_picture.url
+        return &#x27;/static/students/img/default-avatar.png&#x27;  # fallback
+&#x27;&#x27;&#x27;
+
+FILE_UPLOAD_URLS = &#x27;&#x27;&#x27;
+# university_portal/urls.py — serve media files in DEVELOPMENT only:
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    # ... your URL patterns ...
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# NOTE: In production, serve media via Nginx or S3, NOT Django!
+&#x27;&#x27;&#x27;
+
+# CSV Import view:
+CSV_IMPORT_VIEW = &#x27;&#x27;&#x27;
+import csv
+import io
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
+def import_students_csv(request):
+    &quot;&quot;&quot;Accept a CSV upload and bulk-create students.&quot;&quot;&quot;
+    if request.method == &#x27;POST&#x27; and request.FILES.get(&#x27;csv_file&#x27;):
+        csv_file = request.FILES[&#x27;csv_file&#x27;]
+
+        # Validate file type:
+        if not csv_file.name.endswith(&#x27;.csv&#x27;):
+            messages.error(request, &#x27;Please upload a CSV file.&#x27;)
+            return redirect(&#x27;students:import&#x27;)
+
+        # Read and parse:
+        decoded = csv_file.read().decode(&#x27;utf-8&#x27;)
+        reader = csv.DictReader(io.StringIO(decoded))
+
+        created = 0
+        errors  = []
+        for i, row in enumerate(reader):
+            try:
+                Student.objects.create(
+                    first_name = row[&#x27;first_name&#x27;].strip(),
+                    last_name  = row[&#x27;last_name&#x27;].strip(),
+                    email      = row[&#x27;email&#x27;].strip(),
+                    age        = int(row[&#x27;age&#x27;]),
+                    gpa        = float(row[&#x27;gpa&#x27;]),
+                )
+                created += 1
+            except (KeyError, ValueError) as e:
+                errors.append(f&quot;Row {i+2}: {e}&quot;)
+
+        if errors:
+            messages.warning(request, f&quot;Created {created} students. {len(errors)} errors: {errors[:3]}&quot;)
+        else:
+            messages.success(request, f&quot;Successfully imported {created} students!&quot;)
+
+        return redirect(&#x27;students:list&#x27;)
+
+    return render(request, &#x27;students/import.html&#x27;)
+&#x27;&#x27;&#x27;
+
+
+# ==============================================================================
+# LESSON 07 — PRODUCTION SETTINGS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# settings.py has a HUGE security checklist for production.
+# Never run with DEBUG=True in production — it exposes stack traces!
+# Use environment variables for ALL secrets. Use django-environ for clean config.
+#
+# Install: pip install django-environ
+
+PRODUCTION_SETTINGS = &#x27;&#x27;&#x27;
+# settings.py — production-ready configuration with django-environ
+
+import environ
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Initialize environ — reads .env file automatically
+env = environ.Env(
+    DEBUG=(bool, False),      # Default to False in production
+    ALLOWED_HOSTS=(list, []),
+)
+environ.Env.read_env(BASE_DIR / &#x27;.env&#x27;)
+
+# Core settings:
+SECRET_KEY    = env(&#x27;SECRET_KEY&#x27;)                       # NEVER hardcode this!
+DEBUG         = env(&#x27;DEBUG&#x27;)                            # .env: DEBUG=False in prod
+ALLOWED_HOSTS = env(&#x27;ALLOWED_HOSTS&#x27;)                    # .env: ALLOWED_HOSTS=mysite.com
+
+# Database — supports PostgreSQL, MySQL, SQLite via URL:
+DATABASES = {
+    &#x27;default&#x27;: env.db(&#x27;DATABASE_URL&#x27;, default=f&#x27;sqlite:///{BASE_DIR}/db.sqlite3&#x27;)
+}
+# .env: DATABASE_URL=postgresql://user:pass@localhost:5432/mydb
+
+# Static files (CSS, JS, images):
+STATIC_URL  = &#x27;/static/&#x27;
+STATIC_ROOT = BASE_DIR / &#x27;staticfiles&#x27;  # Where collectstatic puts files for nginx/whitenoise
+
+# Media files (uploads):
+MEDIA_URL  = &#x27;/media/&#x27;
+MEDIA_ROOT = BASE_DIR / &#x27;media&#x27;
+
+# Security settings (add these in production!):
+SECURE_SSL_REDIRECT          = env.bool(&#x27;SECURE_SSL_REDIRECT&#x27;, default=False)
+SECURE_HSTS_SECONDS          = 3600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SESSION_COOKIE_SECURE        = True   # Only send cookies over HTTPS
+CSRF_COOKIE_SECURE           = True
+X_FRAME_OPTIONS              = &#x27;DENY&#x27; # Prevent clickjacking
+
+# Email:
+EMAIL_BACKEND  = &#x27;django.core.mail.backends.smtp.EmailBackend&#x27;
+EMAIL_HOST     = env(&#x27;EMAIL_HOST&#x27;, default=&#x27;smtp.gmail.com&#x27;)
+EMAIL_PORT     = 587
+EMAIL_USE_TLS  = True
+EMAIL_HOST_USER     = env(&#x27;EMAIL_HOST_USER&#x27;, default=&#x27;&#x27;)
+EMAIL_HOST_PASSWORD = env(&#x27;EMAIL_HOST_PASSWORD&#x27;, default=&#x27;&#x27;)
+
+# Logging:
+LOGGING = {
+    &#x27;version&#x27;: 1,
+    &#x27;disable_existing_loggers&#x27;: False,
+    &#x27;handlers&#x27;: {
+        &#x27;file&#x27;: {
+            &#x27;class&#x27;: &#x27;logging.FileHandler&#x27;,
+            &#x27;filename&#x27;: BASE_DIR / &#x27;logs/django.log&#x27;,
+        },
+    },
+    &#x27;root&#x27;: {
+        &#x27;handlers&#x27;: [&#x27;file&#x27;],
+        &#x27;level&#x27;: &#x27;WARNING&#x27;,
+    },
+}
+&#x27;&#x27;&#x27;
+
+PRODUCTION_CHECKLIST = &#x27;&#x27;&#x27;
+# python manage.py check --deploy
+# Django&#x27;s built-in deployment checklist — run this before going live!
+#
+# Other production steps:
+# 1. pip install gunicorn whitenoise
+# 2. Add &#x27;whitenoise.middleware.WhiteNoiseMiddleware&#x27; to MIDDLEWARE (serves static files)
+# 3. python manage.py collectstatic  (copies static files to STATIC_ROOT)
+# 4. gunicorn university_portal.wsgi:application  (start production server)
+# 5. Set up Nginx in front of Gunicorn
+# 6. Set up SSL certificate (Let&#x27;s Encrypt — free)
+&#x27;&#x27;&#x27;
+
+
+# ==============================================================================
+# 🎯 YOUR TASKS
+# ==============================================================================
+
+print(&quot;=&quot; * 60)
+print(&quot;YOUR TURN — Django Advanced Practice&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;&quot;&quot;
+TASK 1 — CLASS-BASED VIEWS:
+    In your existing students project:
+    a) Convert your student_list FBV to a StudentListView(ListView) with paginate_by=5
+    b) Convert student_detail to StudentDetailView
+    c) Convert create_student to StudentCreateView
+    d) Test each URL — behavior should be identical to your FBV version
+    e) Add a search input to StudentListView by overriding get_queryset()
+       and filtering by ?q= parameter
+
+TASK 2 — PAGINATION:
+    a) Add paginate_by = 3 to your StudentListView (so you can test with few records)
+    b) Create a template that shows &quot;Page X of Y&quot; and Previous/Next links
+    c) Verify that URLs like ?page=2 work correctly
+    d) Make search + pagination work together (keep ?q= in pagination links)
+
+TASK 3 — CELERY:
+    a) Set up Redis: docker run -d -p 6379:6379 redis:7-alpine
+    b) Install: pip install celery redis
+    c) Create university_portal/celery.py from LESSON 02
+    d) Create students/tasks.py with a send_welcome_email task
+    e) Call .delay() on the task from StudentCreateView.form_valid()
+    f) Start worker: celery -A university_portal worker --loglevel=info
+    g) Create a new student — watch the worker log to see the task run!
+
+TASK 4 — SIGNALS:
+    a) Create students/signals.py with @receiver(post_save, sender=Student)
+    b) On &#x27;created&#x27; → print a message (or call send_welcome_email.delay())
+    c) Register signals in students/apps.py ready() method
+    d) Create a student through the admin panel — verify signal fires
+
+TASK 5 — CUSTOM MANAGEMENT COMMAND:
+    a) Create students/management/commands/seed_data.py from LESSON 04
+    b) Add an --export argument: when passed, export all students to students.csv
+       HINT: python manage.py seed_data --export → writes CSV using Python&#x27;s csv module
+    c) Run: python manage.py seed_data --students 30 --clear
+    d) Run: python manage.py seed_data --export
+    e) Verify the CSV contains all 30 students
+
+TASK 6 — TESTING:
+    a) Create students/tests.py with:
+       - One model test: verify Student.status returns &#x27;Probation&#x27; for GPA &lt; 3.0
+       - One view test: verify list view requires login
+       - One API test: verify GET /api/students/ returns 200
+    b) Run: python manage.py test students -v 2
+    c) Add a test that fails intentionally (assertFalse(True)) to see failure output
+    d) Fix it and run again — all green!
+
+TASK 7 — PRODUCTION SETTINGS:
+    a) Install django-environ: pip install django-environ
+    b) Create a .env file with: SECRET_KEY, DEBUG=False, DATABASE_URL
+    c) Update settings.py to use env() for all secrets
+    d) Run: python manage.py check --deploy
+    e) Fix any warnings it reports
+
+Write your experience and lessons learned in a comment below:
+&quot;&quot;&quot;)
+
+print(&quot;django_advanced.py complete!&quot;)
+print(&quot;You now have the complete Django toolkit for building production ML platforms.&quot;)
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

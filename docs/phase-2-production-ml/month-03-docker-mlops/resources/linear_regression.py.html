@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Linear Regression.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Linear Regression.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">phase-2-production-ml/month-03-docker-mlops/resources/linear_regression.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "# ==============================================================\n# WEEK 10: Linear Regression \u2014 Predict Numbers\n# FILE: linear_regression.py\n#\n# TASK: Train a model to predict house prices using\n#       Linear Regression. Evaluate how accurate it is.\n#\n# WHY:  Linear Regression is the \"Hello World\" of Machine Learning.\n#       It finds a straight line that best fits your data, then\n#       uses that line to predict new values.\n#       Example: Given square footage, predict house price.\n#\n# THE CORE IDEA:\n#   y = m*x + b\n#   where: y = what we want to predict (house price)\n#          x = input features (rooms, size, age...)\n#          m = \"weight\" \u2014 how much each feature matters\n#          b = \"bias\" \u2014 a baseline offset\n#   The model LEARNS the best values for m and b from your data.\n#\n# INSTALL: pip install scikit-learn pandas numpy matplotlib\n#\n# HOW TO RUN: python linear_regression.py\n# ==============================================================\n\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nfrom sklearn.datasets import fetch_california_housing   # Free dataset\nfrom sklearn.model_selection import train_test_split    # Split data\nfrom sklearn.linear_model import LinearRegression       # The model\nfrom sklearn.metrics import mean_squared_error, r2_score  # Evaluation\nfrom sklearn.preprocessing import StandardScaler         # Normalize features\nimport joblib                                           # Save/load models\n\nprint(\"=\" * 60)\nprint(\"WEEK 10: Linear Regression \u2014 Predicting House Prices\")\nprint(\"=\" * 60)\n\n\n# ==============================================================\n# PART 1: Load the Dataset\n# ==============================================================\n\nprint(\"\\n--- PART 1: Loading the California Housing Dataset ---\")\n\n# This dataset is built into scikit-learn \u2014 no download needed!\n# It contains information about 20,000+ California housing blocks\nhousing = fetch_california_housing()\n\n# Put it into a DataFrame so it's easy to work with\ndf = pd.DataFrame(housing.data, columns=housing.feature_names)\ndf[\"price\"] = housing.target   # The price is our TARGET (what we want to predict)\n\n# Prices are in units of $100,000 (so 1.5 = $150,000)\nprint(f\"Dataset shape: {df.shape}\")\nprint(f\"\\nFirst 5 rows:\")\nprint(df.head())\n\nprint(f\"\\nColumn descriptions:\")\nfor name, desc in zip(housing.feature_names, housing.DESCR.split('\\n')[10:18]):\n    print(f\"  {name}: {desc.strip()}\")\n\n\n# ==============================================================\n# PART 2: Exploratory Data Analysis (EDA)\n# ==============================================================\n\nprint(\"\\n--- PART 2: Exploring the Data ---\")\n\nprint(\"Statistical summary:\")\nprint(df.describe())\n\nprint(f\"\\nAverage house price: ${df['price'].mean() * 100000:.0f}\")\nprint(f\"Most expensive: ${df['price'].max() * 100000:.0f}\")\nprint(f\"Cheapest: ${df['price'].min() * 100000:.0f}\")\n\n\n# ==============================================================\n# PART 3: Train/Test Split \u2014 The Most Important Concept in ML!\n# ==============================================================\n\nprint(\"\\n--- PART 3: Train/Test Split ---\")\n\n# WHY we split data:\n# If we test our model on the SAME data it learned from,\n# it's like a student memorizing the exam answers \u2014 not real learning!\n# We hold out 20% of data to test how well the model generalizes\n# to data it has NEVER seen before.\n\n# X = features (the inputs)   \u2014 everything EXCEPT the price\n# y = target (what we predict) \u2014 just the price column\n\nX = df.drop(\"price\", axis=1)   # All columns except 'price'\ny = df[\"price\"]                # Just the 'price' column\n\n# Split: 80% for training, 20% for testing\n# random_state=42 ensures the same split every time you run the code\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.2, random_state=42\n)\n\nprint(f\"Training set size: {X_train.shape[0]} rows (80%)\")\nprint(f\"Testing set size:  {X_test.shape[0]} rows (20%)\")\n\n# HINT: The model ONLY sees X_train and y_train during training\n# We test on X_test and compare predictions to y_test\n\n\n# ==============================================================\n# PART 4: Feature Scaling (Normalization)\n# ==============================================================\n\nprint(\"\\n--- PART 4: Feature Scaling ---\")\n\n# Linear Regression works better when all features are on similar scales\n# Problem: \"MedInc\" (income) ranges 0-15, \"AveRooms\" ranges 0-100\n# The model unfairly gives more weight to larger numbers\n# StandardScaler makes everything have: mean = 0, std = 1\n\nscaler = StandardScaler()\nX_train_scaled = scaler.fit_transform(X_train)   # Fit on train, transform train\nX_test_scaled = scaler.transform(X_test)          # Only transform test (don't fit!)\n\n# CRITICAL HINT: NEVER call fit_transform on test data!\n# The scaler must learn the scale FROM training data only.\n# If you fit on test data, you're \"cheating\" \u2014 leaking test information.\n\n\n# ==============================================================\n# PART 5: Train the Model\n# ==============================================================\n\nprint(\"\\n--- PART 5: Training the Linear Regression Model ---\")\n\nmodel = LinearRegression()\n\n# .fit() is where the actual \"learning\" happens\n# The model finds the best coefficients (m and b) for the data\nmodel.fit(X_train_scaled, y_train)\n\nprint(\"Model trained successfully!\")\nprint(f\"\\nModel learned {len(model.coef_)} coefficients (one per feature)\")\nprint(\"Feature importance (coefficients):\")\nfor feature, coef in zip(housing.feature_names, model.coef_):\n    direction = \"\u2191 price\" if coef > 0 else \"\u2193 price\"\n    print(f\"  {feature:15}: {coef:+.3f}  ({direction})\")\n\n\n# ==============================================================\n# PART 6: Evaluate the Model\n# ==============================================================\n\nprint(\"\\n--- PART 6: Evaluation ---\")\n\n# Make predictions on the TEST set (data the model has never seen)\ny_pred = model.predict(X_test_scaled)\n\n# Calculate evaluation metrics\nmse = mean_squared_error(y_test, y_pred)\nrmse = np.sqrt(mse)\nr2 = r2_score(y_test, y_pred)\n\nprint(f\"Mean Squared Error (MSE):       {mse:.4f}\")\nprint(f\"Root Mean Squared Error (RMSE): {rmse:.4f} (in $100k units)\")\nprint(f\"RMSE in dollars: ${rmse * 100000:,.0f}\")\nprint(f\"R\u00b2 Score: {r2:.4f}\")\n\nprint(\"\"\"\nWhat these metrics mean:\n  MSE   = Average of (actual - predicted)\u00b2. Lower = better.\n  RMSE  = Square root of MSE. In the SAME UNITS as your target.\n          An RMSE of $65,000 means predictions are off by ~$65k on average.\n  R\u00b2    = How much variance the model explains. Range: 0 to 1.\n          R\u00b2=1.0 = perfect predictions. R\u00b2=0.0 = no better than guessing mean.\n          A good R\u00b2 for housing: above 0.7\n\"\"\")\n\n\n# ==============================================================\n# PART 7: Visualize Predictions vs Actual\n# ==============================================================\n\nprint(\"--- PART 7: Creating visualization... ---\")\n\nplt.figure(figsize=(10, 6))\nplt.scatter(y_test, y_pred, alpha=0.3, s=10, color='steelblue')\nplt.plot([y_test.min(), y_test.max()],\n         [y_test.min(), y_test.max()],\n         'r--', lw=2, label='Perfect prediction line')\nplt.xlabel(\"Actual Price (\u00d7$100k)\")\nplt.ylabel(\"Predicted Price (\u00d7$100k)\")\nplt.title(f\"Linear Regression: Actual vs Predicted\\nR\u00b2 = {r2:.3f}, RMSE = ${rmse*100000:,.0f}\")\nplt.legend()\nplt.tight_layout()\nplt.savefig(\"linear_regression_results.png\")\nprint(\"Chart saved as 'linear_regression_results.png'\")\n\n\n# ==============================================================\n# PART 8: Save the Model\n# ==============================================================\n\nprint(\"\\n--- PART 8: Saving the Model ---\")\n\n# joblib saves the entire trained model to a file\n# You can load it later without re-training\njoblib.dump(model, \"linear_regression_model.pkl\")\njoblib.dump(scaler, \"scaler.pkl\")   # Save the scaler too! (needed for predictions)\nprint(\"Model saved to 'linear_regression_model.pkl'\")\nprint(\"Scaler saved to 'scaler.pkl'\")\n\n# Test loading it back\nloaded_model = joblib.load(\"linear_regression_model.pkl\")\nloaded_scaler = joblib.load(\"scaler.pkl\")\ntest_prediction = loaded_model.predict(loaded_scaler.transform([X_test.iloc[0]]))\nprint(f\"\\nTest prediction from loaded model: ${test_prediction[0] * 100000:,.0f}\")\nprint(f\"Actual value:                      ${y_test.iloc[0] * 100000:,.0f}\")\n\n\n# ==============================================================\n# YOUR TASKS FOR WEEK 10\n# ==============================================================\n\nprint(\"\\n\" + \"=\" * 60)\nprint(\"YOUR TASKS:\")\nprint(\"=\" * 60)\nprint(\"\"\"\n1. Run this file completely and read every output\n2. Change test_size from 0.2 to 0.3 and re-run.\n   Does the R\u00b2 score change? Why?\n3. CHALLENGE: Instead of California Housing, use your own\n   Arduino temperature CSV from Month 2.\n   Try to predict temperature based on time of day!\n   (You'll need to extract 'hour' from the timestamp column)\n4. Look at the feature coefficients. Which feature has the\n   biggest positive effect on price? Does it make sense?\n5. Push your model.pkl and the chart to GitHub\n\"\"\")\n";
+      const readerOutputKey = "readerRun:phase-2-production-ml/month-03-docker-mlops/resources/linear_regression.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code># ==============================================================
+# WEEK 10: Linear Regression — Predict Numbers
+# FILE: linear_regression.py
+#
+# TASK: Train a model to predict house prices using
+#       Linear Regression. Evaluate how accurate it is.
+#
+# WHY:  Linear Regression is the &quot;Hello World&quot; of Machine Learning.
+#       It finds a straight line that best fits your data, then
+#       uses that line to predict new values.
+#       Example: Given square footage, predict house price.
+#
+# THE CORE IDEA:
+#   y = m*x + b
+#   where: y = what we want to predict (house price)
+#          x = input features (rooms, size, age...)
+#          m = &quot;weight&quot; — how much each feature matters
+#          b = &quot;bias&quot; — a baseline offset
+#   The model LEARNS the best values for m and b from your data.
+#
+# INSTALL: pip install scikit-learn pandas numpy matplotlib
+#
+# HOW TO RUN: python linear_regression.py
+# ==============================================================
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import fetch_california_housing   # Free dataset
+from sklearn.model_selection import train_test_split    # Split data
+from sklearn.linear_model import LinearRegression       # The model
+from sklearn.metrics import mean_squared_error, r2_score  # Evaluation
+from sklearn.preprocessing import StandardScaler         # Normalize features
+import joblib                                           # Save/load models
+
+print(&quot;=&quot; * 60)
+print(&quot;WEEK 10: Linear Regression — Predicting House Prices&quot;)
+print(&quot;=&quot; * 60)
+
+
+# ==============================================================
+# PART 1: Load the Dataset
+# ==============================================================
+
+print(&quot;\n--- PART 1: Loading the California Housing Dataset ---&quot;)
+
+# This dataset is built into scikit-learn — no download needed!
+# It contains information about 20,000+ California housing blocks
+housing = fetch_california_housing()
+
+# Put it into a DataFrame so it&#x27;s easy to work with
+df = pd.DataFrame(housing.data, columns=housing.feature_names)
+df[&quot;price&quot;] = housing.target   # The price is our TARGET (what we want to predict)
+
+# Prices are in units of $100,000 (so 1.5 = $150,000)
+print(f&quot;Dataset shape: {df.shape}&quot;)
+print(f&quot;\nFirst 5 rows:&quot;)
+print(df.head())
+
+print(f&quot;\nColumn descriptions:&quot;)
+for name, desc in zip(housing.feature_names, housing.DESCR.split(&#x27;\n&#x27;)[10:18]):
+    print(f&quot;  {name}: {desc.strip()}&quot;)
+
+
+# ==============================================================
+# PART 2: Exploratory Data Analysis (EDA)
+# ==============================================================
+
+print(&quot;\n--- PART 2: Exploring the Data ---&quot;)
+
+print(&quot;Statistical summary:&quot;)
+print(df.describe())
+
+print(f&quot;\nAverage house price: ${df[&#x27;price&#x27;].mean() * 100000:.0f}&quot;)
+print(f&quot;Most expensive: ${df[&#x27;price&#x27;].max() * 100000:.0f}&quot;)
+print(f&quot;Cheapest: ${df[&#x27;price&#x27;].min() * 100000:.0f}&quot;)
+
+
+# ==============================================================
+# PART 3: Train/Test Split — The Most Important Concept in ML!
+# ==============================================================
+
+print(&quot;\n--- PART 3: Train/Test Split ---&quot;)
+
+# WHY we split data:
+# If we test our model on the SAME data it learned from,
+# it&#x27;s like a student memorizing the exam answers — not real learning!
+# We hold out 20% of data to test how well the model generalizes
+# to data it has NEVER seen before.
+
+# X = features (the inputs)   — everything EXCEPT the price
+# y = target (what we predict) — just the price column
+
+X = df.drop(&quot;price&quot;, axis=1)   # All columns except &#x27;price&#x27;
+y = df[&quot;price&quot;]                # Just the &#x27;price&#x27; column
+
+# Split: 80% for training, 20% for testing
+# random_state=42 ensures the same split every time you run the code
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+print(f&quot;Training set size: {X_train.shape[0]} rows (80%)&quot;)
+print(f&quot;Testing set size:  {X_test.shape[0]} rows (20%)&quot;)
+
+# HINT: The model ONLY sees X_train and y_train during training
+# We test on X_test and compare predictions to y_test
+
+
+# ==============================================================
+# PART 4: Feature Scaling (Normalization)
+# ==============================================================
+
+print(&quot;\n--- PART 4: Feature Scaling ---&quot;)
+
+# Linear Regression works better when all features are on similar scales
+# Problem: &quot;MedInc&quot; (income) ranges 0-15, &quot;AveRooms&quot; ranges 0-100
+# The model unfairly gives more weight to larger numbers
+# StandardScaler makes everything have: mean = 0, std = 1
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)   # Fit on train, transform train
+X_test_scaled = scaler.transform(X_test)          # Only transform test (don&#x27;t fit!)
+
+# CRITICAL HINT: NEVER call fit_transform on test data!
+# The scaler must learn the scale FROM training data only.
+# If you fit on test data, you&#x27;re &quot;cheating&quot; — leaking test information.
+
+
+# ==============================================================
+# PART 5: Train the Model
+# ==============================================================
+
+print(&quot;\n--- PART 5: Training the Linear Regression Model ---&quot;)
+
+model = LinearRegression()
+
+# .fit() is where the actual &quot;learning&quot; happens
+# The model finds the best coefficients (m and b) for the data
+model.fit(X_train_scaled, y_train)
+
+print(&quot;Model trained successfully!&quot;)
+print(f&quot;\nModel learned {len(model.coef_)} coefficients (one per feature)&quot;)
+print(&quot;Feature importance (coefficients):&quot;)
+for feature, coef in zip(housing.feature_names, model.coef_):
+    direction = &quot;↑ price&quot; if coef &gt; 0 else &quot;↓ price&quot;
+    print(f&quot;  {feature:15}: {coef:+.3f}  ({direction})&quot;)
+
+
+# ==============================================================
+# PART 6: Evaluate the Model
+# ==============================================================
+
+print(&quot;\n--- PART 6: Evaluation ---&quot;)
+
+# Make predictions on the TEST set (data the model has never seen)
+y_pred = model.predict(X_test_scaled)
+
+# Calculate evaluation metrics
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(y_test, y_pred)
+
+print(f&quot;Mean Squared Error (MSE):       {mse:.4f}&quot;)
+print(f&quot;Root Mean Squared Error (RMSE): {rmse:.4f} (in $100k units)&quot;)
+print(f&quot;RMSE in dollars: ${rmse * 100000:,.0f}&quot;)
+print(f&quot;R² Score: {r2:.4f}&quot;)
+
+print(&quot;&quot;&quot;
+What these metrics mean:
+  MSE   = Average of (actual - predicted)². Lower = better.
+  RMSE  = Square root of MSE. In the SAME UNITS as your target.
+          An RMSE of $65,000 means predictions are off by ~$65k on average.
+  R²    = How much variance the model explains. Range: 0 to 1.
+          R²=1.0 = perfect predictions. R²=0.0 = no better than guessing mean.
+          A good R² for housing: above 0.7
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# PART 7: Visualize Predictions vs Actual
+# ==============================================================
+
+print(&quot;--- PART 7: Creating visualization... ---&quot;)
+
+plt.figure(figsize=(10, 6))
+plt.scatter(y_test, y_pred, alpha=0.3, s=10, color=&#x27;steelblue&#x27;)
+plt.plot([y_test.min(), y_test.max()],
+         [y_test.min(), y_test.max()],
+         &#x27;r--&#x27;, lw=2, label=&#x27;Perfect prediction line&#x27;)
+plt.xlabel(&quot;Actual Price (×$100k)&quot;)
+plt.ylabel(&quot;Predicted Price (×$100k)&quot;)
+plt.title(f&quot;Linear Regression: Actual vs Predicted\nR² = {r2:.3f}, RMSE = ${rmse*100000:,.0f}&quot;)
+plt.legend()
+plt.tight_layout()
+plt.savefig(&quot;linear_regression_results.png&quot;)
+print(&quot;Chart saved as &#x27;linear_regression_results.png&#x27;&quot;)
+
+
+# ==============================================================
+# PART 8: Save the Model
+# ==============================================================
+
+print(&quot;\n--- PART 8: Saving the Model ---&quot;)
+
+# joblib saves the entire trained model to a file
+# You can load it later without re-training
+joblib.dump(model, &quot;linear_regression_model.pkl&quot;)
+joblib.dump(scaler, &quot;scaler.pkl&quot;)   # Save the scaler too! (needed for predictions)
+print(&quot;Model saved to &#x27;linear_regression_model.pkl&#x27;&quot;)
+print(&quot;Scaler saved to &#x27;scaler.pkl&#x27;&quot;)
+
+# Test loading it back
+loaded_model = joblib.load(&quot;linear_regression_model.pkl&quot;)
+loaded_scaler = joblib.load(&quot;scaler.pkl&quot;)
+test_prediction = loaded_model.predict(loaded_scaler.transform([X_test.iloc[0]]))
+print(f&quot;\nTest prediction from loaded model: ${test_prediction[0] * 100000:,.0f}&quot;)
+print(f&quot;Actual value:                      ${y_test.iloc[0] * 100000:,.0f}&quot;)
+
+
+# ==============================================================
+# YOUR TASKS FOR WEEK 10
+# ==============================================================
+
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;YOUR TASKS:&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;&quot;&quot;
+1. Run this file completely and read every output
+2. Change test_size from 0.2 to 0.3 and re-run.
+   Does the R² score change? Why?
+3. CHALLENGE: Instead of California Housing, use your own
+   Arduino temperature CSV from Month 2.
+   Try to predict temperature based on time of day!
+   (You&#x27;ll need to extract &#x27;hour&#x27; from the timestamp column)
+4. Look at the feature coefficients. Which feature has the
+   biggest positive effect on price? Does it make sense?
+5. Push your model.pkl and the chart to GitHub
+&quot;&quot;&quot;)
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>
