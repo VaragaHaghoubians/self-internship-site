@@ -314,81 +314,83 @@ const months = [
 
 const monthGithubLinks = {
   1: [
-    { label: "learn-python", url: "https://github.com/trekhleb/learn-python", desc: "30 Python scripts covering every beginner concept — run each one daily" },
-    { label: "learn-python3 (with tests)", url: "https://github.com/jerry-git/learn-python3", desc: "Python 3 notebooks with exercises and automated tests" },
-    { label: "TheAlgorithms/Python", url: "https://github.com/TheAlgorithms/Python", desc: "Reference: every algorithm in Python — look up sorting, searching, OOP patterns" },
-    { label: "github/gitignore templates", url: "https://github.com/github/gitignore", desc: "Copy the Python.gitignore into every repo so you never commit venv or .pyc files" },
-    { label: "Your repo: month-01-python", url: "https://github.com/VaragaHaghoubians/month-01-python", desc: "📁 YOUR REPO — save all Month 1 code here (phase-1-software-engineering)" },
+    { label: "trekhleb/learn-python", url: "https://github.com/trekhleb/learn-python", desc: "🟢 START HERE — 30 Python topic scripts. Clone the repo, open each .py file, read it line by line, then re-type it yourself from scratch." },
+    { label: "jerry-git/learn-python3", url: "https://github.com/jerry-git/learn-python3", desc: "Jupyter notebooks with exercises and auto-tests. Do the OOP and classes notebooks in Week 1 — run the tests to check yourself." },
+    { label: "TheAlgorithms/Python", url: "https://github.com/TheAlgorithms/Python", desc: "Reference — every algorithm in clean Python. When you write a class this month, search here to see how pros write the same thing." },
+    { label: "satwikkansal/wtfpython", url: "https://github.com/satwikkansal/wtfpython", desc: "Python surprises and gotchas explained with examples. Read 2-3 entries per day — it builds real understanding fast." },
+    { label: "realpython/python-guide", url: "https://github.com/realpython/python-guide", desc: "The Hitchhiker's Guide to Python. Read the 'Writing Great Python Code' and 'Virtual Environments' chapters this month." },
   ],
   2: [
-    { label: "tiangolo/fastapi", url: "https://github.com/tiangolo/fastapi", desc: "FastAPI official repo — read the examples/ folder for real patterns" },
-    { label: "full-stack-fastapi-template", url: "https://github.com/tiangolo/full-stack-fastapi-template", desc: "Production FastAPI + PostgreSQL project structure to study" },
-    { label: "pydantic/pydantic", url: "https://github.com/pydantic/pydantic", desc: "Used inside FastAPI for request/response validation — read the docs" },
-    { label: "sqlalchemy/sqlalchemy", url: "https://github.com/sqlalchemy/sqlalchemy", desc: "The ORM used to connect Python to databases (used in Month 5 Django too)" },
-    { label: "Your repo: month-02-sql-fastapi", url: "https://github.com/VaragaHaghoubians/month-02-sql-fastapi", desc: "📁 YOUR REPO — save SQL queries and FastAPI code here" },
+    { label: "XD-DENG/SQL-exercise", url: "https://github.com/XD-DENG/SQL-exercise", desc: "🟢 START HERE for SQL — real practice questions with answers. Do all exercises in the /SQL_exercise_01 through /04 folders in Weeks 5-6." },
+    { label: "tiangolo/fastapi", url: "https://github.com/tiangolo/fastapi", desc: "FastAPI official repo. Open the /docs/en/docs/tutorial/ folder and follow every page as a step-by-step guide in Weeks 7-8." },
+    { label: "tiangolo/full-stack-fastapi-template", url: "https://github.com/tiangolo/full-stack-fastapi-template", desc: "Clone this and explore the folder structure. This is how a real production FastAPI project looks — study it before building yours." },
+    { label: "pydantic/pydantic", url: "https://github.com/pydantic/pydantic", desc: "Data validation used inside FastAPI. Read the README examples and practice defining models with type hints." },
+    { label: "bald-coder/sql-practice-problems", url: "https://github.com/smpetersgithub/AdvancedSQLPuzzles", desc: "Advanced SQL puzzles with window functions and CTEs — do these in Week 6 after the basics." },
   ],
   3: [
-    { label: "mlflow/mlflow", url: "https://github.com/mlflow/mlflow", desc: "Track experiments, log metrics, compare models — use this every training run" },
-    { label: "docker/awesome-compose", url: "https://github.com/docker/awesome-compose", desc: "Real Docker Compose examples for Python, FastAPI, PostgreSQL stacks" },
-    { label: "DataTalksClub/mlops-zoomcamp", url: "https://github.com/DataTalksClub/mlops-zoomcamp", desc: "Free MLOps course — Weeks 1-3 match exactly what you build this month" },
-    { label: "Your repo: month-03-docker-mlops", url: "https://github.com/VaragaHaghoubians/month-03-docker-mlops", desc: "📁 YOUR REPO — save Dockerfiles, MLflow logs, and ML scripts here (phase-2-production-ml)" },
+    { label: "DataTalksClub/mlops-zoomcamp", url: "https://github.com/DataTalksClub/mlops-zoomcamp", desc: "🟢 START HERE — free MLOps course. Do Module 1 (intro) in Week 9 and Module 2 (experiment tracking with MLflow) in Week 11." },
+    { label: "mlflow/mlflow", url: "https://github.com/mlflow/mlflow", desc: "MLflow official. Open /examples/sklearn_elasticnet_wine/ and run it — that is your first experiment tracking exercise." },
+    { label: "docker/awesome-compose", url: "https://github.com/docker/awesome-compose", desc: "Real Docker Compose examples. Clone and run the /flask/ or /fastapi/ example to understand multi-service apps before writing your own." },
+    { label: "GokuMohandas/Made-With-ML", url: "https://github.com/GokuMohandas/Made-With-ML", desc: "Full ML engineering course on GitHub. Read the MLOps and reproducibility sections as a reference for how production teams work." },
   ],
   4: [
-    { label: "actions/starter-workflows", url: "https://github.com/actions/starter-workflows", desc: "Official GitHub Actions workflow templates — copy the Python one to start" },
-    { label: "actions/setup-python", url: "https://github.com/actions/setup-python", desc: "The action that installs Python in CI — use in every workflow" },
-    { label: "bregman-arie/devops-exercises", url: "https://github.com/bregman-arie/devops-exercises", desc: "500+ DevOps interview questions — use for Cloud and CI/CD concept review" },
-    { label: "Your repo: month-04-cloud-cicd", url: "https://github.com/VaragaHaghoubians/month-04-cloud-cicd", desc: "📁 YOUR REPO — save GitHub Actions YAML files and cloud scripts here" },
+    { label: "actions/starter-workflows", url: "https://github.com/actions/starter-workflows", desc: "🟢 START HERE — official GitHub Actions templates. Copy /ci/python-package.yml into your repo and edit it for Week 15." },
+    { label: "bregman-arie/devops-exercises", url: "https://github.com/bregman-arie/devops-exercises", desc: "500+ DevOps questions with answers. Study the Linux, CI/CD, and Cloud sections — treat it like a daily quiz while you set up servers." },
+    { label: "open-guides/og-aws", url: "https://github.com/open-guides/og-aws", desc: "Practical AWS guide written by engineers. Read the EC2 and IAM sections before launching your first cloud server in Week 14." },
+    { label: "bregman-arie/linux-exercises", url: "https://github.com/bregman-arie/linux-exercises", desc: "Linux command exercises. Do 5 exercises per day during the SSH and server setup week to build terminal fluency fast." },
   ],
   5: [
-    { label: "django/django", url: "https://github.com/django/django", desc: "Django official source — browse django/contrib/auth to understand login built-ins" },
-    { label: "wsvincent/djangox", url: "https://github.com/wsvincent/djangox", desc: "Production-ready Django starter with auth — study the project structure" },
-    { label: "cookiecutter/cookiecutter-django", url: "https://github.com/cookiecutter/cookiecutter-django", desc: "How real Django projects are structured — use as a reference for folder layout" },
-    { label: "Your repo: month-05-django", url: "https://github.com/VaragaHaghoubians/month-05-django", desc: "📁 YOUR REPO — save your Django project here (phase-3-full-stack-web)" },
+    { label: "wsvincent/djangox", url: "https://github.com/wsvincent/djangox", desc: "🟢 START HERE — production Django starter with auth. Clone it, run it, and read every file before building your own project." },
+    { label: "django/django", url: "https://github.com/django/django", desc: "Django official source. Browse /django/contrib/auth/ to understand login internals. Browse /django/views/generic/ for class-based views." },
+    { label: "wsvincent/awesome-django", url: "https://github.com/wsvincent/awesome-django", desc: "Curated list of Django packages and tutorials. Use it to find a package for anything you need during this month." },
+    { label: "cookiecutter/cookiecutter-django", url: "https://github.com/cookiecutter/cookiecutter-django", desc: "How real large Django projects are structured. Study the settings/, templates/, and apps/ layout as a reference for your own." },
+    { label: "encode/django-rest-framework", url: "https://github.com/encode/django-rest-framework", desc: "DRF — if you want to add an API layer. Read the /examples/ folder to see ModelViewSet and serializers in practice." },
   ],
   6: [
-    { label: "scikit-learn/scikit-learn", url: "https://github.com/scikit-learn/scikit-learn", desc: "The ML library you will integrate into Django — read the examples/ folder" },
-    { label: "celery/celery", url: "https://github.com/celery/celery", desc: "Background task library — essential for running ML inference without freezing Django" },
-    { label: "joke2k/django-environ", url: "https://github.com/joke2k/django-environ", desc: "Load .env secrets into Django settings — use this instead of hardcoding keys" },
-    { label: "plotly/plotly.py", url: "https://github.com/plotly/plotly.py", desc: "Build interactive dashboards from ML results — used in your Django dashboard" },
-    { label: "Your repo: month-06-ml-django", url: "https://github.com/VaragaHaghoubians/month-06-ml-django", desc: "📁 YOUR REPO — save ML+Django integration code here" },
+    { label: "ageron/handson-ml3", url: "https://github.com/ageron/handson-ml3", desc: "🟢 START HERE — Hands-On ML textbook notebooks. Do Chapter 3 (classification) and Chapter 6 (decision trees) as your ML theory base." },
+    { label: "scikit-learn/scikit-learn", url: "https://github.com/scikit-learn/scikit-learn", desc: "scikit-learn official. Open /examples/classification/ and run a classifier — then integrate that exact pattern into your Django view." },
+    { label: "celery/celery", url: "https://github.com/celery/celery", desc: "Celery background tasks. Read /docs/getting-started/first-steps-with-celery.rst and build the example — then swap in your ML task." },
+    { label: "plotly/plotly.py", url: "https://github.com/plotly/plotly.py", desc: "Interactive charts. Open /doc/python/bar-charts.md and /line-charts.md — recreate each example, then plug in your ML results." },
+    { label: "joke2k/django-environ", url: "https://github.com/joke2k/django-environ", desc: "Load .env secrets in Django. Read the README and add it to your project so API keys never get committed to GitHub." },
   ],
   7: [
-    { label: "espressif/arduino-esp32", url: "https://github.com/espressif/arduino-esp32", desc: "Official ESP32 Arduino core — install this in Arduino IDE via board manager" },
-    { label: "adafruit/DHT-sensor-library", url: "https://github.com/adafruit/DHT-sensor-library", desc: "DHT11/DHT22 sensor library — install via Arduino Library Manager" },
-    { label: "micropython/micropython", url: "https://github.com/micropython/micropython", desc: "Alternative to Arduino C++ — write Python directly on ESP32" },
-    { label: "Your repo: month-07-esp32-iot", url: "https://github.com/VaragaHaghoubians/month-07-esp32-iot", desc: "📁 YOUR REPO — save all firmware .ino files here (phase-4-iot-hardware)" },
+    { label: "espressif/arduino-esp32", url: "https://github.com/espressif/arduino-esp32", desc: "🟢 START HERE — official ESP32 core. Browse /libraries/WiFi/examples/ and /libraries/HTTPClient/examples/ — these are your Week 29 firmware base." },
+    { label: "adafruit/DHT-sensor-library", url: "https://github.com/adafruit/DHT-sensor-library", desc: "DHT11/DHT22 sensor library. Open /examples/DHTtester/DHTtester.ino and upload it directly — that is your Week 26 exercise." },
+    { label: "espressif/esp-idf", url: "https://github.com/espressif/esp-idf", desc: "ESP-IDF advanced firmware. Browse /examples/protocols/http_request/ when you need to understand how HTTP POST works on the chip." },
+    { label: "micropython/micropython", url: "https://github.com/micropython/micropython", desc: "MicroPython — write Python on ESP32 instead of C++. Read /ports/esp32/README.md if you prefer Python for firmware." },
   ],
   8: [
-    { label: "eclipse/paho.mqtt.python", url: "https://github.com/eclipse/paho.mqtt.python", desc: "MQTT Python client — use to receive messages from ESP32 on your server" },
-    { label: "eclipse/mosquitto", url: "https://github.com/eclipse/mosquitto", desc: "Lightweight MQTT broker — run this on your server to relay sensor data" },
-    { label: "apache/kafka", url: "https://github.com/apache/kafka", desc: "Advanced: if you want a production-grade streaming pipeline instead of MQTT" },
-    { label: "Your repo: month-08-iot-streaming", url: "https://github.com/VaragaHaghoubians/month-08-iot-streaming", desc: "📁 YOUR REPO — save backend ingestion and dashboard code here" },
+    { label: "eclipse/paho.mqtt.python", url: "https://github.com/eclipse/paho.mqtt.python", desc: "🟢 START HERE — MQTT Python client. Open /examples/ and run subscribe.py on your laptop to receive messages from the ESP32." },
+    { label: "eclipse/mosquitto", url: "https://github.com/eclipse/mosquitto", desc: "Mosquitto MQTT broker. Read the README to install and run on your server — then test it with mosquitto_pub from the terminal." },
+    { label: "hobbyquaker/awesome-mqtt", url: "https://github.com/hobbyquaker/awesome-mqtt", desc: "Curated MQTT tools, brokers, and clients. Browse to pick the right tool for each part of your sensor-to-dashboard pipeline." },
+    { label: "dpallot/simple-websocket-server", url: "https://github.com/dpallot/simple-websocket-server", desc: "Simple WebSocket server in Python. Study if you want live push updates to your dashboard instead of polling every 5 seconds." },
   ],
   9: [
-    { label: "google/or-tools", url: "https://github.com/google/or-tools", desc: "Google optimization library — use for routing and inventory transfer in the capstone" },
-    { label: "coin-or/pulp", url: "https://github.com/coin-or/pulp", desc: "Linear programming in Python — simpler than OR-Tools for assignment problems" },
-    { label: "plotly/dash", url: "https://github.com/plotly/dash", desc: "Build the financial risk dashboard — or use this with Django templates" },
-    { label: "Your repo: cold-chain-capstone ⭐", url: "https://github.com/VaragaHaghoubians/cold-chain-capstone", desc: "📁 YOUR REPO — your Grand Capstone lives here (phase-5-capstone) — make it public when done!" },
+    { label: "google/or-tools", url: "https://github.com/google/or-tools", desc: "🟢 START HERE — Google optimization library. Open /ortools/linear_solver/samples/simple_lp_program.py and run it — that is your first optimizer." },
+    { label: "coin-or/pulp", url: "https://github.com/coin-or/pulp", desc: "PuLP linear programming. Open /examples/transportation_problem.py — this is the exact pattern for your inventory transfer optimizer." },
+    { label: "plotly/dash", url: "https://github.com/plotly/dash", desc: "Dash for dashboards. Read /docs/tutorial/ — use it to build the financial risk panel if you want something beyond Django templates." },
+    { label: "uqfoundation/pathos", url: "https://github.com/uqfoundation/pathos", desc: "Parallel processing in Python. Use if your Celery ML tasks need to process many sensor records faster during capstone week 34." },
   ],
   10: [
-    { label: "huggingface/transformers", url: "https://github.com/huggingface/transformers", desc: "Download pre-trained models — use for embeddings and text classification this month" },
-    { label: "huggingface/datasets", url: "https://github.com/huggingface/datasets", desc: "Download AG News and other NLP datasets in one line of code" },
-    { label: "openai/openai-python", url: "https://github.com/openai/openai-python", desc: "OpenAI Python SDK — used to call GPT models for the FastAPI LLM endpoint" },
-    { label: "anthropics/anthropic-sdk-python", url: "https://github.com/anthropics/anthropic-sdk-python", desc: "Alternative to OpenAI — Claude API SDK for LLM calls" },
-    { label: "Your repo: rag-document-chat ⭐", url: "https://github.com/VaragaHaghoubians/rag-document-chat", desc: "📁 YOUR REPO — save NLP + LLM work here (phase-6-generative-ai)" },
+    { label: "huggingface/transformers", url: "https://github.com/huggingface/transformers", desc: "🟢 START HERE — open /examples/pytorch/text-classification/ and run the AG News example. That is your Week 38 task done." },
+    { label: "huggingface/datasets", url: "https://github.com/huggingface/datasets", desc: "Load any NLP dataset in one line. Read the quickstart in the README — use it to load AG News for the classifier in Week 37." },
+    { label: "karpathy/nanoGPT", url: "https://github.com/karpathy/nanoGPT", desc: "Small GPT from scratch by Karpathy. Read model.py to understand how transformers actually work — the best 1-hour learning investment." },
+    { label: "openai/openai-python", url: "https://github.com/openai/openai-python", desc: "OpenAI Python SDK. Open /examples/ and run the basic chat completion — then build it into your FastAPI /ask endpoint." },
+    { label: "anthropics/anthropic-sdk-python", url: "https://github.com/anthropics/anthropic-sdk-python", desc: "Claude SDK — alternative to OpenAI. Read /examples/ to see how to call Claude from Python for structured LLM outputs." },
   ],
   11: [
-    { label: "langchain-ai/langchain", url: "https://github.com/langchain-ai/langchain", desc: "The main RAG framework — use for document loading, chunking, retrieval, and LLM calls" },
-    { label: "chroma-core/chroma", url: "https://github.com/chroma-core/chroma", desc: "Vector database — store and search document embeddings locally" },
-    { label: "run-llama/llama_index", url: "https://github.com/run-llama/llama_index", desc: "Alternative to LangChain for RAG — simpler API for PDF ingestion and chat" },
-    { label: "pgvector/pgvector", url: "https://github.com/pgvector/pgvector", desc: "PostgreSQL extension for vector search — use when you move from ChromaDB to production" },
-    { label: "Your repo: rag-document-chat ⭐", url: "https://github.com/VaragaHaghoubians/rag-document-chat", desc: "📁 YOUR REPO — save the full RAG pipeline and Django PDF chat app here" },
+    { label: "langchain-ai/langchain", url: "https://github.com/langchain-ai/langchain", desc: "🟢 START HERE — open /docs/docs/tutorials/rag.ipynb and follow the RAG tutorial step by step. That is Weeks 41-43." },
+    { label: "chroma-core/chroma", url: "https://github.com/chroma-core/chroma", desc: "ChromaDB vector database. Read the README quickstart — run the basic add/query example before integrating it with LangChain." },
+    { label: "run-llama/llama_index", url: "https://github.com/run-llama/llama_index", desc: "LlamaIndex — simpler RAG API. Read /llama_index/core/readers/ for PDF loading patterns used in your Week 44 Django app." },
+    { label: "imartinez/privateGPT", url: "https://github.com/imartinez/privateGPT", desc: "Full local RAG system. Read the source code as a complete architecture reference for your Django PDF chat app." },
+    { label: "pgvector/pgvector", url: "https://github.com/pgvector/pgvector", desc: "PostgreSQL vector extension. Study for Week 44 when you move from ChromaDB to storing embeddings in your Django database." },
   ],
   12: [
-    { label: "langchain-ai/langgraph", url: "https://github.com/langchain-ai/langgraph", desc: "Build stateful multi-step agents — the main tool for Month 12 agentic AI" },
-    { label: "microsoft/autogen", url: "https://github.com/microsoft/autogen", desc: "Multi-agent framework — study for multi-agent architectures and tool coordination" },
-    { label: "openai/openai-python", url: "https://github.com/openai/openai-python", desc: "Tool calling API — use to give your agent SQL, web search, and Python tools" },
-    { label: "Your repo: ai-agent-system ⭐", url: "https://github.com/VaragaHaghoubians/ai-agent-system", desc: "📁 YOUR REPO — save your final agentic AI system here — make it public when done!" },
+    { label: "langchain-ai/langgraph", url: "https://github.com/langchain-ai/langgraph", desc: "🟢 START HERE — open /examples/ and run the ReAct agent example. That is your Week 45 starting point for the agentic AI build." },
+    { label: "microsoft/autogen", url: "https://github.com/microsoft/autogen", desc: "Microsoft multi-agent framework. Read /notebook/agentchat_two_users.ipynb to understand how multi-agent systems coordinate." },
+    { label: "langchain-ai/langchain/tree/master/cookbook", url: "https://github.com/langchain-ai/langchain/tree/master/cookbook", desc: "LangChain cookbook — real agent examples with tools and memory. Read one notebook per day as your Week 46-47 daily practice." },
+    { label: "joaomdmoura/crewAI", url: "https://github.com/joaomdmoura/crewAI", desc: "CrewAI multi-role agents. Study how roles and tasks are orchestrated — useful reference for Week 47 guardrails and memory." },
+    { label: "e2b-dev/awesome-ai-agents", url: "https://github.com/e2b-dev/awesome-ai-agents", desc: "Curated list of every major AI agent framework. Browse it in Week 45 to understand the landscape before choosing your tools." },
   ],
 };
 
@@ -2406,6 +2408,7 @@ function saveProgress() {
 function saveMissionState() {
   localStorage.setItem("setupChecklistDone", JSON.stringify(state.setupDone));
   localStorage.setItem("portfolioEvidence", JSON.stringify(state.evidence));
+  localStorage.setItem("githubRepoBase", state.githubRepoBase);
 }
 
 function saveLabState() {
@@ -2512,6 +2515,298 @@ function formatSavedTime(value) {
   });
 }
 
+function normalizeGitHubRepoBase(value) {
+  const trimmed = String(value || "").trim().replace(/\/+$/, "");
+  if (!trimmed) return "";
+  return trimmed
+    .replace(/\/(?:tree|blob)\/[^/]+.*$/i, "")
+    .replace(/\.git$/i, "");
+}
+
+function encodeGitHubPath(path) {
+  return String(path || "")
+    .split("/")
+    .filter(Boolean)
+    .map((part) => encodeURIComponent(part))
+    .join("/");
+}
+
+function isLikelyFilePath(path) {
+  const last = String(path || "").split("/").filter(Boolean).pop() || "";
+  return /\.[a-z0-9]+$/i.test(last) || ["Dockerfile", "Makefile"].includes(last);
+}
+
+function githubLink(path) {
+  const repo = normalizeGitHubRepoBase(state.githubRepoBase);
+  if (!repo || !path) return "";
+  const mode = isLikelyFilePath(path) ? "blob" : "tree";
+  return `${repo}/${mode}/main/${encodeGitHubPath(path)}`;
+}
+
+function monthSourceCatalog(month) {
+  const items = [
+    { label: "Main study guide", path: month.study },
+    ...month.references.map((item) => ({ label: "Reference", path: item })),
+  ];
+  const workspacePath = monthWorkspacePaths[month.id];
+  if (workspacePath) items.push({ label: `Month ${month.id} workspace`, path: workspacePath });
+  return items;
+}
+
+function weekSourceCatalog(monthId, week) {
+  const workspacePath = monthWorkspacePaths[monthId] || "";
+  const catalogs = {
+    1: {
+      1: [
+        { label: "Python zero-to-hero", path: "knowledge-base/zero-to-hero-guides/python/python_zero_to_hero.py" },
+        { label: "Month 1 resources", path: workspacePath },
+      ],
+      2: [
+        { label: "Git commands guide", path: "knowledge-base/zero-to-hero-guides/git/git_commands.sh" },
+        { label: "Month 1 resources", path: workspacePath },
+      ],
+      3: [
+        { label: "Python practice resources", path: workspacePath },
+        { label: "Roadmap", path: "README.md" },
+      ],
+      4: [
+        { label: "Project 1 guide", path: "projects/foundations/project-1-customer-churn/README.md" },
+        { label: "Month 1 resources", path: workspacePath },
+      ],
+    },
+    2: {
+      5: [
+        { label: "SQL zero-to-hero", path: "knowledge-base/zero-to-hero-guides/sql/sql_zero_to_hero.sql" },
+        { label: "Month 2 resources", path: workspacePath },
+      ],
+      6: [
+        { label: "SQL guide", path: "knowledge-base/zero-to-hero-guides/sql/sql_zero_to_hero.sql" },
+        { label: "Month 2 resources", path: workspacePath },
+      ],
+      7: [
+        { label: "Month 2 resources", path: workspacePath },
+        { label: "Project 2 guide", path: "projects/foundations/project-2-sales-analysis/README.md" },
+      ],
+      8: [
+        { label: "FastAPI/API materials", path: workspacePath },
+        { label: "Project 3 guide", path: "projects/foundations/project-3-house-price-pipeline/README.md" },
+      ],
+    },
+    3: {
+      9: [
+        { label: "Docker guide", path: "knowledge-base/zero-to-hero-guides/docker/README.md" },
+        { label: "Month 3 resources", path: workspacePath },
+      ],
+      10: [
+        { label: "Docker guide", path: "knowledge-base/zero-to-hero-guides/docker/docker_zero_to_hero.sh" },
+        { label: "Month 3 resources", path: workspacePath },
+      ],
+      11: [
+        { label: "Month 3 resources", path: workspacePath },
+        { label: "Project 3 guide", path: "projects/foundations/project-3-house-price-pipeline/README.md" },
+      ],
+      12: [
+        { label: "Month 3 resources", path: workspacePath },
+        { label: "Project 3 guide", path: "projects/foundations/project-3-house-price-pipeline/README.md" },
+      ],
+    },
+    4: {
+      13: [
+        { label: "Linux/Git guide", path: "knowledge-base/zero-to-hero-guides/git/git_commands.sh" },
+        { label: "Month 4 resources", path: workspacePath },
+      ],
+      14: [
+        { label: "Month 4 resources", path: workspacePath },
+        { label: "Docker guide", path: "knowledge-base/zero-to-hero-guides/docker/README.md" },
+      ],
+      15: [
+        { label: "Month 4 resources", path: workspacePath },
+        { label: "Project 3 guide", path: "projects/foundations/project-3-house-price-pipeline/README.md" },
+      ],
+      16: [
+        { label: "Month 4 resources", path: workspacePath },
+        { label: "Deployment notes", path: "knowledge-base/learning-journey/README.md" },
+      ],
+    },
+    5: {
+      17: [
+        { label: "Django guide", path: "knowledge-base/zero-to-hero-guides/django/django_zero_to_hero.py" },
+        { label: "Month 5 resources", path: workspacePath },
+      ],
+      18: [
+        { label: "Django guide", path: "knowledge-base/zero-to-hero-guides/django/django_zero_to_hero.py" },
+        { label: "Month 5 resources", path: workspacePath },
+      ],
+      19: [
+        { label: "Month 5 resources", path: workspacePath },
+        { label: "Django guide", path: "knowledge-base/zero-to-hero-guides/django/django_zero_to_hero.py" },
+      ],
+      20: [
+        { label: "Month 5 resources", path: workspacePath },
+        { label: "Project structure", path: "phase-3-full-stack-web/month-05-django-fundamentals/" },
+      ],
+    },
+    6: {
+      21: [
+        { label: "Month 6 resources", path: workspacePath },
+        { label: "Django guide", path: "knowledge-base/zero-to-hero-guides/django/django_zero_to_hero.py" },
+      ],
+      22: [
+        { label: "Month 6 resources", path: workspacePath },
+        { label: "Capstone roadmap", path: "knowledge-base/learning-journey/CAPSTONE_ROADMAP.md" },
+      ],
+      23: [
+        { label: "Month 6 resources", path: workspacePath },
+        { label: "Project 3 guide", path: "projects/foundations/project-3-house-price-pipeline/README.md" },
+      ],
+      24: [
+        { label: "Month 6 resources", path: workspacePath },
+        { label: "Project 4 guide", path: "projects/foundations/project-4-news-classification/README.md" },
+      ],
+    },
+    7: {
+      25: [
+        { label: "Arduino guide", path: "knowledge-base/zero-to-hero-guides/arduino/README.md" },
+        { label: "Month 7 resources", path: workspacePath },
+      ],
+      26: [
+        { label: "Arduino guide", path: "knowledge-base/zero-to-hero-guides/arduino/README.md" },
+        { label: "Month 7 resources", path: workspacePath },
+      ],
+      27: [
+        { label: "Month 7 resources", path: workspacePath },
+        { label: "IoT guide", path: "knowledge-base/zero-to-hero-guides/iot/README.md" },
+      ],
+      28: [
+        { label: "Month 7 resources", path: workspacePath },
+        { label: "ESP32 project files", path: "phase-4-iot-hardware/month-07-microcontrollers/" },
+      ],
+    },
+    8: {
+      29: [
+        { label: "IoT guide", path: "knowledge-base/zero-to-hero-guides/iot/README.md" },
+        { label: "Month 8 resources", path: workspacePath },
+      ],
+      30: [
+        { label: "Month 8 resources", path: workspacePath },
+        { label: "IoT guide", path: "knowledge-base/zero-to-hero-guides/iot/README.md" },
+      ],
+      31: [
+        { label: "Month 8 resources", path: workspacePath },
+        { label: "IoT dashboard files", path: "phase-4-iot-hardware/month-08-iot-streaming/" },
+      ],
+      32: [
+        { label: "Month 8 resources", path: workspacePath },
+        { label: "Project 6 reference", path: "projects/advanced/project-6-predictive-maintenance/PREREQUISITES.md" },
+      ],
+    },
+    9: {
+      33: [
+        { label: "Capstone folder", path: workspacePath },
+        { label: "Capstone roadmap", path: "knowledge-base/learning-journey/CAPSTONE_ROADMAP.md" },
+      ],
+      34: [
+        { label: "Capstone folder", path: workspacePath },
+        { label: "IoT guide", path: "knowledge-base/zero-to-hero-guides/iot/README.md" },
+      ],
+      35: [
+        { label: "Capstone folder", path: workspacePath },
+        { label: "Optimization guide", path: "knowledge-base/zero-to-hero-guides/optimization/README.md" },
+      ],
+      36: [
+        { label: "Capstone folder", path: workspacePath },
+        { label: "Project 6 reference", path: "projects/advanced/project-6-predictive-maintenance/PREREQUISITES.md" },
+      ],
+    },
+    10: {
+      37: [
+        { label: "Month 10 resources", path: workspacePath },
+        { label: "Project 4 guide", path: "projects/foundations/project-4-news-classification/README.md" },
+      ],
+      38: [
+        { label: "Month 10 resources", path: workspacePath },
+        { label: "AI guide folder", path: "phase-6-generative-ai/month-10-nlp-llm-basics/" },
+      ],
+      39: [
+        { label: "Month 10 resources", path: workspacePath },
+        { label: "OpenAI integration notes", path: "phase-6-generative-ai/month-10-nlp-llm-basics/" },
+      ],
+      40: [
+        { label: "Month 10 resources", path: workspacePath },
+        { label: "AI portfolio files", path: "phase-6-generative-ai/month-10-nlp-llm-basics/" },
+      ],
+    },
+    11: {
+      41: [
+        { label: "RAG pipeline", path: "phase-6-generative-ai/month-11-rag-vector-databases/resources/rag_pipeline.py" },
+        { label: "Month 11 resources", path: workspacePath },
+      ],
+      42: [
+        { label: "Month 11 resources", path: workspacePath },
+        { label: "RAG folder", path: "phase-6-generative-ai/month-11-rag-vector-databases/" },
+      ],
+      43: [
+        { label: "Month 11 resources", path: workspacePath },
+        { label: "RAG folder", path: "phase-6-generative-ai/month-11-rag-vector-databases/" },
+      ],
+      44: [
+        { label: "Month 11 resources", path: workspacePath },
+        { label: "Project 6 reference", path: "projects/advanced/project-6-predictive-maintenance/PREREQUISITES.md" },
+      ],
+    },
+    12: {
+      45: [
+        { label: "Agentic AI file", path: "phase-6-generative-ai/month-12-agentic-ai/resources/agentic_ai.py" },
+        { label: "Month 12 resources", path: workspacePath },
+      ],
+      46: [
+        { label: "Month 12 resources", path: workspacePath },
+        { label: "Agentic AI folder", path: "phase-6-generative-ai/month-12-agentic-ai/" },
+      ],
+      47: [
+        { label: "Month 12 resources", path: workspacePath },
+        { label: "Project 5 reference", path: "projects/advanced/project-5-factory-twin/PREREQUISITES.md" },
+      ],
+      48: [
+        { label: "Month 12 resources", path: workspacePath },
+        { label: "Project 7 reference", path: "projects/advanced/project-7-supply-chain/PREREQUISITES.md" },
+      ],
+    },
+  };
+  return catalogs[monthId]?.[week.week] || (workspacePath ? [{ label: "Month workspace", path: workspacePath }] : []);
+}
+
+function renderSourceLinks(items, options = {}) {
+  const { title = "Source links", compact = false } = options;
+  if (!items?.length) return "";
+  const blocks = items
+    .map((item) => {
+      const github = githubLink(item.path);
+      const githubHtml = github
+        ? `<a class="file-link" href="${github}" target="_blank" rel="noreferrer">GitHub</a>`
+        : `<span class="muted-note">Add GitHub URL in Mission Control to enable GitHub links.</span>`;
+      return `
+        <div class="source-link-row ${compact ? "compact" : ""}">
+          <div>
+            <strong>${item.label}</strong>
+            <div class="resource-path">${item.path}</div>
+          </div>
+          <div class="source-link-actions">
+            <a class="file-link" href="${link(item.path)}">Local</a>
+            ${githubHtml}
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+  return `
+    <div class="source-panel ${compact ? "compact" : ""}">
+      <h4>${title}</h4>
+      ${blocks}
+    </div>
+  `;
+}
+
 function getRunInstruction(mode) {
   if (mode === "sql") return "Press Run lesson to execute the query in a small SQLite database inside the browser.";
   if (mode === "python") return "Press Run lesson to execute the code in the browser Python runner.";
@@ -2587,6 +2882,7 @@ function renderMonths() {
 function renderMonthDetail() {
   const month = months.find((item) => item.id === state.month);
   const done = state.done.includes(month.id);
+  const monthSourcesHtml = renderSourceLinks(monthSourceCatalog(month), { title: "Month source links" });
   const weeksHtml = month.weeks ? `
     <div class="weeks-section">
       <h4>Week-by-week plan</h4>
@@ -2600,6 +2896,7 @@ function renderMonthDetail() {
             <ul class="week-tasks">
               ${w.tasks.map((t) => `<li>${t}</li>`).join("")}
             </ul>
+            ${renderSourceLinks(weekSourceCatalog(month.id, w), { title: "Week source links", compact: true })}
           </div>
         `).join("")}
       </div>
@@ -2632,6 +2929,7 @@ function renderMonthDetail() {
       <p>${month.build}</p>
       <p><strong>Job signal:</strong> ${month.job}</p>
     </div>
+    ${monthSourcesHtml}
     ${monthGithubLinks[month.id] ? `
     <div class="github-links-section">
       <h4>📦 GitHub sources for this month</h4>
@@ -2719,6 +3017,16 @@ function renderMissionControl() {
     log.value = localStorage.getItem(`dailyLog:${dateKey}`) || "";
   }
 
+  const githubInput = document.getElementById("githubRepoBase");
+  const githubStatus = document.getElementById("githubRepoStatus");
+  const normalizedRepo = normalizeGitHubRepoBase(state.githubRepoBase);
+  if (githubInput) githubInput.value = state.githubRepoBase;
+  if (githubStatus) {
+    githubStatus.textContent = normalizedRepo
+      ? `GitHub source links are active for ${normalizedRepo}.`
+      : "Add your GitHub repository URL to unlock source links for months, weeks, projects, and files.";
+  }
+
   renderEvidence();
   updateMissionCounts();
 }
@@ -2772,6 +3080,26 @@ function bindMissionControl() {
     renderEvidence();
     updateMissionCounts();
   });
+
+  const githubInput = document.getElementById("githubRepoBase");
+  const saveGithubButton = document.getElementById("saveGithubRepoBase");
+  const githubStatus = document.getElementById("githubRepoStatus");
+  const saveGithubRepo = () => {
+    state.githubRepoBase = normalizeGitHubRepoBase(githubInput?.value || "");
+    saveMissionState();
+    if (githubInput) githubInput.value = state.githubRepoBase;
+    if (githubStatus) {
+      githubStatus.textContent = state.githubRepoBase
+        ? `Saved GitHub repository URL: ${state.githubRepoBase}`
+        : "GitHub repository URL cleared. Add it again to enable GitHub links.";
+    }
+    renderMonthDetail();
+    renderProjects();
+    renderFolders();
+    renderResources();
+  };
+  githubInput?.addEventListener("change", saveGithubRepo);
+  saveGithubButton?.addEventListener("click", saveGithubRepo);
 
   document.getElementById("exportProgress")?.addEventListener("click", exportProgress);
   document.getElementById("importProgress")?.addEventListener("change", importProgress);
@@ -2884,7 +3212,7 @@ function renderFolders() {
       <article class="folder">
         <h3>${title}</h3>
         <p>${text}</p>
-        <a href="${link(path)}">Open folder</a>
+        ${renderSourceLinks([{ label: title, path }], { title: "Folder links", compact: true })}
       </article>
     `)
     .join("");
@@ -2917,7 +3245,7 @@ function renderProjects() {
         <p>${project.outcome}</p>
         <p><strong>Time:</strong> ${project.time}</p>
         <ul>${project.skills.map((skill) => `<li>${skill}</li>`).join("")}</ul>
-        <p><a href="${link(project.path)}">Open project file</a></p>
+        ${renderSourceLinks([{ label: `${project.title} source`, path: project.path }], { title: "Project source links", compact: true })}
       </article>
     `)
     .join("");
@@ -3646,7 +3974,12 @@ function renderResources() {
           <p>${note}</p>
           <div class="resource-path">${path}</div>
         </div>
-        <a class="file-link" href="${url}">Open</a>
+        <div class="source-link-actions">
+          <a class="file-link" href="${url}">Local</a>
+          ${githubLink(path)
+            ? `<a class="file-link" href="${githubLink(path)}" target="_blank" rel="noreferrer">GitHub</a>`
+            : `<span class="muted-note">GitHub URL not set</span>`}
+        </div>
       </article>
     `)
     .join("") || `<p>No resources match your search.</p>`;

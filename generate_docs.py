@@ -656,8 +656,9 @@ def main() -> None:
             elif path.is_dir():
                 try:
                     path.rmdir()
-                except PermissionError:
+                except (PermissionError, OSError):
                     # OneDrive can briefly lock empty generated folders on Windows.
+                    # Nested generated folders may also still appear non-empty during cleanup.
                     # Leaving the folder is safe because generated pages are overwritten below.
                     pass
     DOCS.mkdir(parents=True, exist_ok=True)

@@ -585,6 +585,54 @@ h1 {
   text-decoration: none;
 }
 
+.source-panel {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 76%, var(--bg));
+}
+
+.source-panel.compact {
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.source-panel h4 {
+  margin: 0;
+}
+
+.source-link-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 74%, transparent);
+}
+
+.source-link-row:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.source-link-row.compact {
+  gap: 8px;
+}
+
+.source-link-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.source-link-actions .muted-note {
+  font-size: 12px;
+}
+
 .project-tabs,
 .chips {
   display: flex;
@@ -1374,6 +1422,11 @@ details p {
 
   .learning-flow,
   .lesson-roadmap {
+    grid-template-columns: 1fr;
+  }
+
+  .source-link-row,
+  .resource-item {
     grid-template-columns: 1fr;
   }
 
