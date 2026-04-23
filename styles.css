@@ -1563,3 +1563,74 @@ details p {
   color: #fcd34d;
   border-color: #f59e0b;
 }
+
+/* ── GitHub Links Section (inside month detail) ───────────────────── */
+.github-links-section {
+  margin-top: 28px;
+  padding: 24px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.github-links-section h4 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.github-links-note {
+  margin: 0 0 18px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.github-links-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.github-link-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.github-link-card:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.github-link-yours {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.github-link-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.github-link-card strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 3px;
+  font-family: "Fira Code", monospace;
+}
+
+.github-link-card span {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}

@@ -19,6 +19,7 @@ const state = {
   setupDone: JSON.parse(localStorage.getItem("setupChecklistDone") || "[]"),
   evidence: JSON.parse(localStorage.getItem("portfolioEvidence") || "[]"),
   glossaryQuery: "",
+  githubRepoBase: localStorage.getItem("githubRepoBase") || "",
 };
 
 const superpowers = [
@@ -311,6 +312,86 @@ const months = [
   },
 ];
 
+const monthGithubLinks = {
+  1: [
+    { label: "learn-python", url: "https://github.com/trekhleb/learn-python", desc: "30 Python scripts covering every beginner concept — run each one daily" },
+    { label: "learn-python3 (with tests)", url: "https://github.com/jerry-git/learn-python3", desc: "Python 3 notebooks with exercises and automated tests" },
+    { label: "TheAlgorithms/Python", url: "https://github.com/TheAlgorithms/Python", desc: "Reference: every algorithm in Python — look up sorting, searching, OOP patterns" },
+    { label: "github/gitignore templates", url: "https://github.com/github/gitignore", desc: "Copy the Python.gitignore into every repo so you never commit venv or .pyc files" },
+    { label: "Your repo: month-01-python", url: "https://github.com/VaragaHaghoubians/month-01-python", desc: "📁 YOUR REPO — save all Month 1 code here (phase-1-software-engineering)" },
+  ],
+  2: [
+    { label: "tiangolo/fastapi", url: "https://github.com/tiangolo/fastapi", desc: "FastAPI official repo — read the examples/ folder for real patterns" },
+    { label: "full-stack-fastapi-template", url: "https://github.com/tiangolo/full-stack-fastapi-template", desc: "Production FastAPI + PostgreSQL project structure to study" },
+    { label: "pydantic/pydantic", url: "https://github.com/pydantic/pydantic", desc: "Used inside FastAPI for request/response validation — read the docs" },
+    { label: "sqlalchemy/sqlalchemy", url: "https://github.com/sqlalchemy/sqlalchemy", desc: "The ORM used to connect Python to databases (used in Month 5 Django too)" },
+    { label: "Your repo: month-02-sql-fastapi", url: "https://github.com/VaragaHaghoubians/month-02-sql-fastapi", desc: "📁 YOUR REPO — save SQL queries and FastAPI code here" },
+  ],
+  3: [
+    { label: "mlflow/mlflow", url: "https://github.com/mlflow/mlflow", desc: "Track experiments, log metrics, compare models — use this every training run" },
+    { label: "docker/awesome-compose", url: "https://github.com/docker/awesome-compose", desc: "Real Docker Compose examples for Python, FastAPI, PostgreSQL stacks" },
+    { label: "DataTalksClub/mlops-zoomcamp", url: "https://github.com/DataTalksClub/mlops-zoomcamp", desc: "Free MLOps course — Weeks 1-3 match exactly what you build this month" },
+    { label: "Your repo: month-03-docker-mlops", url: "https://github.com/VaragaHaghoubians/month-03-docker-mlops", desc: "📁 YOUR REPO — save Dockerfiles, MLflow logs, and ML scripts here (phase-2-production-ml)" },
+  ],
+  4: [
+    { label: "actions/starter-workflows", url: "https://github.com/actions/starter-workflows", desc: "Official GitHub Actions workflow templates — copy the Python one to start" },
+    { label: "actions/setup-python", url: "https://github.com/actions/setup-python", desc: "The action that installs Python in CI — use in every workflow" },
+    { label: "bregman-arie/devops-exercises", url: "https://github.com/bregman-arie/devops-exercises", desc: "500+ DevOps interview questions — use for Cloud and CI/CD concept review" },
+    { label: "Your repo: month-04-cloud-cicd", url: "https://github.com/VaragaHaghoubians/month-04-cloud-cicd", desc: "📁 YOUR REPO — save GitHub Actions YAML files and cloud scripts here" },
+  ],
+  5: [
+    { label: "django/django", url: "https://github.com/django/django", desc: "Django official source — browse django/contrib/auth to understand login built-ins" },
+    { label: "wsvincent/djangox", url: "https://github.com/wsvincent/djangox", desc: "Production-ready Django starter with auth — study the project structure" },
+    { label: "cookiecutter/cookiecutter-django", url: "https://github.com/cookiecutter/cookiecutter-django", desc: "How real Django projects are structured — use as a reference for folder layout" },
+    { label: "Your repo: month-05-django", url: "https://github.com/VaragaHaghoubians/month-05-django", desc: "📁 YOUR REPO — save your Django project here (phase-3-full-stack-web)" },
+  ],
+  6: [
+    { label: "scikit-learn/scikit-learn", url: "https://github.com/scikit-learn/scikit-learn", desc: "The ML library you will integrate into Django — read the examples/ folder" },
+    { label: "celery/celery", url: "https://github.com/celery/celery", desc: "Background task library — essential for running ML inference without freezing Django" },
+    { label: "joke2k/django-environ", url: "https://github.com/joke2k/django-environ", desc: "Load .env secrets into Django settings — use this instead of hardcoding keys" },
+    { label: "plotly/plotly.py", url: "https://github.com/plotly/plotly.py", desc: "Build interactive dashboards from ML results — used in your Django dashboard" },
+    { label: "Your repo: month-06-ml-django", url: "https://github.com/VaragaHaghoubians/month-06-ml-django", desc: "📁 YOUR REPO — save ML+Django integration code here" },
+  ],
+  7: [
+    { label: "espressif/arduino-esp32", url: "https://github.com/espressif/arduino-esp32", desc: "Official ESP32 Arduino core — install this in Arduino IDE via board manager" },
+    { label: "adafruit/DHT-sensor-library", url: "https://github.com/adafruit/DHT-sensor-library", desc: "DHT11/DHT22 sensor library — install via Arduino Library Manager" },
+    { label: "micropython/micropython", url: "https://github.com/micropython/micropython", desc: "Alternative to Arduino C++ — write Python directly on ESP32" },
+    { label: "Your repo: month-07-esp32-iot", url: "https://github.com/VaragaHaghoubians/month-07-esp32-iot", desc: "📁 YOUR REPO — save all firmware .ino files here (phase-4-iot-hardware)" },
+  ],
+  8: [
+    { label: "eclipse/paho.mqtt.python", url: "https://github.com/eclipse/paho.mqtt.python", desc: "MQTT Python client — use to receive messages from ESP32 on your server" },
+    { label: "eclipse/mosquitto", url: "https://github.com/eclipse/mosquitto", desc: "Lightweight MQTT broker — run this on your server to relay sensor data" },
+    { label: "apache/kafka", url: "https://github.com/apache/kafka", desc: "Advanced: if you want a production-grade streaming pipeline instead of MQTT" },
+    { label: "Your repo: month-08-iot-streaming", url: "https://github.com/VaragaHaghoubians/month-08-iot-streaming", desc: "📁 YOUR REPO — save backend ingestion and dashboard code here" },
+  ],
+  9: [
+    { label: "google/or-tools", url: "https://github.com/google/or-tools", desc: "Google optimization library — use for routing and inventory transfer in the capstone" },
+    { label: "coin-or/pulp", url: "https://github.com/coin-or/pulp", desc: "Linear programming in Python — simpler than OR-Tools for assignment problems" },
+    { label: "plotly/dash", url: "https://github.com/plotly/dash", desc: "Build the financial risk dashboard — or use this with Django templates" },
+    { label: "Your repo: cold-chain-capstone ⭐", url: "https://github.com/VaragaHaghoubians/cold-chain-capstone", desc: "📁 YOUR REPO — your Grand Capstone lives here (phase-5-capstone) — make it public when done!" },
+  ],
+  10: [
+    { label: "huggingface/transformers", url: "https://github.com/huggingface/transformers", desc: "Download pre-trained models — use for embeddings and text classification this month" },
+    { label: "huggingface/datasets", url: "https://github.com/huggingface/datasets", desc: "Download AG News and other NLP datasets in one line of code" },
+    { label: "openai/openai-python", url: "https://github.com/openai/openai-python", desc: "OpenAI Python SDK — used to call GPT models for the FastAPI LLM endpoint" },
+    { label: "anthropics/anthropic-sdk-python", url: "https://github.com/anthropics/anthropic-sdk-python", desc: "Alternative to OpenAI — Claude API SDK for LLM calls" },
+    { label: "Your repo: rag-document-chat ⭐", url: "https://github.com/VaragaHaghoubians/rag-document-chat", desc: "📁 YOUR REPO — save NLP + LLM work here (phase-6-generative-ai)" },
+  ],
+  11: [
+    { label: "langchain-ai/langchain", url: "https://github.com/langchain-ai/langchain", desc: "The main RAG framework — use for document loading, chunking, retrieval, and LLM calls" },
+    { label: "chroma-core/chroma", url: "https://github.com/chroma-core/chroma", desc: "Vector database — store and search document embeddings locally" },
+    { label: "run-llama/llama_index", url: "https://github.com/run-llama/llama_index", desc: "Alternative to LangChain for RAG — simpler API for PDF ingestion and chat" },
+    { label: "pgvector/pgvector", url: "https://github.com/pgvector/pgvector", desc: "PostgreSQL extension for vector search — use when you move from ChromaDB to production" },
+    { label: "Your repo: rag-document-chat ⭐", url: "https://github.com/VaragaHaghoubians/rag-document-chat", desc: "📁 YOUR REPO — save the full RAG pipeline and Django PDF chat app here" },
+  ],
+  12: [
+    { label: "langchain-ai/langgraph", url: "https://github.com/langchain-ai/langgraph", desc: "Build stateful multi-step agents — the main tool for Month 12 agentic AI" },
+    { label: "microsoft/autogen", url: "https://github.com/microsoft/autogen", desc: "Multi-agent framework — study for multi-agent architectures and tool coordination" },
+    { label: "openai/openai-python", url: "https://github.com/openai/openai-python", desc: "Tool calling API — use to give your agent SQL, web search, and Python tools" },
+    { label: "Your repo: ai-agent-system ⭐", url: "https://github.com/VaragaHaghoubians/ai-agent-system", desc: "📁 YOUR REPO — save your final agentic AI system here — make it public when done!" },
+  ],
+};
+
 const folders = [
   ["knowledge-base/", "Your reference library: resources, learning journey, and zero-to-hero guides.", "knowledge-base/RESOURCES.md"],
   ["knowledge-base/learning-journey/", "A numbered week-by-week program with small tasks and code examples.", "knowledge-base/learning-journey/README.md"],
@@ -420,6 +501,21 @@ const resources = [
   ["Project 6", "Predictive maintenance", "project", "projects/advanced/project-6-predictive-maintenance/PREREQUISITES.md"],
   ["Project 7", "Supply chain optimizer", "project", "projects/advanced/project-7-supply-chain/PREREQUISITES.md"],
 ];
+
+const monthWorkspacePaths = {
+  1: "phase-1-software-engineering/month-01-python-oop-git/resources/",
+  2: "phase-1-software-engineering/month-02-databases-web/resources/",
+  3: "phase-2-production-ml/month-03-docker-mlops/resources/",
+  4: "phase-2-production-ml/month-04-cloud-cicd/resources/",
+  5: "phase-3-full-stack-web/month-05-django-fundamentals/resources/",
+  6: "phase-3-full-stack-web/month-06-ml-into-django/resources/",
+  7: "phase-4-iot-hardware/month-07-microcontrollers/resources/",
+  8: "phase-4-iot-hardware/month-08-iot-streaming/resources/",
+  9: "phase-5-capstone/month-09-grand-capstone/",
+  10: "phase-6-generative-ai/month-10-nlp-llm-basics/resources/",
+  11: "phase-6-generative-ai/month-11-rag-vector-databases/resources/",
+  12: "phase-6-generative-ai/month-12-agentic-ai/resources/",
+};
 
 const labTasks = [
   {
@@ -2536,6 +2632,23 @@ function renderMonthDetail() {
       <p>${month.build}</p>
       <p><strong>Job signal:</strong> ${month.job}</p>
     </div>
+    ${monthGithubLinks[month.id] ? `
+    <div class="github-links-section">
+      <h4>📦 GitHub sources for this month</h4>
+      <p class="github-links-note">Open each repo, read the README, and star it. Your own repo (marked 📁) is where you save your work.</p>
+      <div class="github-links-grid">
+        ${monthGithubLinks[month.id].map(link => `
+          <a class="github-link-card ${link.desc.includes('YOUR REPO') ? 'github-link-yours' : ''}" href="${link.url}" target="_blank" rel="noreferrer">
+            <span class="github-link-icon">${link.desc.includes('YOUR REPO') ? '📁' : '⭐'}</span>
+            <div>
+              <strong>${link.label}</strong>
+              <span>${link.desc}</span>
+            </div>
+          </a>
+        `).join("")}
+      </div>
+    </div>
+    ` : ""}
     <div class="month-actions">
       <button class="mark-button" id="markMonth" type="button">${done ? "Mark month incomplete" : "Mark month complete"}</button>
       <a class="file-link" href="${link(month.study)}">Open study folder</a>
