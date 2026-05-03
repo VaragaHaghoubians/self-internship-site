@@ -4166,7 +4166,9 @@ function renderResources() {
   });
 
   document.getElementById("resourceList").innerHTML = filtered
-    .map(([title, note, tag, path, url]) => `
+    .map(([title, note, tag, path]) => {
+      const localUrl = link(path);
+      return `
       <article class="resource-item">
         <div>
           <span class="pill">${tag}</span>
@@ -4175,16 +4177,13 @@ function renderResources() {
           <div class="resource-path">${path}</div>
         </div>
         <div class="source-link-actions">
-          <a class="file-link" href="${url}" ${/^https?:/i.test(url) ? 'target="_blank" rel="noreferrer"' : ""}>${/^https?:/i.test(url) ? "Open" : "Local"}</a>
-          ${!/^https?:/i.test(path) && githubLink(path)
+          <a class="file-link" href="${localUrl}" target="_blank" rel="noreferrer">Open</a>
+          ${githubLink(path)
             ? `<a class="file-link" href="${githubLink(path)}" target="_blank" rel="noreferrer">GitHub</a>`
-            : !/^https?:/i.test(path)
-              ? `<span class="muted-note">GitHub URL not set</span>`
-              : ""}
+            : ""}
         </div>
       </article>
-    `)
-    .join("") || `<p>No resources match your search.</p>`;
+    `}).join("") || `<p>No resources match your search.</p>`;
 }
 
 function bindSearch() {
