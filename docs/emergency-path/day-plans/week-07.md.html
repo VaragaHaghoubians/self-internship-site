@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Week 07 - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../index.html">Back to website</a>
+      <a href="../../../index.html#python-lab">Python lab</a>
+      <a href="../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Week 07</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">emergency-path/day-plans/week-07.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="week-7-java-intermediate">Week 7: Java Intermediate</h2>
+<h3 id="goal">Goal</h3>
+<p>Work with real Java collections, exception handling, files, and streams.</p>
+<h3 id="daily-time-split">Daily Time Split</h3>
+<ul>
+<li><code>90 min</code> new topic</li>
+<li><code>60 min</code> code exercises</li>
+<li><code>30 min</code> refactoring</li>
+<li><code>45 min</code> review and notes</li>
+</ul>
+<h3 id="day-1">Day 1</h3>
+<ul>
+<li><code>ArrayList</code></li>
+<li><code>HashSet</code></li>
+<li><code>HashMap</code></li>
+<li>Choosing the right collection</li>
+<li>Practice adding, searching, removing</li>
+</ul>
+<h3 id="day-2">Day 2</h3>
+<ul>
+<li>Generics</li>
+<li>Type safety</li>
+<li>Custom objects in collections</li>
+<li>Iterate cleanly with loops</li>
+</ul>
+<h3 id="day-3">Day 3</h3>
+<ul>
+<li>Exceptions</li>
+<li><code>try</code>, <code>catch</code>, <code>finally</code></li>
+<li>Throwing exceptions</li>
+<li>Custom exceptions</li>
+<li>Add validation to earlier classes</li>
+</ul>
+<h3 id="day-4">Day 4</h3>
+<ul>
+<li>File I/O</li>
+<li><code>BufferedReader</code></li>
+<li><code>FileWriter</code></li>
+<li>Read and write text files</li>
+<li>Persist data from a small console app</li>
+</ul>
+<h3 id="day-5">Day 5</h3>
+<ul>
+<li>Lambdas</li>
+<li>Streams API</li>
+<li><code>filter</code>, <code>map</code>, <code>forEach</code></li>
+<li>Sorting and collecting</li>
+<li>Refactor collection code using streams</li>
+</ul>
+<h3 id="day-6">Day 6</h3>
+<ul>
+<li>Mini integration day</li>
+<li>Combine collections, files, and exceptions</li>
+<li>Build progress toward final Java project</li>
+</ul>
+<h3 id="day-7">Day 7</h3>
+<ul>
+<li>Review weak areas</li>
+<li>Write one clean console application draft</li>
+<li>Commit with a short README</li>
+</ul>
+<h3 id="deliverables">Deliverables</h3>
+<ul>
+<li>collection practice files</li>
+<li>file I/O practice</li>
+<li>exception handling example</li>
+<li>one intermediate console app draft</li>
+</ul>
+<h3 id="pass-check">Pass Check</h3>
+<p>You are ready for Week 8 only if you can:</p>
+<ul>
+<li>choose an appropriate collection</li>
+<li>handle exceptions intentionally</li>
+<li>save and reload data from a file</li>
+<li>use basic lambdas and streams</li>
+</ul></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#week-7-java-intermediate">Week 7: Java Intermediate</a><a style="margin-left:12px" href="#goal">Goal</a><a style="margin-left:12px" href="#daily-time-split">Daily Time Split</a><a style="margin-left:12px" href="#day-1">Day 1</a><a style="margin-left:12px" href="#day-2">Day 2</a><a style="margin-left:12px" href="#day-3">Day 3</a><a style="margin-left:12px" href="#day-4">Day 4</a><a style="margin-left:12px" href="#day-5">Day 5</a><a style="margin-left:12px" href="#day-6">Day 6</a><a style="margin-left:12px" href="#day-7">Day 7</a><a style="margin-left:12px" href="#deliverables">Deliverables</a><a style="margin-left:12px" href="#pass-check">Pass Check</a></aside>
+    </main>
+  </body>
+</html>

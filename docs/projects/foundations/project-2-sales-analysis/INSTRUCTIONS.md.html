@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Instructions - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Instructions</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">projects/foundations/project-2-sales-analysis/INSTRUCTIONS.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="instructions-project-2-data-analyst">INSTRUCTIONS — Project 2: Data Analyst</h2>
+<h3 id="retail-sales-performance-analysis">Retail Sales Performance Analysis</h3>
+<h3 id="your-role">Your Role</h3>
+<p>You are acting as a <strong>Data Analyst</strong>. In industry, a Data Analyst is expected to:</p>
+<ul>
+<li>Clean and prepare raw data for analysis</li>
+<li>Aggregate and summarize data to answer business questions</li>
+<li>Create clear, informative visualizations</li>
+<li>Identify trends, outliers, and anomalies</li>
+<li>Write concise reports with actionable findings</li>
+</ul>
+<p>Data Analysts do NOT necessarily build predictive models — the focus is on <strong>describing what happened</strong> and <strong>why</strong>, not predicting what will happen.</p>
+<h3 id="what-to-study-before-coding">What to Study Before Coding</h3>
+<h4 id="python-amp-pandas">Python &amp; Pandas:</h4>
+<ul>
+<li>[ ] How to read CSV files with <code>pd.read_csv()</code></li>
+<li>[ ] How to parse dates: <code>pd.read_csv(..., parse_dates=[&#x27;Order Date&#x27;])</code></li>
+<li>[ ] How to use <code>.groupby()</code> + <code>.agg()</code> for summarizing data</li>
+<li>Google: &quot;pandas groupby agg tutorial&quot;</li>
+<li>[ ] How to create derived columns: <code>df[&#x27;Profit Margin&#x27;] = df[&#x27;Profit&#x27;] / df[&#x27;Sales&#x27;]</code></li>
+<li>[ ] How to use <code>.sort_values()</code> and <code>.nlargest()</code> / <code>.nsmallest()</code></li>
+<li>[ ] How to work with datetime objects in pandas:</li>
+<li>Extracting year: <code>df[&#x27;Year&#x27;] = df[&#x27;Order Date&#x27;].dt.year</code></li>
+<li>Extracting month: <code>df[&#x27;Month&#x27;] = df[&#x27;Order Date&#x27;].dt.month</code></li>
+</ul>
+<h4 id="visualization">Visualization:</h4>
+<ul>
+<li>[ ] Bar charts — good for comparisons across categories</li>
+<li>[ ] Line charts — good for time series (sales over time)</li>
+<li>[ ] Scatter plots — good for relationships between two numerical variables</li>
+<li>[ ] Heatmaps — good for showing values across two dimensions</li>
+<li>[ ] How to use <code>plt.subplots()</code> for multiple plots in one figure</li>
+<li>[ ] How to customize labels, titles, colors</li>
+</ul>
+<h4 id="business-concepts">Business Concepts:</h4>
+<ul>
+<li>[ ] What is <strong>profit margin</strong>? → <code>Profit / Sales × 100</code></li>
+<li>[ ] What is a <strong>KPI</strong> (Key Performance Indicator)?</li>
+<li>[ ] What does a negative profit mean for a product line?</li>
+<li>[ ] What is a <strong>customer segment</strong>? How do businesses classify customers?</li>
+<li>[ ] What is <strong>seasonality</strong> in sales data?</li>
+</ul>
+<h3 id="phase-by-phase-implementation-guide">Phase-by-Phase Implementation Guide</h3>
+<h4 id="phase-1-setup-20-minutes">Phase 1 — Setup (20 minutes)</h4>
+<ol>
+<li>Create the folder structure:</li>
+</ol>
+<pre><code class="language-">   project_2_data_analyst/
+       data/
+       outputs/
+           figures/</code></pre>
+<ol>
+<li>Download the Superstore dataset from Kaggle (link in README.md)</li>
+<li>Rename the file to <code>superstore.csv</code> and place it in <code>data/</code></li>
+<li>Install libraries:</li>
+</ol>
+<pre><code class="language-">   pip install pandas numpy matplotlib seaborn plotly</code></pre>
+<h4 id="phase-2-load-and-explore-data-45-minutes">Phase 2 — Load and Explore Data (45 minutes)</h4>
+<p><strong>What to do:</strong></p>
+<ol>
+<li>Load the CSV with <code>pd.read_csv()</code>. Try adding <code>encoding=&#x27;latin1&#x27;</code> if you get encoding errors.</li>
+<li>Parse date columns immediately: <code>parse_dates=[&#x27;Order Date&#x27;, &#x27;Ship Date&#x27;]</code></li>
+<li>Check the dataset:</li>
+</ol>
+<ul>
+<li>Shape, column names, data types</li>
+<li>Missing values (<code>.isnull().sum()</code>)</li>
+<li>Data types — are dates loaded as datetime? (<code>df.dtypes</code>)</li>
+<li>First/last rows: <code>.head()</code>, <code>.tail()</code></li>
+</ul>
+<p><strong>Questions to answer in code:</strong></p>
+<ul>
+<li>How many unique orders are there? (<code>Order ID</code>)</li>
+<li>How many unique customers?</li>
+<li>How many product categories?</li>
+<li>What date range does the data cover?</li>
+<li>Is there any missing data?</li>
+</ul>
+<h4 id="phase-3-data-cleaning-amp-feature-engineering-45-minutes">Phase 3 — Data Cleaning &amp; Feature Engineering (45 minutes)</h4>
+<p><strong>Cleaning tasks:</strong></p>
+<ol>
+<li><strong>Check for missing values</strong> — are any important columns missing?</li>
+</ol>
+<ul>
+<li>Drop or fill them depending on the column</li>
+<li>For numerical columns, consider filling with median</li>
+</ul>
+<ol>
+<li><strong>Parse date columns</strong> — if they weren&#x27;t parsed automatically:</li>
+</ol>
+<ul>
+<li><code>df[&#x27;Order Date&#x27;] = pd.to_datetime(df[&#x27;Order Date&#x27;])</code></li>
+<li><code>df[&#x27;Ship Date&#x27;] = pd.to_datetime(df[&#x27;Ship Date&#x27;])</code></li>
+</ul>
+<ol>
+<li><strong>Remove duplicate rows</strong> (if any):</li>
+</ol>
+<ul>
+<li>Check: <code>df.duplicated().sum()</code></li>
+<li>Remove: <code>df.drop_duplicates(inplace=True)</code></li>
+</ul>
+<p><strong>Feature Engineering — create these new columns:</strong></p>
+<table><thead><tr><th>New Column</th><th>Formula</th><th>Why</th></tr></thead><tbody><tr><td><code>Profit Margin</code></td><td><code>Profit / Sales</code></td><td>Profitability ratio</td></tr><tr><td><code>Processing Days</code></td><td><code>Ship Date - Order Date</code> → <code>.dt.days</code></td><td>Operational efficiency</td></tr><tr><td><code>Year</code></td><td><code>Order Date.dt.year</code></td><td>Year-level time series</td></tr><tr><td><code>Month</code></td><td><code>Order Date.dt.month</code></td><td>Monthly trends</td></tr><tr><td><code>Month Name</code></td><td><code>Order Date.dt.month_name()</code></td><td>Readable month labels</td></tr><tr><td><code>Year-Month</code></td><td><code>Order Date.dt.to_period(&#x27;M&#x27;)</code></td><td>Monthly grouping</td></tr></tbody></table>
+<h4 id="phase-4-kpi-summary-30-minutes">Phase 4 — KPI Summary (30 minutes)</h4>
+<p>Before making charts, compute your top-level Key Performance Indicators. These are the numbers that give you the &quot;big picture&quot; at a glance.</p>
+<p><strong>Calculate these KPIs:</strong></p>
+<table><thead><tr><th>KPI</th><th>How to Compute</th></tr></thead><tbody><tr><td>Total Revenue</td><td><code>df[&#x27;Sales&#x27;].sum()</code></td></tr><tr><td>Total Profit</td><td><code>df[&#x27;Profit&#x27;].sum()</code></td></tr><tr><td>Overall Profit Margin</td><td><code>df[&#x27;Profit&#x27;].sum() / df[&#x27;Sales&#x27;].sum() * 100</code></td></tr><tr><td>Total Orders</td><td><code>df[&#x27;Order ID&#x27;].nunique()</code></td></tr><tr><td>Average Order Value</td><td><code>df.groupby(&#x27;Order ID&#x27;)[&#x27;Sales&#x27;].sum().mean()</code></td></tr><tr><td>Average Profit per Order</td><td><code>df.groupby(&#x27;Order ID&#x27;)[&#x27;Profit&#x27;].sum().mean()</code></td></tr><tr><td>Total Customers</td><td><code>df[&#x27;Customer ID&#x27;].nunique()</code></td></tr></tbody></table>
+<p>Print these formatted as a KPI dashboard:</p>
+<pre><code class="language-">========================================
+       SALES PERFORMANCE KPI DASHBOARD
+========================================
+Total Revenue:        $X,XXX,XXX
+Total Profit:         $XXX,XXX
+Profit Margin:        XX.X%
+...
+========================================</code></pre>
+<h4 id="phase-5-sales-amp-profit-by-category-1-hour">Phase 5 — Sales &amp; Profit by Category (1 hour)</h4>
+<p><strong>Analysis 1 — Category Level:</strong></p>
+<ul>
+<li>Group by <code>Category</code>, aggregate <code>Sales</code> and <code>Profit</code> (sum)</li>
+<li>Compute profit margin per category</li>
+<li>Create a grouped bar chart: Sales and Profit side by side for each category</li>
+<li>Which category generates the most revenue? The most profit? What is the margin?</li>
+</ul>
+<p><strong>Analysis 2 — Sub-Category Level:</strong></p>
+<ul>
+<li>Group by <code>Sub-Category</code>, aggregate Sales and Profit (sum)</li>
+<li>Sort by Profit (descending)</li>
+<li>Create a horizontal bar chart showing profit per sub-category</li>
+<li>Color negative bars RED, positive bars GREEN</li>
+<li>This reveals &quot;losing&quot; product lines — critical business finding!</li>
+</ul>
+<p><strong>Key questions to answer:</strong></p>
+<ul>
+<li>What are the top 3 most profitable sub-categories?</li>
+<li>What are the sub-categories losing money? Should the business discontinue them?</li>
+<li>Is Furniture as a category profitable overall?</li>
+</ul>
+<h4 id="phase-6-regional-analysis-1-hour">Phase 6 — Regional Analysis (1 hour)</h4>
+<p><strong>Analysis 3 — Sales by Region:</strong></p>
+<ul>
+<li>Group by <code>Region</code>, aggregate Sales and Profit (sum)</li>
+<li>Create a bar chart comparing regions</li>
+<li>Which region has the most revenue? The highest margin?</li>
+</ul>
+<p><strong>Analysis 4 — Top 10 States by Sales:</strong></p>
+<ul>
+<li>Group by <code>State</code>, aggregate Sales (sum)</li>
+<li>Sort descending, take top 10</li>
+<li>Create a horizontal bar chart of top 10 states</li>
+<li>Which state is the biggest market?</li>
+</ul>
+<p><strong>Analysis 5 — Category Performance by Region (Heatmap):</strong></p>
+<ul>
+<li>Create a pivot table: rows = Region, columns = Category, values = Profit</li>
+<li>Use: <code>df.pivot_table(values=&#x27;Profit&#x27;, index=&#x27;Region&#x27;, columns=&#x27;Category&#x27;, aggfunc=&#x27;sum&#x27;)</code></li>
+<li>Plot as a heatmap: <code>sns.heatmap(pivot, annot=True, fmt=&#x27;.0f&#x27;, cmap=&#x27;RdYlGn&#x27;)</code></li>
+<li>This shows WHERE each category performs best and worst geographically</li>
+</ul>
+<h4 id="phase-7-time-series-analysis-1-hour">Phase 7 — Time Series Analysis (1 hour)</h4>
+<p><strong>Analysis 6 — Monthly Sales Trend:</strong></p>
+<ul>
+<li>Group by <code>Year-Month</code> (or Year and Month), aggregate Sales (sum)</li>
+<li>Plot a line chart: X-axis = time, Y-axis = monthly sales</li>
+<li>Do you see any seasonal patterns? (e.g., spikes at end of year?)</li>
+</ul>
+<p><strong>Analysis 7 — Year-over-Year Growth:</strong></p>
+<ul>
+<li>Group by <code>Year</code>, compute total Sales and Profit</li>
+<li>Compare 2014, 2015, 2016, 2017 (or whatever years are in your data)</li>
+<li>Create a bar chart of annual revenue</li>
+<li>Calculate YoY growth rate: <code>(this_year - last_year) / last_year * 100</code></li>
+</ul>
+<p><strong>Analysis 8 — Monthly Sales Heatmap:</strong></p>
+<ul>
+<li>Create a pivot table: rows = Year, columns = Month, values = Sales</li>
+<li>Plot as a heatmap</li>
+<li>This visually shows which months are hot every year</li>
+</ul>
+<h4 id="phase-8-customer-segment-analysis-45-minutes">Phase 8 — Customer Segment Analysis (45 minutes)</h4>
+<p><strong>Analysis 9 — Revenue and Profit by Segment:</strong></p>
+<ul>
+<li>Group by <code>Segment</code>, aggregate Sales and Profit</li>
+<li>Bar chart comparison</li>
+<li>Which segment is most profitable? Which has the best margin?</li>
+</ul>
+<p><strong>Analysis 10 — Average Order Value by Segment:</strong></p>
+<ul>
+<li>Group by <code>Customer ID</code> and <code>Segment</code> to get per-customer totals</li>
+<li>Then average by Segment</li>
+<li>This shows average customer value across segments</li>
+</ul>
+<h4 id="phase-9-discount-impact-analysis-45-minutes">Phase 9 — Discount Impact Analysis (45 minutes)</h4>
+<p><strong>Analysis 11 — Discount vs. Profit (Scatter Plot):</strong></p>
+<ul>
+<li>Plot <code>Discount</code> (X) vs. <code>Profit</code> (Y) as a scatter plot</li>
+<li>Color by <code>Category</code></li>
+<li>Add a trend line: use <code>np.polyfit()</code> or <code>sns.regplot()</code></li>
+<li>Does higher discount lead to lower profit? (usually yes!)</li>
+</ul>
+<p><strong>Analysis 12 — Average Profit by Discount Range:</strong></p>
+<ul>
+<li>Create discount bins: 0%, 1-20%, 21-40%, 41-60%, 60%+</li>
+<li>Use: <code>pd.cut(df[&#x27;Discount&#x27;], bins=[0, 0.01, 0.2, 0.4, 0.6, 1.0], labels=[...])</code></li>
+<li>Group by the bin, compute mean Profit</li>
+<li>Bar chart: profit per discount range</li>
+<li>This makes the discount-hurts-profit relationship very clear</li>
+</ul>
+<h4 id="phase-10-shipping-analysis-30-minutes">Phase 10 — Shipping Analysis (30 minutes)</h4>
+<p><strong>Analysis 13 — Average Processing Days by Ship Mode:</strong></p>
+<ul>
+<li>Group by <code>Ship Mode</code>, compute mean of <code>Processing Days</code></li>
+<li>Which ship mode is fastest? Slowest?</li>
+<li>Bar chart</li>
+</ul>
+<h4 id="phase-11-final-report-30-minutes">Phase 11 — Final Report (30 minutes)</h4>
+<p>Write a final report as a formatted print block or save to <code>outputs/summary_report.txt</code>.</p>
+<p><strong>Structure your report:</strong></p>
+<pre><code class="language-">SECTION 1 — KPI SUMMARY
+   (paste your KPIs here)
+
+SECTION 2 — TOP FINDINGS
+   Finding 1: ...
+   Finding 2: ...
+   Finding 3: ...
+   Finding 4: ...
+   Finding 5: ...
+
+SECTION 3 — PROBLEM AREAS
+   Issue 1: [Sub-category] is losing $X,XXX — investigate further
+   Issue 2: ...
+
+SECTION 4 — RECOMMENDATIONS
+   Recommendation 1: ...
+   Recommendation 2: ...
+   Recommendation 3: ...</code></pre>
+<h3 id="deliverables-checklist">Deliverables Checklist</h3>
+<ul>
+<li>[ ] Script runs from top to bottom without errors</li>
+<li>[ ] 10+ charts saved in <code>outputs/figures/</code></li>
+<li>[ ] KPI dashboard printed</li>
+<li>[ ] Answers to all 8 business questions</li>
+<li>[ ] Summary report written</li>
+<li>[ ] README.md updated with actual results</li>
+</ul>
+<h3 id="estimated-time-per-phase">Estimated Time Per Phase</h3>
+<table><thead><tr><th>Phase</th><th>Task</th><th>Time</th></tr></thead><tbody><tr><td>1</td><td>Setup</td><td>20 min</td></tr><tr><td>2</td><td>Load &amp; Explore</td><td>45 min</td></tr><tr><td>3</td><td>Clean &amp; Engineer</td><td>45 min</td></tr><tr><td>4</td><td>KPI Summary</td><td>30 min</td></tr><tr><td>5</td><td>Category Analysis</td><td>1 hr</td></tr><tr><td>6</td><td>Regional Analysis</td><td>1 hr</td></tr><tr><td>7</td><td>Time Series</td><td>1 hr</td></tr><tr><td>8</td><td>Customer Segments</td><td>45 min</td></tr><tr><td>9</td><td>Discount Analysis</td><td>45 min</td></tr><tr><td>10</td><td>Shipping Analysis</td><td>30 min</td></tr><tr><td>11</td><td>Final Report</td><td>30 min</td></tr><tr><td><strong>Total</strong></td><td></td><td><strong>~7–8 hrs</strong></td></tr></tbody></table>
+<h3 id="useful-resources">Useful Resources</h3>
+<ul>
+<li>Pandas GroupBy: https://pandas.pydata.org/docs/user_guide/groupby.html</li>
+<li>Seaborn tutorial: https://seaborn.pydata.org/tutorial.html</li>
+<li>Plotly for interactive charts: https://plotly.com/python/</li>
+<li>Pandas date/time: https://pandas.pydata.org/docs/user_guide/timeseries.html</li>
+<li>Superstore dataset description on Kaggle (read the column descriptions!)</li>
+</ul></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#instructions-project-2-data-analyst">INSTRUCTIONS — Project 2: Data Analyst</a><a style="margin-left:12px" href="#retail-sales-performance-analysis">Retail Sales Performance Analysis</a><a style="margin-left:12px" href="#your-role">Your Role</a><a style="margin-left:12px" href="#what-to-study-before-coding">What to Study Before Coding</a><a style="margin-left:24px" href="#python-amp-pandas">Python &amp; Pandas:</a><a style="margin-left:24px" href="#visualization">Visualization:</a><a style="margin-left:24px" href="#business-concepts">Business Concepts:</a><a style="margin-left:12px" href="#phase-by-phase-implementation-guide">Phase-by-Phase Implementation Guide</a><a style="margin-left:24px" href="#phase-1-setup-20-minutes">Phase 1 — Setup (20 minutes)</a><a style="margin-left:24px" href="#phase-2-load-and-explore-data-45-minutes">Phase 2 — Load and Explore Data (45 minutes)</a><a style="margin-left:24px" href="#phase-3-data-cleaning-amp-feature-engineering-45-minutes">Phase 3 — Data Cleaning &amp; Feature Engineering (45 minutes)</a><a style="margin-left:24px" href="#phase-4-kpi-summary-30-minutes">Phase 4 — KPI Summary (30 minutes)</a><a style="margin-left:24px" href="#phase-5-sales-amp-profit-by-category-1-hour">Phase 5 — Sales &amp; Profit by Category (1 hour)</a><a style="margin-left:24px" href="#phase-6-regional-analysis-1-hour">Phase 6 — Regional Analysis (1 hour)</a><a style="margin-left:24px" href="#phase-7-time-series-analysis-1-hour">Phase 7 — Time Series Analysis (1 hour)</a><a style="margin-left:24px" href="#phase-8-customer-segment-analysis-45-minutes">Phase 8 — Customer Segment Analysis (45 minutes)</a><a style="margin-left:24px" href="#phase-9-discount-impact-analysis-45-minutes">Phase 9 — Discount Impact Analysis (45 minutes)</a><a style="margin-left:24px" href="#phase-10-shipping-analysis-30-minutes">Phase 10 — Shipping Analysis (30 minutes)</a><a style="margin-left:24px" href="#phase-11-final-report-30-minutes">Phase 11 — Final Report (30 minutes)</a><a style="margin-left:12px" href="#deliverables-checklist">Deliverables Checklist</a><a style="margin-left:12px" href="#estimated-time-per-phase">Estimated Time Per Phase</a><a style="margin-left:12px" href="#useful-resources">Useful Resources</a></aside>
+    </main>
+  </body>
+</html>

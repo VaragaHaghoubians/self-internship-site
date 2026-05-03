@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mis - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Mis</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/mis/README.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="zero-to-hero-guide-management-information-systems-mis-in-python">Zero-to-Hero Guide: Management Information Systems (MIS) in Python</h2>
+<blockquote><strong>The enterprise layer.</strong> Supply Chain is the <em>physical</em> movement of goods. MIS is the <em>digital nervous system</em> that tracks, manages, and reports on the entire company. As an AI/Data Engineer with an MIS background, you don&#x27;t just build models — you build the <strong>internal tools and dashboards that executives use to run the business.</strong></blockquote>
+<blockquote></blockquote>
+<blockquote>This is where your Engineering Management degree earns a salary premium over a pure CS graduate.</blockquote>
+<h3 id="the-three-technical-pillars">The Three Technical Pillars</h3>
+<pre><code class="language-">Pillar 1: Data Architecture &amp; ETL  → centralise all company data in one place
+Pillar 2: Business Intelligence     → turn that data into executive dashboards
+Pillar 3: Enterprise Automation     → make the system act on its own findings</code></pre>
+<p>The capstone result: a <strong>Custom MIS Platform</strong> — not a &quot;project,&quot; a platform — with a login screen, live KPI dashboard, ML-powered alerts, and automated notifications. That is what gets you hired as an Enterprise AI Architect.</p>
+<h3 id="pillar-1-data-architecture-amp-etl-the-foundation">Pillar 1 — Data Architecture &amp; ETL (The Foundation)</h3>
+<p><strong>The Business Problem:</strong> The marketing team&#x27;s Excel says revenue is $1.2M. The factory&#x27;s ERP says $980k. Finance says $1.1M. Nobody trusts anyone. Your job: build the single source of truth.</p>
+<p><strong>The Data Science Skill:</strong> ETL (Extract, Transform, Load) + Data Warehouse design</p>
+<h4 id="1a-star-schema-the-industry-standard-database-design">1a. Star Schema — The Industry Standard Database Design</h4>
+<p>Before writing a single line of ETL code, design the database correctly. The Kimball Methodology uses <strong>Star Schemas</strong>: one central fact table surrounded by dimension tables.</p>
+<pre><code class="language-">                    dim_product
+                        │
+dim_date ──── fact_sales ──── dim_store
+                        │
+                    dim_customer</code></pre>
+<ul>
+<li><strong>Fact table</strong> (<code>fact_sales</code>): stores measurable events — each row is one sale, one sensor reading, one delivery</li>
+<li><strong>Dimension tables</strong> (<code>dim_product</code>, <code>dim_store</code>, etc.): store descriptive attributes — product name, category, store region</li>
+</ul>
+<p>Why does this matter? Managers run queries like:</p>
+<blockquote>&quot;Show me total revenue by product category, by month, for the last 2 years.&quot;</blockquote>
+<p>A star schema makes this query a single SQL JOIN. A poorly designed database makes it impossible without an engineer rewriting it.</p>
+<pre><code class="language-sql">-- Example: sales fact table + dimensions
+CREATE TABLE dim_date (
+    date_key    INTEGER PRIMARY KEY,  -- YYYYMMDD integer key (faster than DATE for joins)
+    full_date   DATE,
+    year        INTEGER,
+    quarter     INTEGER,
+    month       INTEGER,
+    week        INTEGER,
+    day_of_week VARCHAR(10)
+);
+
+CREATE TABLE dim_product (
+    product_key     SERIAL PRIMARY KEY,
+    product_id      VARCHAR(50) UNIQUE,
+    product_name    VARCHAR(200),
+    category        VARCHAR(100),
+    subcategory     VARCHAR(100),
+    unit_cost_usd   DECIMAL(10,2)
+);
+
+CREATE TABLE dim_store (
+    store_key   SERIAL PRIMARY KEY,
+    store_id    VARCHAR(50) UNIQUE,
+    store_name  VARCHAR(200),
+    city        VARCHAR(100),
+    region      VARCHAR(100),
+    country     VARCHAR(100)
+);
+
+CREATE TABLE fact_sales (
+    sale_id         SERIAL PRIMARY KEY,
+    date_key        INTEGER REFERENCES dim_date(date_key),
+    product_key     INTEGER REFERENCES dim_product(product_key),
+    store_key       INTEGER REFERENCES dim_store(store_key),
+    units_sold      INTEGER,
+    revenue_usd     DECIMAL(12,2),
+    cost_usd        DECIMAL(12,2),
+    profit_usd      DECIMAL(12,2)  -- computed column: revenue - cost
+);
+
+-- Manager query: revenue by category per month
+SELECT
+    d.year,
+    d.month,
+    p.category,
+    SUM(f.revenue_usd)  AS total_revenue,
+    SUM(f.profit_usd)   AS total_profit,
+    SUM(f.units_sold)   AS units_sold
+FROM fact_sales f
+JOIN dim_date    d ON f.date_key    = d.date_key
+JOIN dim_product p ON f.product_key = p.product_key
+GROUP BY d.year, d.month, p.category
+ORDER BY d.year, d.month, p.category;</code></pre>
+<h4 id="1b-etl-pipeline-in-python">1b. ETL Pipeline in Python</h4>
+<p>An ETL pipeline extracts data from source systems (APIs, CSVs, other databases), transforms it (cleans, reshapes, joins), and loads it into your data warehouse.</p>
+<pre><code class="language-python">import pandas as pd
+import sqlalchemy
+from sqlalchemy import create_engine
+from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class ETLPipeline:
+    &quot;&quot;&quot;
+    A reusable ETL base class.
+
+    Design principle: each pipeline run should be IDEMPOTENT — running it
+    twice should produce the same result as running it once. This means:
+    - Use UPSERT (INSERT ... ON CONFLICT UPDATE) instead of plain INSERT
+    - Track the last successful run timestamp and only pull new records
+    - Never delete rows from the warehouse; add an &#x27;is_active&#x27; flag instead
+
+    This matters in production because pipelines fail mid-run. You need
+    to be able to restart them safely.
+    &quot;&quot;&quot;
+
+    def __init__(self, warehouse_url: str):
+        &quot;&quot;&quot;
+        Args:
+            warehouse_url: SQLAlchemy connection string, e.g.
+                &#x27;postgresql://user:password@localhost:5432/warehouse&#x27;
+        &quot;&quot;&quot;
+        self.engine = create_engine(warehouse_url)
+        self.run_log: list[dict] = []
+
+    def extract(self, source) -&gt; pd.DataFrame:
+        &quot;&quot;&quot;
+        Pull raw data from the source system.
+
+        Sources you will encounter:
+        - CSV / Excel files:    pd.read_csv() or pd.read_excel()
+        - REST API:             requests.get(url, headers=auth).json()
+        - Another database:     pd.read_sql(query, other_engine)
+        - IoT/MQTT stream:      see phase-4-iot-hardware/
+        - S3 / cloud storage:   pd.read_csv(&quot;s3://bucket/file.csv&quot;)
+
+        TODO: implement for your specific source
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+    def transform(self, raw_df: pd.DataFrame) -&gt; pd.DataFrame:
+        &quot;&quot;&quot;
+        Clean and reshape the raw data to match the warehouse schema.
+
+        Common transformations:
+        - Standardise column names (snake_case, no spaces)
+        - Parse date strings into datetime objects
+        - Handle nulls: fill, drop, or flag with a sentinel value
+        - Derive new columns (profit = revenue - cost)
+        - Map source IDs to warehouse surrogate keys
+        - Validate data ranges (price &gt; 0, quantity &gt;= 0)
+
+        TODO: implement for your specific schema
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+    def load(self, clean_df: pd.DataFrame, table_name: str, if_exists: str = &quot;append&quot;):
+        &quot;&quot;&quot;
+        Writes the transformed data to the warehouse.
+
+        Args:
+            if_exists: &#x27;append&#x27; for incremental loads, &#x27;replace&#x27; for full refresh
+
+        TODO: clean_df.to_sql(table_name, self.engine, if_exists=if_exists, index=False)
+
+        For UPSERT (recommended in production):
+            Use raw SQL with ON CONFLICT DO UPDATE, or
+            use the &#x27;upsert&#x27; pattern: load to a staging table, then MERGE/UPSERT
+            from staging into the final table.
+        &quot;&quot;&quot;
+        clean_df.to_sql(table_name, self.engine, if_exists=if_exists, index=False)
+        logger.info(f&quot;Loaded {len(clean_df)} rows into {table_name}&quot;)
+
+    def run(self, source, table_name: str):
+        &quot;&quot;&quot;Full ETL run with timing and error logging.&quot;&quot;&quot;
+        start = datetime.utcnow()
+        try:
+            raw  = self.extract(source)
+            clean = self.transform(raw)
+            self.load(clean, table_name)
+            status = &quot;SUCCESS&quot;
+            rows = len(clean)
+        except Exception as e:
+            logger.error(f&quot;ETL failed: {e}&quot;)
+            status = &quot;FAILED&quot;
+            rows = 0
+            raise
+        finally:
+            self.run_log.append({
+                &quot;table&quot;: table_name,
+                &quot;started_at&quot;: start.isoformat(),
+                &quot;duration_s&quot;: (datetime.utcnow() - start).total_seconds(),
+                &quot;rows_loaded&quot;: rows,
+                &quot;status&quot;: status,
+            })
+
+
+class SalesCSVPipeline(ETLPipeline):
+    &quot;&quot;&quot;
+    Concrete ETL: reads a sales CSV and loads it into the fact_sales table.
+    Demonstrates how to subclass ETLPipeline for a specific source.
+    &quot;&quot;&quot;
+
+    def extract(self, csv_path: str) -&gt; pd.DataFrame:
+        df = pd.read_csv(csv_path)
+        logger.info(f&quot;Extracted {len(df)} rows from {csv_path}&quot;)
+        return df
+
+    def transform(self, raw_df: pd.DataFrame) -&gt; pd.DataFrame:
+        df = raw_df.copy()
+
+        # Standardise column names
+        df.columns = [c.lower().replace(&quot; &quot;, &quot;_&quot;) for c in df.columns]
+
+        # Parse dates
+        df[&quot;sale_date&quot;] = pd.to_datetime(df[&quot;sale_date&quot;])
+        df[&quot;date_key&quot;]  = df[&quot;sale_date&quot;].dt.strftime(&quot;%Y%m%d&quot;).astype(int)
+
+        # Derive profit
+        df[&quot;profit_usd&quot;] = df[&quot;revenue_usd&quot;] - df[&quot;cost_usd&quot;]
+
+        # Drop rows with null product or store IDs (cannot join without them)
+        df = df.dropna(subset=[&quot;product_id&quot;, &quot;store_id&quot;])
+
+        # Validate ranges
+        df = df[df[&quot;units_sold&quot;] &gt;= 0]
+        df = df[df[&quot;revenue_usd&quot;] &gt;= 0]
+
+        return df[[&quot;date_key&quot;, &quot;product_id&quot;, &quot;store_id&quot;, &quot;units_sold&quot;,
+                   &quot;revenue_usd&quot;, &quot;cost_usd&quot;, &quot;profit_usd&quot;]]</code></pre>
+<h4 id="1c-automating-etl-with-celery-beat">1c. Automating ETL with Celery Beat</h4>
+<p>In production, your ETL pipeline runs on a schedule — not manually. You already learn Celery in Month 6. Here is how it connects to MIS:</p>
+<pre><code class="language-python"># In your Django app&#x27;s tasks.py:
+
+from celery import shared_task
+from celery.schedules import crontab
+from .etl_pipelines import SalesCSVPipeline
+
+@shared_task
+def nightly_sales_etl():
+    &quot;&quot;&quot;
+    Runs every night at 2 AM to load the previous day&#x27;s sales into the warehouse.
+    Triggered by Celery Beat — no human intervention required.
+    &quot;&quot;&quot;
+    pipeline = SalesCSVPipeline(warehouse_url=&quot;postgresql://...&quot;)
+    pipeline.run(
+        source=&quot;/data/exports/sales_yesterday.csv&quot;,
+        table_name=&quot;fact_sales&quot;,
+    )
+    return {&quot;rows_loaded&quot;: pipeline.run_log[-1][&quot;rows_loaded&quot;]}
+
+
+# In settings.py — CELERY_BEAT_SCHEDULE:
+# &quot;nightly-sales-etl&quot;: {
+#     &quot;task&quot;: &quot;myapp.tasks.nightly_sales_etl&quot;,
+#     &quot;schedule&quot;: crontab(hour=2, minute=0),  # 2:00 AM every night
+# }</code></pre>
+<h3 id="pillar-2-business-intelligence-amp-executive-dashboards">Pillar 2 — Business Intelligence &amp; Executive Dashboards</h3>
+<p><strong>The Business Problem:</strong> The CEO opens your app every Monday morning. She does not look at a Jupyter notebook. She looks at a dashboard with three numbers: Revenue (green/red vs. last week), On-Time Delivery Rate (%), and Inventory Risk ($).</p>
+<p><strong>The Data Science Skill:</strong> BI tools + Plotly/Django integration</p>
+<h4 id="2a-metabase-via-docker-fastest-path-to-enterprise-dashboards">2a. Metabase via Docker (Fastest Path to Enterprise Dashboards)</h4>
+<p>Metabase is an open-source BI tool. You connect it to your PostgreSQL database and build professional dashboards with drag-and-drop — no front-end coding required.</p>
+<pre><code class="language-bash"># Spin up Metabase in 30 seconds — Month 3, after you learn Docker
+docker run -d \
+  -p 3000:3000 \
+  --name metabase \
+  -e MB_DB_TYPE=postgres \
+  -e MB_DB_DBNAME=metabase \
+  -e MB_DB_PORT=5432 \
+  -e MB_DB_USER=postgres \
+  -e MB_DB_PASS=yourpassword \
+  -e MB_DB_HOST=host.docker.internal \
+  metabase/metabase
+
+# Then open http://localhost:3000 — follow the setup wizard
+# Connect to your warehouse database
+# Build charts by clicking, no SQL required (or write SQL for custom queries)</code></pre>
+<p><strong>What to build in Metabase for the capstone:</strong></p>
+<ul>
+<li>Line chart: daily temperature in the cold-chain warehouse (last 7 days)</li>
+<li>Gauge: current failure probability (green/yellow/red)</li>
+<li>KPI card: Financial Risk ($) — one big number, colour-coded</li>
+<li>Table: latest OR-Tools transfer plan</li>
+</ul>
+<h4 id="2b-plotly-dash-embedded-in-django">2b. Plotly Dash Embedded in Django</h4>
+<p>For the capstone dashboard that lives inside your Django app (not a separate Metabase server), use Plotly. It integrates with Django templates and produces interactive charts.</p>
+<pre><code class="language-python"># views.py — the Django view that powers the executive dashboard
+
+import plotly.graph_objects as go
+import plotly.utils
+import json
+from django.shortcuts import render
+from .models import SensorReading, TransferPlan
+
+def executive_dashboard(request):
+    &quot;&quot;&quot;
+    Renders the executive dashboard.
+    Charts are built server-side with Plotly and passed as JSON to the template.
+    The template renders them with Plotly.js — no page reload needed.
+    &quot;&quot;&quot;
+    # --- 1. Temperature trend chart (last 72 hours) ---
+    readings = SensorReading.objects.filter(
+        sensor_id=&quot;COOLER-01&quot;
+    ).order_by(&quot;-timestamp&quot;)[:144]  # 72h * 2 readings/hour
+
+    times  = [r.timestamp for r in reversed(list(readings))]
+    temps  = [r.temperature_c for r in reversed(list(readings))]
+
+    temp_fig = go.Figure()
+    temp_fig.add_trace(go.Scatter(
+        x=times, y=temps,
+        mode=&quot;lines&quot;,
+        line=dict(color=&quot;#2196F3&quot;, width=2),
+        name=&quot;Temperature (°C)&quot;
+    ))
+    temp_fig.add_hline(
+        y=8.0, line_dash=&quot;dash&quot;, line_color=&quot;red&quot;,
+        annotation_text=&quot;Critical threshold (8°C)&quot;
+    )
+    temp_fig.update_layout(
+        title=&quot;Cold-Chain Temperature — Last 72 Hours&quot;,
+        xaxis_title=&quot;Time&quot;,
+        yaxis_title=&quot;°C&quot;,
+        template=&quot;plotly_white&quot;,
+        height=350,
+    )
+
+    # --- 2. KPI cards ---
+    latest = SensorReading.objects.filter(sensor_id=&quot;COOLER-01&quot;).latest(&quot;timestamp&quot;)
+    failure_pct = round(latest.failure_prob_48h * 100, 1)
+    financial_risk = round(latest.financial_risk_usd, 0)
+
+    # Colour logic for the KPI card
+    if failure_pct &lt; 20:
+        risk_colour = &quot;success&quot;   # Bootstrap green
+    elif failure_pct &lt; 40:
+        risk_colour = &quot;warning&quot;   # Bootstrap yellow
+    else:
+        risk_colour = &quot;danger&quot;    # Bootstrap red
+
+    # --- 3. Transfer plan (if active) ---
+    latest_plan = TransferPlan.objects.order_by(&quot;-created_at&quot;).first()
+
+    context = {
+        &quot;temp_chart_json&quot;: json.dumps(temp_fig, cls=plotly.utils.PlotlyJSONEncoder),
+        &quot;current_temp&quot;:    latest.temperature_c,
+        &quot;failure_pct&quot;:     failure_pct,
+        &quot;financial_risk&quot;:  f&quot;${financial_risk:,.0f}&quot;,
+        &quot;risk_colour&quot;:     risk_colour,
+        &quot;alert_active&quot;:    failure_pct &gt;= 40,
+        &quot;transfer_plan&quot;:   latest_plan,
+    }
+    return render(request, &quot;dashboard/executive.html&quot;, context)</code></pre>
+<pre><code class="language-html">&lt;!-- templates/dashboard/executive.html — the executive view --&gt;
+{% extends &quot;base.html&quot; %}
+{% block content %}
+
+&lt;!-- Alert banner --&gt;
+{% if alert_active %}
+&lt;div class=&quot;alert alert-danger text-center fw-bold fs-5&quot;&gt;
+    ⚠️ COOLING FAILURE RISK DETECTED — TRANSFER PLAN GENERATED
+&lt;/div&gt;
+{% endif %}
+
+&lt;!-- KPI Row --&gt;
+&lt;div class=&quot;row mb-4&quot;&gt;
+  &lt;div class=&quot;col-md-4&quot;&gt;
+    &lt;div class=&quot;card text-center p-3&quot;&gt;
+      &lt;div class=&quot;card-title text-muted&quot;&gt;Current Temperature&lt;/div&gt;
+      &lt;div class=&quot;display-5 fw-bold&quot;&gt;{{ current_temp }}°C&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;col-md-4&quot;&gt;
+    &lt;div class=&quot;card text-center p-3 border-{{ risk_colour }}&quot;&gt;
+      &lt;div class=&quot;card-title text-muted&quot;&gt;Failure Probability (48h)&lt;/div&gt;
+      &lt;div class=&quot;display-5 fw-bold text-{{ risk_colour }}&quot;&gt;{{ failure_pct }}%&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;col-md-4&quot;&gt;
+    &lt;div class=&quot;card text-center p-3 border-{{ risk_colour }}&quot;&gt;
+      &lt;div class=&quot;card-title text-muted&quot;&gt;Financial Risk&lt;/div&gt;
+      &lt;div class=&quot;display-5 fw-bold text-{{ risk_colour }}&quot;&gt;{{ financial_risk }}&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Temperature Chart --&gt;
+&lt;div id=&quot;temp-chart&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+  var tempData = {{ temp_chart_json|safe }};
+  Plotly.newPlot(&#x27;temp-chart&#x27;, tempData.data, tempData.layout);
+&lt;/script&gt;
+
+{% endblock %}</code></pre>
+<h3 id="pillar-3-enterprise-automation-making-the-system-act">Pillar 3 — Enterprise Automation (Making the System Act)</h3>
+<p><strong>The Business Problem:</strong> Your ML model flags a failure risk at 2 AM. Nobody is watching the dashboard. The system must autonomously alert the maintenance manager — before the freezer fails and the insulin spoils.</p>
+<p><strong>The Data Science Skill:</strong> Workflow automation + external API integration</p>
+<h4 id="3a-automated-email-alerts-via-django">3a. Automated Email Alerts via Django</h4>
+<pre><code class="language-python"># In your Celery task — after run_decision_pipeline() returns a high-risk result
+
+from django.core.mail import send_mail
+from django.conf import settings
+
+def send_failure_alert(sensor_id: str, failure_prob: float, financial_risk: float, plan: dict):
+    &quot;&quot;&quot;
+    Sends a high-priority email to the maintenance team when failure risk &gt; 40%.
+
+    Django&#x27;s send_mail() works with any SMTP provider.
+    For production: use SendGrid (free tier: 100 emails/day) or AWS SES.
+
+    In settings.py:
+        EMAIL_BACKEND = &#x27;django.core.mail.backends.smtp.EmailBackend&#x27;
+        EMAIL_HOST = &#x27;smtp.sendgrid.net&#x27;
+        EMAIL_PORT = 587
+        EMAIL_USE_TLS = True
+        EMAIL_HOST_USER = &#x27;apikey&#x27;
+        EMAIL_HOST_PASSWORD = os.environ[&#x27;SENDGRID_API_KEY&#x27;]  # never hard-code
+    &quot;&quot;&quot;
+    subject = f&quot;[HIGH PRIORITY] Cooling Failure Risk: {failure_prob*100:.0f}% — {sensor_id}&quot;
+
+    plan_summary = &quot;\n&quot;.join(
+        f&quot;  • {a[&#x27;item_id&#x27;]} → {a[&#x27;to_warehouse&#x27;]} (cost: ${a[&#x27;cost&#x27;]:.0f})&quot;
+        for a in plan.get(&quot;assignments&quot;, [])
+    ) if plan else &quot;  No transfer plan generated.&quot;
+
+    body = f&quot;&quot;&quot;
+AUTOMATED ALERT — Cold-Chain Monitoring System
+
+Sensor:            {sensor_id}
+Failure Risk (48h): {failure_prob*100:.1f}%
+Financial Risk:    ${financial_risk:,.0f}
+
+Recommended Transfer Plan (Total Cost: ${plan.get(&#x27;total_cost_usd&#x27;, 0):,.0f}):
+{plan_summary}
+
+Log in to the dashboard for full details: https://your-app.com/dashboard/
+
+This is an automated message. Do not reply.
+&quot;&quot;&quot;
+
+    send_mail(
+        subject=subject,
+        message=body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[&quot;maintenance-manager@company.com&quot;],
+        fail_silently=False,
+    )
+
+
+# 3b. Slack alert (alternative — often preferred in modern companies)
+
+import requests
+import os
+
+def send_slack_alert(failure_prob: float, financial_risk: float):
+    &quot;&quot;&quot;
+    Sends a Slack message to the #maintenance-alerts channel.
+
+    Setup:
+    1. Go to api.slack.com/apps → Create New App → Incoming Webhooks
+    2. Activate incoming webhooks → Add to workspace → copy the webhook URL
+    3. Store the URL in an environment variable (never hard-code it)
+    &quot;&quot;&quot;
+    webhook_url = os.environ.get(&quot;SLACK_WEBHOOK_URL&quot;)
+    if not webhook_url:
+        return
+
+    colour = &quot;danger&quot; if failure_prob &gt; 0.4 else &quot;warning&quot;
+    payload = {
+        &quot;attachments&quot;: [{
+            &quot;color&quot;: colour,
+            &quot;title&quot;: f&quot;:rotating_light: Cooling Failure Risk: {failure_prob*100:.0f}%&quot;,
+            &quot;text&quot;: (
+                f&quot;*Financial Risk:* ${financial_risk:,.0f}\n&quot;
+                f&quot;*Action:* Transfer plan generated. &quot;
+                f&quot;&lt;https://your-app.com/dashboard/|View Dashboard&gt;&quot;
+            ),
+            &quot;footer&quot;: &quot;Cold-Chain MIS Platform&quot;,
+        }]
+    }
+    requests.post(webhook_url, json=payload, timeout=5)</code></pre>
+<h4 id="3b-apache-airflow-orchestrating-complex-workflows">3b. Apache Airflow — Orchestrating Complex Workflows</h4>
+<p>When your ETL pipeline has 10 steps and some depend on others finishing first, Celery Beat becomes hard to manage. Airflow is the industry standard for orchestrating these <strong>DAGs</strong> (Directed Acyclic Graphs) of tasks.</p>
+<pre><code class="language-python"># A simple Airflow DAG: nightly ETL → run ML model → send report
+
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime, timedelta
+
+default_args = {
+    &quot;owner&quot;: &quot;data-team&quot;,
+    &quot;retries&quot;: 2,
+    &quot;retry_delay&quot;: timedelta(minutes=5),
+    &quot;email_on_failure&quot;: True,
+    &quot;email&quot;: [&quot;data-team@company.com&quot;],
+}
+
+with DAG(
+    dag_id=&quot;nightly_mis_pipeline&quot;,
+    default_args=default_args,
+    description=&quot;ETL → ML scoring → executive report&quot;,
+    schedule_interval=&quot;0 2 * * *&quot;,   # 2 AM every night (cron syntax)
+    start_date=datetime(2024, 1, 1),
+    catchup=False,
+    tags=[&quot;mis&quot;, &quot;production&quot;],
+) as dag:
+
+    extract_sales = PythonOperator(
+        task_id=&quot;extract_sales_data&quot;,
+        python_callable=run_sales_etl,
+    )
+
+    score_inventory = PythonOperator(
+        task_id=&quot;score_inventory_risk&quot;,
+        python_callable=run_ml_scoring,
+    )
+
+    send_report = PythonOperator(
+        task_id=&quot;send_executive_report&quot;,
+        python_callable=send_daily_report_email,
+    )
+
+    # Dependency chain: ETL must finish before ML scoring, which must finish before report
+    extract_sales &gt;&gt; score_inventory &gt;&gt; send_report</code></pre>
+<h3 id="the-full-mis-platform-architecture">The Full MIS Platform Architecture</h3>
+<p>This is what your Month 9 capstone looks like when described as an MIS Platform:</p>
+<pre><code class="language-">┌─────────────────────────────────────────────────────┐
+│              CUSTOM MIS PLATFORM                    │
+│         (Cold-Chain Logistics Edition)              │
+└─────────────────────────────────────────────────────┘
+
+DATA SOURCES                 DATA WAREHOUSE              CONSUMERS
+──────────                   ──────────────              ─────────
+ESP32 Sensor ──────────────► fact_sensor_readings ──────► Executive Dashboard
+Supply Orders (API) ────────► fact_inventory       ──────► Maintenance Alerts
+Delivery Records (CSV) ─────► fact_deliveries      ──────► Plotly KPI Charts
+                             dim_products           ──────► Metabase Reports
+                             dim_warehouses
+                                   │
+                              Celery / Airflow
+                            (nightly ETL + ML jobs)
+                                   │
+                          ┌────────┴────────┐
+                          ▼                 ▼
+                    ML Model           OR-Tools
+                  (failure risk)     (transfer plan)
+                          │                 │
+                          └────────┬────────┘
+                                   ▼
+                         Django Dashboard
+                         (Financial Risk $)
+                         (Automated Email/Slack)</code></pre>
+<h3 id="learning-path-study-alongside-phase-2-3">Learning Path (Study Alongside Phase 2–3)</h3>
+<p><strong>Week 1 — Data Architecture</strong></p>
+<ul>
+<li>[ ] Read the Kimball Group Star Schema introduction: https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/</li>
+<li>[ ] Design a star schema for your cold-chain data (fact + 3 dimensions) on paper first</li>
+<li>[ ] Implement it in PostgreSQL (reuse your Django ORM from Phase 3)</li>
+</ul>
+<p><strong>Week 2 — ETL</strong></p>
+<ul>
+<li>[ ] Implement <code>SalesCSVPipeline</code> above on the DataCo Smart Supply Chain dataset</li>
+<li>[ ] Automate it with a Celery Beat task (reuse Month 6 Celery knowledge)</li>
+<li>[ ] Write a simple run log table to track every ETL execution</li>
+</ul>
+<p><strong>Week 3 — BI Dashboards</strong></p>
+<ul>
+<li>[ ] Spin up Metabase with Docker (<code>docker run metabase/metabase</code> — 1 command)</li>
+<li>[ ] Connect it to your PostgreSQL warehouse</li>
+<li>[ ] Build 3 charts: revenue trend, inventory risk gauge, delivery performance</li>
+<li>[ ] Implement the Plotly Django view above in your existing Phase 3 app</li>
+</ul>
+<p><strong>Week 4 — Automation</strong></p>
+<ul>
+<li>[ ] Implement the email alert function and test it with a fake high-risk reading</li>
+<li>[ ] Set up a Slack webhook and test the Slack alert</li>
+<li>[ ] Read the Apache Airflow docs — understand DAGs and task dependencies</li>
+</ul>
+<h3 id="interview-talking-points">Interview Talking Points</h3>
+<table><thead><tr><th>Question</th><th>What to say</th></tr></thead><tbody><tr><td>&quot;What is a Star Schema and why does it matter?&quot;</td><td>&quot;A star schema separates measurable facts (sales, sensor readings) from descriptive dimensions (product, store, date) into separate tables. It matters because it lets any analyst run queries like &#x27;revenue by region by month&#x27; with simple JOINs — no data engineering degree needed. The alternative is a normalized schema that requires 10-table JOINs for every business question.&quot;</td></tr><tr><td>&quot;What is ETL and what makes a good ETL pipeline?&quot;</td><td>&quot;ETL is Extract-Transform-Load: pull data from source systems, clean and reshape it, then load it into the warehouse. A good pipeline is idempotent (safe to re-run), observable (every run is logged), and incremental (only processes new data, not the full history every night). Celery Beat handles scheduling; SQLAlchemy handles the DB writes.&quot;</td></tr><tr><td>&quot;How do you present ML results to non-technical executives?&quot;</td><td>&quot;I never show a confusion matrix to an executive. I translate it: a 92% recall on failure prediction means &#x27;we catch 92% of failures before they happen, and each failure costs $15,000 in spoilage, so this model is worth $X per year in avoided losses.&#x27; I build a dashboard with one number — Financial Risk ($) — coloured green, yellow, or red. That&#x27;s the entire ML system from a business perspective.&quot;</td></tr><tr><td>&quot;What is the difference between Celery and Airflow?&quot;</td><td>&quot;Celery is a task queue — it runs individual jobs asynchronously, like a background ML scoring task triggered by a web request. Airflow is a workflow orchestrator — it manages <em>pipelines</em> of tasks where step 2 depends on step 1 finishing successfully, with retries, alerts, and a visual DAG monitor. For small ETL jobs, Celery Beat is enough. When you have 20+ interdependent pipeline steps, you need Airflow.&quot;</td></tr></tbody></table></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#zero-to-hero-guide-management-information-systems-mis-in-python">Zero-to-Hero Guide: Management Information Systems (MIS) in Python</a><a style="margin-left:12px" href="#the-three-technical-pillars">The Three Technical Pillars</a><a style="margin-left:12px" href="#pillar-1-data-architecture-amp-etl-the-foundation">Pillar 1 — Data Architecture &amp; ETL (The Foundation)</a><a style="margin-left:24px" href="#1a-star-schema-the-industry-standard-database-design">1a. Star Schema — The Industry Standard Database Design</a><a style="margin-left:24px" href="#1b-etl-pipeline-in-python">1b. ETL Pipeline in Python</a><a style="margin-left:24px" href="#1c-automating-etl-with-celery-beat">1c. Automating ETL with Celery Beat</a><a style="margin-left:12px" href="#pillar-2-business-intelligence-amp-executive-dashboards">Pillar 2 — Business Intelligence &amp; Executive Dashboards</a><a style="margin-left:24px" href="#2a-metabase-via-docker-fastest-path-to-enterprise-dashboards">2a. Metabase via Docker (Fastest Path to Enterprise Dashboards)</a><a style="margin-left:24px" href="#2b-plotly-dash-embedded-in-django">2b. Plotly Dash Embedded in Django</a><a style="margin-left:12px" href="#pillar-3-enterprise-automation-making-the-system-act">Pillar 3 — Enterprise Automation (Making the System Act)</a><a style="margin-left:24px" href="#3a-automated-email-alerts-via-django">3a. Automated Email Alerts via Django</a><a style="margin-left:24px" href="#3b-apache-airflow-orchestrating-complex-workflows">3b. Apache Airflow — Orchestrating Complex Workflows</a><a style="margin-left:12px" href="#the-full-mis-platform-architecture">The Full MIS Platform Architecture</a><a style="margin-left:12px" href="#learning-path-study-alongside-phase-2-3">Learning Path (Study Alongside Phase 2–3)</a><a style="margin-left:12px" href="#interview-talking-points">Interview Talking Points</a></aside>
+    </main>
+  </body>
+</html>

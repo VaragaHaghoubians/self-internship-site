@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sql Data Engineering.Sql - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Sql Data Engineering.Sql</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/sql/sql_data_engineering.sql</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><pre><code>-- ==============================================================================
+--  SQL — DATA ENGINEERING, OPTIMIZATION &amp; WAREHOUSING
+--  FILE: sql_data_engineering.sql
+--
+--  TASK: Learn the SQL skills that ML Engineers and Data Engineers use daily:
+--        ETL pipelines, query optimization, and data warehouse design.
+--
+--  WHY:  Writing a correct query is step 1.
+--        Writing one that runs in 0.5s instead of 45s on 100M rows is step 2.
+--        Building a schema that makes all future queries fast is step 3.
+--        Step 3 is what separates data engineers from data analysts.
+--
+--  PREREQ: sql_zero_to_hero.sql, sql_analytics_advanced.sql
+--
+--  HOW TO USE:
+--    Run in DBeaver / MySQL Workbench.
+--    Section 1-3: run in any order.
+--    Section 4 (star schema): run in sequence — it builds on prior tables.
+-- ==============================================================================
+
+
+-- ==============================================================================
+-- LESSON 01 — QUERY OPTIMIZATION (Why Your Query Is Slow)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- A query that takes 1 second on 10K rows takes 100+ SECONDS on 100M rows
+-- if you don&#x27;t think about indexes and query structure.
+-- Understanding HOW a database executes your query is the most valuable
+-- optimization skill — everything else follows from this.
+--
+-- THE QUERY EXECUTION ORDER (not what you write — what the DB actually runs):
+--   1. FROM / JOIN     → identify which tables, link rows
+--   2. WHERE           → filter rows
+--   3. GROUP BY        → group remaining rows
+--   4. HAVING          → filter groups
+--   5. SELECT          → compute final columns
+--   6. ORDER BY        → sort output
+--   7. LIMIT           → trim to N rows
+--
+-- WHY THIS MATTERS:
+--   - You CANNOT use a SELECT alias in WHERE (WHERE runs before SELECT!)
+--   - You CAN use a SELECT alias in ORDER BY (ORDER runs after SELECT)
+--   - Put filters in WHERE, not HAVING — WHERE removes rows BEFORE grouping (faster!)
+
+-- ❌ SLOW: filtering in HAVING (computes all groups first, THEN filters):
+SELECT major, COUNT(*) AS n
+FROM students
+GROUP BY major
+HAVING major = &#x27;Data Science&#x27;;   -- runs after GROUP BY — wasteful
+
+-- ✅ FAST: filtering in WHERE (eliminates rows before any grouping):
+SELECT major, COUNT(*) AS n
+FROM students
+WHERE major = &#x27;Data Science&#x27;     -- runs before GROUP BY — only groups matching rows
+GROUP BY major;
+
+
+-- ==============================================================================
+-- USING EXPLAIN — Reading the Query Execution Plan
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- EXPLAIN shows you WHAT the database will do, without running the query.
+-- It&#x27;s your debugger for slow queries.
+--
+-- Read the output columns:
+--   type          → access method: &#x27;ALL&#x27; = full table scan (❌ slow), &#x27;ref&#x27; = index used (✅)
+--   rows          → estimated rows examined — if this is 1M+, you need an index
+--   key           → which index was used (NULL = no index)
+--   Extra         → &#x27;Using filesort&#x27; = slow sort, &#x27;Using index&#x27; = index-only scan (fast!)
+--
+-- HOW TO USE:
+
+EXPLAIN SELECT * FROM students WHERE major = &#x27;Data Science&#x27;;
+-- If &#x27;key&#x27; is NULL → no index on &#x27;major&#x27; → full table scan
+
+-- Add an index and see the plan change:
+CREATE INDEX idx_students_major ON students(major);
+
+EXPLAIN SELECT * FROM students WHERE major = &#x27;Data Science&#x27;;
+-- Now &#x27;key&#x27; = idx_students_major → index scan → much faster!
+
+-- EXPLAIN ANALYZE runs the query and reports actual times (MySQL 8+, PostgreSQL):
+-- EXPLAIN ANALYZE SELECT * FROM students WHERE major = &#x27;Data Science&#x27;;
+
+
+-- ==============================================================================
+-- INDEX STRATEGY (When to Add, When to Avoid)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- Indexes speed up reads but SLOW DOWN writes (INSERT/UPDATE/DELETE must update the index).
+-- Indexes also use disk space — sometimes a lot!
+--
+-- ADD AN INDEX WHEN:
+--   - Column is frequently in WHERE clauses
+--   - Column is frequently in JOIN conditions (foreign keys!)
+--   - Column is in ORDER BY on large result sets
+--   - Column has HIGH cardinality (many unique values: email, user_id)
+--
+-- DON&#x27;T ADD AN INDEX WHEN:
+--   - Column has LOW cardinality (status: &#x27;active&#x27;/&#x27;inactive&#x27; — only 2 values!)
+--   - Table is small (&lt; 10K rows — full scan is fine)
+--   - Column is rarely queried
+--   - You write more than you read (real-time log tables)
+--
+-- TYPES OF INDEXES:
+
+-- 1. Single-column index (most common):
+CREATE INDEX idx_shipments_customer  ON shipments(customer_id);
+CREATE INDEX idx_shipments_status    ON shipments(status);
+CREATE INDEX idx_shipments_date      ON shipments(shipped_date);
+
+-- 2. Composite index (multi-column — order matters!):
+--    Best for queries that filter on BOTH columns together.
+--    Rule: most selective column first, then the next filter column.
+CREATE INDEX idx_shipments_status_date ON shipments(status, shipped_date);
+-- This helps: WHERE status = &#x27;delayed&#x27; AND shipped_date &gt; &#x27;2023-01-01&#x27;
+-- This does NOT help: WHERE shipped_date &gt; &#x27;2023-01-01&#x27; (status is first in index!)
+
+-- 3. Covering index — includes all columns the query needs so it never reads the table:
+CREATE INDEX idx_ship_cover ON shipments(customer_id, status, cost_usd);
+-- Query: SELECT cost_usd FROM shipments WHERE customer_id = 1 AND status = &#x27;delivered&#x27;
+-- → DB reads ONLY the index, never touches the main table row!
+
+-- Check which indexes exist on a table:
+SHOW INDEX FROM shipments;   -- MySQL
+-- SELECT * FROM pg_indexes WHERE tablename = &#x27;shipments&#x27;;  -- PostgreSQL
+
+-- Drop an index you don&#x27;t need:
+DROP INDEX idx_shipments_status ON shipments;   -- MySQL syntax
+-- DROP INDEX idx_shipments_status;              -- PostgreSQL syntax
+
+
+-- ==============================================================================
+-- QUERY PATTERNS TO AVOID (Anti-Patterns)
+-- ==============================================================================
+--
+-- These patterns cause full table scans even when an index exists!
+
+-- ❌ Functions on indexed columns break the index:
+SELECT * FROM shipments WHERE YEAR(shipped_date) = 2023;   -- can&#x27;t use date index!
+-- ✅ Use a range instead:
+SELECT * FROM shipments WHERE shipped_date BETWEEN &#x27;2023-01-01&#x27; AND &#x27;2023-12-31&#x27;;
+
+-- ❌ Leading wildcard disables LIKE index:
+SELECT * FROM customers WHERE name LIKE &#x27;%Tech%&#x27;;  -- full scan!
+-- ✅ Trailing wildcard uses index:
+SELECT * FROM customers WHERE name LIKE &#x27;Tech%&#x27;;   -- index works (if name is indexed)
+
+-- ❌ OR across columns disables indexes (use UNION instead):
+SELECT * FROM shipments WHERE status = &#x27;delayed&#x27; OR dest_city = &#x27;Chicago&#x27;;
+-- ✅ UNION: each branch uses its own index
+SELECT * FROM shipments WHERE status = &#x27;delayed&#x27;
+UNION
+SELECT * FROM shipments WHERE dest_city = &#x27;Chicago&#x27;;
+
+-- ❌ SELECT * fetches all columns (even ones you don&#x27;t need):
+SELECT * FROM shipments WHERE customer_id = 1;
+-- ✅ Select only what you need:
+SELECT shipment_id, status, cost_usd FROM shipments WHERE customer_id = 1;
+
+-- ❌ NOT IN with subquery is notoriously slow:
+SELECT * FROM customers WHERE customer_id NOT IN (SELECT customer_id FROM shipments);
+-- ✅ LEFT JOIN + IS NULL is faster:
+SELECT c.* FROM customers c
+LEFT JOIN shipments s ON c.customer_id = s.customer_id
+WHERE s.shipment_id IS NULL;
+
+
+-- ==============================================================================
+-- LESSON 02 — ETL PATTERNS (Extract, Transform, Load)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- ETL is the backbone of every data pipeline:
+--   EXTRACT → pull data from source (another DB, API, CSV)
+--   TRANSFORM → clean, join, aggregate, compute features
+--   LOAD → write results into a destination table
+--
+-- SQL handles all three phases in real-world data engineering.
+--
+-- KEY ETL PATTERNS:
+--   1. CREATE TABLE AS SELECT (CTAS) — create + populate in one step
+--   2. INSERT INTO ... SELECT — append new rows to existing table
+--   3. UPSERT (INSERT ... ON DUPLICATE KEY UPDATE) — update if exists, insert if new
+--   4. Incremental load — only process new/changed rows (critical for production!)
+
+-- PATTERN 1: CREATE TABLE AS SELECT (CTAS)
+-- Create a denormalized &quot;wide table&quot; for analytics / ML feature store:
+CREATE TABLE IF NOT EXISTS shipment_features AS
+SELECT
+    s.shipment_id,
+    s.customer_id,
+    c.tier                                                AS customer_tier,
+    c.city                                                AS customer_city,
+    s.origin_city,
+    s.dest_city,
+    s.weight_kg,
+    s.cost_usd,
+    s.status,
+    s.shipped_date,
+    COALESCE(s.delivered_date, CURRENT_DATE)             AS effective_delivery_date,
+    DATEDIFF(
+        COALESCE(s.delivered_date, CURRENT_DATE),
+        s.shipped_date
+    )                                                     AS transit_days,
+    CASE WHEN s.status = &#x27;delivered&#x27;
+              AND DATEDIFF(s.delivered_date, s.shipped_date) &lt;= 7
+         THEN 1 ELSE 0 END                               AS on_time_flag,
+    s.cost_usd / NULLIF(s.weight_kg, 0)                  AS cost_per_kg,
+    COUNT(t.ticket_id)                                    AS num_tickets
+FROM shipments s
+JOIN customers c ON s.customer_id = c.customer_id
+LEFT JOIN support_tickets t ON s.shipment_id = t.shipment_id
+GROUP BY
+    s.shipment_id, s.customer_id, c.tier, c.city,
+    s.origin_city, s.dest_city, s.weight_kg, s.cost_usd,
+    s.status, s.shipped_date, s.delivered_date;
+
+-- Verify:
+SELECT * FROM shipment_features LIMIT 5;
+
+-- PATTERN 2: INSERT INTO ... SELECT
+-- Append new shipments that arrived after the last ETL run:
+CREATE TABLE IF NOT EXISTS shipment_features_staging (LIKE shipment_features);
+
+-- Incremental: only load rows not yet in the feature table
+INSERT INTO shipment_features
+SELECT sf.*
+FROM shipment_features_staging sf
+WHERE sf.shipment_id NOT IN (SELECT shipment_id FROM shipment_features);
+
+-- PATTERN 3: UPSERT (MySQL — INSERT ... ON DUPLICATE KEY UPDATE)
+-- If shipment_id already exists → update status; otherwise → insert new row:
+INSERT INTO shipment_features (shipment_id, customer_id, status, cost_usd)
+VALUES (999, 1, &#x27;delivered&#x27;, 950.00)
+ON DUPLICATE KEY UPDATE
+    status   = VALUES(status),
+    cost_usd = VALUES(cost_usd);
+
+-- PostgreSQL equivalent (INSERT ... ON CONFLICT):
+-- INSERT INTO shipment_features (shipment_id, customer_id, status, cost_usd)
+-- VALUES (999, 1, &#x27;delivered&#x27;, 950.00)
+-- ON CONFLICT (shipment_id) DO UPDATE SET
+--     status   = EXCLUDED.status,
+--     cost_usd = EXCLUDED.cost_usd;
+
+-- PATTERN 4: Incremental load using a &quot;last_updated&quot; watermark
+-- Only process rows modified since the last run:
+-- (Assumes shipments table has a &#x27;last_modified&#x27; timestamp column)
+--
+-- Step 1: read the watermark:
+--   SELECT MAX(last_run_time) FROM etl_audit WHERE table_name = &#x27;shipments&#x27;;
+--
+-- Step 2: load only new rows:
+--   INSERT INTO shipment_features
+--   SELECT ... FROM shipments WHERE last_modified &gt; &#x27;2024-01-20 00:00:00&#x27;;
+--
+-- Step 3: update watermark:
+--   INSERT INTO etl_audit (table_name, last_run_time) VALUES (&#x27;shipments&#x27;, NOW())
+--   ON DUPLICATE KEY UPDATE last_run_time = NOW();
+
+-- PATTERN 5: Data quality checks INSIDE SQL (before loading)
+SELECT &#x27;NULL check&#x27;      AS check_name, COUNT(*) AS failures
+FROM shipment_features WHERE shipment_id IS NULL
+UNION ALL
+SELECT &#x27;Negative cost&#x27;,   COUNT(*) FROM shipment_features WHERE cost_usd &lt; 0
+UNION ALL
+SELECT &#x27;Future date&#x27;,     COUNT(*) FROM shipment_features WHERE shipped_date &gt; CURRENT_DATE
+UNION ALL
+SELECT &#x27;Zero weight&#x27;,     COUNT(*) FROM shipment_features WHERE weight_kg = 0;
+-- If any failures &gt; 0, the ETL pipeline should raise an alert!
+
+
+-- ==============================================================================
+-- LESSON 03 — DATA WAREHOUSING CONCEPTS
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- Operational databases (OLTP) are optimized for individual row reads/writes.
+-- Data warehouses (OLAP) are optimized for analytical queries across millions of rows.
+--
+-- The STAR SCHEMA is the standard warehouse design:
+--
+--         [dim_customer]           [dim_date]
+--               |                      |
+--   [dim_route]—[fact_shipments]—[dim_status]
+--               |
+--         [dim_product]  (in our case: cargo type)
+--
+-- FACT TABLE: one row per &quot;event&quot; (one shipment, one transaction)
+--   - Has foreign keys to all dimensions
+--   - Has measurable numeric columns (cost, weight, transit days)
+--   - Usually very large — millions/billions of rows
+--   - Never put descriptive text here — put it in dimensions!
+--
+-- DIMENSION TABLE: describes the WHO/WHAT/WHERE/WHEN
+--   - Small, descriptive tables
+--   - Queried to add context to facts
+--   - Slowly Changing Dimensions (SCD): how to handle when a customer changes tier?
+
+-- ==============================================================================
+-- STAR SCHEMA IMPLEMENTATION
+-- ==============================================================================
+
+-- DIMENSION: Date (pre-populated — every possible date)
+-- WHY: Avoids computing YEAR/MONTH/DAYOFWEEK at query time — they&#x27;re already stored!
+CREATE TABLE IF NOT EXISTS dim_date (
+    date_id        INT           PRIMARY KEY,   -- YYYYMMDD format: 20230215
+    date_actual    DATE          NOT NULL UNIQUE,
+    year           SMALLINT      NOT NULL,
+    month          TINYINT       NOT NULL,
+    month_name     VARCHAR(10)   NOT NULL,
+    day            TINYINT       NOT NULL,
+    day_of_week    TINYINT       NOT NULL,       -- 1=Monday, 7=Sunday
+    day_name       VARCHAR(10)   NOT NULL,
+    week_of_year   TINYINT       NOT NULL,
+    quarter        TINYINT       NOT NULL,       -- 1-4
+    is_weekend     BOOLEAN       NOT NULL,
+    fiscal_year    SMALLINT,                     -- if your company uses fiscal years
+    fiscal_quarter TINYINT
+);
+
+INSERT INTO dim_date VALUES
+    (20220801, &#x27;2022-08-01&#x27;, 2022, 8, &#x27;August&#x27;,    1, 1, &#x27;Monday&#x27;,    31, 3, FALSE, 2022, 3),
+    (20220901, &#x27;2022-09-01&#x27;, 2022, 9, &#x27;September&#x27;, 1, 4, &#x27;Thursday&#x27;,  35, 3, FALSE, 2022, 3),
+    (20221101, &#x27;2022-11-20&#x27;, 2022,11, &#x27;November&#x27;, 20, 7, &#x27;Sunday&#x27;,    47, 4, TRUE,  2022, 4),
+    (20230101, &#x27;2023-01-05&#x27;, 2023, 1, &#x27;January&#x27;,   5, 4, &#x27;Thursday&#x27;,   1, 1, FALSE, 2023, 1),
+    (20230201, &#x27;2023-02-01&#x27;, 2023, 2, &#x27;February&#x27;,  1, 3, &#x27;Wednesday&#x27;,  5, 1, FALSE, 2023, 1),
+    (20230228, &#x27;2023-02-28&#x27;, 2023, 2, &#x27;February&#x27;, 28, 2, &#x27;Tuesday&#x27;,    9, 1, FALSE, 2023, 1),
+    (20230315, &#x27;2023-03-15&#x27;, 2023, 3, &#x27;March&#x27;,    15, 3, &#x27;Wednesday&#x27;, 11, 1, FALSE, 2023, 1),
+    (20230410, &#x27;2023-04-10&#x27;, 2023, 4, &#x27;April&#x27;,    10, 1, &#x27;Monday&#x27;,    15, 2, FALSE, 2023, 2),
+    (20230520, &#x27;2023-05-20&#x27;, 2023, 5, &#x27;May&#x27;,      20, 6, &#x27;Saturday&#x27;,  20, 2, TRUE,  2023, 2),
+    (20230701, &#x27;2023-07-01&#x27;, 2023, 7, &#x27;July&#x27;,      1, 6, &#x27;Saturday&#x27;,  26, 3, TRUE,  2023, 3),
+    (20230815, &#x27;2023-08-15&#x27;, 2023, 8, &#x27;August&#x27;,   15, 2, &#x27;Tuesday&#x27;,   33, 3, FALSE, 2023, 3),
+    (20231001, &#x27;2023-10-01&#x27;, 2023,10, &#x27;October&#x27;,   1, 7, &#x27;Sunday&#x27;,    39, 4, TRUE,  2023, 4),
+    (20240101, &#x27;2024-01-15&#x27;, 2024, 1, &#x27;January&#x27;,  15, 1, &#x27;Monday&#x27;,     3, 1, FALSE, 2024, 1);
+
+-- DIMENSION: Customer (with Slowly Changing Dimension type 2 support)
+-- SCD Type 2: keep history when a customer&#x27;s tier changes
+-- (In practice: use a warehouse tool like dbt for this — understanding the concept is key)
+CREATE TABLE IF NOT EXISTS dim_customer (
+    customer_sk    INT           PRIMARY KEY AUTO_INCREMENT,  -- surrogate key
+    customer_id    INT           NOT NULL,                    -- business key (from source system)
+    name           VARCHAR(100)  NOT NULL,
+    city           VARCHAR(50),
+    tier           VARCHAR(20),
+    -- SCD Type 2 fields:
+    valid_from     DATE          NOT NULL,
+    valid_to       DATE          DEFAULT &#x27;9999-12-31&#x27;,        -- NULL = currently active
+    is_current     BOOLEAN       DEFAULT TRUE
+);
+
+INSERT INTO dim_customer (customer_id, name, city, tier, valid_from, valid_to, is_current) VALUES
+    (1, &#x27;TechCorp&#x27;,      &#x27;Seattle&#x27;,       &#x27;enterprise&#x27;, &#x27;2023-01-15&#x27;, &#x27;9999-12-31&#x27;, TRUE),
+    (2, &#x27;SmallBiz LLC&#x27;,  &#x27;Portland&#x27;,      &#x27;standard&#x27;,   &#x27;2023-03-01&#x27;, &#x27;9999-12-31&#x27;, TRUE),
+    (3, &#x27;MegaRetail&#x27;,    &#x27;San Francisco&#x27;, &#x27;enterprise&#x27;, &#x27;2022-11-20&#x27;, &#x27;9999-12-31&#x27;, TRUE),
+    (4, &#x27;StartupCo&#x27;,     &#x27;Austin&#x27;,        &#x27;premium&#x27;,    &#x27;2023-06-10&#x27;, &#x27;9999-12-31&#x27;, TRUE),
+    (5, &#x27;GlobalTrade&#x27;,   &#x27;Chicago&#x27;,       &#x27;enterprise&#x27;, &#x27;2022-08-05&#x27;, &#x27;9999-12-31&#x27;, TRUE),
+    (6, &#x27;LocalShop&#x27;,     &#x27;Denver&#x27;,        &#x27;standard&#x27;,   &#x27;2024-01-02&#x27;, &#x27;9999-12-31&#x27;, TRUE),
+    (7, &#x27;FastMover&#x27;,     &#x27;Seattle&#x27;,       &#x27;premium&#x27;,    &#x27;2023-09-15&#x27;, &#x27;9999-12-31&#x27;, TRUE),
+    (8, &#x27;NeverShipped&#x27;,  &#x27;Boston&#x27;,        &#x27;standard&#x27;,   &#x27;2024-02-01&#x27;, &#x27;9999-12-31&#x27;, TRUE);
+
+-- DIMENSION: Route (origin → destination)
+CREATE TABLE IF NOT EXISTS dim_route (
+    route_sk       INT          PRIMARY KEY AUTO_INCREMENT,
+    origin_city    VARCHAR(50)  NOT NULL,
+    dest_city      VARCHAR(50)  NOT NULL,
+    region         VARCHAR(50),
+    is_cross_region BOOLEAN     DEFAULT FALSE,
+    UNIQUE KEY (origin_city, dest_city)
+);
+
+INSERT INTO dim_route (origin_city, dest_city, region, is_cross_region) VALUES
+    (&#x27;Seattle&#x27;,       &#x27;Chicago&#x27;,      &#x27;West→Midwest&#x27;,    TRUE),
+    (&#x27;Seattle&#x27;,       &#x27;New York&#x27;,     &#x27;West→East&#x27;,       TRUE),
+    (&#x27;Portland&#x27;,      &#x27;Los Angeles&#x27;,  &#x27;West→West&#x27;,       FALSE),
+    (&#x27;San Francisco&#x27;, &#x27;Chicago&#x27;,      &#x27;West→Midwest&#x27;,    TRUE),
+    (&#x27;San Francisco&#x27;, &#x27;Seattle&#x27;,      &#x27;West→West&#x27;,       FALSE),
+    (&#x27;Austin&#x27;,        &#x27;Dallas&#x27;,       &#x27;South→South&#x27;,     FALSE),
+    (&#x27;Austin&#x27;,        &#x27;Houston&#x27;,      &#x27;South→South&#x27;,     FALSE),
+    (&#x27;Chicago&#x27;,       &#x27;Miami&#x27;,        &#x27;Midwest→South&#x27;,   TRUE),
+    (&#x27;Chicago&#x27;,       &#x27;Boston&#x27;,       &#x27;Midwest→East&#x27;,    TRUE),
+    (&#x27;Chicago&#x27;,       &#x27;Seattle&#x27;,      &#x27;Midwest→West&#x27;,    TRUE),
+    (&#x27;Seattle&#x27;,       &#x27;Denver&#x27;,       &#x27;West→Mountain&#x27;,   TRUE),
+    (&#x27;Seattle&#x27;,       &#x27;Austin&#x27;,       &#x27;West→South&#x27;,      TRUE);
+
+-- FACT TABLE: one row per shipment, foreign keys to all dimensions
+CREATE TABLE IF NOT EXISTS fact_shipments (
+    shipment_sk    INT           PRIMARY KEY AUTO_INCREMENT,
+    -- Foreign keys to dimensions:
+    shipment_id    INT           NOT NULL,    -- source system ID
+    customer_sk    INT           REFERENCES dim_customer(customer_sk),
+    route_sk       INT           REFERENCES dim_route(route_sk),
+    ship_date_id   INT           REFERENCES dim_date(date_id),
+    deliver_date_id INT          REFERENCES dim_date(date_id),
+    -- Measures (the actual facts — numeric, aggregatable):
+    weight_kg      DECIMAL(8,2),
+    cost_usd       DECIMAL(10,2),
+    transit_days   INT,
+    on_time_flag   TINYINT,                  -- 1 = on time, 0 = late
+    is_cancelled   TINYINT,
+    is_delayed     TINYINT,
+    num_tickets    INT           DEFAULT 0
+);
+
+-- Populate fact from source tables (this is the ETL &quot;transform + load&quot; step):
+INSERT INTO fact_shipments
+    (shipment_id, customer_sk, route_sk, ship_date_id, deliver_date_id,
+     weight_kg, cost_usd, transit_days, on_time_flag, is_cancelled, is_delayed, num_tickets)
+SELECT
+    s.shipment_id,
+    dc.customer_sk,
+    dr.route_sk,
+    sd.date_id                   AS ship_date_id,
+    dd.date_id                   AS deliver_date_id,
+    s.weight_kg,
+    s.cost_usd,
+    DATEDIFF(COALESCE(s.delivered_date, CURRENT_DATE), s.shipped_date) AS transit_days,
+    CASE WHEN s.status = &#x27;delivered&#x27;
+              AND DATEDIFF(s.delivered_date, s.shipped_date) &lt;= 7
+         THEN 1 ELSE 0 END       AS on_time_flag,
+    CASE WHEN s.status = &#x27;cancelled&#x27; THEN 1 ELSE 0 END AS is_cancelled,
+    CASE WHEN s.status = &#x27;delayed&#x27;   THEN 1 ELSE 0 END AS is_delayed,
+    COUNT(t.ticket_id)           AS num_tickets
+FROM shipments s
+JOIN dim_customer dc    ON s.customer_id  = dc.customer_id AND dc.is_current = TRUE
+JOIN dim_route    dr    ON s.origin_city  = dr.origin_city
+                       AND s.dest_city    = dr.dest_city
+LEFT JOIN dim_date sd   ON sd.date_actual = s.shipped_date
+LEFT JOIN dim_date dd   ON dd.date_actual = s.delivered_date
+LEFT JOIN support_tickets t ON s.shipment_id = t.shipment_id
+GROUP BY
+    s.shipment_id, dc.customer_sk, dr.route_sk, sd.date_id, dd.date_id,
+    s.weight_kg, s.cost_usd, s.status, s.shipped_date, s.delivered_date;
+
+
+-- ==============================================================================
+-- QUERYING THE STAR SCHEMA (OLAP Queries)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- Once your star schema is loaded, analytics queries become fast and readable.
+-- Always JOIN fact to dimensions — never JOIN dim to dim directly.
+-- The fact table is the hub; dimensions are the spokes.
+
+-- Q1: Revenue by quarter and tier:
+SELECT
+    d.year,
+    d.quarter,
+    c.tier,
+    COUNT(f.shipment_id)        AS shipments,
+    ROUND(SUM(f.cost_usd), 2)  AS revenue,
+    ROUND(AVG(f.transit_days), 1) AS avg_transit_days
+FROM fact_shipments f
+JOIN dim_date     d ON f.ship_date_id = d.date_id
+JOIN dim_customer c ON f.customer_sk  = c.customer_sk
+GROUP BY d.year, d.quarter, c.tier
+ORDER BY d.year, d.quarter, c.tier;
+
+-- Q2: Best and worst routes by on-time rate:
+SELECT
+    r.origin_city,
+    r.dest_city,
+    r.region,
+    COUNT(f.shipment_id)         AS total_shipments,
+    SUM(f.on_time_flag)          AS on_time,
+    ROUND(100.0 * SUM(f.on_time_flag) / NULLIF(COUNT(f.shipment_id), 0), 1) AS on_time_pct,
+    ROUND(AVG(f.transit_days), 1) AS avg_transit_days
+FROM fact_shipments f
+JOIN dim_route r ON f.route_sk = r.route_sk
+WHERE f.is_cancelled = 0
+GROUP BY r.origin_city, r.dest_city, r.region
+ORDER BY on_time_pct ASC;
+
+-- Q3: Monthly revenue trend with MoM % change (window function on warehouse data):
+WITH monthly_revenue AS (
+    SELECT
+        d.year,
+        d.month,
+        d.month_name,
+        ROUND(SUM(f.cost_usd), 2) AS revenue
+    FROM fact_shipments f
+    JOIN dim_date d ON f.ship_date_id = d.date_id
+    GROUP BY d.year, d.month, d.month_name
+)
+SELECT
+    year,
+    month_name,
+    revenue,
+    LAG(revenue) OVER (ORDER BY year, month) AS prev_month_revenue,
+    ROUND(
+        100.0 * (revenue - LAG(revenue) OVER (ORDER BY year, month))
+        / NULLIF(LAG(revenue) OVER (ORDER BY year, month), 0),
+        1
+    ) AS mom_growth_pct
+FROM monthly_revenue
+ORDER BY year, month;
+
+
+-- ==============================================================================
+-- LESSON 04 — REAL-TIME vs BATCH SQL PATTERNS
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- In production ML systems, you need two types of SQL queries:
+--   BATCH → runs on a schedule (nightly, hourly), processes large historical data
+--   REAL-TIME → runs per event (per API call), must return in &lt; 100ms
+--
+-- Real-time queries require:
+--   1. Indexed lookups (never full table scans)
+--   2. Pre-computed aggregates (don&#x27;t compute on the fly)
+--   3. Point lookups (fetch one customer, not all customers)
+
+-- BATCH PATTERN: Nightly job to recompute customer feature table
+-- (Run every night at 2 AM via cron + dbt/Airflow)
+CREATE TABLE IF NOT EXISTS customer_ml_features (
+    customer_id          INT     PRIMARY KEY,
+    computed_at          DATETIME DEFAULT CURRENT_TIMESTAMP,
+    -- Recency / Frequency / Monetary (RFM) features:
+    days_since_last_ship INT,
+    total_shipments      INT,
+    lifetime_value       DECIMAL(12,2),
+    avg_shipment_value   DECIMAL(10,2),
+    -- Risk signals:
+    on_time_rate         DECIMAL(5,2),
+    delay_rate           DECIMAL(5,2),
+    open_tickets         INT,
+    -- ML prediction output (stored back after model runs):
+    churn_score          DECIMAL(5,4),
+    churn_label          VARCHAR(20)
+);
+
+-- The batch ETL that feeds the above table:
+INSERT INTO customer_ml_features
+    (customer_id, days_since_last_ship, total_shipments, lifetime_value,
+     avg_shipment_value, on_time_rate, delay_rate, open_tickets)
+SELECT
+    c.customer_id,
+    DATEDIFF(CURRENT_DATE, MAX(s.shipped_date))         AS days_since_last_ship,
+    COUNT(DISTINCT s.shipment_id)                        AS total_shipments,
+    COALESCE(SUM(s.cost_usd), 0)                        AS lifetime_value,
+    COALESCE(AVG(s.cost_usd), 0)                        AS avg_shipment_value,
+    ROUND(
+        100.0 * SUM(CASE WHEN s.status = &#x27;delivered&#x27;
+                              AND DATEDIFF(s.delivered_date, s.shipped_date) &lt;= 7
+                         THEN 1 ELSE 0 END) /
+        NULLIF(SUM(CASE WHEN s.status = &#x27;delivered&#x27; THEN 1 ELSE 0 END), 0),
+        2
+    )                                                    AS on_time_rate,
+    ROUND(
+        100.0 * SUM(CASE WHEN s.status = &#x27;delayed&#x27; THEN 1 ELSE 0 END)
+        / NULLIF(COUNT(DISTINCT s.shipment_id), 0),
+        2
+    )                                                    AS delay_rate,
+    SUM(CASE WHEN t.resolved_date IS NULL THEN 1 ELSE 0 END) AS open_tickets
+FROM customers c
+LEFT JOIN shipments       s ON c.customer_id = s.customer_id
+LEFT JOIN support_tickets t ON c.customer_id = t.customer_id
+GROUP BY c.customer_id
+ON DUPLICATE KEY UPDATE
+    computed_at           = CURRENT_TIMESTAMP,
+    days_since_last_ship  = VALUES(days_since_last_ship),
+    total_shipments       = VALUES(total_shipments),
+    lifetime_value        = VALUES(lifetime_value),
+    avg_shipment_value    = VALUES(avg_shipment_value),
+    on_time_rate          = VALUES(on_time_rate),
+    delay_rate            = VALUES(delay_rate),
+    open_tickets          = VALUES(open_tickets);
+
+-- REAL-TIME PATTERN: Lookup features for ONE customer at API call time
+-- This returns in &lt; 5ms because customer_id is the primary key (auto-indexed):
+SELECT
+    customer_id,
+    days_since_last_ship,
+    total_shipments,
+    lifetime_value,
+    on_time_rate,
+    open_tickets,
+    churn_score,
+    churn_label
+FROM customer_ml_features
+WHERE customer_id = 1;    -- point lookup — instant!
+
+-- HOW YOUR ML SYSTEM USES THIS:
+--   1. FastAPI receives POST /predict?customer_id=1
+--   2. FastAPI runs the SQL above (&lt; 5ms)
+--   3. Returns feature dict to Python
+--   4. Passes features to loaded sklearn model
+--   5. Returns prediction to caller
+--   Total latency: &lt; 100ms
+
+-- FEATURE STORE CONCEPT:
+--   customer_ml_features IS a feature store — a pre-computed table of ML features.
+--   Real feature stores (Feast, Tecton, Hopsworks) extend this:
+--     - Online store: Redis/DynamoDB for real-time lookups (&lt; 10ms)
+--     - Offline store: S3/BigQuery for batch training
+--     - Time-travel: &quot;give me features as they looked on 2023-06-01&quot; (for training)
+--   For now: a well-indexed SQL table IS a feature store.
+
+
+-- ==============================================================================
+-- LESSON 05 — CLOUD SQL SYNTAX NOTES (BigQuery / Redshift / Snowflake)
+-- ==============================================================================
+--
+-- TEACHER SAYS:
+-- At Amazon, Uber, Flexport you won&#x27;t use MySQL — you&#x27;ll use:
+--   Amazon Redshift  → Amazon&#x27;s data warehouse (PostgreSQL-based)
+--   Google BigQuery  → Google&#x27;s fully managed warehouse (standard SQL)
+--   Snowflake        → multi-cloud warehouse (SQL compatible)
+--
+-- 90% of what you&#x27;ve learned works the same. These are the KEY DIFFERENCES:
+
+-- BIGQUERY:
+--   - No CREATE INDEX (BQ manages this automatically with partition/cluster)
+--   - PARTITION BY ingestion time or date column:
+--       CREATE TABLE project.dataset.shipments
+--       PARTITION BY DATE(shipped_date)  -- dramatically speeds up date-range queries!
+--       CLUSTER BY customer_id, status; -- secondary ordering for point lookups
+--
+--   - Standard SQL: use QUALIFY instead of a subquery for window function filtering:
+--       SELECT * FROM shipments
+--       QUALIFY ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY shipped_date DESC) = 1;
+--       -- Gets the LATEST shipment per customer — no subquery needed!
+--
+--   - Date functions: DATE_DIFF(end, start, DAY) instead of DATEDIFF(end, start)
+--
+-- REDSHIFT:
+--   - DISTKEY / SORTKEY instead of traditional indexes:
+--       CREATE TABLE fact_shipments (
+--           shipment_id INT,
+--           customer_id INT DISTKEY,    -- distribute rows by this column across nodes
+--           ship_date   DATE SORTKEY    -- sort rows by this column for range scans
+--       );
+--   - Use COPY command for bulk loads (not INSERT INTO ... SELECT for large data)
+--
+-- SNOWFLAKE:
+--   - Automatic clustering — no indexes needed
+--   - FLATTEN for JSON arrays (BigQuery uses JSON_VALUE/UNNEST)
+--   - TIME TRAVEL: query data as it existed at a past timestamp:
+--       SELECT * FROM shipments AT (TIMESTAMP =&gt; &#x27;2023-06-01 00:00:00&#x27;);
+--
+-- COMMON PATTERN THAT WORKS EVERYWHERE (BigQuery, Redshift, Snowflake, MySQL, PostgreSQL):
+--   CTEs, window functions, CASE WHEN, JOIN, GROUP BY, HAVING — 100% portable!
+
+
+-- ==============================================================================
+-- 🎯 YOUR TASKS
+-- ==============================================================================
+
+-- TASK 1 — EXPLAIN &amp; INDEX:
+--    a) Write: EXPLAIN SELECT * FROM shipments WHERE dest_city = &#x27;Chicago&#x27; AND status = &#x27;delayed&#x27;;
+--    b) Read the output — is there a key? How many rows scanned?
+--    c) Add a composite index on (dest_city, status)
+--    d) Run EXPLAIN again — what changed?
+--    e) Drop the index. Write one scenario where this index would NOT help.
+
+-- TASK 2 — ETL PIPELINE:
+--    Build a complete mini-ETL in 3 steps:
+--    a) CREATE TABLE customer_monthly_summary with columns:
+--       customer_id, month (YYYY-MM), shipments, revenue, avg_transit_days, on_time_pct
+--    b) INSERT INTO ... SELECT to populate it from shipments + customers
+--    c) Write a SELECT to find which customer had the best on-time rate in January 2023
+--    d) Add ON DUPLICATE KEY UPDATE so re-running the ETL refreshes data, not duplicates it
+--    HINT: PRIMARY KEY should be (customer_id, month) to detect duplicates
+
+-- TASK 3 — STAR SCHEMA QUERY:
+--    Using fact_shipments + dim_customer + dim_route + dim_date:
+--    a) Show total revenue by region (dim_route.region) for Q1 2023
+--    b) Which enterprise customers had &gt; 0% delay rate in 2023?
+--    c) Show the top 3 routes by revenue, including their on-time rate
+--    Write clean, well-aliased queries — comment WHY each JOIN is needed.
+
+-- TASK 4 — OPTIMIZATION CHALLENGE:
+--    This query is slow (full table scan). Identify WHY and fix it:
+--
+--    SELECT * FROM shipments
+--    WHERE YEAR(shipped_date) = 2023
+--    AND status != &#x27;cancelled&#x27;
+--    AND CONCAT(origin_city, &#x27;-&gt;&#x27;, dest_city) = &#x27;Seattle-&gt;Chicago&#x27;;
+--
+--    Your job:
+--    a) Rewrite all 3 conditions to be index-friendly
+--    b) State which indexes you&#x27;d create and why
+--    c) Explain the CONCAT issue specifically
+
+-- TASK 5 — FEATURE STORE:
+--    a) Add a churn_score column to customer_ml_features (DECIMAL(5,4))
+--    b) Write an UPDATE to set churn_score = 0.8 for all customers where
+--       days_since_last_ship &gt; 180 OR open_tickets &gt; 1
+--    c) Write the &quot;real-time API lookup&quot; query that returns all features for
+--       customer_id = 3 — it should be a single-row point lookup
+--    d) Explain in a comment: why is customer_id the PRIMARY KEY here, not
+--       just a regular indexed column?
+
+-- Write your solutions below:
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

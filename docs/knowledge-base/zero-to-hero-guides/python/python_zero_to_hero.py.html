@@ -1,0 +1,2249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Python Zero To Hero.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Python Zero To Hero.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/python/python_zero_to_hero.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "# ==============================================================================\n#  PYTHON \u2014 ZERO TO HERO\n#  Your personal Python teacher \u2014 from print(\"Hello World!\") to Data Science\n#  Author: Your Coding Journey\n#  How to use: Read every comment, study every example, then do YOUR TURN tasks.\n#              Run the file after each section: python python_zero_to_hero.py\n# ==============================================================================\n\n# ==============================================================================\n# DAY 01 \u2014 YOUR FIRST STEPS: print() and Comments\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Welcome! You already know print(\"Hello World!\") \u2014 that's your first Python skill.\n# Let's understand what it means.\n#\n# print() is a FUNCTION \u2014 a reusable block of code that does a job.\n# Whatever you put inside the parentheses ( ) gets displayed on screen.\n# The # symbol starts a COMMENT \u2014 Python ignores it. Comments are for humans.\n# Use comments to explain your thinking. Good programmers comment EVERYTHING.\n#\n# EXAMPLE:\n\nprint(\"Hello World!\")           # This prints text to the screen\nprint(\"My name is Python!\")     # You can print any text inside quotes\nprint(\"I am learning Python!\")\n\n# You can also print numbers directly:\nprint(42)\nprint(3.14)\n\n# You can print multiple things separated by commas:\nprint(\"The answer is\", 42)\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 01:\n# 1. Print your own name\n# 2. Print your university name\n# 3. Print your age\n# 4. Print: \"I am a Data Science student and I will master Python!\"\n# Write your code below this line:\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 02 \u2014 VARIABLES & DATA TYPES\n# ==============================================================================\n#\n# TEACHER SAYS:\n# A VARIABLE is a named container that stores a value.\n# Think of it like a labelled box. You put something in the box, give it a name,\n# and later you can use that name to get the value back.\n#\n# Python has these main data types:\n#   int   \u2192 whole numbers         \u2192 5, 100, -3\n#   float \u2192 decimal numbers       \u2192 3.14, 0.5, -2.7\n#   str   \u2192 text (string)         \u2192 \"hello\", 'world'\n#   bool  \u2192 True or False         \u2192 True, False\n#\n# To check the type of a variable, use: type(variable_name)\n# To check the content, use: print(variable_name)\n#\n# EXAMPLE:\n\nname = \"Alice\"                   # str  \u2014 always use quotes for text\nage = 25                         # int  \u2014 no quotes for numbers\nheight = 1.75                    # float\nis_student = True                # bool \u2014 capital T and F!\n\nprint(name)\nprint(age)\nprint(height)\nprint(is_student)\n\nprint(type(name))                # Output: <class 'str'>\nprint(type(age))                 # Output: <class 'int'>\nprint(type(height))              # Output: <class 'float'>\nprint(type(is_student))          # Output: <class 'bool'>\n\n# You can reassign a variable \u2014 the new value REPLACES the old one:\nage = 26\nprint(age)                       # Now prints 26\n\n# Variable naming rules:\n#   \u2705  my_name, age2, total_score   (use lowercase and underscores)\n#   \u274c  2name, my-name, class        (cannot start with number, no hyphens, no keywords)\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 02:\n# 1. Create a variable for your first name\n# 2. Create a variable for your GPA (e.g., 3.8)\n# 3. Create a variable for your student ID (as an integer)\n# 4. Create a variable is_enrolled = True\n# 5. Print ALL of them with their types using type()\n# HINT: print(type(your_variable))\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 03 \u2014 STRINGS IN DEPTH\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Strings are sequences of characters. In Data Science you clean and process\n# text data all the time. Master strings now!\n#\n# KEY STRING OPERATIONS:\n#   len(s)          \u2192 length (number of characters)\n#   s.upper()       \u2192 ALL CAPS\n#   s.lower()       \u2192 all lowercase\n#   s.strip()       \u2192 removes extra spaces at start/end\n#   s.replace(a, b) \u2192 replaces 'a' with 'b'\n#   s.split(\",\")    \u2192 splits string into a LIST by comma\n#   s[0]            \u2192 first character (indexing starts at 0!)\n#   s[-1]           \u2192 last character\n#   s[0:3]          \u2192 characters from index 0 to 2 (slicing)\n#\n# f-strings \u2192 the modern way to embed variables inside strings\n#   f\"My name is {variable}\" \u2014 put an f before the quote, use { } for variables\n#\n# EXAMPLE:\n\nuniversity = \"Massachusetts Institute of Technology\"\nprint(len(university))           # How many characters?\nprint(university.upper())        # UPPERCASE\nprint(university.lower())        # lowercase\nprint(university[0])             # First character: 'M'\nprint(university[0:13])          # First 13 characters: 'Massachusetts'\n\n# f-strings \u2014 your best friend for formatting output:\nstudent_name = \"Alex\"\ngpa = 3.9\nprint(f\"Student: {student_name}, GPA: {gpa}\")\n\n# String methods are powerful for data cleaning:\nmessy_text = \"   hello world   \"\nclean_text = messy_text.strip()\nprint(f\"Before: '{messy_text}'\")\nprint(f\"After:  '{clean_text}'\")\n\ncsv_row = \"Alice,25,Data Science,3.8\"\nfields = csv_row.split(\",\")      # Split by comma \u2192 creates a list\nprint(fields)                    # ['Alice', '25', 'Data Science', '3.8']\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 03:\n# 1. Create a string with your full name\n# 2. Print its length\n# 3. Print it in uppercase\n# 4. Print only your first name using slicing (hint: s[0:N])\n# 5. Create: sentence = \"  Python is amazing for data science  \"\n#    Clean it with strip(), make it uppercase, and print it\n# 6. Use an f-string to print: \"My name is [name] and I study [subject]\"\n# HINT: f\"text {variable} text\"\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 04 \u2014 NUMBERS & MATH OPERATIONS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Python is a calculator on steroids. All math operators you know work here.\n#\n# OPERATORS:\n#   +   addition          5 + 3 = 8\n#   -   subtraction       5 - 3 = 2\n#   *   multiplication    5 * 3 = 15\n#   /   division          5 / 3 = 1.666...  (always returns float)\n#   //  floor division    5 // 3 = 1        (integer result, drops decimal)\n#   %   modulo            5 % 3 = 2         (remainder of division)\n#   **  exponentiation    5 ** 3 = 125      (5 to the power of 3)\n#\n# Python follows PEMDAS: Parentheses \u2192 Exponents \u2192 Mult/Div \u2192 Add/Sub\n#\n# EXAMPLE:\n\na = 10\nb = 3\n\nprint(a + b)    # 13\nprint(a - b)    # 7\nprint(a * b)    # 30\nprint(a / b)    # 3.3333...\nprint(a // b)   # 3   \u2190 floor division\nprint(a % b)    # 1   \u2190 remainder: 10 = 3*3 + 1\nprint(a ** b)   # 1000  (10\u00b3)\n\n# Useful math functions (built-in):\nprint(abs(-42))         # 42  \u2014 absolute value\nprint(round(3.7))       # 4   \u2014 round to nearest integer\nprint(round(3.14159, 2))# 3.14 \u2014 round to 2 decimal places\nprint(max(5, 3, 9, 1))  # 9\nprint(min(5, 3, 9, 1))  # 1\nprint(sum([1, 2, 3, 4]))# 10\n\n# The math module has more:\nimport math\nprint(math.sqrt(144))   # 12.0 \u2014 square root\nprint(math.pi)          # 3.14159...\nprint(math.ceil(3.1))   # 4  \u2014 round UP always\nprint(math.floor(3.9))  # 3  \u2014 round DOWN always\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 04:\n# 1. Calculate the area of a circle with radius = 7  (Area = \u03c0 * r\u00b2)\n#    HINT: use math.pi and ** for power\n# 2. You scored 87 on exam 1 and 93 on exam 2. Calculate your average.\n# 3. A dataset has 1000 rows. You split it 80% train / 20% test.\n#    Calculate how many rows are in each split.\n#    HINT: use integer multiplication and // or int()\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 05 \u2014 USER INPUT\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Programs become interactive when they can ask for user input.\n# input() pauses the program and waits for the user to type something.\n# IMPORTANT: input() ALWAYS returns a STRING \u2014 even if the user types a number!\n# To convert: int(\"42\") \u2192 42    float(\"3.14\") \u2192 3.14\n#\n# EXAMPLE:\n\n# Uncomment the lines below to try interactive input (remove the # symbols):\n# user_name = input(\"What is your name? \")\n# print(f\"Hello, {user_name}! Welcome to Python.\")\n\n# Converting input to a number:\n# age_input = input(\"How old are you? \")   # This is a STRING like \"25\"\n# age_number = int(age_input)              # Now it's an INTEGER: 25\n# birth_year = 2026 - age_number\n# print(f\"You were born in {birth_year}\")\n\n# Shorter version \u2014 convert directly:\n# age = int(input(\"Enter your age: \"))\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 05:\n# Uncomment and complete this mini program:\n# 1. Ask the user for their name\n# 2. Ask the user for their age (as integer)\n# 3. Ask the user for their GPA (as float)\n# 4. Print a nicely formatted summary using f-strings\n# HINT: name = input(\"...\"), age = int(input(\"...\")), gpa = float(input(\"...\"))\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 06 \u2014 LISTS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# A LIST is an ORDERED, MUTABLE (changeable) collection of items.\n# Lists use square brackets [ ] and items are separated by commas.\n# Lists can hold ANY type \u2014 strings, numbers, even other lists!\n# In Data Science, you'll use lists constantly before moving to NumPy arrays.\n#\n# KEY OPERATIONS:\n#   my_list[0]          \u2192 access by index (starts at 0)\n#   my_list[-1]         \u2192 last item\n#   my_list[1:4]        \u2192 slice (items at index 1, 2, 3)\n#   my_list.append(x)   \u2192 add x to the END\n#   my_list.insert(i,x) \u2192 insert x at position i\n#   my_list.remove(x)   \u2192 remove first occurrence of x\n#   my_list.pop()       \u2192 remove and return the LAST item\n#   my_list.sort()      \u2192 sort in place (ascending)\n#   len(my_list)        \u2192 number of items\n#   x in my_list        \u2192 True if x is in the list\n#\n# EXAMPLE:\n\ngrades = [88, 92, 75, 95, 83, 91]\nprint(grades)\nprint(grades[0])          # 88 \u2014 first item\nprint(grades[-1])         # 91 \u2014 last item\nprint(grades[1:4])        # [92, 75, 95] \u2014 slice\n\ngrades.append(79)         # Add 79 at the end\nprint(grades)\n\ngrades.sort()             # Sort ascending\nprint(grades)\n\ngrades.sort(reverse=True) # Sort descending\nprint(grades)\n\nprint(len(grades))        # Number of grades\nprint(max(grades))        # Highest grade\nprint(min(grades))        # Lowest grade\nprint(sum(grades) / len(grades))  # Average \u2014 calculate manually\n\n# List of mixed types (valid in Python):\nstudent = [\"Alice\", 25, 3.8, True, [\"Math\", \"Stats\"]]\nprint(student[4])         # ['Math', 'Stats'] \u2014 a list inside a list!\nprint(student[4][0])      # 'Math' \u2014 access nested list\n\n# Check membership:\nprint(95 in grades)       # True\nprint(50 in grades)       # False\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 06:\n# 1. Create a list of 5 subjects you are studying\n# 2. Add a 6th subject using append()\n# 3. Print the 3rd subject (remember: index starts at 0)\n# 4. Sort the list alphabetically and print it\n# 5. Create a list of 5 exam scores\n# 6. Calculate and print: highest score, lowest score, and average\n# HINT: max(), min(), sum(), len()\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 07 \u2014 TUPLES\n# ==============================================================================\n#\n# TEACHER SAYS:\n# A TUPLE is like a list BUT IMMUTABLE \u2014 once created, you cannot change it.\n# Tuples use parentheses ( ) instead of brackets [ ].\n# Use tuples for data that should NOT change: coordinates, RGB colors, DB records.\n# Tuples are FASTER than lists \u2014 use them when data is fixed.\n#\n# EXAMPLE:\n\ncoordinates = (40.7128, -74.0060)   # Latitude, Longitude of New York\nprint(coordinates[0])               # 40.7128\nprint(coordinates[1])               # -74.0060\n\n# Tuple unpacking \u2014 assign each item to its own variable:\nlatitude, longitude = coordinates\nprint(f\"Lat: {latitude}, Lon: {longitude}\")\n\n# You can't change a tuple:\n# coordinates[0] = 50  \u2190 This would cause a TypeError!\n\n# Tuple with one item needs a trailing comma:\nsingle = (42,)         # Without the comma it's just parentheses around 42\nprint(type(single))    # <class 'tuple'>\nprint(type((42)))      # <class 'int'>  \u2190 NOT a tuple!\n\n# Common use \u2014 returning multiple values from a function:\ndef get_min_max(numbers):\n    return min(numbers), max(numbers)   # Returns a TUPLE\n\nresult = get_min_max([3, 1, 4, 1, 5, 9])\nprint(result)          # (1, 9)\nlow, high = result     # Unpack directly\nprint(f\"Min: {low}, Max: {high}\")\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 07:\n# 1. Create a tuple with the RGB color for red: (255, 0, 0)\n# 2. Unpack it into three variables: r, g, b\n# 3. Print: \"Red channel: 255, Green channel: 0, Blue channel: 0\"\n# 4. Create a tuple of your top 3 programming languages\n# 5. Try to change the first language \u2014 observe the error (then comment it out)\n# HINT: tuple[0] = \"something\"  \u2192 TypeError\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 08 \u2014 DICTIONARIES\n# ==============================================================================\n#\n# TEACHER SAYS:\n# A DICTIONARY stores data as KEY: VALUE pairs \u2014 like a real dictionary\n# where the word is the key and the definition is the value.\n# Dictionaries use curly braces { } and colons :.\n# Keys must be UNIQUE. Values can be anything.\n# This is THE most important data structure in Python for structured data.\n# JSON data (APIs, web) looks exactly like Python dictionaries!\n#\n# KEY OPERATIONS:\n#   d[key]          \u2192 get value by key\n#   d[key] = value  \u2192 add or update key-value pair\n#   d.get(key)      \u2192 safe access (returns None if key doesn't exist)\n#   d.keys()        \u2192 all keys\n#   d.values()      \u2192 all values\n#   d.items()       \u2192 all key-value pairs as tuples\n#   key in d        \u2192 True if key exists\n#   del d[key]      \u2192 delete a key\n#\n# EXAMPLE:\n\nstudent = {\n    \"name\": \"Alice\",\n    \"age\": 25,\n    \"gpa\": 3.8,\n    \"subjects\": [\"Python\", \"Stats\", \"ML\"],\n    \"is_enrolled\": True\n}\n\nprint(student[\"name\"])          # Alice\nprint(student[\"gpa\"])           # 3.8\nprint(student[\"subjects\"])      # ['Python', 'Stats', 'ML']\n\n# Safe access with .get() \u2014 no crash if key doesn't exist:\nprint(student.get(\"email\"))             # None \u2014 no crash!\nprint(student.get(\"email\", \"N/A\"))      # 'N/A' \u2014 default value\n\n# Add a new key:\nstudent[\"email\"] = \"alice@university.edu\"\nprint(student)\n\n# Update existing value:\nstudent[\"gpa\"] = 3.9\nprint(student[\"gpa\"])\n\n# Loop through all key-value pairs:\nfor key, value in student.items():\n    print(f\"{key}: {value}\")\n\n# Nested dictionary (very common with JSON/APIs):\ndatabase = {\n    \"student_001\": {\"name\": \"Alice\", \"gpa\": 3.8},\n    \"student_002\": {\"name\": \"Bob\",   \"gpa\": 3.5}\n}\nprint(database[\"student_001\"][\"name\"])  # Alice\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 08:\n# 1. Create a dictionary for a dataset column:\n#    column_info = {\"name\": \"...\", \"type\": \"...\", \"missing_values\": ..., \"mean\": ...}\n#    Fill it with realistic data for a \"temperature\" column\n# 2. Add a new key \"unit\" with value \"Celsius\"\n# 3. Print all keys, then all values\n# 4. Loop through it and print each key: value pair nicely\n# HINT: for key, value in my_dict.items():\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 09 \u2014 SETS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# A SET is an UNORDERED collection with NO DUPLICATE values.\n# Sets use curly braces {} but have NO key-value pairs (unlike dicts).\n# Great for: removing duplicates, finding unique values, set math (union, intersection).\n# In Data Science: find unique categories, check overlaps between datasets.\n#\n# EXAMPLE:\n\nfruits = {\"apple\", \"banana\", \"orange\", \"apple\", \"banana\"}\nprint(fruits)           # {'apple', 'banana', 'orange'} \u2014 duplicates removed!\n\n# Set operations \u2014 think of Venn diagrams:\ndata_scientists = {\"Python\", \"SQL\", \"Stats\", \"ML\", \"Viz\"}\ndata_engineers  = {\"Python\", \"SQL\", \"Spark\", \"Kafka\", \"ETL\"}\n\n# Union \u2014 everything in EITHER set:\nprint(data_scientists | data_engineers)\n\n# Intersection \u2014 only what's in BOTH sets:\nprint(data_scientists & data_engineers)\n\n# Difference \u2014 what's in first but NOT second:\nprint(data_scientists - data_engineers)  # Skills only data scientists have\n\n# Check membership (very fast for sets):\nprint(\"Python\" in data_scientists)   # True\n\n# Remove duplicates from a list using a set:\nmessy_list = [1, 2, 2, 3, 3, 3, 4]\nunique_list = list(set(messy_list))\nprint(unique_list)\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 09:\n# 1. Create a set of countries in dataset_1: {\"USA\", \"UK\", \"Germany\", \"France\"}\n# 2. Create a set of countries in dataset_2: {\"Germany\", \"France\", \"Japan\", \"Brazil\"}\n# 3. Find: countries in BOTH datasets (intersection)\n# 4. Find: all unique countries combined (union)\n# 5. Find: countries ONLY in dataset_1\n# HINT: use |, &, - operators\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 10 \u2014 CONDITIONALS: if / elif / else\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Conditions let your program make DECISIONS \u2014 \"if this is true, do that.\"\n# INDENTATION is CRITICAL in Python \u2014 4 spaces (or 1 Tab) define code blocks.\n# Python does NOT use { } for blocks like Java or C \u2014 indentation IS the structure.\n#\n# STRUCTURE:\n#   if condition:\n#       # runs if condition is True\n#   elif another_condition:\n#       # runs if first was False but this is True\n#   else:\n#       # runs if ALL above were False\n#\n# COMPARISON OPERATORS:\n#   ==  equal to          !=  not equal\n#   >   greater than      <   less than\n#   >=  greater or equal  <=  less or equal\n#\n# LOGICAL OPERATORS:\n#   and  \u2192 both must be True\n#   or   \u2192 at least one must be True\n#   not  \u2192 reverses True/False\n#\n# EXAMPLE:\n\nscore = 85\n\nif score >= 90:\n    print(\"Grade: A\")\nelif score >= 80:\n    print(\"Grade: B\")\nelif score >= 70:\n    print(\"Grade: C\")\nelif score >= 60:\n    print(\"Grade: D\")\nelse:\n    print(\"Grade: F\")\n\n# Using and / or:\ngpa = 3.7\nhas_application = True\n\nif gpa >= 3.5 and has_application:\n    print(\"Eligible for scholarship!\")\n\n# Ternary (one-line if/else) \u2014 concise:\nstatus = \"Pass\" if score >= 70 else \"Fail\"\nprint(f\"Status: {status}\")\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 10:\n# 1. Write an if/elif/else that classifies a temperature:\n#    > 35\u00b0C: \"Hot\", 20-35: \"Warm\", 10-20: \"Cool\", < 10: \"Cold\"\n# 2. Write a condition: if a student's GPA > 3.5 AND attendance > 80%,\n#    print \"Dean's List\", otherwise print \"Keep working!\"\n# 3. Use a ternary expression to set category = \"High\" if value > 100 else \"Low\"\n# HINT: category = \"High\" if value > 100 else \"Low\"\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 11 \u2014 FOR LOOPS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# A FOR LOOP repeats code for each item in a sequence (list, string, range, etc.).\n# This is how you process data row by row \u2014 the most important loop in Data Science!\n#\n# range(n)       \u2192 0, 1, 2, ..., n-1\n# range(a, b)    \u2192 a, a+1, ..., b-1\n# range(a, b, s) \u2192 a to b with step s\n# enumerate(seq) \u2192 gives both INDEX and VALUE \u2014 use this constantly!\n# zip(a, b)      \u2192 pair up two sequences element by element\n#\n# EXAMPLE:\n\n# Loop through a list:\nsubjects = [\"Python\", \"Statistics\", \"Machine Learning\", \"Deep Learning\"]\nfor subject in subjects:\n    print(f\"Studying: {subject}\")\n\n# range() \u2014 classic counter loop:\nfor i in range(5):\n    print(i)                      # 0 1 2 3 4\n\nfor i in range(1, 6):\n    print(i)                      # 1 2 3 4 5\n\n# enumerate() \u2014 index AND value together:\nfor index, subject in enumerate(subjects):\n    print(f\"{index + 1}. {subject}\")\n\n# zip() \u2014 loop over two lists simultaneously:\nstudents = [\"Alice\", \"Bob\", \"Carol\"]\nscores   = [92, 87, 95]\nfor student, score in zip(students, scores):\n    print(f\"{student}: {score}\")\n\n# Loop over a string:\nfor char in \"Python\":\n    print(char)\n\n# Calculate sum manually with a loop:\nnumbers = [10, 20, 30, 40, 50]\ntotal = 0\nfor num in numbers:\n    total = total + num          # same as: total += num\nprint(f\"Total: {total}\")\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 11:\n# 1. Loop through a list of 5 temperatures in Celsius and convert each to Fahrenheit\n#    FORMULA: F = C * 9/5 + 32\n# 2. Use enumerate() to print: \"Row 1: Alice\", \"Row 2: Bob\" etc. from a names list\n# 3. Using range(), calculate and print the squares of numbers 1 to 10 (1, 4, 9...)\n# 4. You have two lists: names and gpas. Use zip() to print each student's info.\n# HINT: for c in celsius_list: f = c * 9/5 + 32\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 12 \u2014 WHILE LOOPS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# A WHILE LOOP runs AS LONG AS a condition is True.\n# Use when you don't know HOW MANY times to repeat \u2014 you just know the stop condition.\n# WARNING: If the condition never becomes False \u2192 INFINITE LOOP \u2192 Ctrl+C to stop!\n# Always make sure something changes inside the loop to eventually stop it.\n#\n# break     \u2192 exit the loop immediately\n# continue  \u2192 skip the rest of this iteration, go to next\n#\n# EXAMPLE:\n\ncount = 0\nwhile count < 5:\n    print(f\"Count: {count}\")\n    count += 1              # VERY IMPORTANT \u2014 always update the counter!\n\nprint(\"Loop finished!\")\n\n# while with break \u2014 search for something:\ndata = [12, 45, 7, 89, 23, 56, 3]\ntarget = 89\nposition = 0\nwhile position < len(data):\n    if data[position] == target:\n        print(f\"Found {target} at index {position}\")\n        break               # Exit the loop \u2014 we found it!\n    position += 1\n\n# continue \u2014 skip even numbers:\nnum = 0\nwhile num < 10:\n    num += 1\n    if num % 2 == 0:        # if even...\n        continue            # ...skip the print\n    print(num)              # prints only odd numbers: 1,3,5,7,9\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 12:\n# 1. Write a while loop that asks the user to guess a number between 1 and 10.\n#    Keep asking until they guess correctly. (Use a variable as the secret number)\n#    HINT: secret = 7; while True: guess = int(input(...)): if guess == secret: break\n# 2. Write a while loop that keeps adding random numbers to a running total\n#    until the total exceeds 100, then print how many numbers were added.\n#    HINT: import random; random.randint(1, 20)\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 13 \u2014 FUNCTIONS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# A FUNCTION is a named, reusable block of code.\n# def keyword defines it. Call it by name to run it.\n# Functions can accept PARAMETERS (inputs) and RETURN values (output).\n# The DRY principle: Don't Repeat Yourself \u2014 wrap repeated code in functions!\n# In Data Science you'll build functions for: data cleaning, feature engineering, metrics.\n#\n# STRUCTURE:\n#   def function_name(parameter1, parameter2):\n#       # code\n#       return result\n#\n# SCOPE: variables inside a function are LOCAL \u2014 they don't exist outside.\n#\n# EXAMPLE:\n\ndef greet(name):\n    \"\"\"Greets a person by name.\"\"\"      # This is a DOCSTRING \u2014 always add it!\n    return f\"Hello, {name}!\"\n\nmessage = greet(\"Alice\")\nprint(message)\n\n# Function with multiple parameters and default values:\ndef calculate_grade(score, total=100):\n    \"\"\"Calculates percentage grade.\"\"\"\n    percentage = (score / total) * 100\n    if percentage >= 90:\n        return \"A\"\n    elif percentage >= 80:\n        return \"B\"\n    elif percentage >= 70:\n        return \"C\"\n    else:\n        return \"F\"\n\nprint(calculate_grade(85))          # Uses default total=100\nprint(calculate_grade(42, 50))      # 42 out of 50 \u2192 84% \u2192 B\n\n# Function that processes a list \u2014 common in data science:\ndef get_statistics(numbers):\n    \"\"\"Returns basic stats for a list of numbers.\"\"\"\n    n = len(numbers)\n    mean = sum(numbers) / n\n    sorted_nums = sorted(numbers)\n    median = sorted_nums[n // 2]\n    return {\n        \"count\": n,\n        \"mean\": round(mean, 2),\n        \"median\": median,\n        \"min\": min(numbers),\n        \"max\": max(numbers)\n    }\n\ndata = [23, 45, 12, 67, 34, 56, 78, 9, 43]\nstats = get_statistics(data)\nfor key, val in stats.items():\n    print(f\"  {key}: {val}\")\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 13:\n# 1. Write a function celsius_to_fahrenheit(c) that converts temperature\n# 2. Write a function is_prime(n) that returns True if n is prime, False otherwise\n#    HINT: a prime is only divisible by 1 and itself \u2014 use a for loop with %\n# 3. Write a function clean_text(text) that:\n#    - strips whitespace\n#    - converts to lowercase\n#    - replaces double spaces with single space\n# 4. Call each function with test inputs and print the results\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 14 \u2014 *args AND **kwargs\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Sometimes you don't know HOW MANY arguments a function will receive.\n# *args  \u2192 collects extra POSITIONAL arguments into a TUPLE\n# **kwargs \u2192 collects extra KEYWORD arguments into a DICTIONARY\n# The * and ** are the actual syntax \u2014 'args' and 'kwargs' are just conventions.\n#\n# EXAMPLE:\n\ndef add_all(*args):\n    \"\"\"Adds any number of numbers.\"\"\"\n    print(f\"Arguments received: {args}\")    # It's a tuple!\n    return sum(args)\n\nprint(add_all(1, 2))                # 3\nprint(add_all(1, 2, 3, 4, 5))       # 15\nprint(add_all(10, 20, 30))          # 60\n\ndef describe_student(**kwargs):\n    \"\"\"Prints student info from keyword arguments.\"\"\"\n    print(f\"Keyword arguments: {kwargs}\")   # It's a dict!\n    for key, value in kwargs.items():\n        print(f\"  {key}: {value}\")\n\ndescribe_student(name=\"Alice\", gpa=3.8, major=\"Data Science\")\ndescribe_student(name=\"Bob\", age=26)\n\n# Combined: regular + *args + **kwargs\ndef show_info(title, *items, **details):\n    print(f\"\\n=== {title} ===\")\n    for item in items:\n        print(f\"  - {item}\")\n    for k, v in details.items():\n        print(f\"  {k}: {v}\")\n\nshow_info(\"My Profile\", \"Python\", \"SQL\", \"ML\",\n          university=\"MIT\", year=2026)\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 14:\n# 1. Write multiply_all(*args) that multiplies all its arguments together\n# 2. Write create_record(**kwargs) that returns a dictionary of all keyword args\n# 3. Call each with at least 4 arguments\n# HINT: for multiply, start with result = 1 and loop multiplying\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 15 \u2014 LAMBDA FUNCTIONS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# A LAMBDA is a tiny, anonymous (nameless) function written in ONE line.\n# Syntax: lambda parameters: expression\n# Use lambdas for short, simple operations \u2014 especially with sorted(), map(), filter().\n#\n# EXAMPLE:\n\n# Regular function:\ndef square(x):\n    return x ** 2\n\n# Same thing as a lambda:\nsquare_lambda = lambda x: x ** 2\nprint(square_lambda(5))     # 25\n\n# Lambda with two parameters:\nmultiply = lambda x, y: x * y\nprint(multiply(4, 7))       # 28\n\n# REAL USE CASE \u2014 sorting complex data:\nstudents = [\n    {\"name\": \"Alice\", \"gpa\": 3.8},\n    {\"name\": \"Bob\",   \"gpa\": 3.5},\n    {\"name\": \"Carol\", \"gpa\": 3.9},\n]\n\n# Sort by gpa without lambda \u2014 you'd need a full function:\nsorted_students = sorted(students, key=lambda s: s[\"gpa\"], reverse=True)\nfor s in sorted_students:\n    print(f\"{s['name']}: {s['gpa']}\")\n\n# map() \u2014 apply a function to every item in a list:\nnumbers = [1, 2, 3, 4, 5]\nsquares = list(map(lambda x: x**2, numbers))\nprint(squares)              # [1, 4, 9, 16, 25]\n\n# filter() \u2014 keep only items where function returns True:\nevens = list(filter(lambda x: x % 2 == 0, numbers))\nprint(evens)                # [2, 4]\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 15:\n# 1. Use a lambda to convert a list of Celsius temps to Fahrenheit with map()\n# 2. Use a lambda with filter() to keep only scores >= 70 from a list of scores\n# 3. Sort a list of tuples (name, age) by age:\n#    people = [(\"Alice\", 25), (\"Bob\", 22), (\"Carol\", 28)]\n# HINT: sorted(people, key=lambda person: person[1])\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 16 \u2014 LIST COMPREHENSIONS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# List comprehension is Python's elegant way to build lists in ONE line.\n# It's shorter, faster, and more \"Pythonic\" than a for loop.\n# MASTER this \u2014 it's used EVERYWHERE in data science code.\n#\n# SYNTAX:\n#   [expression for item in iterable]\n#   [expression for item in iterable if condition]\n#\n# EXAMPLE:\n\n# Traditional for loop approach:\nsquares_loop = []\nfor x in range(1, 6):\n    squares_loop.append(x**2)\n\n# List comprehension \u2014 same result, one line:\nsquares_comp = [x**2 for x in range(1, 6)]\nprint(squares_comp)         # [1, 4, 9, 16, 25]\n\n# With condition \u2014 filter while building:\neven_squares = [x**2 for x in range(1, 11) if x % 2 == 0]\nprint(even_squares)         # [4, 16, 36, 64, 100]\n\n# String operations in comprehension:\nwords = [\"hello\", \"WORLD\", \"  Python  \", \"DATA\"]\ncleaned = [w.strip().lower() for w in words]\nprint(cleaned)              # ['hello', 'world', 'python', 'data']\n\n# Dictionary comprehension \u2014 same concept for dicts:\nsubjects = [\"Math\", \"Stats\", \"Python\", \"ML\"]\nsubject_lengths = {subject: len(subject) for subject in subjects}\nprint(subject_lengths)      # {'Math': 4, 'Stats': 5, 'Python': 6, 'ML': 2}\n\n# Set comprehension:\nnumbers = [1, 2, 2, 3, 3, 4]\nunique_squares = {x**2 for x in numbers}\nprint(unique_squares)       # {1, 4, 9, 16}\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 16:\n# 1. Use list comprehension to get all numbers from 1-100 divisible by 7\n# 2. Given: temps_celsius = [0, 20, 37, 100, -10]\n#    Use comprehension to create temps_fahrenheit\n# 3. Given a list of words, use comprehension to keep only words longer than 4 chars\n# 4. Create a dict comprehension: {number: number**3} for numbers 1 to 5\n# HINT: [x for x in range(1, 101) if x % 7 == 0]\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 17 \u2014 FILE I/O (Reading and Writing Files)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# In Data Science, you constantly read data from files (CSV, TXT, JSON) and\n# write results back. Python's open() function handles this.\n# ALWAYS use the 'with' keyword \u2014 it automatically closes the file for you.\n#\n# Modes:\n#   \"r\"  \u2192 read (default) \u2014 file must exist\n#   \"w\"  \u2192 write (creates new file OR OVERWRITES existing!)\n#   \"a\"  \u2192 append (adds to end of file)\n#   \"r+\" \u2192 read AND write\n#\n# EXAMPLE:\n\n# Writing to a file:\nwith open(\"sample_data.txt\", \"w\") as f:\n    f.write(\"Name,Age,GPA\\n\")\n    f.write(\"Alice,25,3.8\\n\")\n    f.write(\"Bob,23,3.5\\n\")\n    f.write(\"Carol,26,3.9\\n\")\nprint(\"File written!\")\n\n# Reading the entire file:\nwith open(\"sample_data.txt\", \"r\") as f:\n    content = f.read()\nprint(content)\n\n# Reading line by line (memory-efficient for large files):\nwith open(\"sample_data.txt\", \"r\") as f:\n    for line in f:\n        print(line.strip())     # strip() removes the \\n at end of each line\n\n# Reading into a list of lines:\nwith open(\"sample_data.txt\", \"r\") as f:\n    lines = f.readlines()\nprint(lines)\n\n# Append to file:\nwith open(\"sample_data.txt\", \"a\") as f:\n    f.write(\"David,24,3.7\\n\")\nprint(\"Line appended!\")\n\n# Working with CSV manually (before learning Pandas):\nwith open(\"sample_data.txt\", \"r\") as f:\n    next(f)                     # Skip header line\n    for line in f:\n        fields = line.strip().split(\",\")\n        name, age, gpa = fields\n        print(f\"Student: {name}, Age: {age}, GPA: {gpa}\")\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 17:\n# 1. Create a file \"my_notes.txt\" and write 5 things you've learned in Python so far\n# 2. Read the file and print each line with its line number\n#    HINT: use enumerate() while reading\n# 3. Append 2 more items to the file\n# 4. Read and print the final file\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 18 \u2014 EXCEPTION HANDLING (try / except / finally)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Errors (Exceptions) happen \u2014 users give wrong input, files are missing, etc.\n# Instead of your program CRASHING, you can CATCH the error and handle it gracefully.\n# This is called Exception Handling.\n#\n# COMMON EXCEPTIONS:\n#   ValueError       \u2014 wrong type of value (int(\"abc\"))\n#   ZeroDivisionError \u2014 dividing by zero\n#   FileNotFoundError \u2014 file doesn't exist\n#   IndexError        \u2014 index out of range\n#   KeyError          \u2014 key doesn't exist in dict\n#   TypeError         \u2014 wrong type for operation\n#\n# STRUCTURE:\n#   try:\n#       risky code here\n#   except ExceptionType as e:\n#       handle the error\n#   else:\n#       runs if NO exception occurred\n#   finally:\n#       ALWAYS runs (use for cleanup)\n#\n# EXAMPLE:\n\n# Without handling \u2014 this would CRASH:\n# print(10 / 0)   \u2190 ZeroDivisionError\n\n# With handling:\ntry:\n    result = 10 / 0\nexcept ZeroDivisionError:\n    print(\"Error: Cannot divide by zero!\")\n\n# Multiple exception types:\ndef safe_divide(a, b):\n    try:\n        result = a / b\n    except ZeroDivisionError:\n        return \"Error: division by zero\"\n    except TypeError:\n        return \"Error: inputs must be numbers\"\n    else:\n        return result        # Only runs if no exception\n    finally:\n        print(\"safe_divide() was called\")   # ALWAYS runs\n\nprint(safe_divide(10, 2))   # 5.0\nprint(safe_divide(10, 0))   # Error message\nprint(safe_divide(10, \"x\")) # Error message\n\n# Safe file reading:\ntry:\n    with open(\"nonexistent_file.txt\", \"r\") as f:\n        data = f.read()\nexcept FileNotFoundError as e:\n    print(f\"File not found: {e}\")\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 18:\n# 1. Write a function safe_int_input(prompt) that keeps asking the user for\n#    a number until they actually enter a valid integer (using try/except in a loop)\n# 2. Write a function read_csv_safe(filename) that tries to open a CSV file,\n#    returns the lines as a list, or returns an empty list with an error message\n# HINT: while True: try: return int(input(prompt)) except ValueError: print(\"Try again\")\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 19 \u2014 OBJECT-ORIENTED PROGRAMMING (OOP) \u2014 Classes & Objects\n# ==============================================================================\n#\n# TEACHER SAYS:\n# OOP organizes code into OBJECTS \u2014 self-contained units that have:\n#   ATTRIBUTES (data/variables) \u2014 what the object KNOWS (e.g., name, age)\n#   METHODS (functions) \u2014 what the object CAN DO (e.g., study, submit)\n# A CLASS is the BLUEPRINT. An OBJECT is the actual INSTANCE created from it.\n# Think: Class = Cookie Cutter, Object = Cookie\n#\n# __init__ is the CONSTRUCTOR \u2014 runs automatically when you create an object.\n# 'self' refers to the object itself \u2014 always the first parameter in methods.\n#\n# EXAMPLE:\n\nclass Student:\n    \"\"\"Represents a university student.\"\"\"\n\n    # Class variable \u2014 shared by ALL students:\n    university = \"Data Science University\"\n\n    def __init__(self, name, age, gpa):\n        \"\"\"Constructor \u2014 runs when Student() is called.\"\"\"\n        self.name = name        # Instance variable \u2014 unique per object\n        self.age  = age\n        self.gpa  = gpa\n        self.courses = []       # Empty list of courses\n\n    def enroll(self, course):\n        \"\"\"Enroll the student in a course.\"\"\"\n        self.courses.append(course)\n        print(f\"{self.name} enrolled in {course}\")\n\n    def get_status(self):\n        \"\"\"Returns 'Good Standing' if GPA >= 3.0, else 'Probation'.\"\"\"\n        if self.gpa >= 3.0:\n            return \"Good Standing\"\n        return \"Probation\"\n\n    def __str__(self):\n        \"\"\"Called when you print(student) \u2014 defines string representation.\"\"\"\n        return f\"Student({self.name}, GPA={self.gpa}, Courses={self.courses})\"\n\n# Create objects from the class:\nalice = Student(\"Alice\", 25, 3.8)\nbob   = Student(\"Bob\",   23, 2.9)\n\nalice.enroll(\"Python\")\nalice.enroll(\"Machine Learning\")\nbob.enroll(\"Statistics\")\n\nprint(alice)                    # Uses __str__\nprint(bob)\nprint(f\"{alice.name}: {alice.get_status()}\")\nprint(f\"{bob.name}: {bob.get_status()}\")\nprint(Student.university)       # Class variable \u2014 accessed from the class\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 19:\n# 1. Create a class Dataset with:\n#    - __init__(name, rows, columns, source)\n#    - method describe() that prints all attributes\n#    - method is_large() that returns True if rows > 100000\n# 2. Create 2 Dataset objects with different data\n# 3. Call describe() and is_large() on both\n# HINT: class Dataset: def __init__(self, name, rows, columns, source): self.name = name ...\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 20 \u2014 OOP: INHERITANCE & POLYMORPHISM\n# ==============================================================================\n#\n# TEACHER SAYS:\n# INHERITANCE lets a new class (child) reuse and EXTEND another class (parent).\n# The child gets all the parent's attributes and methods automatically.\n# POLYMORPHISM means different classes can share the same method NAME,\n# but each implements it differently \u2014 \"same interface, different behaviour.\"\n# Use super() to call the parent's version of a method.\n#\n# EXAMPLE:\n\nclass Person:\n    \"\"\"Base class for all people.\"\"\"\n    def __init__(self, name, age):\n        self.name = name\n        self.age  = age\n\n    def introduce(self):\n        return f\"Hi, I'm {self.name}, {self.age} years old.\"\n\nclass Student(Person):          # Student INHERITS from Person\n    def __init__(self, name, age, gpa):\n        super().__init__(name, age)   # Call Person's __init__\n        self.gpa = gpa\n\n    def introduce(self):        # OVERRIDE the parent's method (Polymorphism)\n        base = super().introduce()\n        return f\"{base} I'm a student with GPA {self.gpa}.\"\n\nclass Professor(Person):        # Professor also INHERITS from Person\n    def __init__(self, name, age, subject):\n        super().__init__(name, age)\n        self.subject = subject\n\n    def introduce(self):        # Different override\n        base = super().introduce()\n        return f\"{base} I teach {self.subject}.\"\n\n# Polymorphism in action \u2014 same method name, different results:\npeople = [\n    Student(\"Alice\", 25, 3.8),\n    Professor(\"Dr. Smith\", 45, \"Machine Learning\"),\n    Student(\"Bob\", 22, 3.5)\n]\n\nfor person in people:\n    print(person.introduce())   # Python calls the RIGHT version automatically!\n\n# isinstance() checks:\nprint(isinstance(people[0], Student))    # True\nprint(isinstance(people[0], Person))    # True (Student IS a Person)\nprint(isinstance(people[1], Student))   # False (Professor is NOT a Student)\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 20:\n# 1. Create a base class Animal with: name, sound, __init__, and speak() method\n# 2. Create Dog(Animal) and Cat(Animal) that override speak()\n#    Dog: \"Woof!\", Cat: \"Meow!\"\n# 3. Create a list of animals and call speak() on each using a loop\n# HINT: class Dog(Animal): def speak(self): return f\"{self.name} says Woof!\"\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 21 \u2014 MODULES & PACKAGES\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Python's real power is its LIBRARIES (collections of pre-written code).\n# import brings in a module/library. You don't have to write everything yourself!\n#\n# Built-in modules (no install needed):\n#   math, os, sys, random, datetime, json, csv, time, re\n#\n# Third-party (install with pip):\n#   numpy, pandas, matplotlib, scikit-learn, requests, flask, django\n#\n# Ways to import:\n#   import math                   \u2192 use as math.sqrt()\n#   from math import sqrt         \u2192 use as sqrt() directly\n#   from math import sqrt, pi     \u2192 import multiple\n#   import numpy as np            \u2192 alias (convention: np for numpy)\n#   from math import *            \u2192 import everything (avoid this \u2014 pollutes namespace)\n#\n# EXAMPLE:\n\nimport os\nimport json\nimport random\nfrom datetime import datetime, date\n\n# os \u2014 interact with the operating system:\nprint(os.getcwd())                  # Current working directory\nprint(os.listdir(\".\"))              # List files in current dir\n\n# random \u2014 generate random numbers:\nprint(random.randint(1, 100))       # Random integer 1-100\nprint(random.random())              # Random float 0.0 to 1.0\nprint(random.choice([\"Python\", \"SQL\", \"ML\"]))   # Random choice\n\n# datetime \u2014 work with dates and times:\nnow = datetime.now()\nprint(f\"Now: {now}\")\nprint(f\"Year: {now.year}, Month: {now.month}, Day: {now.day}\")\ntoday = date.today()\nprint(f\"Today: {today}\")\n\n# json \u2014 read/write JSON (critical for APIs and web data):\ndata_dict = {\"name\": \"Alice\", \"scores\": [88, 92, 95], \"active\": True}\njson_string = json.dumps(data_dict, indent=2)   # dict \u2192 JSON string\nprint(json_string)\nback_to_dict = json.loads(json_string)          # JSON string \u2192 dict\nprint(back_to_dict[\"name\"])\n\n# Write JSON to file:\nwith open(\"student.json\", \"w\") as f:\n    json.dump(data_dict, f, indent=2)\n\n# Read JSON from file:\nwith open(\"student.json\", \"r\") as f:\n    loaded = json.load(f)\nprint(loaded)\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 21:\n# 1. Use os module to: print cwd, create a folder \"my_data\", list files in current dir\n#    HINT: os.makedirs(\"my_data\", exist_ok=True)\n# 2. Use random to simulate rolling a 6-sided dice 10 times, count how many 6s you get\n# 3. Create a Python dict representing a dataset summary, convert to JSON and save to file\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 22 \u2014 REGULAR EXPRESSIONS (regex)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Regular Expressions (regex) are patterns that match text.\n# Critical for data cleaning \u2014 find emails, phone numbers, dates in messy text.\n# The 're' module is built-in.\n#\n# COMMON PATTERNS:\n#   .       \u2192 any character\n#   \\d      \u2192 digit (0-9)\n#   \\w      \u2192 word character (letter, digit, _)\n#   \\s      \u2192 whitespace\n#   +       \u2192 one or more\n#   *       \u2192 zero or more\n#   ?       \u2192 zero or one (optional)\n#   ^       \u2192 start of string\n#   $       \u2192 end of string\n#   [abc]   \u2192 a or b or c\n#   [a-z]   \u2192 any lowercase letter\n#\n# KEY FUNCTIONS:\n#   re.search(pattern, text)   \u2192 find FIRST match anywhere\n#   re.findall(pattern, text)  \u2192 find ALL matches \u2192 returns list\n#   re.sub(pattern, repl, text) \u2192 REPLACE matches\n#   re.match(pattern, text)    \u2192 match at the START only\n#\n# EXAMPLE:\n\nimport re\n\ntext = \"Contact us at alice@university.edu or bob123@gmail.com. Call: +1-555-123-4567\"\n\n# Find all email addresses:\nemails = re.findall(r\"[\\w.-]+@[\\w.-]+\\.\\w+\", text)\nprint(f\"Emails: {emails}\")\n\n# Find all phone-like patterns:\nphones = re.findall(r\"\\+?\\d[\\d\\-]{8,}\", text)\nprint(f\"Phones: {phones}\")\n\n# Replace digits with 'X' (anonymize):\nanonymized = re.sub(r\"\\d\", \"X\", text)\nprint(f\"Anonymized: {anonymized}\")\n\n# Validate email format:\ndef is_valid_email(email):\n    pattern = r\"^[\\w.-]+@[\\w.-]+\\.\\w{2,}$\"\n    return bool(re.match(pattern, email))\n\nprint(is_valid_email(\"alice@uni.edu\"))     # True\nprint(is_valid_email(\"notanemail\"))        # False\nprint(is_valid_email(\"test@.com\"))         # False\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 22:\n# 1. Extract all dates in format YYYY-MM-DD from this string:\n#    s = \"Reports: 2024-01-15, 2024-03-22, invalid-date, 2025-12-31\"\n# 2. Write is_valid_phone(phone) that checks: +1-555-123-4567 format\n# 3. Clean a messy text by removing all punctuation using re.sub()\n# HINT: re.findall(r\"\\d{4}-\\d{2}-\\d{2}\", s)\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 23 \u2014 DECORATORS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# A DECORATOR is a function that WRAPS another function to add behaviour.\n# It's how Python frameworks (Flask, Django) work under the hood.\n# You've seen: @staticmethod, @property, @app.route \u2014 those are decorators!\n# Decorators use @syntax \u2014 placed directly above the function definition.\n#\n# EXAMPLE:\n\nimport time\nimport functools\n\n# A timing decorator \u2014 measures how long a function takes:\ndef timer(func):\n    \"\"\"Decorator that times a function's execution.\"\"\"\n    @functools.wraps(func)          # Preserves original function's name/docstring\n    def wrapper(*args, **kwargs):\n        start = time.time()\n        result = func(*args, **kwargs)\n        end = time.time()\n        print(f\"'{func.__name__}' took {end - start:.4f} seconds\")\n        return result\n    return wrapper\n\n@timer                              # Apply the decorator\ndef slow_calculation(n):\n    \"\"\"Sums numbers from 0 to n.\"\"\"\n    return sum(range(n))\n\nresult = slow_calculation(1_000_000)\nprint(f\"Result: {result}\")\n\n# A logging decorator:\ndef log_calls(func):\n    @functools.wraps(func)\n    def wrapper(*args, **kwargs):\n        print(f\"Calling {func.__name__} with args={args}, kwargs={kwargs}\")\n        result = func(*args, **kwargs)\n        print(f\"{func.__name__} returned {result}\")\n        return result\n    return wrapper\n\n@log_calls\ndef add(a, b):\n    return a + b\n\nadd(3, 5)\nadd(10, 20)\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 23:\n# 1. Write a decorator 'validate_positive' that checks all arguments are > 0\n#    before running the function; if not, print an error and return None\n# 2. Apply it to a function square_root(n) that returns math.sqrt(n)\n# 3. Test with positive and negative numbers\n# HINT: def validate_positive(func): def wrapper(*args): for a in args: if a <= 0: ...\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 24 \u2014 GENERATORS & ITERATORS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# A GENERATOR is a function that yields values ONE AT A TIME instead of all at once.\n# Use generators when working with LARGE data \u2014 they don't load everything into memory!\n# This is critical in Data Science when your CSV has millions of rows.\n# yield pauses the function and returns a value; next() resumes it.\n#\n# EXAMPLE:\n\n# A generator function:\ndef count_up(start, end):\n    \"\"\"Yields numbers from start to end, one at a time.\"\"\"\n    current = start\n    while current <= end:\n        yield current           # Pauses here, gives the value, resumes on next call\n        current += 1\n\ngen = count_up(1, 5)\nprint(next(gen))        # 1\nprint(next(gen))        # 2\nprint(next(gen))        # 3\n\n# Loop over a generator:\nfor num in count_up(1, 5):\n    print(num)\n\n# Infinite generator (never ends \u2014 use break or take()):\ndef infinite_counter(start=0):\n    n = start\n    while True:\n        yield n\n        n += 1\n\ncounter = infinite_counter(10)\nfor _ in range(5):              # Take only 5 values\n    print(next(counter))        # 10, 11, 12, 13, 14\n\n# Generator expression (like list comprehension but lazy):\n# List comprehension \u2014 creates ALL at once (uses memory):\nsquares_list = [x**2 for x in range(1_000_000)]   # Uses ~8MB RAM\n\n# Generator expression \u2014 creates ONE AT A TIME (tiny memory footprint):\nsquares_gen  = (x**2 for x in range(1_000_000))   # Uses ~100 bytes RAM\n\nprint(next(squares_gen))    # 0\nprint(next(squares_gen))    # 1\nprint(sum(squares_gen))     # Sum all remaining\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 24:\n# 1. Write a generator read_csv_chunks(filename, chunk_size) that reads a file\n#    and yields lists of N lines at a time (chunks)\n# 2. Write a Fibonacci generator that yields Fibonacci numbers indefinitely\n#    HINT: yield a, then a,b = b, a+b\n# 3. Use a generator expression to yield squares of even numbers under 100\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 25 \u2014 NUMPY (Numerical Python)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# NumPy is THE foundation of Data Science in Python.\n# It provides N-dimensional arrays (ndarray) \u2014 like lists but:\n#   - MUCH faster (implemented in C)\n#   - Supports vectorized math (no loops needed!)\n#   - The basis for Pandas, scikit-learn, TensorFlow, etc.\n#\n# Install: pip install numpy\n# Convention: import numpy as np   (ALWAYS use 'np' as alias)\n#\n# EXAMPLE:\n\nimport numpy as np\n\n# Create arrays:\narr1d = np.array([1, 2, 3, 4, 5])\narr2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])\n\nprint(arr1d)\nprint(arr2d)\nprint(arr1d.shape)      # (5,)  \u2014 5 elements, 1 dimension\nprint(arr2d.shape)      # (3,3) \u2014 3 rows, 3 columns\nprint(arr2d.dtype)      # int64 \u2014 data type\n\n# Useful array creators:\nprint(np.zeros((3, 4)))         # 3x4 array of zeros\nprint(np.ones((2, 3)))          # 2x3 array of ones\nprint(np.arange(0, 10, 2))      # [0, 2, 4, 6, 8]\nprint(np.linspace(0, 1, 5))     # 5 evenly spaced values: [0, .25, .5, .75, 1]\nprint(np.random.rand(3, 3))     # 3x3 random floats (0 to 1)\n\n# Vectorized math \u2014 NO loops needed:\nscores = np.array([75, 88, 92, 65, 80, 95, 70])\nprint(scores + 5)           # Add 5 to EVERY element\nprint(scores * 1.1)         # Multiply every element by 1.1\nprint(scores > 80)          # Boolean array: which are > 80?\n\n# Boolean indexing \u2014 filter by condition:\nhigh_scores = scores[scores > 80]\nprint(high_scores)          # [88 92 95]\n\n# Statistics:\nprint(f\"Mean:   {np.mean(scores):.2f}\")\nprint(f\"Std:    {np.std(scores):.2f}\")\nprint(f\"Median: {np.median(scores):.2f}\")\nprint(f\"Max:    {np.max(scores)}\")\nprint(f\"Min:    {np.min(scores)}\")\n\n# Reshape and matrix operations:\nmatrix_a = np.array([[1, 2], [3, 4]])\nmatrix_b = np.array([[5, 6], [7, 8]])\nprint(np.dot(matrix_a, matrix_b))   # Matrix multiplication\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 25:\n# 1. Create a numpy array of 20 random integers between 0 and 100\n# 2. Normalize it (scale to 0-1): normalized = (arr - arr.min()) / (arr.max() - arr.min())\n# 3. Find indices where value > 50: np.where(arr > 50)\n# 4. Create a 5x5 identity matrix: np.eye(5)\n# 5. Calculate: mean, std, variance, 25th percentile, 75th percentile\n# HINT: np.percentile(arr, 25), np.var(arr)\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 26 \u2014 PANDAS (Data Analysis Library)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Pandas is your data table (spreadsheet) in Python. THE most important library.\n# DataFrame = table with rows and columns (like Excel or SQL table)\n# Series = single column of data\n# Install: pip install pandas\n# Convention: import pandas as pd\n#\n# EXAMPLE:\n\nimport pandas as pd\n\n# Create a DataFrame from a dict:\ndata = {\n    \"name\":    [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"],\n    \"age\":     [25, 23, 26, 24, 22],\n    \"gpa\":     [3.8, 3.5, 3.9, 3.7, 3.2],\n    \"major\":   [\"DS\", \"CS\", \"DS\", \"Stats\", \"CS\"],\n    \"passed\":  [True, True, True, True, False]\n}\ndf = pd.DataFrame(data)\n\n# Explore the data:\nprint(df)\nprint(df.head(3))           # First 3 rows\nprint(df.tail(2))           # Last 2 rows\nprint(df.shape)             # (5, 5) \u2014 rows, columns\nprint(df.dtypes)            # Data type of each column\nprint(df.describe())        # Statistics summary\nprint(df.info())            # Overview with memory usage\n\n# Select columns:\nprint(df[\"name\"])           # One column \u2192 Series\nprint(df[[\"name\", \"gpa\"]]) # Multiple columns \u2192 DataFrame\n\n# Filter rows by condition:\nds_students = df[df[\"major\"] == \"DS\"]\nprint(ds_students)\n\nhigh_gpa = df[df[\"gpa\"] >= 3.7]\nprint(high_gpa)\n\n# Add a new column:\ndf[\"gpa_letter\"] = df[\"gpa\"].apply(lambda g: \"A\" if g >= 3.7 else \"B\")\nprint(df)\n\n# Sort values:\ndf_sorted = df.sort_values(\"gpa\", ascending=False)\nprint(df_sorted)\n\n# Group by:\nprint(df.groupby(\"major\")[\"gpa\"].mean())\n\n# Read/Write CSV:\ndf.to_csv(\"students.csv\", index=False)\ndf_loaded = pd.read_csv(\"students.csv\")\nprint(df_loaded)\n\n# Handle missing values:\ndf_with_nan = df.copy()\ndf_with_nan.loc[1, \"gpa\"] = None\nprint(df_with_nan.isnull().sum())       # Count missing per column\ndf_clean = df_with_nan.dropna()         # Drop rows with any NaN\ndf_filled = df_with_nan.fillna(df[\"gpa\"].mean())  # Fill NaN with mean\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 26:\n# 1. Load a CSV from the internet (or create one) and:\n#    - Show shape, dtypes, head(), describe()\n# 2. Filter rows where a numeric column > some threshold\n# 3. Calculate mean/median for each numeric column using .describe()\n# 4. Add a new column that categorizes another (e.g., \"high\" / \"low\")\n# 5. Group by a categorical column and calculate mean of numeric columns\n# HINT: df.groupby(\"column\")[\"numeric\"].mean()\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 27 \u2014 MATPLOTLIB & SEABORN (Data Visualization)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# A Data Scientist who can't visualize data is flying blind.\n# Matplotlib is the base plotting library. Seaborn builds on it \u2014 easier & prettier.\n# Install: pip install matplotlib seaborn\n# Convention: import matplotlib.pyplot as plt; import seaborn as sns\n#\n# EXAMPLE:\n\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n# Sample data:\nmonths  = [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"]\nrevenue = [4500, 5200, 4800, 6100, 5900, 7200]\ncosts   = [3000, 3100, 2900, 3400, 3200, 3800]\n\n# --- LINE CHART ---\nplt.figure(figsize=(10, 5))\nplt.plot(months, revenue, marker=\"o\", label=\"Revenue\", color=\"green\")\nplt.plot(months, costs,   marker=\"s\", label=\"Costs\",   color=\"red\")\nplt.title(\"Monthly Revenue vs Costs\")\nplt.xlabel(\"Month\")\nplt.ylabel(\"Amount ($)\")\nplt.legend()\nplt.grid(True)\nplt.tight_layout()\nplt.savefig(\"line_chart.png\")       # Save to file\nplt.show()                          # Display (comment out if running in terminal)\n\n# --- BAR CHART ---\nplt.figure(figsize=(8, 5))\nplt.bar(months, revenue, color=\"steelblue\", edgecolor=\"black\")\nplt.title(\"Monthly Revenue\")\nplt.xlabel(\"Month\")\nplt.ylabel(\"Revenue ($)\")\nplt.tight_layout()\nplt.savefig(\"bar_chart.png\")\nplt.show()\n\n# --- HISTOGRAM (distribution) ---\nnp_data = np.random.normal(loc=70, scale=15, size=500)   # 500 random exam scores\nplt.figure(figsize=(8, 5))\nplt.hist(np_data, bins=20, color=\"orange\", edgecolor=\"black\")\nplt.title(\"Exam Score Distribution\")\nplt.xlabel(\"Score\")\nplt.ylabel(\"Frequency\")\nplt.axvline(np.mean(np_data), color=\"red\", linestyle=\"--\", label=f\"Mean={np.mean(np_data):.1f}\")\nplt.legend()\nplt.savefig(\"histogram.png\")\nplt.show()\n\n# --- SEABORN SCATTER PLOT ---\ndf_plot = pd.DataFrame({\n    \"hours_studied\": np.random.uniform(1, 10, 50),\n    \"score\": np.random.uniform(40, 100, 50),\n    \"major\": np.random.choice([\"DS\", \"CS\", \"Stats\"], 50)\n})\nplt.figure(figsize=(8, 5))\nsns.scatterplot(data=df_plot, x=\"hours_studied\", y=\"score\", hue=\"major\")\nplt.title(\"Hours Studied vs Score by Major\")\nplt.savefig(\"scatter.png\")\nplt.show()\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 27:\n# 1. Create a pie chart of: {\"Python\": 35, \"SQL\": 25, \"ML\": 20, \"Stats\": 20}\n#    HINT: plt.pie(values, labels=keys, autopct='%1.1f%%')\n# 2. Create a boxplot of exam scores grouped by major using seaborn\n#    HINT: sns.boxplot(data=df, x=\"major\", y=\"score\")\n# 3. Create a heatmap of the correlation matrix of a DataFrame\n#    HINT: sns.heatmap(df.corr(), annot=True)\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 28 \u2014 DATA CLEANING PROJECT\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Real-world data is MESSY. 80% of a data scientist's time is cleaning data.\n# This is your first mini-project: clean a messy dataset end to end.\n# You'll use everything: Pandas, string methods, loops, conditions, functions.\n#\n# COMMON DATA PROBLEMS:\n#   - Missing values (NaN)\n#   - Wrong data types (age stored as string)\n#   - Duplicates\n#   - Inconsistent formatting (\"USA\" vs \"usa\" vs \"U.S.A\")\n#   - Outliers\n#   - Extra whitespace\n#\n# EXAMPLE:\n\n# Create a messy dataset:\nmessy_data = {\n    \"name\":    [\"Alice \", \"  BOB\", \"carol\", \"Alice \", \"DAVID\", None],\n    \"age\":     [25, \"twenty-three\", 26, 25, 200, 24],   # outlier: 200, wrong type\n    \"salary\":  [50000, 60000, None, 50000, 70000, 55000],\n    \"country\": [\"USA\", \"usa\", \"U.S.A\", \"UK\", \"uk\", \"Germany\"]\n}\ndf_messy = pd.DataFrame(messy_data)\nprint(\"=== MESSY DATA ===\")\nprint(df_messy)\nprint(df_messy.info())\n\n# Step 1: Remove duplicates\ndf_clean = df_messy.drop_duplicates()\nprint(f\"\\nAfter drop_duplicates: {df_clean.shape}\")\n\n# Step 2: Handle missing values\ndf_clean = df_clean.dropna(subset=[\"name\"])         # Drop rows with no name\ndf_clean[\"salary\"] = df_clean[\"salary\"].fillna(df_clean[\"salary\"].median())\n\n# Step 3: Standardize text \u2014 strip spaces, lowercase\ndf_clean[\"name\"] = df_clean[\"name\"].str.strip().str.title()\n\n# Step 4: Standardize country names\ncountry_map = {\"usa\": \"USA\", \"u.s.a\": \"USA\", \"uk\": \"UK\"}\ndf_clean[\"country\"] = df_clean[\"country\"].str.lower().map(\n    lambda c: country_map.get(c, c.upper())\n)\n\n# Step 5: Fix data types and handle outliers\ndf_clean[\"age\"] = pd.to_numeric(df_clean[\"age\"], errors=\"coerce\")   # NaN for non-numeric\ndf_clean = df_clean[df_clean[\"age\"].between(15, 100)]               # Remove outliers\n\nprint(\"\\n=== CLEAN DATA ===\")\nprint(df_clean)\nprint(df_clean.dtypes)\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 28:\n# Download the Titanic dataset: pd.read_csv(\"https://raw.githubusercontent.com/\n#   datasciencedojo/datasets/master/titanic.csv\")\n# 1. Explore: shape, info(), describe(), isnull().sum()\n# 2. Fill missing 'Age' with median\n# 3. Drop 'Cabin' column (too many missing values)\n# 4. Standardize 'Sex' column to title case\n# 5. Create a new column 'AgeGroup': Child(<18), Adult(18-60), Senior(>60)\n# 6. Calculate survival rate by Sex and by Pclass using groupby\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 29 \u2014 MACHINE LEARNING INTRO (scikit-learn)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Machine Learning = teaching a computer to find patterns in data and make predictions.\n# scikit-learn is Python's standard ML library.\n# The ML workflow is always the same:\n#   1. Load & clean data\n#   2. Split into features (X) and target (y)\n#   3. Split into train/test sets (80/20)\n#   4. Choose a model\n#   5. Train (fit) the model\n#   6. Predict on test set\n#   7. Evaluate with metrics\n#\n# Install: pip install scikit-learn\n#\n# EXAMPLE:\n\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.linear_model import LinearRegression\nfrom sklearn.metrics import mean_squared_error, r2_score\nfrom sklearn.preprocessing import StandardScaler\n\n# Generate synthetic study data:\nnp.random.seed(42)\nhours_studied = np.random.uniform(1, 10, 100)\nexam_score    = 10 * hours_studied + np.random.normal(0, 5, 100)   # Linear + noise\n\n# Step 1: Prepare features and target\nX = hours_studied.reshape(-1, 1)    # Reshape to 2D: (100, 1)\ny = exam_score\n\n# Step 2: Split into train (80%) and test (20%):\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\nprint(f\"Train size: {X_train.shape}, Test size: {X_test.shape}\")\n\n# Step 3: Scale features (optional for linear regression, essential for others):\nscaler  = StandardScaler()\nX_train = scaler.fit_transform(X_train)   # fit on train, then transform\nX_test  = scaler.transform(X_test)        # ONLY transform (never fit on test!)\n\n# Step 4 & 5: Create and train model:\nmodel = LinearRegression()\nmodel.fit(X_train, y_train)\n\n# Step 6: Predict:\ny_pred = model.predict(X_test)\n\n# Step 7: Evaluate:\nmse  = mean_squared_error(y_test, y_pred)\nrmse = np.sqrt(mse)\nr2   = r2_score(y_test, y_pred)\nprint(f\"RMSE:  {rmse:.2f}\")\nprint(f\"R\u00b2:    {r2:.4f}\")\nprint(f\"Coef:  {model.coef_[0]:.2f}\")\nprint(f\"Intercept: {model.intercept_:.2f}\")\n\n# Visualize:\nplt.figure(figsize=(8, 5))\nplt.scatter(X_test, y_test, color=\"blue\", alpha=0.5, label=\"Actual\")\nplt.plot(X_test, y_pred, color=\"red\", linewidth=2, label=\"Predicted\")\nplt.title(\"Linear Regression: Hours Studied vs Exam Score\")\nplt.xlabel(\"Hours Studied (scaled)\")\nplt.ylabel(\"Score\")\nplt.legend()\nplt.savefig(\"linear_regression.png\")\nplt.show()\n\n# ==============================================================================\n# YOUR TURN \u2014 DAY 29:\n# Use the Iris dataset (classic classification dataset):\n#   from sklearn.datasets import load_iris\n#   iris = load_iris()\n#   X, y = iris.data, iris.target\n# 1. Split into train/test\n# 2. Train a KNeighborsClassifier(n_neighbors=5)\n# 3. Evaluate with accuracy_score\n# 4. Print a classification_report\n# HINT: from sklearn.neighbors import KNeighborsClassifier\n#       from sklearn.metrics import accuracy_score, classification_report\n# ==============================================================================\n\n\n\n\n# ==============================================================================\n# DAY 30 \u2014 CAPSTONE PROJECT: End-to-End Data Analysis\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Congratulations! You've completed 29 days of Python fundamentals.\n# This final day is your CAPSTONE \u2014 a complete, real data science workflow.\n# You will use EVERYTHING: Pandas, NumPy, Matplotlib, Seaborn, scikit-learn.\n# This is the kind of work you'll do in your Master's program and job.\n#\n# PROJECT: Student Performance Analysis & Prediction\n# Goal: Analyze student data and predict exam performance\n#\n# INSTRUCTIONS: Build this project step by step. Each step is your task.\n\nprint(\"\\n\" + \"=\"*60)\nprint(\"  CAPSTONE PROJECT: Student Performance Analysis\")\nprint(\"=\"*60)\n\n# --- STEP 1: Generate realistic dataset ---\nnp.random.seed(2026)\nn = 300\n\ncapstone_data = pd.DataFrame({\n    \"student_id\":      [f\"S{i:04d}\" for i in range(1, n+1)],\n    \"age\":             np.random.randint(18, 30, n),\n    \"hours_studied\":   np.random.uniform(1, 12, n).round(1),\n    \"attendance_pct\":  np.random.uniform(50, 100, n).round(1),\n    \"prev_gpa\":        np.random.uniform(2.0, 4.0, n).round(2),\n    \"major\":           np.random.choice([\"Data Science\", \"CS\", \"Statistics\", \"Math\"], n),\n    \"scholarship\":     np.random.choice([True, False], n, p=[0.3, 0.7]),\n})\n\n# Generate final score as a function of the features + noise:\ncapstone_data[\"final_score\"] = (\n    capstone_data[\"hours_studied\"] * 5 +\n    capstone_data[\"attendance_pct\"] * 0.3 +\n    capstone_data[\"prev_gpa\"] * 8 +\n    np.random.normal(0, 8, n)\n).clip(0, 100).round(1)\n\ncapstone_data[\"passed\"] = (capstone_data[\"final_score\"] >= 60).astype(int)\n\n# --- STEP 2: EDA (YOUR TURN) ---\n# Explore the dataset: shape, dtypes, describe(), missing values, distributions\n# TASK A: Print info and describe()\n# TASK B: Plot distribution of final_score as a histogram\n# TASK C: Boxplot of final_score by major\n# TASK D: Correlation heatmap of numeric columns\n# TASK E: Bar chart of pass rate by major\nprint(\"\\n--- YOUR EDA TASKS START HERE ---\")\n# Write your EDA code below:\n\n\n\n\n# --- STEP 3: Feature Engineering (YOUR TURN) ---\n# TASK F: Create a new column 'study_efficiency' = final_score / hours_studied\n# TASK G: Create 'performance_tier': \"Top\"(>=85), \"Good\"(70-85), \"Average\"(55-70), \"Low\"(<55)\n# TASK H: Encode 'major' using pd.get_dummies()\n# Write your feature engineering code below:\n\n\n\n\n# --- STEP 4: Machine Learning (YOUR TURN) ---\n# TASK I: Select features: hours_studied, attendance_pct, prev_gpa + encoded majors\n# TASK J: Target: 'passed' (binary classification)\n# TASK K: Split 80/20, scale features\n# TASK L: Train at least TWO models: LogisticRegression, RandomForestClassifier\n# TASK M: Compare accuracy, print classification_report for each\n# TASK N: Plot feature importances from RandomForest\n# Write your ML code below:\n\n\n\n\n# --- STEP 5: Save Results (YOUR TURN) ---\n# TASK O: Save the cleaned + engineered DataFrame to 'student_analysis.csv'\n# TASK P: Save all your charts as PNG files\n# TASK Q: Print a final summary: dataset size, pass rate, best model accuracy\n\n\n\n\nprint(\"\\n\" + \"=\"*60)\nprint(\"  YOU COMPLETED 30 DAYS OF PYTHON!\")\nprint(\"  Next steps:\")\nprint(\"  - SQL (sql/sql_zero_to_hero.sql)\")\nprint(\"  - Git (git/git_commands.sh)\")\nprint(\"  - Django (django/django_zero_to_hero.py)\")\nprint(\"=\"*60)\n";
+      const readerOutputKey = "readerRun:knowledge-base/zero-to-hero-guides/python/python_zero_to_hero.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code># ==============================================================================
+#  PYTHON — ZERO TO HERO
+#  Your personal Python teacher — from print(&quot;Hello World!&quot;) to Data Science
+#  Author: Your Coding Journey
+#  How to use: Read every comment, study every example, then do YOUR TURN tasks.
+#              Run the file after each section: python python_zero_to_hero.py
+# ==============================================================================
+
+# ==============================================================================
+# DAY 01 — YOUR FIRST STEPS: print() and Comments
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Welcome! You already know print(&quot;Hello World!&quot;) — that&#x27;s your first Python skill.
+# Let&#x27;s understand what it means.
+#
+# print() is a FUNCTION — a reusable block of code that does a job.
+# Whatever you put inside the parentheses ( ) gets displayed on screen.
+# The # symbol starts a COMMENT — Python ignores it. Comments are for humans.
+# Use comments to explain your thinking. Good programmers comment EVERYTHING.
+#
+# EXAMPLE:
+
+print(&quot;Hello World!&quot;)           # This prints text to the screen
+print(&quot;My name is Python!&quot;)     # You can print any text inside quotes
+print(&quot;I am learning Python!&quot;)
+
+# You can also print numbers directly:
+print(42)
+print(3.14)
+
+# You can print multiple things separated by commas:
+print(&quot;The answer is&quot;, 42)
+
+# ==============================================================================
+# YOUR TURN — DAY 01:
+# 1. Print your own name
+# 2. Print your university name
+# 3. Print your age
+# 4. Print: &quot;I am a Data Science student and I will master Python!&quot;
+# Write your code below this line:
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 02 — VARIABLES &amp; DATA TYPES
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A VARIABLE is a named container that stores a value.
+# Think of it like a labelled box. You put something in the box, give it a name,
+# and later you can use that name to get the value back.
+#
+# Python has these main data types:
+#   int   → whole numbers         → 5, 100, -3
+#   float → decimal numbers       → 3.14, 0.5, -2.7
+#   str   → text (string)         → &quot;hello&quot;, &#x27;world&#x27;
+#   bool  → True or False         → True, False
+#
+# To check the type of a variable, use: type(variable_name)
+# To check the content, use: print(variable_name)
+#
+# EXAMPLE:
+
+name = &quot;Alice&quot;                   # str  — always use quotes for text
+age = 25                         # int  — no quotes for numbers
+height = 1.75                    # float
+is_student = True                # bool — capital T and F!
+
+print(name)
+print(age)
+print(height)
+print(is_student)
+
+print(type(name))                # Output: &lt;class &#x27;str&#x27;&gt;
+print(type(age))                 # Output: &lt;class &#x27;int&#x27;&gt;
+print(type(height))              # Output: &lt;class &#x27;float&#x27;&gt;
+print(type(is_student))          # Output: &lt;class &#x27;bool&#x27;&gt;
+
+# You can reassign a variable — the new value REPLACES the old one:
+age = 26
+print(age)                       # Now prints 26
+
+# Variable naming rules:
+#   ✅  my_name, age2, total_score   (use lowercase and underscores)
+#   ❌  2name, my-name, class        (cannot start with number, no hyphens, no keywords)
+
+# ==============================================================================
+# YOUR TURN — DAY 02:
+# 1. Create a variable for your first name
+# 2. Create a variable for your GPA (e.g., 3.8)
+# 3. Create a variable for your student ID (as an integer)
+# 4. Create a variable is_enrolled = True
+# 5. Print ALL of them with their types using type()
+# HINT: print(type(your_variable))
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 03 — STRINGS IN DEPTH
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Strings are sequences of characters. In Data Science you clean and process
+# text data all the time. Master strings now!
+#
+# KEY STRING OPERATIONS:
+#   len(s)          → length (number of characters)
+#   s.upper()       → ALL CAPS
+#   s.lower()       → all lowercase
+#   s.strip()       → removes extra spaces at start/end
+#   s.replace(a, b) → replaces &#x27;a&#x27; with &#x27;b&#x27;
+#   s.split(&quot;,&quot;)    → splits string into a LIST by comma
+#   s[0]            → first character (indexing starts at 0!)
+#   s[-1]           → last character
+#   s[0:3]          → characters from index 0 to 2 (slicing)
+#
+# f-strings → the modern way to embed variables inside strings
+#   f&quot;My name is {variable}&quot; — put an f before the quote, use { } for variables
+#
+# EXAMPLE:
+
+university = &quot;Massachusetts Institute of Technology&quot;
+print(len(university))           # How many characters?
+print(university.upper())        # UPPERCASE
+print(university.lower())        # lowercase
+print(university[0])             # First character: &#x27;M&#x27;
+print(university[0:13])          # First 13 characters: &#x27;Massachusetts&#x27;
+
+# f-strings — your best friend for formatting output:
+student_name = &quot;Alex&quot;
+gpa = 3.9
+print(f&quot;Student: {student_name}, GPA: {gpa}&quot;)
+
+# String methods are powerful for data cleaning:
+messy_text = &quot;   hello world   &quot;
+clean_text = messy_text.strip()
+print(f&quot;Before: &#x27;{messy_text}&#x27;&quot;)
+print(f&quot;After:  &#x27;{clean_text}&#x27;&quot;)
+
+csv_row = &quot;Alice,25,Data Science,3.8&quot;
+fields = csv_row.split(&quot;,&quot;)      # Split by comma → creates a list
+print(fields)                    # [&#x27;Alice&#x27;, &#x27;25&#x27;, &#x27;Data Science&#x27;, &#x27;3.8&#x27;]
+
+# ==============================================================================
+# YOUR TURN — DAY 03:
+# 1. Create a string with your full name
+# 2. Print its length
+# 3. Print it in uppercase
+# 4. Print only your first name using slicing (hint: s[0:N])
+# 5. Create: sentence = &quot;  Python is amazing for data science  &quot;
+#    Clean it with strip(), make it uppercase, and print it
+# 6. Use an f-string to print: &quot;My name is [name] and I study [subject]&quot;
+# HINT: f&quot;text {variable} text&quot;
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 04 — NUMBERS &amp; MATH OPERATIONS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Python is a calculator on steroids. All math operators you know work here.
+#
+# OPERATORS:
+#   +   addition          5 + 3 = 8
+#   -   subtraction       5 - 3 = 2
+#   *   multiplication    5 * 3 = 15
+#   /   division          5 / 3 = 1.666...  (always returns float)
+#   //  floor division    5 // 3 = 1        (integer result, drops decimal)
+#   %   modulo            5 % 3 = 2         (remainder of division)
+#   **  exponentiation    5 ** 3 = 125      (5 to the power of 3)
+#
+# Python follows PEMDAS: Parentheses → Exponents → Mult/Div → Add/Sub
+#
+# EXAMPLE:
+
+a = 10
+b = 3
+
+print(a + b)    # 13
+print(a - b)    # 7
+print(a * b)    # 30
+print(a / b)    # 3.3333...
+print(a // b)   # 3   ← floor division
+print(a % b)    # 1   ← remainder: 10 = 3*3 + 1
+print(a ** b)   # 1000  (10³)
+
+# Useful math functions (built-in):
+print(abs(-42))         # 42  — absolute value
+print(round(3.7))       # 4   — round to nearest integer
+print(round(3.14159, 2))# 3.14 — round to 2 decimal places
+print(max(5, 3, 9, 1))  # 9
+print(min(5, 3, 9, 1))  # 1
+print(sum([1, 2, 3, 4]))# 10
+
+# The math module has more:
+import math
+print(math.sqrt(144))   # 12.0 — square root
+print(math.pi)          # 3.14159...
+print(math.ceil(3.1))   # 4  — round UP always
+print(math.floor(3.9))  # 3  — round DOWN always
+
+# ==============================================================================
+# YOUR TURN — DAY 04:
+# 1. Calculate the area of a circle with radius = 7  (Area = π * r²)
+#    HINT: use math.pi and ** for power
+# 2. You scored 87 on exam 1 and 93 on exam 2. Calculate your average.
+# 3. A dataset has 1000 rows. You split it 80% train / 20% test.
+#    Calculate how many rows are in each split.
+#    HINT: use integer multiplication and // or int()
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 05 — USER INPUT
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Programs become interactive when they can ask for user input.
+# input() pauses the program and waits for the user to type something.
+# IMPORTANT: input() ALWAYS returns a STRING — even if the user types a number!
+# To convert: int(&quot;42&quot;) → 42    float(&quot;3.14&quot;) → 3.14
+#
+# EXAMPLE:
+
+# Uncomment the lines below to try interactive input (remove the # symbols):
+# user_name = input(&quot;What is your name? &quot;)
+# print(f&quot;Hello, {user_name}! Welcome to Python.&quot;)
+
+# Converting input to a number:
+# age_input = input(&quot;How old are you? &quot;)   # This is a STRING like &quot;25&quot;
+# age_number = int(age_input)              # Now it&#x27;s an INTEGER: 25
+# birth_year = 2026 - age_number
+# print(f&quot;You were born in {birth_year}&quot;)
+
+# Shorter version — convert directly:
+# age = int(input(&quot;Enter your age: &quot;))
+
+# ==============================================================================
+# YOUR TURN — DAY 05:
+# Uncomment and complete this mini program:
+# 1. Ask the user for their name
+# 2. Ask the user for their age (as integer)
+# 3. Ask the user for their GPA (as float)
+# 4. Print a nicely formatted summary using f-strings
+# HINT: name = input(&quot;...&quot;), age = int(input(&quot;...&quot;)), gpa = float(input(&quot;...&quot;))
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 06 — LISTS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A LIST is an ORDERED, MUTABLE (changeable) collection of items.
+# Lists use square brackets [ ] and items are separated by commas.
+# Lists can hold ANY type — strings, numbers, even other lists!
+# In Data Science, you&#x27;ll use lists constantly before moving to NumPy arrays.
+#
+# KEY OPERATIONS:
+#   my_list[0]          → access by index (starts at 0)
+#   my_list[-1]         → last item
+#   my_list[1:4]        → slice (items at index 1, 2, 3)
+#   my_list.append(x)   → add x to the END
+#   my_list.insert(i,x) → insert x at position i
+#   my_list.remove(x)   → remove first occurrence of x
+#   my_list.pop()       → remove and return the LAST item
+#   my_list.sort()      → sort in place (ascending)
+#   len(my_list)        → number of items
+#   x in my_list        → True if x is in the list
+#
+# EXAMPLE:
+
+grades = [88, 92, 75, 95, 83, 91]
+print(grades)
+print(grades[0])          # 88 — first item
+print(grades[-1])         # 91 — last item
+print(grades[1:4])        # [92, 75, 95] — slice
+
+grades.append(79)         # Add 79 at the end
+print(grades)
+
+grades.sort()             # Sort ascending
+print(grades)
+
+grades.sort(reverse=True) # Sort descending
+print(grades)
+
+print(len(grades))        # Number of grades
+print(max(grades))        # Highest grade
+print(min(grades))        # Lowest grade
+print(sum(grades) / len(grades))  # Average — calculate manually
+
+# List of mixed types (valid in Python):
+student = [&quot;Alice&quot;, 25, 3.8, True, [&quot;Math&quot;, &quot;Stats&quot;]]
+print(student[4])         # [&#x27;Math&#x27;, &#x27;Stats&#x27;] — a list inside a list!
+print(student[4][0])      # &#x27;Math&#x27; — access nested list
+
+# Check membership:
+print(95 in grades)       # True
+print(50 in grades)       # False
+
+# ==============================================================================
+# YOUR TURN — DAY 06:
+# 1. Create a list of 5 subjects you are studying
+# 2. Add a 6th subject using append()
+# 3. Print the 3rd subject (remember: index starts at 0)
+# 4. Sort the list alphabetically and print it
+# 5. Create a list of 5 exam scores
+# 6. Calculate and print: highest score, lowest score, and average
+# HINT: max(), min(), sum(), len()
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 07 — TUPLES
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A TUPLE is like a list BUT IMMUTABLE — once created, you cannot change it.
+# Tuples use parentheses ( ) instead of brackets [ ].
+# Use tuples for data that should NOT change: coordinates, RGB colors, DB records.
+# Tuples are FASTER than lists — use them when data is fixed.
+#
+# EXAMPLE:
+
+coordinates = (40.7128, -74.0060)   # Latitude, Longitude of New York
+print(coordinates[0])               # 40.7128
+print(coordinates[1])               # -74.0060
+
+# Tuple unpacking — assign each item to its own variable:
+latitude, longitude = coordinates
+print(f&quot;Lat: {latitude}, Lon: {longitude}&quot;)
+
+# You can&#x27;t change a tuple:
+# coordinates[0] = 50  ← This would cause a TypeError!
+
+# Tuple with one item needs a trailing comma:
+single = (42,)         # Without the comma it&#x27;s just parentheses around 42
+print(type(single))    # &lt;class &#x27;tuple&#x27;&gt;
+print(type((42)))      # &lt;class &#x27;int&#x27;&gt;  ← NOT a tuple!
+
+# Common use — returning multiple values from a function:
+def get_min_max(numbers):
+    return min(numbers), max(numbers)   # Returns a TUPLE
+
+result = get_min_max([3, 1, 4, 1, 5, 9])
+print(result)          # (1, 9)
+low, high = result     # Unpack directly
+print(f&quot;Min: {low}, Max: {high}&quot;)
+
+# ==============================================================================
+# YOUR TURN — DAY 07:
+# 1. Create a tuple with the RGB color for red: (255, 0, 0)
+# 2. Unpack it into three variables: r, g, b
+# 3. Print: &quot;Red channel: 255, Green channel: 0, Blue channel: 0&quot;
+# 4. Create a tuple of your top 3 programming languages
+# 5. Try to change the first language — observe the error (then comment it out)
+# HINT: tuple[0] = &quot;something&quot;  → TypeError
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 08 — DICTIONARIES
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A DICTIONARY stores data as KEY: VALUE pairs — like a real dictionary
+# where the word is the key and the definition is the value.
+# Dictionaries use curly braces { } and colons :.
+# Keys must be UNIQUE. Values can be anything.
+# This is THE most important data structure in Python for structured data.
+# JSON data (APIs, web) looks exactly like Python dictionaries!
+#
+# KEY OPERATIONS:
+#   d[key]          → get value by key
+#   d[key] = value  → add or update key-value pair
+#   d.get(key)      → safe access (returns None if key doesn&#x27;t exist)
+#   d.keys()        → all keys
+#   d.values()      → all values
+#   d.items()       → all key-value pairs as tuples
+#   key in d        → True if key exists
+#   del d[key]      → delete a key
+#
+# EXAMPLE:
+
+student = {
+    &quot;name&quot;: &quot;Alice&quot;,
+    &quot;age&quot;: 25,
+    &quot;gpa&quot;: 3.8,
+    &quot;subjects&quot;: [&quot;Python&quot;, &quot;Stats&quot;, &quot;ML&quot;],
+    &quot;is_enrolled&quot;: True
+}
+
+print(student[&quot;name&quot;])          # Alice
+print(student[&quot;gpa&quot;])           # 3.8
+print(student[&quot;subjects&quot;])      # [&#x27;Python&#x27;, &#x27;Stats&#x27;, &#x27;ML&#x27;]
+
+# Safe access with .get() — no crash if key doesn&#x27;t exist:
+print(student.get(&quot;email&quot;))             # None — no crash!
+print(student.get(&quot;email&quot;, &quot;N/A&quot;))      # &#x27;N/A&#x27; — default value
+
+# Add a new key:
+student[&quot;email&quot;] = &quot;alice@university.edu&quot;
+print(student)
+
+# Update existing value:
+student[&quot;gpa&quot;] = 3.9
+print(student[&quot;gpa&quot;])
+
+# Loop through all key-value pairs:
+for key, value in student.items():
+    print(f&quot;{key}: {value}&quot;)
+
+# Nested dictionary (very common with JSON/APIs):
+database = {
+    &quot;student_001&quot;: {&quot;name&quot;: &quot;Alice&quot;, &quot;gpa&quot;: 3.8},
+    &quot;student_002&quot;: {&quot;name&quot;: &quot;Bob&quot;,   &quot;gpa&quot;: 3.5}
+}
+print(database[&quot;student_001&quot;][&quot;name&quot;])  # Alice
+
+# ==============================================================================
+# YOUR TURN — DAY 08:
+# 1. Create a dictionary for a dataset column:
+#    column_info = {&quot;name&quot;: &quot;...&quot;, &quot;type&quot;: &quot;...&quot;, &quot;missing_values&quot;: ..., &quot;mean&quot;: ...}
+#    Fill it with realistic data for a &quot;temperature&quot; column
+# 2. Add a new key &quot;unit&quot; with value &quot;Celsius&quot;
+# 3. Print all keys, then all values
+# 4. Loop through it and print each key: value pair nicely
+# HINT: for key, value in my_dict.items():
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 09 — SETS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A SET is an UNORDERED collection with NO DUPLICATE values.
+# Sets use curly braces {} but have NO key-value pairs (unlike dicts).
+# Great for: removing duplicates, finding unique values, set math (union, intersection).
+# In Data Science: find unique categories, check overlaps between datasets.
+#
+# EXAMPLE:
+
+fruits = {&quot;apple&quot;, &quot;banana&quot;, &quot;orange&quot;, &quot;apple&quot;, &quot;banana&quot;}
+print(fruits)           # {&#x27;apple&#x27;, &#x27;banana&#x27;, &#x27;orange&#x27;} — duplicates removed!
+
+# Set operations — think of Venn diagrams:
+data_scientists = {&quot;Python&quot;, &quot;SQL&quot;, &quot;Stats&quot;, &quot;ML&quot;, &quot;Viz&quot;}
+data_engineers  = {&quot;Python&quot;, &quot;SQL&quot;, &quot;Spark&quot;, &quot;Kafka&quot;, &quot;ETL&quot;}
+
+# Union — everything in EITHER set:
+print(data_scientists | data_engineers)
+
+# Intersection — only what&#x27;s in BOTH sets:
+print(data_scientists &amp; data_engineers)
+
+# Difference — what&#x27;s in first but NOT second:
+print(data_scientists - data_engineers)  # Skills only data scientists have
+
+# Check membership (very fast for sets):
+print(&quot;Python&quot; in data_scientists)   # True
+
+# Remove duplicates from a list using a set:
+messy_list = [1, 2, 2, 3, 3, 3, 4]
+unique_list = list(set(messy_list))
+print(unique_list)
+
+# ==============================================================================
+# YOUR TURN — DAY 09:
+# 1. Create a set of countries in dataset_1: {&quot;USA&quot;, &quot;UK&quot;, &quot;Germany&quot;, &quot;France&quot;}
+# 2. Create a set of countries in dataset_2: {&quot;Germany&quot;, &quot;France&quot;, &quot;Japan&quot;, &quot;Brazil&quot;}
+# 3. Find: countries in BOTH datasets (intersection)
+# 4. Find: all unique countries combined (union)
+# 5. Find: countries ONLY in dataset_1
+# HINT: use |, &amp;, - operators
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 10 — CONDITIONALS: if / elif / else
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Conditions let your program make DECISIONS — &quot;if this is true, do that.&quot;
+# INDENTATION is CRITICAL in Python — 4 spaces (or 1 Tab) define code blocks.
+# Python does NOT use { } for blocks like Java or C — indentation IS the structure.
+#
+# STRUCTURE:
+#   if condition:
+#       # runs if condition is True
+#   elif another_condition:
+#       # runs if first was False but this is True
+#   else:
+#       # runs if ALL above were False
+#
+# COMPARISON OPERATORS:
+#   ==  equal to          !=  not equal
+#   &gt;   greater than      &lt;   less than
+#   &gt;=  greater or equal  &lt;=  less or equal
+#
+# LOGICAL OPERATORS:
+#   and  → both must be True
+#   or   → at least one must be True
+#   not  → reverses True/False
+#
+# EXAMPLE:
+
+score = 85
+
+if score &gt;= 90:
+    print(&quot;Grade: A&quot;)
+elif score &gt;= 80:
+    print(&quot;Grade: B&quot;)
+elif score &gt;= 70:
+    print(&quot;Grade: C&quot;)
+elif score &gt;= 60:
+    print(&quot;Grade: D&quot;)
+else:
+    print(&quot;Grade: F&quot;)
+
+# Using and / or:
+gpa = 3.7
+has_application = True
+
+if gpa &gt;= 3.5 and has_application:
+    print(&quot;Eligible for scholarship!&quot;)
+
+# Ternary (one-line if/else) — concise:
+status = &quot;Pass&quot; if score &gt;= 70 else &quot;Fail&quot;
+print(f&quot;Status: {status}&quot;)
+
+# ==============================================================================
+# YOUR TURN — DAY 10:
+# 1. Write an if/elif/else that classifies a temperature:
+#    &gt; 35°C: &quot;Hot&quot;, 20-35: &quot;Warm&quot;, 10-20: &quot;Cool&quot;, &lt; 10: &quot;Cold&quot;
+# 2. Write a condition: if a student&#x27;s GPA &gt; 3.5 AND attendance &gt; 80%,
+#    print &quot;Dean&#x27;s List&quot;, otherwise print &quot;Keep working!&quot;
+# 3. Use a ternary expression to set category = &quot;High&quot; if value &gt; 100 else &quot;Low&quot;
+# HINT: category = &quot;High&quot; if value &gt; 100 else &quot;Low&quot;
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 11 — FOR LOOPS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A FOR LOOP repeats code for each item in a sequence (list, string, range, etc.).
+# This is how you process data row by row — the most important loop in Data Science!
+#
+# range(n)       → 0, 1, 2, ..., n-1
+# range(a, b)    → a, a+1, ..., b-1
+# range(a, b, s) → a to b with step s
+# enumerate(seq) → gives both INDEX and VALUE — use this constantly!
+# zip(a, b)      → pair up two sequences element by element
+#
+# EXAMPLE:
+
+# Loop through a list:
+subjects = [&quot;Python&quot;, &quot;Statistics&quot;, &quot;Machine Learning&quot;, &quot;Deep Learning&quot;]
+for subject in subjects:
+    print(f&quot;Studying: {subject}&quot;)
+
+# range() — classic counter loop:
+for i in range(5):
+    print(i)                      # 0 1 2 3 4
+
+for i in range(1, 6):
+    print(i)                      # 1 2 3 4 5
+
+# enumerate() — index AND value together:
+for index, subject in enumerate(subjects):
+    print(f&quot;{index + 1}. {subject}&quot;)
+
+# zip() — loop over two lists simultaneously:
+students = [&quot;Alice&quot;, &quot;Bob&quot;, &quot;Carol&quot;]
+scores   = [92, 87, 95]
+for student, score in zip(students, scores):
+    print(f&quot;{student}: {score}&quot;)
+
+# Loop over a string:
+for char in &quot;Python&quot;:
+    print(char)
+
+# Calculate sum manually with a loop:
+numbers = [10, 20, 30, 40, 50]
+total = 0
+for num in numbers:
+    total = total + num          # same as: total += num
+print(f&quot;Total: {total}&quot;)
+
+# ==============================================================================
+# YOUR TURN — DAY 11:
+# 1. Loop through a list of 5 temperatures in Celsius and convert each to Fahrenheit
+#    FORMULA: F = C * 9/5 + 32
+# 2. Use enumerate() to print: &quot;Row 1: Alice&quot;, &quot;Row 2: Bob&quot; etc. from a names list
+# 3. Using range(), calculate and print the squares of numbers 1 to 10 (1, 4, 9...)
+# 4. You have two lists: names and gpas. Use zip() to print each student&#x27;s info.
+# HINT: for c in celsius_list: f = c * 9/5 + 32
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 12 — WHILE LOOPS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A WHILE LOOP runs AS LONG AS a condition is True.
+# Use when you don&#x27;t know HOW MANY times to repeat — you just know the stop condition.
+# WARNING: If the condition never becomes False → INFINITE LOOP → Ctrl+C to stop!
+# Always make sure something changes inside the loop to eventually stop it.
+#
+# break     → exit the loop immediately
+# continue  → skip the rest of this iteration, go to next
+#
+# EXAMPLE:
+
+count = 0
+while count &lt; 5:
+    print(f&quot;Count: {count}&quot;)
+    count += 1              # VERY IMPORTANT — always update the counter!
+
+print(&quot;Loop finished!&quot;)
+
+# while with break — search for something:
+data = [12, 45, 7, 89, 23, 56, 3]
+target = 89
+position = 0
+while position &lt; len(data):
+    if data[position] == target:
+        print(f&quot;Found {target} at index {position}&quot;)
+        break               # Exit the loop — we found it!
+    position += 1
+
+# continue — skip even numbers:
+num = 0
+while num &lt; 10:
+    num += 1
+    if num % 2 == 0:        # if even...
+        continue            # ...skip the print
+    print(num)              # prints only odd numbers: 1,3,5,7,9
+
+# ==============================================================================
+# YOUR TURN — DAY 12:
+# 1. Write a while loop that asks the user to guess a number between 1 and 10.
+#    Keep asking until they guess correctly. (Use a variable as the secret number)
+#    HINT: secret = 7; while True: guess = int(input(...)): if guess == secret: break
+# 2. Write a while loop that keeps adding random numbers to a running total
+#    until the total exceeds 100, then print how many numbers were added.
+#    HINT: import random; random.randint(1, 20)
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 13 — FUNCTIONS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A FUNCTION is a named, reusable block of code.
+# def keyword defines it. Call it by name to run it.
+# Functions can accept PARAMETERS (inputs) and RETURN values (output).
+# The DRY principle: Don&#x27;t Repeat Yourself — wrap repeated code in functions!
+# In Data Science you&#x27;ll build functions for: data cleaning, feature engineering, metrics.
+#
+# STRUCTURE:
+#   def function_name(parameter1, parameter2):
+#       # code
+#       return result
+#
+# SCOPE: variables inside a function are LOCAL — they don&#x27;t exist outside.
+#
+# EXAMPLE:
+
+def greet(name):
+    &quot;&quot;&quot;Greets a person by name.&quot;&quot;&quot;      # This is a DOCSTRING — always add it!
+    return f&quot;Hello, {name}!&quot;
+
+message = greet(&quot;Alice&quot;)
+print(message)
+
+# Function with multiple parameters and default values:
+def calculate_grade(score, total=100):
+    &quot;&quot;&quot;Calculates percentage grade.&quot;&quot;&quot;
+    percentage = (score / total) * 100
+    if percentage &gt;= 90:
+        return &quot;A&quot;
+    elif percentage &gt;= 80:
+        return &quot;B&quot;
+    elif percentage &gt;= 70:
+        return &quot;C&quot;
+    else:
+        return &quot;F&quot;
+
+print(calculate_grade(85))          # Uses default total=100
+print(calculate_grade(42, 50))      # 42 out of 50 → 84% → B
+
+# Function that processes a list — common in data science:
+def get_statistics(numbers):
+    &quot;&quot;&quot;Returns basic stats for a list of numbers.&quot;&quot;&quot;
+    n = len(numbers)
+    mean = sum(numbers) / n
+    sorted_nums = sorted(numbers)
+    median = sorted_nums[n // 2]
+    return {
+        &quot;count&quot;: n,
+        &quot;mean&quot;: round(mean, 2),
+        &quot;median&quot;: median,
+        &quot;min&quot;: min(numbers),
+        &quot;max&quot;: max(numbers)
+    }
+
+data = [23, 45, 12, 67, 34, 56, 78, 9, 43]
+stats = get_statistics(data)
+for key, val in stats.items():
+    print(f&quot;  {key}: {val}&quot;)
+
+# ==============================================================================
+# YOUR TURN — DAY 13:
+# 1. Write a function celsius_to_fahrenheit(c) that converts temperature
+# 2. Write a function is_prime(n) that returns True if n is prime, False otherwise
+#    HINT: a prime is only divisible by 1 and itself — use a for loop with %
+# 3. Write a function clean_text(text) that:
+#    - strips whitespace
+#    - converts to lowercase
+#    - replaces double spaces with single space
+# 4. Call each function with test inputs and print the results
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 14 — *args AND **kwargs
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Sometimes you don&#x27;t know HOW MANY arguments a function will receive.
+# *args  → collects extra POSITIONAL arguments into a TUPLE
+# **kwargs → collects extra KEYWORD arguments into a DICTIONARY
+# The * and ** are the actual syntax — &#x27;args&#x27; and &#x27;kwargs&#x27; are just conventions.
+#
+# EXAMPLE:
+
+def add_all(*args):
+    &quot;&quot;&quot;Adds any number of numbers.&quot;&quot;&quot;
+    print(f&quot;Arguments received: {args}&quot;)    # It&#x27;s a tuple!
+    return sum(args)
+
+print(add_all(1, 2))                # 3
+print(add_all(1, 2, 3, 4, 5))       # 15
+print(add_all(10, 20, 30))          # 60
+
+def describe_student(**kwargs):
+    &quot;&quot;&quot;Prints student info from keyword arguments.&quot;&quot;&quot;
+    print(f&quot;Keyword arguments: {kwargs}&quot;)   # It&#x27;s a dict!
+    for key, value in kwargs.items():
+        print(f&quot;  {key}: {value}&quot;)
+
+describe_student(name=&quot;Alice&quot;, gpa=3.8, major=&quot;Data Science&quot;)
+describe_student(name=&quot;Bob&quot;, age=26)
+
+# Combined: regular + *args + **kwargs
+def show_info(title, *items, **details):
+    print(f&quot;\n=== {title} ===&quot;)
+    for item in items:
+        print(f&quot;  - {item}&quot;)
+    for k, v in details.items():
+        print(f&quot;  {k}: {v}&quot;)
+
+show_info(&quot;My Profile&quot;, &quot;Python&quot;, &quot;SQL&quot;, &quot;ML&quot;,
+          university=&quot;MIT&quot;, year=2026)
+
+# ==============================================================================
+# YOUR TURN — DAY 14:
+# 1. Write multiply_all(*args) that multiplies all its arguments together
+# 2. Write create_record(**kwargs) that returns a dictionary of all keyword args
+# 3. Call each with at least 4 arguments
+# HINT: for multiply, start with result = 1 and loop multiplying
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 15 — LAMBDA FUNCTIONS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A LAMBDA is a tiny, anonymous (nameless) function written in ONE line.
+# Syntax: lambda parameters: expression
+# Use lambdas for short, simple operations — especially with sorted(), map(), filter().
+#
+# EXAMPLE:
+
+# Regular function:
+def square(x):
+    return x ** 2
+
+# Same thing as a lambda:
+square_lambda = lambda x: x ** 2
+print(square_lambda(5))     # 25
+
+# Lambda with two parameters:
+multiply = lambda x, y: x * y
+print(multiply(4, 7))       # 28
+
+# REAL USE CASE — sorting complex data:
+students = [
+    {&quot;name&quot;: &quot;Alice&quot;, &quot;gpa&quot;: 3.8},
+    {&quot;name&quot;: &quot;Bob&quot;,   &quot;gpa&quot;: 3.5},
+    {&quot;name&quot;: &quot;Carol&quot;, &quot;gpa&quot;: 3.9},
+]
+
+# Sort by gpa without lambda — you&#x27;d need a full function:
+sorted_students = sorted(students, key=lambda s: s[&quot;gpa&quot;], reverse=True)
+for s in sorted_students:
+    print(f&quot;{s[&#x27;name&#x27;]}: {s[&#x27;gpa&#x27;]}&quot;)
+
+# map() — apply a function to every item in a list:
+numbers = [1, 2, 3, 4, 5]
+squares = list(map(lambda x: x**2, numbers))
+print(squares)              # [1, 4, 9, 16, 25]
+
+# filter() — keep only items where function returns True:
+evens = list(filter(lambda x: x % 2 == 0, numbers))
+print(evens)                # [2, 4]
+
+# ==============================================================================
+# YOUR TURN — DAY 15:
+# 1. Use a lambda to convert a list of Celsius temps to Fahrenheit with map()
+# 2. Use a lambda with filter() to keep only scores &gt;= 70 from a list of scores
+# 3. Sort a list of tuples (name, age) by age:
+#    people = [(&quot;Alice&quot;, 25), (&quot;Bob&quot;, 22), (&quot;Carol&quot;, 28)]
+# HINT: sorted(people, key=lambda person: person[1])
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 16 — LIST COMPREHENSIONS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# List comprehension is Python&#x27;s elegant way to build lists in ONE line.
+# It&#x27;s shorter, faster, and more &quot;Pythonic&quot; than a for loop.
+# MASTER this — it&#x27;s used EVERYWHERE in data science code.
+#
+# SYNTAX:
+#   [expression for item in iterable]
+#   [expression for item in iterable if condition]
+#
+# EXAMPLE:
+
+# Traditional for loop approach:
+squares_loop = []
+for x in range(1, 6):
+    squares_loop.append(x**2)
+
+# List comprehension — same result, one line:
+squares_comp = [x**2 for x in range(1, 6)]
+print(squares_comp)         # [1, 4, 9, 16, 25]
+
+# With condition — filter while building:
+even_squares = [x**2 for x in range(1, 11) if x % 2 == 0]
+print(even_squares)         # [4, 16, 36, 64, 100]
+
+# String operations in comprehension:
+words = [&quot;hello&quot;, &quot;WORLD&quot;, &quot;  Python  &quot;, &quot;DATA&quot;]
+cleaned = [w.strip().lower() for w in words]
+print(cleaned)              # [&#x27;hello&#x27;, &#x27;world&#x27;, &#x27;python&#x27;, &#x27;data&#x27;]
+
+# Dictionary comprehension — same concept for dicts:
+subjects = [&quot;Math&quot;, &quot;Stats&quot;, &quot;Python&quot;, &quot;ML&quot;]
+subject_lengths = {subject: len(subject) for subject in subjects}
+print(subject_lengths)      # {&#x27;Math&#x27;: 4, &#x27;Stats&#x27;: 5, &#x27;Python&#x27;: 6, &#x27;ML&#x27;: 2}
+
+# Set comprehension:
+numbers = [1, 2, 2, 3, 3, 4]
+unique_squares = {x**2 for x in numbers}
+print(unique_squares)       # {1, 4, 9, 16}
+
+# ==============================================================================
+# YOUR TURN — DAY 16:
+# 1. Use list comprehension to get all numbers from 1-100 divisible by 7
+# 2. Given: temps_celsius = [0, 20, 37, 100, -10]
+#    Use comprehension to create temps_fahrenheit
+# 3. Given a list of words, use comprehension to keep only words longer than 4 chars
+# 4. Create a dict comprehension: {number: number**3} for numbers 1 to 5
+# HINT: [x for x in range(1, 101) if x % 7 == 0]
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 17 — FILE I/O (Reading and Writing Files)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# In Data Science, you constantly read data from files (CSV, TXT, JSON) and
+# write results back. Python&#x27;s open() function handles this.
+# ALWAYS use the &#x27;with&#x27; keyword — it automatically closes the file for you.
+#
+# Modes:
+#   &quot;r&quot;  → read (default) — file must exist
+#   &quot;w&quot;  → write (creates new file OR OVERWRITES existing!)
+#   &quot;a&quot;  → append (adds to end of file)
+#   &quot;r+&quot; → read AND write
+#
+# EXAMPLE:
+
+# Writing to a file:
+with open(&quot;sample_data.txt&quot;, &quot;w&quot;) as f:
+    f.write(&quot;Name,Age,GPA\n&quot;)
+    f.write(&quot;Alice,25,3.8\n&quot;)
+    f.write(&quot;Bob,23,3.5\n&quot;)
+    f.write(&quot;Carol,26,3.9\n&quot;)
+print(&quot;File written!&quot;)
+
+# Reading the entire file:
+with open(&quot;sample_data.txt&quot;, &quot;r&quot;) as f:
+    content = f.read()
+print(content)
+
+# Reading line by line (memory-efficient for large files):
+with open(&quot;sample_data.txt&quot;, &quot;r&quot;) as f:
+    for line in f:
+        print(line.strip())     # strip() removes the \n at end of each line
+
+# Reading into a list of lines:
+with open(&quot;sample_data.txt&quot;, &quot;r&quot;) as f:
+    lines = f.readlines()
+print(lines)
+
+# Append to file:
+with open(&quot;sample_data.txt&quot;, &quot;a&quot;) as f:
+    f.write(&quot;David,24,3.7\n&quot;)
+print(&quot;Line appended!&quot;)
+
+# Working with CSV manually (before learning Pandas):
+with open(&quot;sample_data.txt&quot;, &quot;r&quot;) as f:
+    next(f)                     # Skip header line
+    for line in f:
+        fields = line.strip().split(&quot;,&quot;)
+        name, age, gpa = fields
+        print(f&quot;Student: {name}, Age: {age}, GPA: {gpa}&quot;)
+
+# ==============================================================================
+# YOUR TURN — DAY 17:
+# 1. Create a file &quot;my_notes.txt&quot; and write 5 things you&#x27;ve learned in Python so far
+# 2. Read the file and print each line with its line number
+#    HINT: use enumerate() while reading
+# 3. Append 2 more items to the file
+# 4. Read and print the final file
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 18 — EXCEPTION HANDLING (try / except / finally)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Errors (Exceptions) happen — users give wrong input, files are missing, etc.
+# Instead of your program CRASHING, you can CATCH the error and handle it gracefully.
+# This is called Exception Handling.
+#
+# COMMON EXCEPTIONS:
+#   ValueError       — wrong type of value (int(&quot;abc&quot;))
+#   ZeroDivisionError — dividing by zero
+#   FileNotFoundError — file doesn&#x27;t exist
+#   IndexError        — index out of range
+#   KeyError          — key doesn&#x27;t exist in dict
+#   TypeError         — wrong type for operation
+#
+# STRUCTURE:
+#   try:
+#       risky code here
+#   except ExceptionType as e:
+#       handle the error
+#   else:
+#       runs if NO exception occurred
+#   finally:
+#       ALWAYS runs (use for cleanup)
+#
+# EXAMPLE:
+
+# Without handling — this would CRASH:
+# print(10 / 0)   ← ZeroDivisionError
+
+# With handling:
+try:
+    result = 10 / 0
+except ZeroDivisionError:
+    print(&quot;Error: Cannot divide by zero!&quot;)
+
+# Multiple exception types:
+def safe_divide(a, b):
+    try:
+        result = a / b
+    except ZeroDivisionError:
+        return &quot;Error: division by zero&quot;
+    except TypeError:
+        return &quot;Error: inputs must be numbers&quot;
+    else:
+        return result        # Only runs if no exception
+    finally:
+        print(&quot;safe_divide() was called&quot;)   # ALWAYS runs
+
+print(safe_divide(10, 2))   # 5.0
+print(safe_divide(10, 0))   # Error message
+print(safe_divide(10, &quot;x&quot;)) # Error message
+
+# Safe file reading:
+try:
+    with open(&quot;nonexistent_file.txt&quot;, &quot;r&quot;) as f:
+        data = f.read()
+except FileNotFoundError as e:
+    print(f&quot;File not found: {e}&quot;)
+
+# ==============================================================================
+# YOUR TURN — DAY 18:
+# 1. Write a function safe_int_input(prompt) that keeps asking the user for
+#    a number until they actually enter a valid integer (using try/except in a loop)
+# 2. Write a function read_csv_safe(filename) that tries to open a CSV file,
+#    returns the lines as a list, or returns an empty list with an error message
+# HINT: while True: try: return int(input(prompt)) except ValueError: print(&quot;Try again&quot;)
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 19 — OBJECT-ORIENTED PROGRAMMING (OOP) — Classes &amp; Objects
+# ==============================================================================
+#
+# TEACHER SAYS:
+# OOP organizes code into OBJECTS — self-contained units that have:
+#   ATTRIBUTES (data/variables) — what the object KNOWS (e.g., name, age)
+#   METHODS (functions) — what the object CAN DO (e.g., study, submit)
+# A CLASS is the BLUEPRINT. An OBJECT is the actual INSTANCE created from it.
+# Think: Class = Cookie Cutter, Object = Cookie
+#
+# __init__ is the CONSTRUCTOR — runs automatically when you create an object.
+# &#x27;self&#x27; refers to the object itself — always the first parameter in methods.
+#
+# EXAMPLE:
+
+class Student:
+    &quot;&quot;&quot;Represents a university student.&quot;&quot;&quot;
+
+    # Class variable — shared by ALL students:
+    university = &quot;Data Science University&quot;
+
+    def __init__(self, name, age, gpa):
+        &quot;&quot;&quot;Constructor — runs when Student() is called.&quot;&quot;&quot;
+        self.name = name        # Instance variable — unique per object
+        self.age  = age
+        self.gpa  = gpa
+        self.courses = []       # Empty list of courses
+
+    def enroll(self, course):
+        &quot;&quot;&quot;Enroll the student in a course.&quot;&quot;&quot;
+        self.courses.append(course)
+        print(f&quot;{self.name} enrolled in {course}&quot;)
+
+    def get_status(self):
+        &quot;&quot;&quot;Returns &#x27;Good Standing&#x27; if GPA &gt;= 3.0, else &#x27;Probation&#x27;.&quot;&quot;&quot;
+        if self.gpa &gt;= 3.0:
+            return &quot;Good Standing&quot;
+        return &quot;Probation&quot;
+
+    def __str__(self):
+        &quot;&quot;&quot;Called when you print(student) — defines string representation.&quot;&quot;&quot;
+        return f&quot;Student({self.name}, GPA={self.gpa}, Courses={self.courses})&quot;
+
+# Create objects from the class:
+alice = Student(&quot;Alice&quot;, 25, 3.8)
+bob   = Student(&quot;Bob&quot;,   23, 2.9)
+
+alice.enroll(&quot;Python&quot;)
+alice.enroll(&quot;Machine Learning&quot;)
+bob.enroll(&quot;Statistics&quot;)
+
+print(alice)                    # Uses __str__
+print(bob)
+print(f&quot;{alice.name}: {alice.get_status()}&quot;)
+print(f&quot;{bob.name}: {bob.get_status()}&quot;)
+print(Student.university)       # Class variable — accessed from the class
+
+# ==============================================================================
+# YOUR TURN — DAY 19:
+# 1. Create a class Dataset with:
+#    - __init__(name, rows, columns, source)
+#    - method describe() that prints all attributes
+#    - method is_large() that returns True if rows &gt; 100000
+# 2. Create 2 Dataset objects with different data
+# 3. Call describe() and is_large() on both
+# HINT: class Dataset: def __init__(self, name, rows, columns, source): self.name = name ...
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 20 — OOP: INHERITANCE &amp; POLYMORPHISM
+# ==============================================================================
+#
+# TEACHER SAYS:
+# INHERITANCE lets a new class (child) reuse and EXTEND another class (parent).
+# The child gets all the parent&#x27;s attributes and methods automatically.
+# POLYMORPHISM means different classes can share the same method NAME,
+# but each implements it differently — &quot;same interface, different behaviour.&quot;
+# Use super() to call the parent&#x27;s version of a method.
+#
+# EXAMPLE:
+
+class Person:
+    &quot;&quot;&quot;Base class for all people.&quot;&quot;&quot;
+    def __init__(self, name, age):
+        self.name = name
+        self.age  = age
+
+    def introduce(self):
+        return f&quot;Hi, I&#x27;m {self.name}, {self.age} years old.&quot;
+
+class Student(Person):          # Student INHERITS from Person
+    def __init__(self, name, age, gpa):
+        super().__init__(name, age)   # Call Person&#x27;s __init__
+        self.gpa = gpa
+
+    def introduce(self):        # OVERRIDE the parent&#x27;s method (Polymorphism)
+        base = super().introduce()
+        return f&quot;{base} I&#x27;m a student with GPA {self.gpa}.&quot;
+
+class Professor(Person):        # Professor also INHERITS from Person
+    def __init__(self, name, age, subject):
+        super().__init__(name, age)
+        self.subject = subject
+
+    def introduce(self):        # Different override
+        base = super().introduce()
+        return f&quot;{base} I teach {self.subject}.&quot;
+
+# Polymorphism in action — same method name, different results:
+people = [
+    Student(&quot;Alice&quot;, 25, 3.8),
+    Professor(&quot;Dr. Smith&quot;, 45, &quot;Machine Learning&quot;),
+    Student(&quot;Bob&quot;, 22, 3.5)
+]
+
+for person in people:
+    print(person.introduce())   # Python calls the RIGHT version automatically!
+
+# isinstance() checks:
+print(isinstance(people[0], Student))    # True
+print(isinstance(people[0], Person))    # True (Student IS a Person)
+print(isinstance(people[1], Student))   # False (Professor is NOT a Student)
+
+# ==============================================================================
+# YOUR TURN — DAY 20:
+# 1. Create a base class Animal with: name, sound, __init__, and speak() method
+# 2. Create Dog(Animal) and Cat(Animal) that override speak()
+#    Dog: &quot;Woof!&quot;, Cat: &quot;Meow!&quot;
+# 3. Create a list of animals and call speak() on each using a loop
+# HINT: class Dog(Animal): def speak(self): return f&quot;{self.name} says Woof!&quot;
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 21 — MODULES &amp; PACKAGES
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Python&#x27;s real power is its LIBRARIES (collections of pre-written code).
+# import brings in a module/library. You don&#x27;t have to write everything yourself!
+#
+# Built-in modules (no install needed):
+#   math, os, sys, random, datetime, json, csv, time, re
+#
+# Third-party (install with pip):
+#   numpy, pandas, matplotlib, scikit-learn, requests, flask, django
+#
+# Ways to import:
+#   import math                   → use as math.sqrt()
+#   from math import sqrt         → use as sqrt() directly
+#   from math import sqrt, pi     → import multiple
+#   import numpy as np            → alias (convention: np for numpy)
+#   from math import *            → import everything (avoid this — pollutes namespace)
+#
+# EXAMPLE:
+
+import os
+import json
+import random
+from datetime import datetime, date
+
+# os — interact with the operating system:
+print(os.getcwd())                  # Current working directory
+print(os.listdir(&quot;.&quot;))              # List files in current dir
+
+# random — generate random numbers:
+print(random.randint(1, 100))       # Random integer 1-100
+print(random.random())              # Random float 0.0 to 1.0
+print(random.choice([&quot;Python&quot;, &quot;SQL&quot;, &quot;ML&quot;]))   # Random choice
+
+# datetime — work with dates and times:
+now = datetime.now()
+print(f&quot;Now: {now}&quot;)
+print(f&quot;Year: {now.year}, Month: {now.month}, Day: {now.day}&quot;)
+today = date.today()
+print(f&quot;Today: {today}&quot;)
+
+# json — read/write JSON (critical for APIs and web data):
+data_dict = {&quot;name&quot;: &quot;Alice&quot;, &quot;scores&quot;: [88, 92, 95], &quot;active&quot;: True}
+json_string = json.dumps(data_dict, indent=2)   # dict → JSON string
+print(json_string)
+back_to_dict = json.loads(json_string)          # JSON string → dict
+print(back_to_dict[&quot;name&quot;])
+
+# Write JSON to file:
+with open(&quot;student.json&quot;, &quot;w&quot;) as f:
+    json.dump(data_dict, f, indent=2)
+
+# Read JSON from file:
+with open(&quot;student.json&quot;, &quot;r&quot;) as f:
+    loaded = json.load(f)
+print(loaded)
+
+# ==============================================================================
+# YOUR TURN — DAY 21:
+# 1. Use os module to: print cwd, create a folder &quot;my_data&quot;, list files in current dir
+#    HINT: os.makedirs(&quot;my_data&quot;, exist_ok=True)
+# 2. Use random to simulate rolling a 6-sided dice 10 times, count how many 6s you get
+# 3. Create a Python dict representing a dataset summary, convert to JSON and save to file
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 22 — REGULAR EXPRESSIONS (regex)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Regular Expressions (regex) are patterns that match text.
+# Critical for data cleaning — find emails, phone numbers, dates in messy text.
+# The &#x27;re&#x27; module is built-in.
+#
+# COMMON PATTERNS:
+#   .       → any character
+#   \d      → digit (0-9)
+#   \w      → word character (letter, digit, _)
+#   \s      → whitespace
+#   +       → one or more
+#   *       → zero or more
+#   ?       → zero or one (optional)
+#   ^       → start of string
+#   $       → end of string
+#   [abc]   → a or b or c
+#   [a-z]   → any lowercase letter
+#
+# KEY FUNCTIONS:
+#   re.search(pattern, text)   → find FIRST match anywhere
+#   re.findall(pattern, text)  → find ALL matches → returns list
+#   re.sub(pattern, repl, text) → REPLACE matches
+#   re.match(pattern, text)    → match at the START only
+#
+# EXAMPLE:
+
+import re
+
+text = &quot;Contact us at alice@university.edu or bob123@gmail.com. Call: +1-555-123-4567&quot;
+
+# Find all email addresses:
+emails = re.findall(r&quot;[\w.-]+@[\w.-]+\.\w+&quot;, text)
+print(f&quot;Emails: {emails}&quot;)
+
+# Find all phone-like patterns:
+phones = re.findall(r&quot;\+?\d[\d\-]{8,}&quot;, text)
+print(f&quot;Phones: {phones}&quot;)
+
+# Replace digits with &#x27;X&#x27; (anonymize):
+anonymized = re.sub(r&quot;\d&quot;, &quot;X&quot;, text)
+print(f&quot;Anonymized: {anonymized}&quot;)
+
+# Validate email format:
+def is_valid_email(email):
+    pattern = r&quot;^[\w.-]+@[\w.-]+\.\w{2,}$&quot;
+    return bool(re.match(pattern, email))
+
+print(is_valid_email(&quot;alice@uni.edu&quot;))     # True
+print(is_valid_email(&quot;notanemail&quot;))        # False
+print(is_valid_email(&quot;test@.com&quot;))         # False
+
+# ==============================================================================
+# YOUR TURN — DAY 22:
+# 1. Extract all dates in format YYYY-MM-DD from this string:
+#    s = &quot;Reports: 2024-01-15, 2024-03-22, invalid-date, 2025-12-31&quot;
+# 2. Write is_valid_phone(phone) that checks: +1-555-123-4567 format
+# 3. Clean a messy text by removing all punctuation using re.sub()
+# HINT: re.findall(r&quot;\d{4}-\d{2}-\d{2}&quot;, s)
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 23 — DECORATORS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A DECORATOR is a function that WRAPS another function to add behaviour.
+# It&#x27;s how Python frameworks (Flask, Django) work under the hood.
+# You&#x27;ve seen: @staticmethod, @property, @app.route — those are decorators!
+# Decorators use @syntax — placed directly above the function definition.
+#
+# EXAMPLE:
+
+import time
+import functools
+
+# A timing decorator — measures how long a function takes:
+def timer(func):
+    &quot;&quot;&quot;Decorator that times a function&#x27;s execution.&quot;&quot;&quot;
+    @functools.wraps(func)          # Preserves original function&#x27;s name/docstring
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(f&quot;&#x27;{func.__name__}&#x27; took {end - start:.4f} seconds&quot;)
+        return result
+    return wrapper
+
+@timer                              # Apply the decorator
+def slow_calculation(n):
+    &quot;&quot;&quot;Sums numbers from 0 to n.&quot;&quot;&quot;
+    return sum(range(n))
+
+result = slow_calculation(1_000_000)
+print(f&quot;Result: {result}&quot;)
+
+# A logging decorator:
+def log_calls(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        print(f&quot;Calling {func.__name__} with args={args}, kwargs={kwargs}&quot;)
+        result = func(*args, **kwargs)
+        print(f&quot;{func.__name__} returned {result}&quot;)
+        return result
+    return wrapper
+
+@log_calls
+def add(a, b):
+    return a + b
+
+add(3, 5)
+add(10, 20)
+
+# ==============================================================================
+# YOUR TURN — DAY 23:
+# 1. Write a decorator &#x27;validate_positive&#x27; that checks all arguments are &gt; 0
+#    before running the function; if not, print an error and return None
+# 2. Apply it to a function square_root(n) that returns math.sqrt(n)
+# 3. Test with positive and negative numbers
+# HINT: def validate_positive(func): def wrapper(*args): for a in args: if a &lt;= 0: ...
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 24 — GENERATORS &amp; ITERATORS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A GENERATOR is a function that yields values ONE AT A TIME instead of all at once.
+# Use generators when working with LARGE data — they don&#x27;t load everything into memory!
+# This is critical in Data Science when your CSV has millions of rows.
+# yield pauses the function and returns a value; next() resumes it.
+#
+# EXAMPLE:
+
+# A generator function:
+def count_up(start, end):
+    &quot;&quot;&quot;Yields numbers from start to end, one at a time.&quot;&quot;&quot;
+    current = start
+    while current &lt;= end:
+        yield current           # Pauses here, gives the value, resumes on next call
+        current += 1
+
+gen = count_up(1, 5)
+print(next(gen))        # 1
+print(next(gen))        # 2
+print(next(gen))        # 3
+
+# Loop over a generator:
+for num in count_up(1, 5):
+    print(num)
+
+# Infinite generator (never ends — use break or take()):
+def infinite_counter(start=0):
+    n = start
+    while True:
+        yield n
+        n += 1
+
+counter = infinite_counter(10)
+for _ in range(5):              # Take only 5 values
+    print(next(counter))        # 10, 11, 12, 13, 14
+
+# Generator expression (like list comprehension but lazy):
+# List comprehension — creates ALL at once (uses memory):
+squares_list = [x**2 for x in range(1_000_000)]   # Uses ~8MB RAM
+
+# Generator expression — creates ONE AT A TIME (tiny memory footprint):
+squares_gen  = (x**2 for x in range(1_000_000))   # Uses ~100 bytes RAM
+
+print(next(squares_gen))    # 0
+print(next(squares_gen))    # 1
+print(sum(squares_gen))     # Sum all remaining
+
+# ==============================================================================
+# YOUR TURN — DAY 24:
+# 1. Write a generator read_csv_chunks(filename, chunk_size) that reads a file
+#    and yields lists of N lines at a time (chunks)
+# 2. Write a Fibonacci generator that yields Fibonacci numbers indefinitely
+#    HINT: yield a, then a,b = b, a+b
+# 3. Use a generator expression to yield squares of even numbers under 100
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 25 — NUMPY (Numerical Python)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# NumPy is THE foundation of Data Science in Python.
+# It provides N-dimensional arrays (ndarray) — like lists but:
+#   - MUCH faster (implemented in C)
+#   - Supports vectorized math (no loops needed!)
+#   - The basis for Pandas, scikit-learn, TensorFlow, etc.
+#
+# Install: pip install numpy
+# Convention: import numpy as np   (ALWAYS use &#x27;np&#x27; as alias)
+#
+# EXAMPLE:
+
+import numpy as np
+
+# Create arrays:
+arr1d = np.array([1, 2, 3, 4, 5])
+arr2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+
+print(arr1d)
+print(arr2d)
+print(arr1d.shape)      # (5,)  — 5 elements, 1 dimension
+print(arr2d.shape)      # (3,3) — 3 rows, 3 columns
+print(arr2d.dtype)      # int64 — data type
+
+# Useful array creators:
+print(np.zeros((3, 4)))         # 3x4 array of zeros
+print(np.ones((2, 3)))          # 2x3 array of ones
+print(np.arange(0, 10, 2))      # [0, 2, 4, 6, 8]
+print(np.linspace(0, 1, 5))     # 5 evenly spaced values: [0, .25, .5, .75, 1]
+print(np.random.rand(3, 3))     # 3x3 random floats (0 to 1)
+
+# Vectorized math — NO loops needed:
+scores = np.array([75, 88, 92, 65, 80, 95, 70])
+print(scores + 5)           # Add 5 to EVERY element
+print(scores * 1.1)         # Multiply every element by 1.1
+print(scores &gt; 80)          # Boolean array: which are &gt; 80?
+
+# Boolean indexing — filter by condition:
+high_scores = scores[scores &gt; 80]
+print(high_scores)          # [88 92 95]
+
+# Statistics:
+print(f&quot;Mean:   {np.mean(scores):.2f}&quot;)
+print(f&quot;Std:    {np.std(scores):.2f}&quot;)
+print(f&quot;Median: {np.median(scores):.2f}&quot;)
+print(f&quot;Max:    {np.max(scores)}&quot;)
+print(f&quot;Min:    {np.min(scores)}&quot;)
+
+# Reshape and matrix operations:
+matrix_a = np.array([[1, 2], [3, 4]])
+matrix_b = np.array([[5, 6], [7, 8]])
+print(np.dot(matrix_a, matrix_b))   # Matrix multiplication
+
+# ==============================================================================
+# YOUR TURN — DAY 25:
+# 1. Create a numpy array of 20 random integers between 0 and 100
+# 2. Normalize it (scale to 0-1): normalized = (arr - arr.min()) / (arr.max() - arr.min())
+# 3. Find indices where value &gt; 50: np.where(arr &gt; 50)
+# 4. Create a 5x5 identity matrix: np.eye(5)
+# 5. Calculate: mean, std, variance, 25th percentile, 75th percentile
+# HINT: np.percentile(arr, 25), np.var(arr)
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 26 — PANDAS (Data Analysis Library)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Pandas is your data table (spreadsheet) in Python. THE most important library.
+# DataFrame = table with rows and columns (like Excel or SQL table)
+# Series = single column of data
+# Install: pip install pandas
+# Convention: import pandas as pd
+#
+# EXAMPLE:
+
+import pandas as pd
+
+# Create a DataFrame from a dict:
+data = {
+    &quot;name&quot;:    [&quot;Alice&quot;, &quot;Bob&quot;, &quot;Carol&quot;, &quot;David&quot;, &quot;Eve&quot;],
+    &quot;age&quot;:     [25, 23, 26, 24, 22],
+    &quot;gpa&quot;:     [3.8, 3.5, 3.9, 3.7, 3.2],
+    &quot;major&quot;:   [&quot;DS&quot;, &quot;CS&quot;, &quot;DS&quot;, &quot;Stats&quot;, &quot;CS&quot;],
+    &quot;passed&quot;:  [True, True, True, True, False]
+}
+df = pd.DataFrame(data)
+
+# Explore the data:
+print(df)
+print(df.head(3))           # First 3 rows
+print(df.tail(2))           # Last 2 rows
+print(df.shape)             # (5, 5) — rows, columns
+print(df.dtypes)            # Data type of each column
+print(df.describe())        # Statistics summary
+print(df.info())            # Overview with memory usage
+
+# Select columns:
+print(df[&quot;name&quot;])           # One column → Series
+print(df[[&quot;name&quot;, &quot;gpa&quot;]]) # Multiple columns → DataFrame
+
+# Filter rows by condition:
+ds_students = df[df[&quot;major&quot;] == &quot;DS&quot;]
+print(ds_students)
+
+high_gpa = df[df[&quot;gpa&quot;] &gt;= 3.7]
+print(high_gpa)
+
+# Add a new column:
+df[&quot;gpa_letter&quot;] = df[&quot;gpa&quot;].apply(lambda g: &quot;A&quot; if g &gt;= 3.7 else &quot;B&quot;)
+print(df)
+
+# Sort values:
+df_sorted = df.sort_values(&quot;gpa&quot;, ascending=False)
+print(df_sorted)
+
+# Group by:
+print(df.groupby(&quot;major&quot;)[&quot;gpa&quot;].mean())
+
+# Read/Write CSV:
+df.to_csv(&quot;students.csv&quot;, index=False)
+df_loaded = pd.read_csv(&quot;students.csv&quot;)
+print(df_loaded)
+
+# Handle missing values:
+df_with_nan = df.copy()
+df_with_nan.loc[1, &quot;gpa&quot;] = None
+print(df_with_nan.isnull().sum())       # Count missing per column
+df_clean = df_with_nan.dropna()         # Drop rows with any NaN
+df_filled = df_with_nan.fillna(df[&quot;gpa&quot;].mean())  # Fill NaN with mean
+
+# ==============================================================================
+# YOUR TURN — DAY 26:
+# 1. Load a CSV from the internet (or create one) and:
+#    - Show shape, dtypes, head(), describe()
+# 2. Filter rows where a numeric column &gt; some threshold
+# 3. Calculate mean/median for each numeric column using .describe()
+# 4. Add a new column that categorizes another (e.g., &quot;high&quot; / &quot;low&quot;)
+# 5. Group by a categorical column and calculate mean of numeric columns
+# HINT: df.groupby(&quot;column&quot;)[&quot;numeric&quot;].mean()
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 27 — MATPLOTLIB &amp; SEABORN (Data Visualization)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A Data Scientist who can&#x27;t visualize data is flying blind.
+# Matplotlib is the base plotting library. Seaborn builds on it — easier &amp; prettier.
+# Install: pip install matplotlib seaborn
+# Convention: import matplotlib.pyplot as plt; import seaborn as sns
+#
+# EXAMPLE:
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Sample data:
+months  = [&quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;, &quot;Apr&quot;, &quot;May&quot;, &quot;Jun&quot;]
+revenue = [4500, 5200, 4800, 6100, 5900, 7200]
+costs   = [3000, 3100, 2900, 3400, 3200, 3800]
+
+# --- LINE CHART ---
+plt.figure(figsize=(10, 5))
+plt.plot(months, revenue, marker=&quot;o&quot;, label=&quot;Revenue&quot;, color=&quot;green&quot;)
+plt.plot(months, costs,   marker=&quot;s&quot;, label=&quot;Costs&quot;,   color=&quot;red&quot;)
+plt.title(&quot;Monthly Revenue vs Costs&quot;)
+plt.xlabel(&quot;Month&quot;)
+plt.ylabel(&quot;Amount ($)&quot;)
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.savefig(&quot;line_chart.png&quot;)       # Save to file
+plt.show()                          # Display (comment out if running in terminal)
+
+# --- BAR CHART ---
+plt.figure(figsize=(8, 5))
+plt.bar(months, revenue, color=&quot;steelblue&quot;, edgecolor=&quot;black&quot;)
+plt.title(&quot;Monthly Revenue&quot;)
+plt.xlabel(&quot;Month&quot;)
+plt.ylabel(&quot;Revenue ($)&quot;)
+plt.tight_layout()
+plt.savefig(&quot;bar_chart.png&quot;)
+plt.show()
+
+# --- HISTOGRAM (distribution) ---
+np_data = np.random.normal(loc=70, scale=15, size=500)   # 500 random exam scores
+plt.figure(figsize=(8, 5))
+plt.hist(np_data, bins=20, color=&quot;orange&quot;, edgecolor=&quot;black&quot;)
+plt.title(&quot;Exam Score Distribution&quot;)
+plt.xlabel(&quot;Score&quot;)
+plt.ylabel(&quot;Frequency&quot;)
+plt.axvline(np.mean(np_data), color=&quot;red&quot;, linestyle=&quot;--&quot;, label=f&quot;Mean={np.mean(np_data):.1f}&quot;)
+plt.legend()
+plt.savefig(&quot;histogram.png&quot;)
+plt.show()
+
+# --- SEABORN SCATTER PLOT ---
+df_plot = pd.DataFrame({
+    &quot;hours_studied&quot;: np.random.uniform(1, 10, 50),
+    &quot;score&quot;: np.random.uniform(40, 100, 50),
+    &quot;major&quot;: np.random.choice([&quot;DS&quot;, &quot;CS&quot;, &quot;Stats&quot;], 50)
+})
+plt.figure(figsize=(8, 5))
+sns.scatterplot(data=df_plot, x=&quot;hours_studied&quot;, y=&quot;score&quot;, hue=&quot;major&quot;)
+plt.title(&quot;Hours Studied vs Score by Major&quot;)
+plt.savefig(&quot;scatter.png&quot;)
+plt.show()
+
+# ==============================================================================
+# YOUR TURN — DAY 27:
+# 1. Create a pie chart of: {&quot;Python&quot;: 35, &quot;SQL&quot;: 25, &quot;ML&quot;: 20, &quot;Stats&quot;: 20}
+#    HINT: plt.pie(values, labels=keys, autopct=&#x27;%1.1f%%&#x27;)
+# 2. Create a boxplot of exam scores grouped by major using seaborn
+#    HINT: sns.boxplot(data=df, x=&quot;major&quot;, y=&quot;score&quot;)
+# 3. Create a heatmap of the correlation matrix of a DataFrame
+#    HINT: sns.heatmap(df.corr(), annot=True)
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 28 — DATA CLEANING PROJECT
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Real-world data is MESSY. 80% of a data scientist&#x27;s time is cleaning data.
+# This is your first mini-project: clean a messy dataset end to end.
+# You&#x27;ll use everything: Pandas, string methods, loops, conditions, functions.
+#
+# COMMON DATA PROBLEMS:
+#   - Missing values (NaN)
+#   - Wrong data types (age stored as string)
+#   - Duplicates
+#   - Inconsistent formatting (&quot;USA&quot; vs &quot;usa&quot; vs &quot;U.S.A&quot;)
+#   - Outliers
+#   - Extra whitespace
+#
+# EXAMPLE:
+
+# Create a messy dataset:
+messy_data = {
+    &quot;name&quot;:    [&quot;Alice &quot;, &quot;  BOB&quot;, &quot;carol&quot;, &quot;Alice &quot;, &quot;DAVID&quot;, None],
+    &quot;age&quot;:     [25, &quot;twenty-three&quot;, 26, 25, 200, 24],   # outlier: 200, wrong type
+    &quot;salary&quot;:  [50000, 60000, None, 50000, 70000, 55000],
+    &quot;country&quot;: [&quot;USA&quot;, &quot;usa&quot;, &quot;U.S.A&quot;, &quot;UK&quot;, &quot;uk&quot;, &quot;Germany&quot;]
+}
+df_messy = pd.DataFrame(messy_data)
+print(&quot;=== MESSY DATA ===&quot;)
+print(df_messy)
+print(df_messy.info())
+
+# Step 1: Remove duplicates
+df_clean = df_messy.drop_duplicates()
+print(f&quot;\nAfter drop_duplicates: {df_clean.shape}&quot;)
+
+# Step 2: Handle missing values
+df_clean = df_clean.dropna(subset=[&quot;name&quot;])         # Drop rows with no name
+df_clean[&quot;salary&quot;] = df_clean[&quot;salary&quot;].fillna(df_clean[&quot;salary&quot;].median())
+
+# Step 3: Standardize text — strip spaces, lowercase
+df_clean[&quot;name&quot;] = df_clean[&quot;name&quot;].str.strip().str.title()
+
+# Step 4: Standardize country names
+country_map = {&quot;usa&quot;: &quot;USA&quot;, &quot;u.s.a&quot;: &quot;USA&quot;, &quot;uk&quot;: &quot;UK&quot;}
+df_clean[&quot;country&quot;] = df_clean[&quot;country&quot;].str.lower().map(
+    lambda c: country_map.get(c, c.upper())
+)
+
+# Step 5: Fix data types and handle outliers
+df_clean[&quot;age&quot;] = pd.to_numeric(df_clean[&quot;age&quot;], errors=&quot;coerce&quot;)   # NaN for non-numeric
+df_clean = df_clean[df_clean[&quot;age&quot;].between(15, 100)]               # Remove outliers
+
+print(&quot;\n=== CLEAN DATA ===&quot;)
+print(df_clean)
+print(df_clean.dtypes)
+
+# ==============================================================================
+# YOUR TURN — DAY 28:
+# Download the Titanic dataset: pd.read_csv(&quot;https://raw.githubusercontent.com/
+#   datasciencedojo/datasets/master/titanic.csv&quot;)
+# 1. Explore: shape, info(), describe(), isnull().sum()
+# 2. Fill missing &#x27;Age&#x27; with median
+# 3. Drop &#x27;Cabin&#x27; column (too many missing values)
+# 4. Standardize &#x27;Sex&#x27; column to title case
+# 5. Create a new column &#x27;AgeGroup&#x27;: Child(&lt;18), Adult(18-60), Senior(&gt;60)
+# 6. Calculate survival rate by Sex and by Pclass using groupby
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 29 — MACHINE LEARNING INTRO (scikit-learn)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Machine Learning = teaching a computer to find patterns in data and make predictions.
+# scikit-learn is Python&#x27;s standard ML library.
+# The ML workflow is always the same:
+#   1. Load &amp; clean data
+#   2. Split into features (X) and target (y)
+#   3. Split into train/test sets (80/20)
+#   4. Choose a model
+#   5. Train (fit) the model
+#   6. Predict on test set
+#   7. Evaluate with metrics
+#
+# Install: pip install scikit-learn
+#
+# EXAMPLE:
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+
+# Generate synthetic study data:
+np.random.seed(42)
+hours_studied = np.random.uniform(1, 10, 100)
+exam_score    = 10 * hours_studied + np.random.normal(0, 5, 100)   # Linear + noise
+
+# Step 1: Prepare features and target
+X = hours_studied.reshape(-1, 1)    # Reshape to 2D: (100, 1)
+y = exam_score
+
+# Step 2: Split into train (80%) and test (20%):
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+print(f&quot;Train size: {X_train.shape}, Test size: {X_test.shape}&quot;)
+
+# Step 3: Scale features (optional for linear regression, essential for others):
+scaler  = StandardScaler()
+X_train = scaler.fit_transform(X_train)   # fit on train, then transform
+X_test  = scaler.transform(X_test)        # ONLY transform (never fit on test!)
+
+# Step 4 &amp; 5: Create and train model:
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Step 6: Predict:
+y_pred = model.predict(X_test)
+
+# Step 7: Evaluate:
+mse  = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+r2   = r2_score(y_test, y_pred)
+print(f&quot;RMSE:  {rmse:.2f}&quot;)
+print(f&quot;R²:    {r2:.4f}&quot;)
+print(f&quot;Coef:  {model.coef_[0]:.2f}&quot;)
+print(f&quot;Intercept: {model.intercept_:.2f}&quot;)
+
+# Visualize:
+plt.figure(figsize=(8, 5))
+plt.scatter(X_test, y_test, color=&quot;blue&quot;, alpha=0.5, label=&quot;Actual&quot;)
+plt.plot(X_test, y_pred, color=&quot;red&quot;, linewidth=2, label=&quot;Predicted&quot;)
+plt.title(&quot;Linear Regression: Hours Studied vs Exam Score&quot;)
+plt.xlabel(&quot;Hours Studied (scaled)&quot;)
+plt.ylabel(&quot;Score&quot;)
+plt.legend()
+plt.savefig(&quot;linear_regression.png&quot;)
+plt.show()
+
+# ==============================================================================
+# YOUR TURN — DAY 29:
+# Use the Iris dataset (classic classification dataset):
+#   from sklearn.datasets import load_iris
+#   iris = load_iris()
+#   X, y = iris.data, iris.target
+# 1. Split into train/test
+# 2. Train a KNeighborsClassifier(n_neighbors=5)
+# 3. Evaluate with accuracy_score
+# 4. Print a classification_report
+# HINT: from sklearn.neighbors import KNeighborsClassifier
+#       from sklearn.metrics import accuracy_score, classification_report
+# ==============================================================================
+
+
+
+
+# ==============================================================================
+# DAY 30 — CAPSTONE PROJECT: End-to-End Data Analysis
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Congratulations! You&#x27;ve completed 29 days of Python fundamentals.
+# This final day is your CAPSTONE — a complete, real data science workflow.
+# You will use EVERYTHING: Pandas, NumPy, Matplotlib, Seaborn, scikit-learn.
+# This is the kind of work you&#x27;ll do in your Master&#x27;s program and job.
+#
+# PROJECT: Student Performance Analysis &amp; Prediction
+# Goal: Analyze student data and predict exam performance
+#
+# INSTRUCTIONS: Build this project step by step. Each step is your task.
+
+print(&quot;\n&quot; + &quot;=&quot;*60)
+print(&quot;  CAPSTONE PROJECT: Student Performance Analysis&quot;)
+print(&quot;=&quot;*60)
+
+# --- STEP 1: Generate realistic dataset ---
+np.random.seed(2026)
+n = 300
+
+capstone_data = pd.DataFrame({
+    &quot;student_id&quot;:      [f&quot;S{i:04d}&quot; for i in range(1, n+1)],
+    &quot;age&quot;:             np.random.randint(18, 30, n),
+    &quot;hours_studied&quot;:   np.random.uniform(1, 12, n).round(1),
+    &quot;attendance_pct&quot;:  np.random.uniform(50, 100, n).round(1),
+    &quot;prev_gpa&quot;:        np.random.uniform(2.0, 4.0, n).round(2),
+    &quot;major&quot;:           np.random.choice([&quot;Data Science&quot;, &quot;CS&quot;, &quot;Statistics&quot;, &quot;Math&quot;], n),
+    &quot;scholarship&quot;:     np.random.choice([True, False], n, p=[0.3, 0.7]),
+})
+
+# Generate final score as a function of the features + noise:
+capstone_data[&quot;final_score&quot;] = (
+    capstone_data[&quot;hours_studied&quot;] * 5 +
+    capstone_data[&quot;attendance_pct&quot;] * 0.3 +
+    capstone_data[&quot;prev_gpa&quot;] * 8 +
+    np.random.normal(0, 8, n)
+).clip(0, 100).round(1)
+
+capstone_data[&quot;passed&quot;] = (capstone_data[&quot;final_score&quot;] &gt;= 60).astype(int)
+
+# --- STEP 2: EDA (YOUR TURN) ---
+# Explore the dataset: shape, dtypes, describe(), missing values, distributions
+# TASK A: Print info and describe()
+# TASK B: Plot distribution of final_score as a histogram
+# TASK C: Boxplot of final_score by major
+# TASK D: Correlation heatmap of numeric columns
+# TASK E: Bar chart of pass rate by major
+print(&quot;\n--- YOUR EDA TASKS START HERE ---&quot;)
+# Write your EDA code below:
+
+
+
+
+# --- STEP 3: Feature Engineering (YOUR TURN) ---
+# TASK F: Create a new column &#x27;study_efficiency&#x27; = final_score / hours_studied
+# TASK G: Create &#x27;performance_tier&#x27;: &quot;Top&quot;(&gt;=85), &quot;Good&quot;(70-85), &quot;Average&quot;(55-70), &quot;Low&quot;(&lt;55)
+# TASK H: Encode &#x27;major&#x27; using pd.get_dummies()
+# Write your feature engineering code below:
+
+
+
+
+# --- STEP 4: Machine Learning (YOUR TURN) ---
+# TASK I: Select features: hours_studied, attendance_pct, prev_gpa + encoded majors
+# TASK J: Target: &#x27;passed&#x27; (binary classification)
+# TASK K: Split 80/20, scale features
+# TASK L: Train at least TWO models: LogisticRegression, RandomForestClassifier
+# TASK M: Compare accuracy, print classification_report for each
+# TASK N: Plot feature importances from RandomForest
+# Write your ML code below:
+
+
+
+
+# --- STEP 5: Save Results (YOUR TURN) ---
+# TASK O: Save the cleaned + engineered DataFrame to &#x27;student_analysis.csv&#x27;
+# TASK P: Save all your charts as PNG files
+# TASK Q: Print a final summary: dataset size, pass rate, best model accuracy
+
+
+
+
+print(&quot;\n&quot; + &quot;=&quot;*60)
+print(&quot;  YOU COMPLETED 30 DAYS OF PYTHON!&quot;)
+print(&quot;  Next steps:&quot;)
+print(&quot;  - SQL (sql/sql_zero_to_hero.sql)&quot;)
+print(&quot;  - Git (git/git_commands.sh)&quot;)
+print(&quot;  - Django (django/django_zero_to_hero.py)&quot;)
+print(&quot;=&quot;*60)
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

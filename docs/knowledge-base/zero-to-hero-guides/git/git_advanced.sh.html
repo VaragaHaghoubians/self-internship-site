@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Git Advanced.Sh - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Git Advanced.Sh</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/git/git_advanced.sh</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><pre><code>#!/bin/bash
+# ==============================================================================
+#  GIT ADVANCED — ML Engineer Level
+#  FILE: git_advanced.sh
+#
+#  TASK: Master the Git commands that separate junior from senior engineers.
+#        These are used DAILY in production ML engineering teams.
+#
+#  WHY:  When you work at Amazon/Uber/Flexport:
+#          → You stash work constantly when switching context
+#          → You rebase feature branches before PRs (clean history)
+#          → You squash commits so PRs are one logical unit
+#          → You use blame to find who broke something
+#          → You use bisect to find WHICH commit introduced a bug
+#          → You use reflog to recover after a bad reset
+#
+#  PREREQ: git_commands.sh + git_conflict_resolution.sh
+# ==============================================================================
+
+
+# ==============================================================================
+# LESSON 01 — GIT STASH: Temporary Save Without Committing
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Scenario: You&#x27;re halfway through a feature. Urgent bug report comes in.
+# You can&#x27;t commit unfinished code. But you can&#x27;t lose your work.
+# Solution: git stash → temporarily saves your work, cleans the working dir.
+# Later: git stash pop → brings your work back.
+#
+# Think of stash as a CLIPBOARD for your uncommitted changes.
+#
+# COMMANDS:
+#   git stash                     → stash all uncommitted changes
+#   git stash push -m &quot;message&quot;   → stash with a description (recommended)
+#   git stash list                → see all stashes
+#   git stash pop                 → apply latest stash AND delete it
+#   git stash apply stash@{1}     → apply specific stash but KEEP it in list
+#   git stash drop stash@{0}      → delete a specific stash
+#   git stash clear               → delete ALL stashes (careful!)
+#
+# EXAMPLE:
+
+echo &quot;=== LESSON 01: git stash ===&quot;
+
+# You&#x27;re working on a feature:
+# (pretend you&#x27;ve edited model.py halfway through)
+echo &quot;Scenario: halfway through editing model.py when urgent bug comes in&quot;
+
+# git stash push -m &quot;WIP: adding dropout layer to model&quot;
+# → Your working directory is now CLEAN
+# → You can switch branches safely
+
+# git checkout main
+# git checkout -b hotfix/fix-null-pointer
+# ... fix the bug, commit, merge ...
+
+# git checkout feature/dropout-layer
+# git stash pop
+# → Your half-finished work is BACK, exactly as you left it
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+LAB: Try this yourself:
+  mkdir stash-lab &amp;&amp; cd stash-lab &amp;&amp; git init
+  echo &quot;original content&quot; &gt; feature.py &amp;&amp; git add . &amp;&amp; git commit -m &quot;init&quot;
+  echo &quot;WORK IN PROGRESS - half done&quot; &gt;&gt; feature.py
+  git status                  ← shows modified: feature.py
+  git stash push -m &quot;WIP: adding feature X&quot;
+  git status                  ← CLEAN! Working dir empty
+  git stash list              ← shows: stash@{0}: WIP: adding feature X
+  git stash pop               ← brings feature.py changes back
+  git status                  ← shows modified again
+
+Advanced: stash ONLY specific files:
+  git stash push -m &quot;only model.py&quot; -- model.py
+
+Stash INCLUDING untracked new files:
+  git stash push -u -m &quot;include new files&quot;
+
+EOF
+
+# ==============================================================================
+# YOUR TURN — LESSON 01:
+# 1. Create a repo, make an initial commit, then start modifying a file.
+# 2. Stash your work with a descriptive message.
+# 3. Make a &quot;hotfix&quot; commit on main.
+# 4. Pop your stash. Verify your WIP changes are back.
+# 5. CHALLENGE: stash twice (two WIPs), then apply them in REVERSE order.
+# ==============================================================================
+
+
+# ==============================================================================
+# LESSON 02 — GIT LOG ADVANCED: Reading History Like a Pro
+# ==============================================================================
+#
+# TEACHER SAYS:
+# git log is more than just a history list. It&#x27;s a SEARCH and ANALYSIS tool.
+# These flags are used every day in professional teams.
+
+echo &quot;&quot;
+echo &quot;=== LESSON 02: Advanced git log ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+USEFUL GIT LOG FLAGS:
+
+git log --oneline                    # Compact: one line per commit
+git log --oneline --graph --all      # ASCII branch/merge diagram (VERY useful!)
+git log --oneline -10                # Last 10 commits only
+
+git log --author=&quot;Alice&quot;             # All commits by Alice
+git log --since=&quot;2026-01-01&quot;         # Commits after a date
+git log --until=&quot;2026-04-01&quot;         # Commits before a date
+git log --since=&quot;1 week ago&quot;         # Relative dates work too!
+
+git log --grep=&quot;fix&quot;                 # Commits with &quot;fix&quot; in message
+git log -- model.py                  # Commits that touched model.py
+
+git log -p                           # Show FULL diff for each commit (verbose)
+git log -p -- data_loader.py         # Show all changes to data_loader.py over time
+git log --stat                       # Files changed + lines added/deleted per commit
+
+# See commits on feature-branch but NOT on main:
+git log main..feature-branch
+
+# The MOST USEFUL combination for understanding a repo:
+git log --oneline --graph --all --decorate
+
+EXAMPLE OUTPUT:
+* a1b2c3d (HEAD -&gt; main) feat: add batch scoring endpoint
+* f4e5d6a feat: resolve conflict — combine Alice + Bob tuning
+|\
+| * c7b8e9f (feature/bob-tuning) feat: increase epochs (Bob)
+* | d0e1f2a (feature/alice-tuning) feat: tune lr and batch (Alice)
+|/
+* 1234567 feat: initial model configuration
+
+EOF
+
+
+# ==============================================================================
+# LESSON 03 — GIT DIFF: Comparing Anything with Anything
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 03: git diff ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+git diff                        # Unstaged changes (working dir vs last commit)
+git diff --staged               # Staged changes (what will be in next commit)
+git diff HEAD                   # ALL changes (staged + unstaged) vs last commit
+git diff HEAD~1                 # Changes since 2 commits ago
+git diff HEAD~3..HEAD           # Changes over last 3 commits
+
+git diff main..feature-branch   # What&#x27;s different between branches?
+git diff a1b2c3d f4e5d6a        # Compare two specific commits by hash
+
+git diff -- model.py            # Changes in ONE specific file only
+git diff --stat                 # Summary: which files changed, how many lines
+
+PRACTICAL USE (find what changed before a deployment):
+git diff origin/main..HEAD      # What am I about to push to remote?
+
+EOF
+
+
+# ==============================================================================
+# LESSON 04 — GIT BLAME: Find Who Changed What
+# ==============================================================================
+#
+# TEACHER SAYS:
+# git blame shows who last edited EACH LINE of a file, and in which commit.
+# NOT for blaming people — for UNDERSTANDING context:
+#   &quot;Why was this line written this way? Who knows? Let me find the author and ask.&quot;
+#   &quot;This line changed in commit abc123 — what was the PR that introduced it?&quot;
+
+echo &quot;&quot;
+echo &quot;=== LESSON 04: git blame ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+git blame filename.py           # Show all lines with author + commit + date
+git blame -L 10,25 filename.py  # Only lines 10-25
+git blame --since=&quot;1 month ago&quot; filename.py  # Only recent changes
+
+EXAMPLE OUTPUT:
+a1b2c3d4 (Alice  2026-04-15 10:23:11 +0000 1) LEARNING_RATE = 0.001
+f9e8d7c6 (Bob    2026-04-14 14:05:32 +0000 2) BATCH_SIZE = 64
+1a2b3c4d (Carol  2026-04-10 09:11:45 +0000 3) EPOCHS = 50
+
+Reading the output:
+  a1b2c3d4     = commit hash (short)
+  (Alice ...)  = author, date
+  1)           = line number
+  LEARNING_RATE = 0.001  = the line content
+
+WORKFLOW: You find a weird line in the code.
+  1. git blame filename.py                    → find the commit hash (e.g., a1b2c3d4)
+  2. git show a1b2c3d4                        → see the full commit — what changed and why
+  3. Read the commit message for context
+  4. If needed, contact the author
+
+VS Code: Right-click a line → &quot;Git Blame&quot; shows this inline (GitLens extension)
+
+EOF
+
+
+# ==============================================================================
+# LESSON 05 — GIT BISECT: Binary Search for a Bug
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Scenario: &quot;The model was accurate last month. Now it&#x27;s wrong. Which commit broke it?&quot;
+# With 200 commits between &quot;good&quot; and &quot;now&quot; — you can&#x27;t test them all manually.
+# git bisect does a BINARY SEARCH: it cuts the commits in half each time.
+# 200 commits → only ~8 tests needed!
+
+echo &quot;&quot;
+echo &quot;=== LESSON 05: git bisect — Binary Search for Bugs ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+WORKFLOW:
+  git bisect start                    # Start the bisect session
+  git bisect bad                      # Mark CURRENT commit as bad
+  git bisect good abc1234             # Mark a known GOOD commit (e.g., last month)
+
+  → Git checks out the MIDDLE commit automatically.
+  → You test: does the bug exist here?
+
+  git bisect good                     # If bug NOT here → bug is NEWER
+  git bisect bad                      # If bug IS here → bug is in first half
+
+  → Git checks out the next midpoint. You test again.
+  → Repeat until Git tells you: &quot;abc1234 is the first bad commit&quot;
+
+  git bisect reset                    # IMPORTANT: always reset when done!
+
+AUTOMATE IT (when you have a test script):
+  git bisect start
+  git bisect bad
+  git bisect good abc1234
+  git bisect run python test_accuracy.py
+  # Git auto-runs your script at each step!
+  # 0 = good, non-zero = bad
+  git bisect reset
+
+EXAMPLE:
+  You know the model was accurate on 2026-03-01:
+  git log --oneline --before=&quot;2026-03-01&quot; -1
+  # → gets hash of a good commit
+
+  git bisect start
+  git bisect bad HEAD
+  git bisect good &lt;that hash&gt;
+  # → git binary-searches and finds the exact bad commit in ~8 steps
+
+EOF
+
+# ==============================================================================
+# YOUR TURN — LESSON 05:
+# 1. Create a repo with 10 commits. In commit #7, &quot;introduce a bug&quot;
+#    (e.g., change a function return value from True to False).
+# 2. Use git bisect to find commit #7:
+#      git bisect start
+#      git bisect bad HEAD
+#      git bisect good &lt;commit 1 hash&gt;
+#    Test each checkpoint: does the &quot;bug&quot; exist? Mark good/bad.
+# 3. Can you find it in under 4 steps?
+# ==============================================================================
+
+
+# ==============================================================================
+# LESSON 06 — GIT REFLOG: Your Safety Net
+# ==============================================================================
+#
+# TEACHER SAYS:
+# git reflog is your UNDO for undos. It records EVERY position HEAD has been at.
+# Even if you deleted a branch or did git reset --hard, reflog lets you recover.
+# NEVER panic after a bad git command — check reflog first!
+
+echo &quot;&quot;
+echo &quot;=== LESSON 06: git reflog — Recovery Tool ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+git reflog                      # See every position HEAD has moved to
+git reflog --all                # Include all branches (not just HEAD)
+
+EXAMPLE OUTPUT:
+a1b2c3d (HEAD -&gt; main) HEAD@{0}: merge feature/bob: Fast-forward
+f9e8d7c HEAD@{1}: checkout: moving from feature/bob to main
+c8b7a6f HEAD@{2}: commit: feat: add epoch tuning
+d5e4f3a HEAD@{3}: checkout: moving from main to feature/bob
+1234abc HEAD@{4}: commit (amend): fix: correct typo
+
+RECOVERY SCENARIO — accidentally reset --hard:
+  git reset --hard HEAD~3      ← OH NO, lost 3 commits!
+  git reflog                   ← find the commit BEFORE the reset: HEAD@{1}
+  git reset --hard HEAD@{1}   ← restore to that point — commits recovered!
+
+RECOVERY — accidentally deleted a branch:
+  git branch -D my-feature     ← deleted! Oh no!
+  git reflog                   ← find the last commit on that branch
+  git checkout -b my-feature &lt;hash&gt;  ← recreate the branch
+
+RULE: reflog is LOCAL only — it&#x27;s not pushed to GitHub.
+      It only helps for local mistakes. Pushed+deleted branches need GitHub restore.
+
+IMPORTANT: reflog entries expire after 90 days by default.
+           Recover ASAP if you need it!
+
+EOF
+
+
+# ==============================================================================
+# LESSON 07 — GIT REBASE: Rewrite History Cleanly
+# ==============================================================================
+#
+# TEACHER SAYS:
+# MERGE creates a &quot;merge commit&quot; — the graph gets forked.
+# REBASE replays your commits ON TOP of another branch — history stays LINEAR.
+#
+# When to use:
+#   ✅ rebase: your feature branch, before opening a PR (keeps history clean)
+#   ✅ merge:  when accepting a PR into main (preserves full history)
+#   ❌ NEVER rebase commits already pushed to shared branches!
+#
+#  BEFORE rebase:          AFTER rebase:
+#  main: A-B-C             main: A-B-C
+#  feat:   D-E             feat:       D&#x27;-E&#x27;  (replayed on top of C)
+#
+#  After merge(rebase):    A-B-C-D&#x27;-E&#x27;  (linear!)
+#  After merge(no-rebase): A-B-C-M  (merge commit M = messy graph)
+
+echo &quot;&quot;
+echo &quot;=== LESSON 07: git rebase ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+BASIC REBASE (update your feature branch with latest main):
+  git checkout feature/my-feature
+  git fetch origin
+  git rebase origin/main         # Replay feature commits on top of latest main
+
+If conflicts arise during rebase:
+  1. Resolve the conflict in the file
+  2. git add &lt;resolved-file&gt;
+  3. git rebase --continue        # Move to next commit
+  (OR: git rebase --abort        # Cancel the entire rebase)
+
+AFTER rebase, if you previously pushed the branch:
+  git push --force-with-lease    # Force push (safe version — checks no one else pushed)
+
+INTERACTIVE REBASE (git squash + reorder):
+  git rebase -i HEAD~5           # Open editor for last 5 commits
+
+  Editor shows:
+  pick a1b2c3d feat: add model training loop
+  pick f4e5d6a fix: correct variable name
+  pick c7b8e9f fix: another typo
+  pick d0e1f2a feat: add evaluation metrics
+  pick e1f2a3b docs: update readme
+
+  COMMANDS you can use (change &quot;pick&quot; to):
+    p  pick    = keep commit as-is
+    r  reword  = change commit message
+    e  edit    = pause and amend
+    s  squash  = merge into PREVIOUS commit (keeps all messages)
+    f  fixup   = merge into previous (discards this commit&#x27;s message)
+    d  drop    = delete this commit entirely
+
+  SQUASH the 2 typo fixes into the first commit:
+  pick a1b2c3d feat: add model training loop
+  squash f4e5d6a fix: correct variable name
+  squash c7b8e9f fix: another typo
+  pick d0e1f2a feat: add evaluation metrics
+  f    e1f2a3b docs: update readme
+
+  → Git squashes fixes into the feat commit, drops readme commit.
+  → Result: 2 clean commits instead of 5 messy ones.
+  → MUCH better for code review!
+
+GOLDEN RULE: Only rebase LOCAL / unpushed commits.
+             Rebasing pushed commits = rewriting shared history = team conflict!
+
+EOF
+
+# ==============================================================================
+# YOUR TURN — LESSON 07:
+# 1. Create a feature branch with 5 commits:
+#    &quot;feat: add function&quot;, &quot;fix: typo&quot;, &quot;fix: typo again&quot;, &quot;docs: update&quot;, &quot;chore: cleanup&quot;
+# 2. Squash the 2 typo fixes into the feat commit using:
+#    git rebase -i HEAD~5
+# 3. Result: 3 clean commits (feat, docs, chore)
+# 4. Verify with git log --oneline
+# ==============================================================================
+
+
+# ==============================================================================
+# LESSON 08 — GIT CHERRY-PICK: Apply One Commit from Another Branch
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 08: git cherry-pick ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+Scenario: You committed a critical bug fix on a feature branch.
+          Main is BROKEN and needs ONLY that fix — not the whole feature.
+
+git cherry-pick &lt;commit-hash&gt;   # Apply that ONE commit to current branch
+
+Example:
+  git log feature/new-model --oneline
+  a1b2c3d feat: add attention mechanism
+  f4e5d6a fix: critical null pointer in scorer   ← we only want THIS
+  c7b8e9f feat: experimental layer
+
+  git checkout main
+  git cherry-pick f4e5d6a       # Apply ONLY the bug fix commit
+  git push
+
+Cherry-pick creates a NEW commit with the SAME changes (different hash).
+The original commit stays on the feature branch.
+
+Conflicts can occur during cherry-pick — resolve them the same way as merge conflicts:
+  git add &lt;resolved-file&gt;
+  git cherry-pick --continue
+  (or: git cherry-pick --abort)
+
+EOF
+
+
+# ==============================================================================
+# LESSON 09 — GIT TAG: Versioning Releases
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 09: git tag — Versioning Releases ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+Tags mark SPECIFIC commits as important versions (releases).
+Think: &quot;git log tells you commit history; tags tell you which commits are releases.&quot;
+
+git tag                         # List all tags
+git tag v1.0.0                  # Create lightweight tag on current commit
+git tag -a v1.0.0 -m &quot;First stable release&quot;  # Annotated tag (preferred — has metadata)
+git tag -a v1.0.0 abc1234 -m &quot;Tagging v1.0&quot;  # Tag a specific past commit
+
+git push origin v1.0.0          # Push a specific tag to GitHub
+git push origin --tags          # Push ALL tags to GitHub
+
+git checkout v1.0.0             # Check out code at that exact version (detached HEAD)
+
+git tag -d v1.0.0               # Delete local tag
+git push origin --delete v1.0.0 # Delete remote tag
+
+SEMANTIC VERSIONING (the standard: MAJOR.MINOR.PATCH):
+  v1.0.0 → initial release
+  v1.1.0 → new feature added (backward compatible)
+  v1.1.1 → bug fix
+  v2.0.0 → breaking changes (API changed)
+
+ML USAGE:
+  Tag model releases:
+    v1.0.0  → first production model
+    v1.1.0  → retrained with more data
+    v2.0.0  → completely new architecture
+  Then: git checkout v1.0.0 → reproduce ANY previous model exactly.
+
+EOF
+
+
+# ==============================================================================
+# LESSON 10 — GIT FLOW: Professional Branching Strategy
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;=== LESSON 10: Git Flow (Team Branching Strategy) ===&quot;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+
+SIMPLE GITHUB FLOW (small teams, continuous deployment):
+  main ← always deployable
+  feature/X → PR → main
+
+GIT FLOW (larger teams, release cycles):
+  main     → production-ready only (tagged releases)
+  develop  → integration branch (all features merged here first)
+  feature/* → one branch per feature, merged into develop
+  release/* → prepare a release (bugfixes only), merged to main + develop
+  hotfix/*  → emergency fixes to main (bypass develop)
+
+WORKFLOW:
+  1. git checkout -b feature/add-churn-model develop
+  2. Work → commit → push
+  3. PR: feature/add-churn-model → develop
+  4. When ready for release:
+     git checkout -b release/v2.0.0 develop
+  5. Bug fixes on release branch
+  6. Merge release/v2.0.0 → main AND → develop
+  7. Tag main: git tag -a v2.0.0 -m &quot;Release v2.0.0&quot;
+
+WHICH TO USE?
+  GitHub Flow → startups, SaaS, continuous deploy → SIMPLER, RECOMMENDED
+  Git Flow    → enterprise, release cycles, multiple versions in prod
+
+For your self-internship projects: use GitHub Flow.
+For a company like Amazon/Uber: likely some variant of Git Flow.
+
+EOF
+
+
+# ==============================================================================
+# QUICK REFERENCE — ADVANCED GIT CHEAT SHEET
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;==================================================================&quot;
+echo &quot;ADVANCED GIT QUICK REFERENCE&quot;
+echo &quot;==================================================================&quot;
+cat &lt;&lt; &#x27;EOF&#x27;
+
+STASH
+  git stash push -m &quot;msg&quot;          Save work temporarily
+  git stash list                   See all stashes
+  git stash pop                    Restore latest stash (delete it)
+  git stash apply stash@{1}        Restore specific stash (keep it)
+  git stash drop stash@{0}         Delete a stash
+
+LOG
+  git log --oneline --graph --all  Full visual history
+  git log --author=&quot;Name&quot;          Filter by author
+  git log --since=&quot;1 week ago&quot;     Filter by date
+  git log -- filename.py           Commits touching a file
+  git log -p -- filename.py        Full diffs for a file
+
+DIFF
+  git diff main..feature           What&#x27;s different between branches
+  git diff HEAD~3..HEAD            Changes over last 3 commits
+  git diff --stat                  Summary of what changed
+
+BLAME / INVESTIGATE
+  git blame filename.py            Who wrote each line?
+  git blame -L 10,25 filename.py   Specific lines only
+  git show &lt;hash&gt;                  Full details of a commit
+  git bisect start/bad/good        Binary search for bug
+
+RECOVERY
+  git reflog                       See all HEAD positions
+  git reset --hard HEAD@{2}        Jump back to earlier position
+  git cherry-pick &lt;hash&gt;           Apply one commit to current branch
+
+REBASE / SQUASH
+  git rebase origin/main           Update feature branch with latest main
+  git rebase -i HEAD~5             Interactive: squash/reorder commits
+  git push --force-with-lease      Safe force push after rebase
+
+TAGS
+  git tag -a v1.0.0 -m &quot;Release&quot;  Create annotated tag
+  git push origin --tags           Push all tags
+  git checkout v1.0.0              Check out a specific version
+
+EOF
+
+
+# ==============================================================================
+# 🎯 YOUR TASKS
+# ==============================================================================
+
+echo &quot;&quot;
+echo &quot;==================================================================&quot;
+echo &quot;YOUR TURN — Advanced Git Practice&quot;
+echo &quot;==================================================================&quot;
+cat &lt;&lt; &#x27;EOF&#x27;
+
+TASK 1 — STASH:
+    a) Start editing a file, stash it with a message.
+    b) Make a hotfix commit on main.
+    c) Pop the stash. Verify your changes are back.
+
+TASK 2 — BLAME + SHOW:
+    In any project repo:
+    a) git blame README.md → find the commit hash for a specific line
+    b) git show &lt;hash&gt; → read the full commit message and diff
+    c) What was the purpose of that change?
+
+TASK 3 — BISECT:
+    a) Create a repo with 8 commits. In commit 5, change a value.
+    b) Use git bisect to find commit 5 (without knowing which one it is).
+    c) How many steps did bisect need? (Should be about 3)
+
+TASK 4 — INTERACTIVE REBASE:
+    a) Create a branch with 6 commits:
+       &quot;feat: main function&quot;, &quot;fix: typo&quot;, &quot;fix: missing import&quot;,
+       &quot;feat: add tests&quot;, &quot;chore: whitespace&quot;, &quot;docs: add docstring&quot;
+    b) Squash the 2 fixes into the feat, drop the whitespace chore.
+    c) Result should be 3 clean commits.
+    d) git log --oneline to verify.
+
+TASK 5 — TAGGING:
+    a) In any project, create a tag: git tag -a v0.1.0 -m &quot;Initial MVP&quot;
+    b) Push it: git push origin v0.1.0
+    c) Check GitHub — find the tag in the Releases section
+    d) git checkout v0.1.0 → verify the code is at that exact point
+    e) git checkout main → come back
+
+TASK 6 — REFLOG RECOVERY:
+    a) Make 3 commits on a new branch.
+    b) Do: git reset --hard HEAD~3  (loses all 3!)
+    c) git reflog → find the commit before the reset
+    d) git reset --hard HEAD@{1}   → recover!
+    e) git log --oneline → are your commits back?
+
+Write your solutions in a file called &quot;advanced_git_practice.md&quot;:
+EOF
+
+echo &quot;&quot;
+echo &quot;git_advanced.sh complete!&quot;
+echo &quot;Next: git_ml_workflow.sh (GitHub Actions, git hooks, DVC)&quot;
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

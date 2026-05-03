@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fetch Api Data.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../../index.html">Back to website</a>
+      <a href="../../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Fetch Api Data.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/learning-journey/month-02-data-science/week-07-apis/fetch_api_data.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "# ==============================================================\n# WEEK 7: APIs & Automation \u2014 Fetch Data from the Internet\n# FILE: fetch_api_data.py\n#\n# TASK: Use Python to automatically download data from the internet\n#       using a public API, then save it to a CSV file.\n#\n# WHY:  An API (Application Programming Interface) is a way for\n#       programs to talk to each other. Instead of manually\n#       downloading files, your Python script can fetch fresh data\n#       automatically every day, every hour, or every minute.\n#       This is how real data pipelines work in industry.\n#\n# INSTALL: pip install requests\n#\n# HOW TO RUN: python fetch_api_data.py\n# ==============================================================\n\nimport requests    # For making HTTP requests (fetching web data)\nimport json        # For working with JSON data (built-in to Python)\nimport pandas as pd\nfrom datetime import datetime   # For timestamps\nimport os                       # For file operations (built-in)\n\nprint(\"=\" * 60)\nprint(\"WEEK 7: Fetching Data from APIs\")\nprint(\"=\" * 60)\n\n\n# ==============================================================\n# PART 1: What is an API and what is JSON?\n# ==============================================================\n\n# API = Application Programming Interface\n# Think of it like a waiter at a restaurant:\n#   YOU          = your Python script\n#   RESTAURANT   = the data server (e.g., weather service)\n#   WAITER       = the API\n#   MENU         = available data (what you can request)\n#   FOOD         = the data you get back\n#\n# JSON = JavaScript Object Notation\n# It's the most common data format for APIs. It looks like a\n# Python dictionary:\n# {\n#   \"temperature\": 22.5,\n#   \"city\": \"Istanbul\",\n#   \"weather\": \"Sunny\"\n# }\n\n\n# ==============================================================\n# PART 2: Fetch a Simple Public API (no key needed)\n# ==============================================================\n\nprint(\"\\n--- PART 2: Fetching a Public API ---\")\n\n# This is a FREE public API for random jokes \u2014 no signup needed\n# It's perfect for learning how APIs work\nAPI_URL = \"https://official-joke-api.appspot.com/jokes/programming/ten\"\n\nprint(f\"Fetching data from: {API_URL}\")\n\n# requests.get() sends an HTTP GET request to the URL\n# (just like typing a URL in your browser, but from Python code)\nresponse = requests.get(API_URL, timeout=10)\n\n# Check if the request was successful\n# Status 200 = OK, Status 404 = Not Found, Status 500 = Server Error\nprint(f\"Response status code: {response.status_code}\")\n\nif response.status_code == 200:\n    # .json() converts the JSON text into a Python list/dictionary\n    jokes = response.json()\n    print(f\"\\nReceived {len(jokes)} jokes!\")\n    print(\"\\nFirst joke:\")\n    print(\"Setup:\", jokes[0][\"setup\"])\n    print(\"Punchline:\", jokes[0][\"punchline\"])\nelse:\n    print(\"Error: Could not fetch data. Check your internet connection.\")\n    jokes = []\n\n\n# ==============================================================\n# PART 3: A More Useful API \u2014 Open-Meteo (Free Weather Data)\n# ==============================================================\n\nprint(\"\\n--- PART 3: Fetching Real Weather Data ---\")\n\n# Open-Meteo is completely FREE and needs no API key\n# We'll get hourly temperature data for Istanbul\n# Latitude/Longitude for Istanbul: 41.0082, 28.9784\n\nweather_url = (\n    \"https://api.open-meteo.com/v1/forecast\"\n    \"?latitude=41.0082\"\n    \"&longitude=28.9784\"\n    \"&hourly=temperature_2m\"\n    \"&forecast_days=3\"\n    \"&timezone=Europe/Istanbul\"\n)\n\nprint(f\"Fetching weather data for Istanbul...\")\n\ntry:\n    weather_response = requests.get(weather_url, timeout=10)\n    weather_response.raise_for_status()   # Raises an error if status != 200\n    weather_data = weather_response.json()\n\n    # Extract the hourly data\n    # The API returns a dictionary with nested data\n    times = weather_data[\"hourly\"][\"time\"]           # List of timestamps\n    temperatures = weather_data[\"hourly\"][\"temperature_2m\"]  # List of temps\n\n    print(f\"Received {len(times)} hourly temperature readings\")\n    print(\"\\nFirst 5 readings:\")\n    for i in range(5):\n        print(f\"  {times[i]}: {temperatures[i]}\u00b0C\")\n\n    # ==============================================================\n    # PART 4: Save the API Data to a CSV\n    # ==============================================================\n\n    print(\"\\n--- PART 4: Saving to CSV ---\")\n\n    # Create a DataFrame from the API data\n    weather_df = pd.DataFrame({\n        \"timestamp\": times,\n        \"temperature_celsius\": temperatures,\n        \"fetch_time\": datetime.now().strftime(\"%Y-%m-%d %H:%M:%S\")\n    })\n\n    # Convert the timestamp string to an actual datetime object\n    weather_df[\"timestamp\"] = pd.to_datetime(weather_df[\"timestamp\"])\n\n    # Save to CSV with a timestamp in the filename\n    filename = f\"weather_data_{datetime.now().strftime('%Y%m%d')}.csv\"\n    weather_df.to_csv(filename, index=False)\n    print(f\"Saved {len(weather_df)} rows to '{filename}'\")\n\n    # Show a quick summary\n    print(\"\\nWeather data summary:\")\n    print(f\"  Date range: {weather_df['timestamp'].min()} to {weather_df['timestamp'].max()}\")\n    print(f\"  Min temp: {weather_df['temperature_celsius'].min()}\u00b0C\")\n    print(f\"  Max temp: {weather_df['temperature_celsius'].max()}\u00b0C\")\n    print(f\"  Avg temp: {weather_df['temperature_celsius'].mean():.1f}\u00b0C\")\n\nexcept requests.exceptions.ConnectionError:\n    print(\"No internet connection. Skipping weather fetch.\")\nexcept requests.exceptions.Timeout:\n    print(\"Request timed out. The server is too slow right now.\")\nexcept Exception as e:\n    print(f\"An error occurred: {e}\")\n\n\n# ==============================================================\n# PART 5: How to Automate This Script (Run It Every Day)\n# ==============================================================\n\nprint(\"\\n--- PART 5: Automation with Cron (Linux) ---\")\n\nprint(\"\"\"\nCRON is a Linux tool that runs scripts automatically on a schedule.\nIt's how you automate data collection without clicking anything.\n\nTo run this script every day at 8:00 AM:\n\nStep 1: Find the full path to your Python executable\n        Run in terminal: which python3\n        Example result: /home/varag/lab/projects/ds-env/bin/python3\n\nStep 2: Find the full path to this script\n        Run in terminal: pwd\n        Then add the filename: /home/varag/lab/projects/month-02-data-science/week-07-apis/fetch_api_data.py\n\nStep 3: Open the cron editor\n        Run in terminal: crontab -e\n\nStep 4: Add this line at the bottom (replace paths with yours):\n        0 8 * * * /home/varag/ds-env/bin/python3 /home/varag/.../fetch_api_data.py >> /home/varag/cron_log.txt 2>&1\n\n        The format is: minute hour day month weekday command\n        0 8 * * * = \"at minute 0, hour 8, every day, every month, every weekday\"\n\nStep 5: Save and exit. Cron will now run the script automatically!\n\nOn Windows: Use Task Scheduler instead of cron.\n\"\"\")\n\n\n# ==============================================================\n# YOUR TASKS FOR WEEK 7\n# ==============================================================\n\nprint(\"=\" * 60)\nprint(\"YOUR TASKS:\")\nprint(\"=\" * 60)\nprint(\"\"\"\n1. Run this file and observe the output\n2. Find a public API you're interested in. Examples:\n   - https://api.coincap.io/v2/assets   (cryptocurrency prices)\n   - https://api.agify.io?name=michael  (predict age from name)\n   - https://dog.ceo/api/breeds/list/all (dog breeds)\n3. Fetch data from your chosen API and save it to a CSV\n4. Load the CSV with Pandas and print a summary (describe())\n5. STRETCH GOAL: Set up a cron job (Linux) or Task Scheduler \n   (Windows) to run your fetch script once a day\n6. Push everything to GitHub\n\"\"\")\n";
+      const readerOutputKey = "readerRun:knowledge-base/learning-journey/month-02-data-science/week-07-apis/fetch_api_data.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code># ==============================================================
+# WEEK 7: APIs &amp; Automation — Fetch Data from the Internet
+# FILE: fetch_api_data.py
+#
+# TASK: Use Python to automatically download data from the internet
+#       using a public API, then save it to a CSV file.
+#
+# WHY:  An API (Application Programming Interface) is a way for
+#       programs to talk to each other. Instead of manually
+#       downloading files, your Python script can fetch fresh data
+#       automatically every day, every hour, or every minute.
+#       This is how real data pipelines work in industry.
+#
+# INSTALL: pip install requests
+#
+# HOW TO RUN: python fetch_api_data.py
+# ==============================================================
+
+import requests    # For making HTTP requests (fetching web data)
+import json        # For working with JSON data (built-in to Python)
+import pandas as pd
+from datetime import datetime   # For timestamps
+import os                       # For file operations (built-in)
+
+print(&quot;=&quot; * 60)
+print(&quot;WEEK 7: Fetching Data from APIs&quot;)
+print(&quot;=&quot; * 60)
+
+
+# ==============================================================
+# PART 1: What is an API and what is JSON?
+# ==============================================================
+
+# API = Application Programming Interface
+# Think of it like a waiter at a restaurant:
+#   YOU          = your Python script
+#   RESTAURANT   = the data server (e.g., weather service)
+#   WAITER       = the API
+#   MENU         = available data (what you can request)
+#   FOOD         = the data you get back
+#
+# JSON = JavaScript Object Notation
+# It&#x27;s the most common data format for APIs. It looks like a
+# Python dictionary:
+# {
+#   &quot;temperature&quot;: 22.5,
+#   &quot;city&quot;: &quot;Istanbul&quot;,
+#   &quot;weather&quot;: &quot;Sunny&quot;
+# }
+
+
+# ==============================================================
+# PART 2: Fetch a Simple Public API (no key needed)
+# ==============================================================
+
+print(&quot;\n--- PART 2: Fetching a Public API ---&quot;)
+
+# This is a FREE public API for random jokes — no signup needed
+# It&#x27;s perfect for learning how APIs work
+API_URL = &quot;https://official-joke-api.appspot.com/jokes/programming/ten&quot;
+
+print(f&quot;Fetching data from: {API_URL}&quot;)
+
+# requests.get() sends an HTTP GET request to the URL
+# (just like typing a URL in your browser, but from Python code)
+response = requests.get(API_URL, timeout=10)
+
+# Check if the request was successful
+# Status 200 = OK, Status 404 = Not Found, Status 500 = Server Error
+print(f&quot;Response status code: {response.status_code}&quot;)
+
+if response.status_code == 200:
+    # .json() converts the JSON text into a Python list/dictionary
+    jokes = response.json()
+    print(f&quot;\nReceived {len(jokes)} jokes!&quot;)
+    print(&quot;\nFirst joke:&quot;)
+    print(&quot;Setup:&quot;, jokes[0][&quot;setup&quot;])
+    print(&quot;Punchline:&quot;, jokes[0][&quot;punchline&quot;])
+else:
+    print(&quot;Error: Could not fetch data. Check your internet connection.&quot;)
+    jokes = []
+
+
+# ==============================================================
+# PART 3: A More Useful API — Open-Meteo (Free Weather Data)
+# ==============================================================
+
+print(&quot;\n--- PART 3: Fetching Real Weather Data ---&quot;)
+
+# Open-Meteo is completely FREE and needs no API key
+# We&#x27;ll get hourly temperature data for Istanbul
+# Latitude/Longitude for Istanbul: 41.0082, 28.9784
+
+weather_url = (
+    &quot;https://api.open-meteo.com/v1/forecast&quot;
+    &quot;?latitude=41.0082&quot;
+    &quot;&amp;longitude=28.9784&quot;
+    &quot;&amp;hourly=temperature_2m&quot;
+    &quot;&amp;forecast_days=3&quot;
+    &quot;&amp;timezone=Europe/Istanbul&quot;
+)
+
+print(f&quot;Fetching weather data for Istanbul...&quot;)
+
+try:
+    weather_response = requests.get(weather_url, timeout=10)
+    weather_response.raise_for_status()   # Raises an error if status != 200
+    weather_data = weather_response.json()
+
+    # Extract the hourly data
+    # The API returns a dictionary with nested data
+    times = weather_data[&quot;hourly&quot;][&quot;time&quot;]           # List of timestamps
+    temperatures = weather_data[&quot;hourly&quot;][&quot;temperature_2m&quot;]  # List of temps
+
+    print(f&quot;Received {len(times)} hourly temperature readings&quot;)
+    print(&quot;\nFirst 5 readings:&quot;)
+    for i in range(5):
+        print(f&quot;  {times[i]}: {temperatures[i]}°C&quot;)
+
+    # ==============================================================
+    # PART 4: Save the API Data to a CSV
+    # ==============================================================
+
+    print(&quot;\n--- PART 4: Saving to CSV ---&quot;)
+
+    # Create a DataFrame from the API data
+    weather_df = pd.DataFrame({
+        &quot;timestamp&quot;: times,
+        &quot;temperature_celsius&quot;: temperatures,
+        &quot;fetch_time&quot;: datetime.now().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)
+    })
+
+    # Convert the timestamp string to an actual datetime object
+    weather_df[&quot;timestamp&quot;] = pd.to_datetime(weather_df[&quot;timestamp&quot;])
+
+    # Save to CSV with a timestamp in the filename
+    filename = f&quot;weather_data_{datetime.now().strftime(&#x27;%Y%m%d&#x27;)}.csv&quot;
+    weather_df.to_csv(filename, index=False)
+    print(f&quot;Saved {len(weather_df)} rows to &#x27;{filename}&#x27;&quot;)
+
+    # Show a quick summary
+    print(&quot;\nWeather data summary:&quot;)
+    print(f&quot;  Date range: {weather_df[&#x27;timestamp&#x27;].min()} to {weather_df[&#x27;timestamp&#x27;].max()}&quot;)
+    print(f&quot;  Min temp: {weather_df[&#x27;temperature_celsius&#x27;].min()}°C&quot;)
+    print(f&quot;  Max temp: {weather_df[&#x27;temperature_celsius&#x27;].max()}°C&quot;)
+    print(f&quot;  Avg temp: {weather_df[&#x27;temperature_celsius&#x27;].mean():.1f}°C&quot;)
+
+except requests.exceptions.ConnectionError:
+    print(&quot;No internet connection. Skipping weather fetch.&quot;)
+except requests.exceptions.Timeout:
+    print(&quot;Request timed out. The server is too slow right now.&quot;)
+except Exception as e:
+    print(f&quot;An error occurred: {e}&quot;)
+
+
+# ==============================================================
+# PART 5: How to Automate This Script (Run It Every Day)
+# ==============================================================
+
+print(&quot;\n--- PART 5: Automation with Cron (Linux) ---&quot;)
+
+print(&quot;&quot;&quot;
+CRON is a Linux tool that runs scripts automatically on a schedule.
+It&#x27;s how you automate data collection without clicking anything.
+
+To run this script every day at 8:00 AM:
+
+Step 1: Find the full path to your Python executable
+        Run in terminal: which python3
+        Example result: /home/varag/lab/projects/ds-env/bin/python3
+
+Step 2: Find the full path to this script
+        Run in terminal: pwd
+        Then add the filename: /home/varag/lab/projects/month-02-data-science/week-07-apis/fetch_api_data.py
+
+Step 3: Open the cron editor
+        Run in terminal: crontab -e
+
+Step 4: Add this line at the bottom (replace paths with yours):
+        0 8 * * * /home/varag/ds-env/bin/python3 /home/varag/.../fetch_api_data.py &gt;&gt; /home/varag/cron_log.txt 2&gt;&amp;1
+
+        The format is: minute hour day month weekday command
+        0 8 * * * = &quot;at minute 0, hour 8, every day, every month, every weekday&quot;
+
+Step 5: Save and exit. Cron will now run the script automatically!
+
+On Windows: Use Task Scheduler instead of cron.
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# YOUR TASKS FOR WEEK 7
+# ==============================================================
+
+print(&quot;=&quot; * 60)
+print(&quot;YOUR TASKS:&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;&quot;&quot;
+1. Run this file and observe the output
+2. Find a public API you&#x27;re interested in. Examples:
+   - https://api.coincap.io/v2/assets   (cryptocurrency prices)
+   - https://api.agify.io?name=michael  (predict age from name)
+   - https://dog.ceo/api/breeds/list/all (dog breeds)
+3. Fetch data from your chosen API and save it to a CSV
+4. Load the CSV with Pandas and print a summary (describe())
+5. STRETCH GOAL: Set up a cron job (Linux) or Task Scheduler 
+   (Windows) to run your fetch script once a day
+6. Push everything to GitHub
+&quot;&quot;&quot;)
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

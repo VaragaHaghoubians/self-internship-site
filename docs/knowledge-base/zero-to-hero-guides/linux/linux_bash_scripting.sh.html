@@ -1,0 +1,1113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Linux Bash Scripting.Sh - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Linux Bash Scripting.Sh</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/linux/linux_bash_scripting.sh</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><pre><code>#!/bin/bash
+# ==============================================================================
+#  LINUX — BASH SCRIPTING, ENVIRONMENT VARIABLES &amp; AUTOMATION
+#  FILE: linux_bash_scripting.sh
+#
+#  TASK: Write real bash scripts — automate everything you do more than once.
+#        Master environment variables — the correct way to manage secrets and config.
+#        Use cron to schedule jobs — your nightly ETL and model retraining.
+#        Deploy a FastAPI model as a systemd service — always-on production ML.
+#
+#  WHY:  At Amazon/Uber/Flexport, manual work doesn&#x27;t scale.
+#        &quot;I ran the script manually this morning&quot; is not production.
+#        Production = automated, scheduled, monitored, self-restarting.
+#        A bash script you write today can save you hours every week.
+#        A cron job + systemd service is the difference between a project and a product.
+#
+#  PREREQ: linux_commands.sh (files, pipes, grep), linux_ssh_remote.sh (tmux, servers)
+#
+#  HOW TO USE:
+#    Run sections one by one in your terminal.
+#    For cron/systemd: run on a real Linux machine (WSL2 works for cron, systemd needs real Linux).
+# ==============================================================================
+
+
+# ==============================================================================
+# LESSON 01 — BASH VARIABLES
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Variables store values. Rules:
+#   - NO spaces around = when assigning: name=&quot;Alice&quot; (not name = &quot;Alice&quot;!)
+#   - Use $name or ${name} to READ the variable
+#   - ${name} is safer in complex strings: &quot;${name}_backup&quot; (prevents ambiguity)
+#   - UPPER_CASE for constants / config; lower_case for local script variables
+#
+# SPECIAL VARIABLES (built-in):
+#   $0        → name of the script itself
+#   $1 $2 $3  → positional arguments (what the user passes when calling the script)
+#   $@        → all arguments as separate words
+#   $#        → number of arguments
+#   $?        → exit code of LAST command (0 = success, non-zero = error)
+#   $$        → PID (process ID) of current shell
+#   $!        → PID of last background job
+
+#!/bin/bash
+
+# Simple variable assignment:
+name=&quot;Alice&quot;
+age=25
+project_dir=&quot;/home/alice/ml_project&quot;
+
+# Read variables:
+echo &quot;Name: $name&quot;
+echo &quot;Age: $age&quot;
+echo &quot;Project: $project_dir&quot;
+
+# String concatenation:
+model_name=&quot;churn&quot;
+version=&quot;v3&quot;
+full_name=&quot;${model_name}_${version}&quot;        # churn_v3
+backup_name=&quot;${full_name}_backup&quot;           # churn_v3_backup
+echo &quot;Model: $full_name&quot;
+
+# Command substitution — store output of a command in a variable:
+today=$(date +%Y-%m-%d)                     # e.g., 2026-04-21
+num_files=$(ls *.py | wc -l)               # count .py files
+current_user=$(whoami)
+disk_usage=$(df -h / | tail -1 | awk &#x27;{print $5}&#x27;)   # e.g., &quot;45%&quot;
+
+echo &quot;Date: $today&quot;
+echo &quot;Python files: $num_files&quot;
+echo &quot;User: $current_user&quot;
+echo &quot;Disk: $disk_usage&quot;
+
+# Arithmetic (use $(( )) for integer math):
+x=10
+y=3
+echo &quot;Sum: $((x + y))&quot;
+echo &quot;Product: $((x * y))&quot;
+echo &quot;Integer division: $((x / y))&quot;    # 3 (truncates)
+echo &quot;Modulo: $((x % y))&quot;              # 1
+
+# For floating point, use bc or Python:
+result=$(echo &quot;scale=4; 10 / 3&quot; | bc)   # 3.3333
+echo &quot;Float division: $result&quot;
+
+# Check if variable is set (empty string vs not set):
+echo ${name:-&quot;Unknown&quot;}           # Use &quot;Unknown&quot; if name is empty/unset
+echo ${name:=&quot;Default&quot;}           # SET name to &quot;Default&quot; if empty/unset
+echo ${name:?&quot;name is required&quot;}  # Print error and exit if name is empty/unset
+
+
+# ==============================================================================
+# LESSON 02 — CONDITIONALS (if/elif/else)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# [ ] (test command) evaluates conditions. Note: spaces inside brackets are REQUIRED!
+# [[ ]] is the modern bash extended version — prefer this.
+#
+# STRING comparisons: == (equal), != (not equal), -z (empty), -n (not empty)
+# NUMBER comparisons: -eq, -ne, -lt, -le, -gt, -ge
+# FILE checks:        -f (file exists), -d (directory exists), -e (exists), -r (readable)
+
+#!/bin/bash
+
+gpa=3.7
+name=&quot;Alice&quot;
+data_file=&quot;data/train.csv&quot;
+
+# String condition:
+if [[ &quot;$name&quot; == &quot;Alice&quot; ]]; then
+    echo &quot;Hello Alice!&quot;
+elif [[ &quot;$name&quot; == &quot;Bob&quot; ]]; then
+    echo &quot;Hello Bob!&quot;
+else
+    echo &quot;Hello stranger!&quot;
+fi
+
+# Number condition:
+if [[ $gpa -ge 370 ]]; then          # Note: bash doesn&#x27;t do floats — multiply by 100
+    echo &quot;High performer&quot;
+fi
+
+# Better: use Python or bc for float comparisons:
+if (( $(echo &quot;$gpa &gt;= 3.5&quot; | bc -l) )); then
+    echo &quot;GPA is above 3.5&quot;
+fi
+
+# File/directory checks (CRITICAL in scripts — don&#x27;t assume files exist!):
+if [[ -f &quot;$data_file&quot; ]]; then
+    echo &quot;✓ Data file found: $data_file&quot;
+    wc -l &quot;$data_file&quot;
+else
+    echo &quot;✗ Data file NOT found: $data_file&quot;
+    echo &quot;Please download the data first.&quot;
+    exit 1           # Exit the script with error code 1
+fi
+
+if [[ -d &quot;models/&quot; ]]; then
+    echo &quot;✓ models/ directory exists&quot;
+else
+    mkdir -p models/
+    echo &quot;✓ Created models/ directory&quot;
+fi
+
+# Check if a command exists (before trying to run it):
+if command -v jq &amp;&gt; /dev/null; then
+    echo &quot;✓ jq is installed&quot;
+else
+    echo &quot;✗ jq not found. Install with: sudo apt install jq&quot;
+fi
+
+# Check exit code ($?) of previous command:
+python3 -c &quot;import pandas&quot;
+if [[ $? -eq 0 ]]; then
+    echo &quot;✓ pandas is installed&quot;
+else
+    echo &quot;✗ pandas not found. Run: pip install pandas&quot;
+fi
+
+
+# ==============================================================================
+# LESSON 03 — LOOPS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Bash loops are how you process multiple files, run experiments, batch jobs.
+# Forget doing 50 things manually — write a loop and do them all at once.
+
+#!/bin/bash
+
+# FOR loop over a list of values:
+for model in &quot;logistic_regression&quot; &quot;random_forest&quot; &quot;xgboost&quot;; do
+    echo &quot;Training model: $model&quot;
+    # python train.py --model=$model   ← real version
+done
+
+# FOR loop over files (the most common pattern!):
+for file in data/*.csv; do
+    echo &quot;Processing: $file&quot;
+    wc -l &quot;$file&quot;       # Count rows in each CSV
+done
+
+# FOR loop over a range of numbers:
+for i in {1..5}; do
+    echo &quot;Epoch $i&quot;
+done
+
+# FOR loop with step (every other number):
+for i in {0..20..5}; do   # 0, 5, 10, 15, 20
+    echo &quot;Learning rate experiment: lr=0.00$i&quot;
+done
+
+# C-style for loop:
+for ((i=1; i&lt;=5; i++)); do
+    echo &quot;Run $i of 5&quot;
+done
+
+# WHILE loop — runs while condition is true:
+count=0
+max=5
+while [[ $count -lt $max ]]; do
+    echo &quot;Count: $count&quot;
+    ((count++))
+done
+
+# Useful while: wait for a process to finish:
+while ps aux | grep -q &quot;[t]rain.py&quot;; do
+    echo &quot;Training still running... $(date +%H:%M:%S)&quot;
+    sleep 30     # Check every 30 seconds
+done
+echo &quot;Training complete!&quot;
+
+# Read file line by line:
+while IFS=&#x27;,&#x27; read -r name age major gpa; do
+    echo &quot;Student: $name, Major: $major, GPA: $gpa&quot;
+done &lt; students.csv
+
+# Process command output line by line:
+ps aux | grep python | while read -r line; do
+    pid=$(echo &quot;$line&quot; | awk &#x27;{print $2}&#x27;)
+    echo &quot;Python process PID: $pid&quot;
+done
+
+
+# ==============================================================================
+# LESSON 04 — FUNCTIONS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Functions in bash work like functions in Python — they encapsulate reusable logic.
+# Key rules:
+#   - Define BEFORE you call them
+#   - No types for parameters — just use $1, $2 inside the function
+#   - Use &#x27;local&#x27; for variables inside functions (prevents polluting global scope)
+#   - Return values via echo (not &#x27;return&#x27; — return only sets exit code 0-255)
+
+#!/bin/bash
+
+# Define functions:
+log_info() {
+    local message=&quot;$1&quot;
+    echo &quot;[$(date +%H:%M:%S)] INFO: $message&quot;
+}
+
+log_error() {
+    local message=&quot;$1&quot;
+    echo &quot;[$(date +%H:%M:%S)] ERROR: $message&quot; &gt;&amp;2   # Print to stderr
+}
+
+check_file() {
+    local filepath=&quot;$1&quot;
+    if [[ -f &quot;$filepath&quot; ]]; then
+        log_info &quot;File found: $filepath ($(wc -l &lt; &quot;$filepath&quot;) lines)&quot;
+        return 0    # success
+    else
+        log_error &quot;File not found: $filepath&quot;
+        return 1    # failure
+    fi
+}
+
+# Function that RETURNS a value (via echo):
+get_file_size() {
+    local filepath=&quot;$1&quot;
+    du -sh &quot;$filepath&quot; | awk &#x27;{print $1}&#x27;
+}
+
+create_experiment_dir() {
+    local experiment_name=&quot;$1&quot;
+    local base_dir=&quot;${2:-./experiments}&quot;    # Default to ./experiments if not given
+    local exp_dir=&quot;${base_dir}/${experiment_name}_$(date +%Y%m%d_%H%M%S)&quot;
+
+    mkdir -p &quot;$exp_dir&quot;/{logs,models,plots}
+    log_info &quot;Created experiment directory: $exp_dir&quot;
+    echo &quot;$exp_dir&quot;    # Return the path so caller can use it
+}
+
+# Call functions:
+log_info &quot;Starting experiment&quot;
+check_file &quot;data/train.csv&quot; || exit 1   # Exit if file check fails
+
+size=$(get_file_size &quot;data/train.csv&quot;)
+log_info &quot;Training data size: $size&quot;
+
+exp_dir=$(create_experiment_dir &quot;churn_rf_v3&quot;)
+log_info &quot;Running in: $exp_dir&quot;
+
+# Function to send notification (Slack webhook example):
+notify_slack() {
+    local message=&quot;$1&quot;
+    local webhook_url=&quot;${SLACK_WEBHOOK_URL:-}&quot;     # Read from env var
+
+    if [[ -z &quot;$webhook_url&quot; ]]; then
+        log_error &quot;SLACK_WEBHOOK_URL not set — skipping notification&quot;
+        return 1
+    fi
+
+    curl -s -X POST &quot;$webhook_url&quot; \
+        -H &#x27;Content-type: application/json&#x27; \
+        -d &quot;{\&quot;text\&quot;: \&quot;$message\&quot;}&quot; &gt; /dev/null
+    log_info &quot;Slack notification sent&quot;
+}
+
+
+# ==============================================================================
+# LESSON 05 — ENVIRONMENT VARIABLES &amp; .env FILES (API Key Management)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# NEVER hardcode passwords, API keys, or database URLs in code.
+# Someone will accidentally commit it to GitHub. It will be stolen in hours.
+# Professional practice: load secrets from ENVIRONMENT VARIABLES.
+#
+# ENVIRONMENT VARIABLES:
+#   - Stored in the shell&#x27;s memory for the current session (and child processes)
+#   - Set with: export VAR=value
+#   - Read with: $VAR or ${VAR}
+#   - List all: env | sort
+#   - Remove: unset VAR
+#
+# .env FILE = a file that holds your environment variables (NEVER commit this to git!)
+
+# ==============================================================================
+# THE PATH VARIABLE (The Most Important Environment Variable)
+# ==============================================================================
+#
+# PATH tells the shell WHERE to look for executables.
+# When you type &#x27;python&#x27;, the shell searches each directory in PATH, left to right.
+# If &#x27;python&#x27; isn&#x27;t found anywhere in PATH → &quot;command not found&quot; error!
+
+echo $PATH          # Shows all directories separated by :
+                    # e.g. /usr/local/bin:/usr/bin:/usr/local/sbin:/bin
+
+# Add a directory to PATH (for the current session):
+export PATH=&quot;$HOME/.local/bin:$PATH&quot;   # Prepend → searched FIRST
+
+# Add permanently (to ~/.bashrc or ~/.zshrc):
+# echo &#x27;export PATH=&quot;$HOME/.local/bin:$PATH&quot;&#x27; &gt;&gt; ~/.bashrc
+# source ~/.bashrc
+
+# Other important built-in environment variables:
+echo $HOME          # /home/alice — your home directory
+echo $USER          # alice — current username
+echo $PWD           # current directory (same as pwd command)
+echo $SHELL         # /bin/bash — which shell you&#x27;re using
+
+# ==============================================================================
+# SETTING ENVIRONMENT VARIABLES
+# ==============================================================================
+
+# Set for current session only:
+export DATABASE_URL=&quot;postgresql://user:password@localhost:5432/mldb&quot;
+export OPENAI_API_KEY=&quot;sk-...&quot;
+export MLFLOW_TRACKING_URI=&quot;http://mlserver:5000&quot;
+export MODEL_VERSION=&quot;v3&quot;
+
+# Read them in your code:
+echo &quot;Database: $DATABASE_URL&quot;
+echo &quot;Model: $MODEL_VERSION&quot;
+
+# In Python, read with os.environ:
+python3 -c &quot;import os; print(os.environ.get(&#x27;MODEL_VERSION&#x27;, &#x27;not set&#x27;))&quot;
+
+# ==============================================================================
+# .env FILES — PROFESSIONAL SECRET MANAGEMENT
+# ==============================================================================
+
+# Create a .env file for your project:
+cat &gt; .env &lt;&lt; &#x27;EOF&#x27;
+# Project environment variables
+# IMPORTANT: Add .env to .gitignore BEFORE committing!
+
+DATABASE_URL=postgresql://mluser:securepass@localhost:5432/shipments_db
+OPENAI_API_KEY=sk-your-key-here
+AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/HERE
+MLFLOW_TRACKING_URI=http://localhost:5000
+ENVIRONMENT=development
+LOG_LEVEL=INFO
+EOF
+
+# IMMEDIATELY add to .gitignore (do this BEFORE the first commit!):
+echo &quot;.env&quot; &gt;&gt; .gitignore
+
+# Load .env into current shell session:
+source .env
+# OR more safely (handles comments and export):
+set -a; source .env; set +a
+# set -a makes all subsequent variable assignments automatically exported
+
+# In Python (best practice — use python-dotenv library):
+python3 -c &quot;
+from dotenv import load_dotenv
+import os
+load_dotenv()  # reads .env file
+print(os.environ[&#x27;DATABASE_URL&#x27;])
+&quot;
+# pip install python-dotenv
+
+# Check what&#x27;s set (without revealing values!):
+env | grep -E &quot;DATABASE|API|AWS&quot; | sed &#x27;s/=.*/=***HIDDEN***/&#x27;
+
+# Create a .env.example file to document what variables are needed:
+# (This IS committed to git — it shows the shape, but not the values)
+cat &gt; .env.example &lt;&lt; &#x27;EOF&#x27;
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+OPENAI_API_KEY=sk-your-key-here
+AWS_ACCESS_KEY_ID=your-key-id
+AWS_SECRET_ACCESS_KEY=your-secret-key
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+MLFLOW_TRACKING_URI=http://localhost:5000
+ENVIRONMENT=development
+LOG_LEVEL=INFO
+EOF
+
+
+# ==============================================================================
+# LESSON 06 — WRITING ROBUST SCRIPTS (Error Handling, Logging)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# A production script needs 3 things that beginners skip:
+#   1. Exit on error (set -e) — don&#x27;t silently continue after a failure!
+#   2. Validation — check arguments and environment before doing anything
+#   3. Logging — write timestamped records so you can debug failures at 3 AM
+
+#!/bin/bash
+# ==== ROBUST SCRIPT TEMPLATE ====
+
+set -euo pipefail
+# set -e    → exit immediately if any command fails (CRITICAL!)
+# set -u    → treat unset variables as errors (catches typos!)
+# set -o pipefail → catch errors in pipes (not just the last command)
+# ALWAYS put this at the top of production scripts!
+
+# Logging function with levels:
+LOG_FILE=&quot;./pipeline.log&quot;
+
+log() {
+    local level=&quot;$1&quot;
+    local message=&quot;$2&quot;
+    local timestamp
+    timestamp=$(date &#x27;+%Y-%m-%d %H:%M:%S&#x27;)
+    echo &quot;[$timestamp] [$level] $message&quot; | tee -a &quot;$LOG_FILE&quot;
+}
+
+log_info()  { log &quot;INFO &quot; &quot;$1&quot;; }
+log_warn()  { log &quot;WARN &quot; &quot;$1&quot;; }
+log_error() { log &quot;ERROR&quot; &quot;$1&quot; &gt;&amp;2; }
+
+# Trap: run cleanup even if the script fails (like Python&#x27;s try/finally):
+cleanup() {
+    local exit_code=$?
+    log_warn &quot;Script exited with code: $exit_code&quot;
+    # Add cleanup here: remove temp files, send failure notification, etc.
+    rm -f /tmp/pipeline_lock.tmp 2&gt;/dev/null || true
+}
+trap cleanup EXIT   # cleanup() will run even on Ctrl+C or set -e exit!
+
+# Validate required arguments:
+usage() {
+    echo &quot;Usage: $0 &lt;model_name&gt; &lt;data_path&gt;&quot;
+    echo &quot;  model_name: Name for this training run (e.g. churn_rf_v3)&quot;
+    echo &quot;  data_path:  Path to training CSV file&quot;
+    exit 1
+}
+
+if [[ $# -lt 2 ]]; then
+    log_error &quot;Missing required arguments.&quot;
+    usage
+fi
+
+MODEL_NAME=&quot;$1&quot;
+DATA_PATH=&quot;$2&quot;
+
+# Validate required environment variables:
+REQUIRED_VARS=(&quot;DATABASE_URL&quot; &quot;MLFLOW_TRACKING_URI&quot;)
+for var in &quot;${REQUIRED_VARS[@]}&quot;; do
+    if [[ -z &quot;${!var:-}&quot; ]]; then
+        log_error &quot;Required environment variable not set: $var&quot;
+        log_error &quot;Check your .env file.&quot;
+        exit 1
+    fi
+done
+
+# Validate required files:
+if [[ ! -f &quot;$DATA_PATH&quot; ]]; then
+    log_error &quot;Data file not found: $DATA_PATH&quot;
+    exit 1
+fi
+
+log_info &quot;Starting training pipeline&quot;
+log_info &quot;  Model: $MODEL_NAME&quot;
+log_info &quot;  Data:  $DATA_PATH ($(wc -l &lt; &quot;$DATA_PATH&quot;) rows)&quot;
+log_info &quot;  User:  $USER on $HOSTNAME&quot;
+
+# Create output directory with timestamp:
+OUTPUT_DIR=&quot;./experiments/${MODEL_NAME}_$(date +%Y%m%d_%H%M%S)&quot;
+mkdir -p &quot;$OUTPUT_DIR&quot;
+log_info &quot;Output directory: $OUTPUT_DIR&quot;
+
+# ==== END TEMPLATE ====
+
+
+# ==============================================================================
+# LESSON 07 — FULL PIPELINE SCRIPT (Real-World ML Automation)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Here&#x27;s a complete ML pipeline script that pulls data, trains, evaluates,
+# and saves the model — all automated. Study each section.
+
+#!/bin/bash
+set -euo pipefail
+
+# ---- Config ----
+PROJECT_DIR=&quot;$(cd &quot;$(dirname &quot;$0&quot;)&quot; &amp;&amp; pwd)&quot;   # Script&#x27;s own directory
+DATA_DIR=&quot;$PROJECT_DIR/data&quot;
+MODEL_DIR=&quot;$PROJECT_DIR/models&quot;
+LOG_DIR=&quot;$PROJECT_DIR/logs&quot;
+VENV_DIR=&quot;$PROJECT_DIR/venv&quot;
+RUN_DATE=$(date +%Y%m%d_%H%M%S)
+RUN_LOG=&quot;$LOG_DIR/run_$RUN_DATE.log&quot;
+
+# ---- Logging ----
+log() { echo &quot;[$(date &#x27;+%H:%M:%S&#x27;)] $*&quot; | tee -a &quot;$RUN_LOG&quot;; }
+
+# ---- Setup ----
+mkdir -p &quot;$DATA_DIR&quot; &quot;$MODEL_DIR&quot; &quot;$LOG_DIR&quot;
+log &quot;=== ML Pipeline Run: $RUN_DATE ===&quot;
+log &quot;Project: $PROJECT_DIR&quot;
+
+# ---- Step 1: Activate virtualenv ----
+log &quot;Step 1/5: Activating virtual environment&quot;
+if [[ ! -d &quot;$VENV_DIR&quot; ]]; then
+    log &quot;  Creating new venv...&quot;
+    python3 -m venv &quot;$VENV_DIR&quot;
+fi
+# shellcheck source=/dev/null
+source &quot;$VENV_DIR/bin/activate&quot;
+log &quot;  Python: $(python --version)&quot;
+
+# ---- Step 2: Install/update dependencies ----
+log &quot;Step 2/5: Installing dependencies&quot;
+pip install -q -r &quot;$PROJECT_DIR/requirements.txt&quot;
+
+# ---- Step 3: Fetch latest data ----
+log &quot;Step 3/5: Fetching data&quot;
+DATA_FILE=&quot;$DATA_DIR/shipments_$(date +%Y%m%d).csv&quot;
+if [[ -f &quot;$DATA_FILE&quot; ]]; then
+    log &quot;  Data already downloaded: $DATA_FILE&quot;
+else
+    log &quot;  Downloading fresh data...&quot;
+    # In production: query database or call an API
+    # python &quot;$PROJECT_DIR/src/fetch_data.py&quot; --output &quot;$DATA_FILE&quot;
+    # For now: use a placeholder
+    echo &quot;shipment_id,customer_id,cost_usd,status&quot; &gt; &quot;$DATA_FILE&quot;
+    echo &quot;101,1,450.00,delivered&quot; &gt;&gt; &quot;$DATA_FILE&quot;
+    log &quot;  Downloaded: $DATA_FILE ($(wc -l &lt; &quot;$DATA_FILE&quot;) rows)&quot;
+fi
+
+# ---- Step 4: Train model ----
+log &quot;Step 4/5: Training model&quot;
+MODEL_OUTPUT=&quot;$MODEL_DIR/churn_model_$RUN_DATE.pkl&quot;
+# python &quot;$PROJECT_DIR/src/train.py&quot; \
+#     --data &quot;$DATA_FILE&quot; \
+#     --output &quot;$MODEL_OUTPUT&quot; \
+#     --epochs 100
+log &quot;  [PLACEHOLDER] Training would save model to: $MODEL_OUTPUT&quot;
+
+# ---- Step 5: Evaluate and alert ----
+log &quot;Step 5/5: Evaluating model&quot;
+# METRICS=$(python &quot;$PROJECT_DIR/src/evaluate.py&quot; --model &quot;$MODEL_OUTPUT&quot; --data &quot;$DATA_FILE&quot;)
+# VAL_F1=$(echo &quot;$METRICS&quot; | jq -r &#x27;.val_f1&#x27;)
+VAL_F1=0.847   # placeholder
+
+log &quot;  val_f1 = $VAL_F1&quot;
+
+# Alert if performance dropped:
+THRESHOLD=0.80
+if (( $(echo &quot;$VAL_F1 &lt; $THRESHOLD&quot; | bc -l) )); then
+    log &quot;  ⚠️  WARNING: val_f1 ($VAL_F1) below threshold ($THRESHOLD)!&quot;
+    # notify_slack &quot;⚠️ Model performance dropped: val_f1=$VAL_F1&quot;
+fi
+
+log &quot;=== Pipeline complete! Log saved to: $RUN_LOG ===&quot;
+
+
+# ==============================================================================
+# LESSON 08 — CRON JOBS (Schedule Your Pipelines)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# cron is Linux&#x27;s job scheduler. It runs commands on a schedule automatically.
+# &quot;Nightly ETL at 2 AM&quot; → cron.
+# &quot;Retrain model every Sunday at midnight&quot; → cron.
+# &quot;Clean up disk space every day at 3 AM&quot; → cron.
+#
+# CRON SYNTAX: 5 time fields then the command
+#   ┌─── minute (0-59)
+#   │ ┌─── hour (0-23)
+#   │ │ ┌─── day of month (1-31)
+#   │ │ │ ┌─── month (1-12)
+#   │ │ │ │ ┌─── day of week (0=Sun, 1=Mon, ..., 6=Sat)
+#   │ │ │ │ │
+#   * * * * *  command_to_run
+#
+# * = every possible value (wildcard)
+
+# EXAMPLES (memorize these patterns):
+#   0 2 * * *        → 2:00 AM every day
+#   0 0 * * 0        → midnight every Sunday
+#   */5 * * * *      → every 5 minutes
+#   0 9 * * 1-5      → 9:00 AM Monday through Friday (weekdays)
+#   0 */4 * * *      → every 4 hours
+#   30 23 * * *      → 11:30 PM every day
+
+# How to edit your crontab (cron schedule):
+# crontab -e         → opens your crontab in the default editor (nano usually)
+# crontab -l         → lists your current cron jobs
+# crontab -r         → REMOVES all your cron jobs (careful!)
+
+# After running crontab -e, add lines like:
+
+cat &lt;&lt; &#x27;CRONTAB_EXAMPLE&#x27;
+# Example crontab entries:
+
+# Run nightly ETL at 2 AM every day:
+0 2 * * * /home/alice/ml_project/scripts/pipeline.sh &gt;&gt; /home/alice/logs/cron.log 2&gt;&amp;1
+
+# Retrain model every Sunday at midnight:
+0 0 * * 0 /home/alice/ml_project/scripts/train_weekly.sh &gt;&gt; /home/alice/logs/weekly.log 2&gt;&amp;1
+
+# Monitor disk every hour and alert if &gt;90%:
+0 * * * * /home/alice/scripts/disk_check.sh
+
+# Clear old logs every night at 3:30 AM:
+30 3 * * * find /home/alice/logs -name &quot;*.log&quot; -mtime +30 -delete
+
+# Run model inference every 5 minutes (real-time scoring):
+*/5 * * * * python3 /home/alice/ml_project/src/score_new_customers.py &gt;&gt; /home/alice/logs/scoring.log 2&gt;&amp;1
+
+CRONTAB_EXAMPLE
+
+# IMPORTANT CRON RULES:
+# 1. Use ABSOLUTE paths everywhere (cron doesn&#x27;t know your PATH)
+#    ❌  python train.py     (cron can&#x27;t find &#x27;python&#x27;)
+#    ✅  /home/alice/venv/bin/python /home/alice/project/train.py
+#
+# 2. Always redirect output to a log file (cron runs silently):
+#    &gt;&gt; /home/alice/logs/cron.log 2&gt;&amp;1
+#
+# 3. Set environment variables in the crontab file itself:
+#    SHELL=/bin/bash
+#    HOME=/home/alice
+#    PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/home/alice/venv/bin
+#    DATABASE_URL=postgresql://...
+
+# Quick test: run a cron-style command in your terminal to verify it works:
+/home/$USER/venv/bin/python -c &quot;print(&#x27;cron test ok&#x27;)&quot;
+
+
+# ==============================================================================
+# LESSON 09 — SYSTEMD SERVICES (Always-On Production ML APIs)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Scenario: You&#x27;ve trained your churn model. You&#x27;ve built a FastAPI app to serve it.
+# You start it manually: uvicorn app:app --port 8000
+# It runs while you&#x27;re logged in. If the server reboots? It&#x27;s gone.
+# If it crashes? Nobody restarts it. Not production!
+#
+# systemd is Linux&#x27;s service manager. When you use:
+#   sudo systemctl start nginx
+#   sudo systemctl status mysql
+# That&#x27;s systemd managing those services.
+#
+# You can register YOUR FastAPI app as a systemd service:
+#   - Starts automatically when the server boots
+#   - Restarts automatically if it crashes
+#   - Logs go to journald (viewable with journalctl)
+#   - Runs under a specific user account (not root!)
+#
+# NOTE: systemd requires a real Linux machine (not WSL2 by default)
+
+# ==== STEP-BY-STEP: DEPLOY FASTAPI AS A SERVICE ====
+
+# 1. Your FastAPI app file: /home/ubuntu/ml_project/app.py
+#    (Your working FastAPI app — see JavaSpringBootGuide.java for the concept)
+
+# 2. Create the systemd service file:
+cat &lt;&lt; &#x27;SERVICE_FILE&#x27;
+# File: /etc/systemd/system/churn-api.service
+# (Run: sudo nano /etc/systemd/system/churn-api.service to create it)
+
+[Unit]
+Description=Churn Prediction FastAPI Service
+After=network.target                        # Wait for network before starting
+
+[Service]
+User=ubuntu                                 # Run as this user (NOT root!)
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/ml_project    # cd here before running
+EnvironmentFile=/home/ubuntu/ml_project/.env  # Load environment variables from .env
+ExecStart=/home/ubuntu/ml_project/venv/bin/uvicorn app:app --host 0.0.0.0 --port 8000
+Restart=always                              # Restart if it crashes (key for production!)
+RestartSec=5                               # Wait 5 seconds before restarting
+StandardOutput=journal                      # Log stdout to journald
+StandardError=journal                       # Log stderr to journald
+
+[Install]
+WantedBy=multi-user.target                  # Start at normal boot
+SERVICE_FILE
+
+# 3. Enable and start the service:
+# sudo systemctl daemon-reload             # Tell systemd to read new files
+# sudo systemctl enable churn-api         # Auto-start on boot
+# sudo systemctl start churn-api          # Start now
+
+# 4. Management commands:
+# sudo systemctl status churn-api         # Is it running? Any errors?
+# sudo systemctl stop churn-api           # Stop the service
+# sudo systemctl restart churn-api        # Restart (e.g. after code update)
+# sudo systemctl disable churn-api        # Remove from auto-start
+
+# 5. View logs:
+# journalctl -u churn-api                 # All logs for this service
+# journalctl -u churn-api -f              # FOLLOW logs in real-time (like tail -f)
+# journalctl -u churn-api --since &quot;1 hour ago&quot;  # Only recent logs
+
+# ==== DEPLOYMENT WORKFLOW (after updating your model) ====
+cat &lt;&lt; &#x27;DEPLOY_WORKFLOW&#x27;
+# deploy.sh — run this after every model update:
+#!/bin/bash
+set -euo pipefail
+
+echo &quot;Deploying new model...&quot;
+
+# 1. Pull latest code:
+cd /home/ubuntu/ml_project
+git pull origin main
+
+# 2. Install any new dependencies:
+source venv/bin/activate
+pip install -q -r requirements.txt
+
+# 3. Restart the service:
+sudo systemctl restart churn-api
+
+# 4. Wait and verify it came back up:
+sleep 3
+if systemctl is-active --quiet churn-api; then
+    echo &quot;✓ Service restarted successfully&quot;
+    curl -s http://localhost:8000/health | python3 -m json.tool
+else
+    echo &quot;✗ Service failed to start!&quot;
+    journalctl -u churn-api --since &quot;1 minute ago&quot;
+    exit 1
+fi
+DEPLOY_WORKFLOW
+
+
+# ==============================================================================
+# LESSON 10 — PORT &amp; FIREWALL MANAGEMENT (AI Engineer)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# When you deploy a service, you need to open the right ports so traffic can reach it.
+# ufw (Uncomplicated Firewall) is Ubuntu&#x27;s built-in firewall.
+# ss (socket statistics) shows what&#x27;s running and listening on which port.
+
+# Check what services are currently listening on which ports:
+ss -tlnp
+# -t = TCP, -l = listening, -n = numeric ports, -p = show processes
+# Output: port 8000 (your FastAPI), 5432 (postgres), 22 (ssh), 80 (nginx)...
+
+# Alternative (older tool):
+netstat -tlnp 2&gt;/dev/null
+
+# Check a specific port:
+ss -tlnp | grep :8000      # Is something running on port 8000?
+ss -tlnp | grep :22        # Is SSH listening?
+
+# FIREWALL with ufw:
+sudo ufw status             # Check current firewall rules
+sudo ufw enable             # Turn on the firewall
+sudo ufw disable            # Turn off (DON&#x27;T do this on a production server!)
+
+# Allow specific ports:
+sudo ufw allow 22           # SSH (ALWAYS keep this open or you&#x27;ll lock yourself out!)
+sudo ufw allow 80           # HTTP
+sudo ufw allow 443          # HTTPS
+sudo ufw allow 8000         # FastAPI development
+sudo ufw allow 8888         # Jupyter Notebook
+
+# Allow from specific IP only (more secure):
+sudo ufw allow from 192.168.1.100 to any port 5432  # Only allow postgres from one IP
+
+# Deny and delete rules:
+sudo ufw deny 23            # Block telnet
+sudo ufw delete allow 8000  # Remove the rule that opened port 8000
+
+
+# ==============================================================================
+# 🎯 YOUR TASKS
+# ==============================================================================
+echo &quot;&quot;
+echo &quot;==================================================================&quot;
+echo &quot;YOUR TURN — Bash Scripting &amp; Automation Practice&quot;
+echo &quot;==================================================================&quot;
+cat &lt;&lt; &#x27;EOF&#x27;
+
+TASK 1 — VARIABLES &amp; CONDITIONS:
+    Write a script &#x27;check_env.sh&#x27; that:
+    a) Reads $MODEL_VERSION from environment (use ${MODEL_VERSION:-&quot;not set&quot;})
+    b) Reads $DATA_PATH from environment
+    c) Checks if the data file exists (if [[ -f ... ]])
+    d) Checks if models/ directory exists — creates it if not
+    e) Prints a summary: date, user, model version, data path, file size
+    Test: MODEL_VERSION=v3 DATA_PATH=./data.csv ./check_env.sh
+
+TASK 2 — LOOPS &amp; FILE PROCESSING:
+    Create 3 CSV files: sales_jan.csv, sales_feb.csv, sales_mar.csv
+    (Use echo with fake data — just headers and 2-3 rows each)
+    Write a script that:
+    a) Loops over all sales_*.csv files
+    b) For each file: prints the filename, row count (wc -l), and first line (head -1)
+    c) Creates a combined output: cat all files into sales_combined.csv
+    d) Removes duplicates from combined: sort -u sales_combined.csv &gt; sales_deduped.csv
+
+TASK 3 — FUNCTIONS &amp; LOGGING:
+    Write a script &#x27;pipeline.sh&#x27; with:
+    a) A log() function that prints timestamped messages
+    b) A check_requirements() function that verifies Python packages are installed
+       (use: python3 -c &quot;import $pkg&quot; for each package in a list)
+    c) A setup_dirs() function that creates data/, models/, logs/
+    d) Main flow: log &quot;Starting&quot; → check_requirements → setup_dirs → log &quot;Done&quot;
+    e) Add set -euo pipefail at the top
+
+TASK 4 — ENVIRONMENT VARIABLES:
+    a) Create a .env file with 4 variables (make up fake values for:
+       DATABASE_URL, API_KEY, MODEL_VERSION, LOG_LEVEL)
+    b) Add .env to .gitignore
+    c) Write a script that loads .env and prints each variable name (NOT the value!)
+       HINT: for var in DATABASE_URL API_KEY MODEL_VERSION LOG_LEVEL; do
+                 echo &quot;$var is $([ -z &quot;${!var:-}&quot; ] &amp;&amp; echo &#x27;NOT SET&#x27; || echo &#x27;set&#x27;)&quot;
+             done
+    d) Create a .env.example with placeholder values
+    e) Write a Python one-liner that reads DATABASE_URL using python-dotenv
+
+TASK 5 — CRON JOB:
+    a) Write a script &#x27;disk_monitor.sh&#x27; that:
+       - Gets current disk usage %: df -h / | tail -1 | awk &#x27;{print $5}&#x27; | tr -d &#x27;%&#x27;
+       - If usage &gt; 80: echo &quot;ALERT: Disk $(df -h / | tail -1 | awk &#x27;{print $5}&#x27;) full&quot; &gt;&gt; /tmp/disk_alerts.log
+       - Otherwise: echo &quot;OK: $(date)&quot; &gt;&gt; /tmp/disk_check.log
+    b) Make it executable: chmod +x disk_monitor.sh
+    c) Test it manually first
+    d) Add it to crontab to run every 10 minutes: */10 * * * * /full/path/disk_monitor.sh
+    e) Verify it&#x27;s scheduled: crontab -l
+
+TASK 6 — FULL PIPELINE SCRIPT:
+    Write a complete &#x27;run_experiment.sh&#x27; script that:
+    a) Takes 2 arguments: model_name and learning_rate (validate both are provided)
+    b) Uses set -euo pipefail
+    c) Creates an experiment directory: ./experiments/{model_name}_{date}/
+    d) Logs each step to a file inside that directory
+    e) Simulates training: echo &quot;Training $model_name with lr=$learning_rate&quot; → sleep 2
+    f) Writes fake metrics to metrics.json: {&quot;model&quot;: &quot;...&quot;, &quot;lr&quot;: ..., &quot;val_f1&quot;: 0.847}
+    g) Reads val_f1 back with jq and checks if it&#x27;s above 0.80
+    h) Prints success or warning accordingly
+    Test: ./run_experiment.sh random_forest 0.001
+
+TASK 7 — SYSTEMD SERVICE (if on real Linux):
+    a) Write a tiny FastAPI app (app.py) with a single /health endpoint:
+       from fastapi import FastAPI; app = FastAPI()
+       @app.get(&quot;/health&quot;)
+       def health(): return {&quot;status&quot;: &quot;ok&quot;, &quot;version&quot;: &quot;1.0&quot;}
+    b) Install uvicorn: pip install fastapi uvicorn
+    c) Test manually: uvicorn app:app --port 8000 → curl http://localhost:8000/health
+    d) Write a systemd service file: churn-api.service (see LESSON 09 above)
+    e) Enable and start: sudo systemctl enable churn-api &amp;&amp; sudo systemctl start churn-api
+    f) Verify: sudo systemctl status churn-api
+    g) View live logs: journalctl -u churn-api -f
+
+Write your experience and lessons learned in a comment below:
+EOF
+
+echo &quot;&quot;
+echo &quot;linux_bash_scripting.sh complete!&quot;
+echo &quot;You now have the full Linux toolkit for ML Engineering.&quot;
+echo &quot;&quot;
+echo &quot;Summary of all Linux guides:&quot;
+echo &quot;  linux_commands.sh     → Navigation, files, grep/sed/awk, permissions, processes&quot;
+echo &quot;  linux_ssh_remote.sh   → SSH, tmux, SCP, rsync, SSH tunneling for Jupyter&quot;
+echo &quot;  linux_bash_scripting.sh → Variables, loops, functions, .env, cron, systemd&quot;
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

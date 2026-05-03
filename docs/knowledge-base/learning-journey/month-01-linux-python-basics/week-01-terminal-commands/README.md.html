@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Week 01 Terminal Commands - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../../index.html">Back to website</a>
+      <a href="../../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Week 01 Terminal Commands</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">knowledge-base/learning-journey/month-01-linux-python-basics/week-01-terminal-commands/README.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="week-1-terminal-commands-cheatsheet">Week 1: Terminal Commands Cheatsheet</h2>
+<h3 id="what-is-the-terminal">What is the Terminal?</h3>
+<p>The terminal (also called &quot;command line&quot; or &quot;shell&quot;) is a text-based way to control your computer. Instead of clicking icons, you type commands.</p>
+<p><strong>Why use it?</strong></p>
+<ul>
+<li>It&#x27;s faster for repetitive tasks</li>
+<li>Servers (where your code runs in the cloud) have NO screen — only a terminal</li>
+<li>Every professional developer uses it daily</li>
+</ul>
+<h3 id="setup-how-to-open-a-terminal-on-windows">Setup: How to Open a Terminal on Windows</h3>
+<h4 id="option-a-wsl-2-best-gives-you-real-linux">Option A: WSL 2 (Best — gives you real Linux)</h4>
+<ol>
+<li>Open PowerShell as Administrator</li>
+<li>Type: <code>wsl --install</code></li>
+<li>Restart your computer</li>
+<li>Open the &quot;Ubuntu&quot; app — you are now in Linux!</li>
+</ol>
+<h4 id="option-b-git-bash-quick-works-now">Option B: Git Bash (Quick, works now)</h4>
+<ol>
+<li>Download Git from https://git-scm.com/download/win</li>
+<li>During install, choose &quot;Git Bash Here&quot; option</li>
+<li>Right-click any folder → &quot;Git Bash Here&quot;</li>
+</ol>
+<h3 id="command-reference-table">Command Reference Table</h3>
+<table><thead><tr><th>Command</th><th>What it does</th><th>Example</th></tr></thead><tbody><tr><td><code>pwd</code></td><td>Print Working Directory (where am I?)</td><td><code>pwd</code> → <code>/home/varag</code></td></tr><tr><td><code>ls</code></td><td>List files in current folder</td><td><code>ls</code></td></tr><tr><td><code>ls -la</code></td><td>List files with details + hidden files</td><td><code>ls -la</code></td></tr><tr><td><code>cd foldername</code></td><td>Change Directory (move into folder)</td><td><code>cd projects</code></td></tr><tr><td><code>cd ..</code></td><td>Go UP one folder</td><td><code>cd ..</code></td></tr><tr><td><code>cd ~</code></td><td>Go to your HOME folder</td><td><code>cd ~</code></td></tr><tr><td><code>mkdir name</code></td><td>Make a new Directory (folder)</td><td><code>mkdir datasets</code></td></tr><tr><td><code>touch file.txt</code></td><td>Create an empty file</td><td><code>touch notes.txt</code></td></tr><tr><td><code>cp a.txt b.txt</code></td><td>Copy file a to b</td><td><code>cp notes.txt backup.txt</code></td></tr><tr><td><code>mv a.txt folder/</code></td><td>Move file into folder</td><td><code>mv notes.txt projects/</code></td></tr><tr><td><code>rm file.txt</code></td><td>Remove (delete) a file</td><td><code>rm old_file.txt</code></td></tr><tr><td><code>rm -r folder/</code></td><td>Remove an entire folder</td><td><code>rm -r old_folder/</code></td></tr><tr><td><code>cat file.txt</code></td><td>Print file contents to screen</td><td><code>cat notes.txt</code></td></tr><tr><td><code>clear</code></td><td>Clear the terminal screen</td><td><code>clear</code></td></tr></tbody></table>
+<h3 id="your-task-for-week-1">🎯 YOUR TASK FOR WEEK 1</h3>
+<p>Open your terminal and run these commands ONE BY ONE. Do NOT copy-paste all at once. Type each one manually to build muscle memory.</p>
+<pre><code class="language-bash"># Step 1: Go to your home folder
+cd ~
+
+# Step 2: See what&#x27;s already there
+ls
+
+# Step 3: Create your main lab folder
+mkdir lab
+
+# Step 4: Go into it
+cd lab
+
+# Step 5: Create three subfolders at once
+mkdir projects datasets notes
+
+# Step 6: Check that they were created
+ls
+
+# Step 7: Create a notes file
+touch notes/week1-notes.txt
+
+# Step 8: Go into notes and verify the file exists
+cd notes
+ls
+
+# Step 9: Write something into the file (the &gt; symbol means &quot;write to file&quot;)
+echo &quot;I learned terminal commands today!&quot; &gt; week1-notes.txt
+
+# Step 10: Read the file
+cat week1-notes.txt
+
+# Step 11: Go back to lab folder
+cd ..
+
+# Step 12: See the full structure
+ls -R</code></pre>
+<p>If you did all of that without errors — congratulations! You passed Week 1.</p>
+<h3 id="common-mistakes-amp-fixes">Common Mistakes &amp; Fixes</h3>
+<table><thead><tr><th>Problem</th><th>Cause</th><th>Fix</th></tr></thead><tbody><tr><td><code>command not found</code></td><td>Typo in command</td><td>Check spelling</td></tr><tr><td><code>No such file or directory</code></td><td>Wrong folder path</td><td>Run <code>pwd</code> to see where you are, then <code>ls</code></td></tr><tr><td><code>Permission denied</code></td><td>Need admin rights</td><td>Use <code>sudo</code> before the command (Linux only)</td></tr><tr><td>Nothing happens after <code>mkdir</code></td><td>That&#x27;s normal!</td><td>Run <code>ls</code> to confirm the folder was created</td></tr></tbody></table>
+<p><strong>Next week → <code>../week-02-git-github/README.md</code></strong></p></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#week-1-terminal-commands-cheatsheet">Week 1: Terminal Commands Cheatsheet</a><a style="margin-left:12px" href="#what-is-the-terminal">What is the Terminal?</a><a style="margin-left:12px" href="#setup-how-to-open-a-terminal-on-windows">Setup: How to Open a Terminal on Windows</a><a style="margin-left:24px" href="#option-a-wsl-2-best-gives-you-real-linux">Option A: WSL 2 (Best — gives you real Linux)</a><a style="margin-left:24px" href="#option-b-git-bash-quick-works-now">Option B: Git Bash (Quick, works now)</a><a style="margin-left:12px" href="#command-reference-table">Command Reference Table</a><a style="margin-left:12px" href="#your-task-for-week-1">🎯 YOUR TASK FOR WEEK 1</a><a style="margin-left:12px" href="#common-mistakes-amp-fixes">Common Mistakes &amp; Fixes</a></aside>
+    </main>
+  </body>
+</html>

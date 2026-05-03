@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cloud And Cicd Guide.Sh - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Cloud And Cicd Guide.Sh</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">phase-2-production-ml/month-04-cloud-cicd/resources/cloud_and_cicd_guide.sh</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><pre><code>#!/bin/bash
+# ==============================================================================
+# PHASE 2 — MONTH 4: Cloud Computing &amp; CI/CD
+# FILE: cloud_and_cicd_guide.sh
+#
+# GOAL: Deploy your Dockerized ML model to a real cloud server so that
+#       anyone on the internet can call your /predict API endpoint.
+#
+# THE PROBLEM THIS SOLVES:
+#   Your model runs on YOUR laptop. Nobody else can use it.
+#   You need to put it on a server that runs 24/7 on the internet.
+#   And every time you push a code change, it should redeploy automatically.
+#
+# WHAT YOU WILL LEARN:
+#   Part 1  — Cloud server basics (AWS EC2 / GCP)
+#   Part 2  — SSH: how to connect to a remote Linux server
+#   Part 3  — Setting up a server (Docker, nginx, firewall)
+#   Part 4  — Deploying your Docker container to the cloud
+#   Part 5  — GitHub Actions: automate everything on every push
+#   Part 6  — Environment secrets and .env files on a server
+#   Part 7  — Keeping the server running (systemd / Docker restart policies)
+#
+# PRE-REQUISITES:
+#   - Month 3 complete (you have a working Dockerized FastAPI app)
+#   - A GitHub account
+#   - A free-tier cloud account (AWS Free Tier or GCP Free Tier)
+#
+# COST: Free tier is enough for learning. AWS EC2 t2.micro = free for 12 months.
+# ==============================================================================
+
+
+# ==============================================================================
+# PART 1 — CLOUD SERVER BASICS
+# ==============================================================================
+: &#x27;
+TEACHER SAYS:
+A cloud server is just a Linux computer that runs 24/7 in a data centre.
+You pay by the hour. AWS, GCP, and Azure are the big three.
+
+For this program, we use AWS EC2 (Elastic Compute Cloud):
+  - t2.micro: 1 vCPU, 1 GB RAM — free for 12 months on a new account
+  - Ubuntu Server 22.04 LTS (Long-Term Support) is the recommended OS
+
+HOW TO CREATE AN EC2 INSTANCE (one-time setup):
+  1. Go to console.aws.amazon.com → EC2 → Launch Instance
+  2. Name: &quot;ml-server&quot;
+  3. AMI: Ubuntu Server 22.04 LTS (free tier eligible)
+  4. Instance type: t2.micro (free tier)
+  5. Key pair: Create new → download the .pem file → KEEP IT SAFE
+  6. Security group: Add rules:
+       - SSH:   port 22  from My IP (for you to connect)
+       - HTTP:  port 80  from Anywhere (for the world to reach your API)
+       - Custom: port 8000 from Anywhere (FastAPI default port)
+  7. Launch!
+
+IMPORTANT: Note your instance&#x27;&quot;&#x27;&quot;&#x27;s &quot;Public IPv4 address&quot; — you need it to connect.
+&#x27;
+
+echo &quot;=== PART 1: Cloud server is running. Now connect to it. ===&quot;
+
+
+# ==============================================================================
+# PART 2 — SSH: CONNECTING TO YOUR REMOTE SERVER
+# ==============================================================================
+: &#x27;
+TEACHER SAYS:
+SSH (Secure Shell) is how you control a remote Linux server from your terminal.
+It is exactly like opening a terminal on that machine — but over the internet.
+
+The .pem file you downloaded is your &quot;key&quot; — like a password but more secure.
+&#x27;
+
+# On your LOCAL machine (not the server):
+
+# Fix permissions on the key file (SSH refuses to use keys with open permissions):
+# chmod 400 ~/Downloads/your-key.pem
+
+# Connect to the server:
+# ssh -i ~/Downloads/your-key.pem ubuntu@YOUR_PUBLIC_IP
+
+# Example:
+# ssh -i ~/Downloads/ml-server-key.pem ubuntu@54.123.45.67
+
+echo &quot;Connecting to server...&quot;
+echo &quot;Command: ssh -i your-key.pem ubuntu@YOUR_SERVER_IP&quot;
+echo &quot;&quot;
+echo &quot;Once connected, your terminal prompt changes to:&quot;
+echo &quot;  ubuntu@ip-172-31-xx-xx:~\$&quot;
+echo &quot;You are now INSIDE the cloud server.&quot;
+
+
+# ==============================================================================
+# PART 3 — SETTING UP THE SERVER
+# ==============================================================================
+: &#x27;
+TEACHER SAYS:
+Run these commands ONCE after your first SSH login to a fresh server.
+This installs everything you need to run your Docker container.
+&#x27;
+
+# --- Run these on the SERVER after SSH login ---
+
+# Update package list and install Docker:
+# sudo apt update &amp;&amp; sudo apt upgrade -y
+# sudo apt install -y docker.io docker-compose git curl
+# sudo systemctl enable docker
+# sudo systemctl start docker
+
+# Add your user to the docker group (so you don&#x27;&quot;&#x27;&quot;&#x27;t need sudo every time):
+# sudo usermod -aG docker $USER
+# newgrp docker   # Apply group change immediately
+
+# Verify Docker works:
+# docker run hello-world
+
+# Install GitHub CLI (optional but useful):
+# curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+# echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main&quot; | sudo tee /etc/apt/sources.list.d/github-cli.list &gt; /dev/null
+# sudo apt update &amp;&amp; sudo apt install gh -y
+
+echo &quot;Server setup complete.&quot;
+
+
+# ==============================================================================
+# PART 4 — DEPLOYING YOUR DOCKER CONTAINER
+# ==============================================================================
+: &#x27;
+TEACHER SAYS:
+You have two options for getting your Docker image onto the server:
+  A) Push to Docker Hub (public registry), pull on server
+  B) Use GitHub Actions to build and push automatically (Part 5)
+
+Option A is manual but good to understand first.
+&#x27;
+
+# --- On your LOCAL machine ---
+
+# Log in to Docker Hub (create a free account at hub.docker.com):
+# docker login
+
+# Tag your image with your Docker Hub username:
+# docker tag my-ml-app yourusername/my-ml-app:latest
+
+# Push to Docker Hub:
+# docker push yourusername/my-ml-app:latest
+
+# --- On the SERVER (via SSH) ---
+
+# Pull the image:
+# docker pull yourusername/my-ml-app:latest
+
+# Run the container:
+# docker run -d \                          # -d = detached (background)
+#   --name ml-api \
+#   --restart unless-stopped \             # Auto-restart if server reboots
+#   -p 8000:8000 \                         # Map port 8000 host → container
+#   -e OPENAI_API_KEY=&quot;sk-...&quot; \           # Pass environment variables
+#   yourusername/my-ml-app:latest
+
+# Test it works:
+# curl http://localhost:8000/health
+# curl http://YOUR_PUBLIC_IP:8000/health   # From your laptop!
+
+echo &quot;Container deployed. Test: curl http://YOUR_SERVER_IP:8000/health&quot;
+
+
+# ==============================================================================
+# PART 5 — GITHUB ACTIONS: CI/CD PIPELINE
+# ==============================================================================
+: &#x27;
+TEACHER SAYS:
+CI/CD = Continuous Integration / Continuous Deployment.
+Every time you push to GitHub, GitHub automatically:
+  1. Runs your tests (CI)
+  2. Builds the Docker image
+  3. Pushes it to Docker Hub
+  4. SSHes into your server and pulls + restarts the container (CD)
+
+This means: git push → code is live on the internet. That&#x27;&quot;&#x27;&quot;&#x27;s professional deployment.
+
+Create this file in your repo: .github/workflows/deploy.yml
+&#x27;
+
+cat &lt;&lt; &#x27;EOF&#x27;
+# .github/workflows/deploy.yml
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]   # Trigger only on pushes to main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/my-ml-app:latest
+
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ubuntu
+          key: ${{ secrets.SERVER_SSH_KEY }}    # Contents of your .pem file
+          script: |
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my-ml-app:latest
+            docker stop ml-api || true
+            docker rm ml-api || true
+            docker run -d \
+              --name ml-api \
+              --restart unless-stopped \
+              -p 8000:8000 \
+              -e OPENAI_API_KEY=&quot;${{ secrets.OPENAI_API_KEY }}&quot; \
+              ${{ secrets.DOCKERHUB_USERNAME }}/my-ml-app:latest
+EOF
+
+: &#x27;
+ADD SECRETS in GitHub → Your Repo → Settings → Secrets and Variables → Actions:
+  DOCKERHUB_USERNAME   → your Docker Hub username
+  DOCKERHUB_TOKEN      → Docker Hub access token (not your password)
+  SERVER_IP            → your EC2 public IP
+  SERVER_SSH_KEY       → the contents of your .pem key file (cat your-key.pem)
+  OPENAI_API_KEY       → (optional) your OpenAI key if your app needs it
+&#x27;
+
+echo &quot;CI/CD pipeline configured.&quot;
+
+
+# ==============================================================================
+# PART 6 — ENVIRONMENT VARIABLES ON THE SERVER
+# ==============================================================================
+: &#x27;
+TEACHER SAYS:
+NEVER hardcode secrets (API keys, database passwords) in your code or Dockerfile.
+Use environment variables. There are two patterns:
+
+Pattern A: Pass via docker run -e (shown in Part 4 and 5 — simple)
+Pattern B: Use a .env file on the server (better for many variables)
+&#x27;
+
+# Create a .env file on the server (do this manually once via SSH):
+# cat &gt; /home/ubuntu/ml-api.env &lt;&lt; &#x27;ENVEOF&#x27;
+# OPENAI_API_KEY=sk-...
+# DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+# SECRET_KEY=some-random-string-here
+# ENVEOF
+
+# Then run Docker with the env file:
+# docker run -d \
+#   --name ml-api \
+#   --restart unless-stopped \
+#   -p 8000:8000 \
+#   --env-file /home/ubuntu/ml-api.env \
+#   yourusername/my-ml-app:latest
+
+echo &quot;Environment variables configured.&quot;
+
+
+# ==============================================================================
+# PART 7 — MONITORING AND MANAGEMENT COMMANDS
+# ==============================================================================
+: &#x27;
+TEACHER SAYS:
+Useful commands for managing your running container on the server.
+Run all of these on the server via SSH.
+&#x27;
+
+# View running containers:
+# docker ps
+
+# View container logs (real-time):
+# docker logs -f ml-api
+
+# View last 50 log lines:
+# docker logs --tail 50 ml-api
+
+# Restart the container:
+# docker restart ml-api
+
+# Check server resource usage (CPU, RAM, disk):
+# htop                # Interactive process viewer (install: sudo apt install htop)
+# df -h               # Disk usage
+# free -h             # RAM usage
+
+# Check which ports are open:
+# sudo ss -tlnp
+
+# View nginx logs (if you use nginx as a reverse proxy):
+# sudo tail -f /var/log/nginx/access.log
+
+echo &quot;&quot;
+echo &quot;=== MONTH 4 SUMMARY ===&quot;
+echo &quot;You can now:&quot;
+echo &quot;  ✓ Launch and connect to a cloud Linux server&quot;
+echo &quot;  ✓ Install Docker on a server&quot;
+echo &quot;  ✓ Deploy a Docker container and expose it to the internet&quot;
+echo &quot;  ✓ Set up GitHub Actions to auto-deploy on every git push&quot;
+echo &quot;  ✓ Manage secrets safely with environment variables&quot;
+echo &quot;  ✓ Monitor and manage running containers&quot;
+echo &quot;&quot;
+echo &quot;NEXT → Phase 3: Django — build a full web app around your model.&quot;
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

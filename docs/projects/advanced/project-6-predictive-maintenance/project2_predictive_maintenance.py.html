@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Project2 Predictive Maintenance.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Project2 Predictive Maintenance.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">projects/advanced/project-6-predictive-maintenance/project2_predictive_maintenance.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "\"\"\"\nPROJECT 2 \u2014 Predictive Maintenance with Causal NLP\n====================================================\nGoal: combine sensor time-series data with unstructured technician notes\nto predict *when* a machine will fail AND explain *why*.\n\nMost teams solve only one half. Solving both is the differentiator.\n\nPipeline:\n    Raw sensor data\n        \u2192 feature engineering (rolling stats, variance filtering)\n        \u2192 XGBoost RUL regressor\n        \u2192 low-RUL trigger\n        \u2192 RAG pipeline (retrieve similar historical notes)\n        \u2192 LLM report generator\n        \u2192 Streamlit dashboard\n\nSuggested libraries (research before importing):\n    pandas, numpy         \u2014 data loading and feature engineering\n    xgboost               \u2014 gradient-boosted regression\n    scikit-learn          \u2014 preprocessing, cross-validation, metrics\n    optuna                \u2014 hyperparameter search (better than GridSearch)\n    sentence-transformers \u2014 text embeddings for RAG\n    chromadb              \u2014 local vector store (no server needed)\n    openai / anthropic    \u2014 LLM for report generation\n    streamlit, plotly     \u2014 dashboard and charts\n\nDataset:\n    NASA CMAPSS Turbofan Engine Degradation Simulation Data\n    Search \"CMAPSS dataset Kaggle\" \u2014 several cleaned versions exist.\n    Official source: ti.arc.nasa.gov/tech/dash/groups/pcoe/prognostic-data-repository/\n\"\"\"\n\nimport os\nimport logging\nfrom dataclasses import dataclass\nfrom typing import Optional\n\n# TODO: add imports as you need them\n\n\n# ---------------------------------------------------------------------------\n# CONSTANTS\n# ---------------------------------------------------------------------------\n\n# Column layout of the raw CMAPSS files (space-separated, no header row)\nSENSOR_COLS    = [f\"s{i}\" for i in range(1, 22)]   # 21 sensor readings\nSETTING_COLS   = [\"op1\", \"op2\", \"op3\"]              # 3 operating condition settings\nALL_COLS       = [\"unit_id\", \"cycle\"] + SETTING_COLS + SENSOR_COLS\n\n# The custom NASA scoring function penalizes late predictions more than early ones.\n# Implement it. Don't skip it. Recruiters who know this dataset will ask about it.\n#\n#   d = predicted_RUL - true_RUL\n#   if d < 0:  score_i = exp(-d / 13) - 1\n#   if d >= 0: score_i = exp( d / 10) - 1\n#   total_score = sum(score_i)\n#\n# Why asymmetric? Think about the real-world consequence of a late prediction\n# (engine fails unexpectedly) vs. an early prediction (unnecessary maintenance).\n\n\n# ---------------------------------------------------------------------------\n# DATA LOADING & FEATURE ENGINEERING\n# ---------------------------------------------------------------------------\n\nclass CMAPSSLoader:\n    \"\"\"\n    Loads, labels, and engineers features from the NASA CMAPSS dataset.\n\n    File naming convention (after download):\n        train_FD001.txt, train_FD002.txt, train_FD003.txt, train_FD004.txt\n        test_FD001.txt  ...\n        RUL_FD001.txt   ... (true RUL values for test engines)\n\n    Start with FD001. It has one operating condition and one fault mode \u2014\n    simplest to understand. FD003/FD004 are harder and more realistic.\n    \"\"\"\n\n    def __init__(self, data_dir: str):\n        \"\"\"\n        TODO: store data_dir.\n        TODO: verify the directory exists; raise FileNotFoundError if not.\n        \"\"\"\n        self.data_dir = data_dir\n\n    def load_train(self, subset: str = \"FD001\"):\n        \"\"\"\n        Returns a DataFrame with all sensor columns plus a 'rul' target column.\n\n        TODO: path = os.path.join(self.data_dir, f\"train_{subset}.txt\")\n        TODO: df = pd.read_csv(path, sep=r'\\s+', names=ALL_COLS, header=None)\n        TODO: drop any all-NaN columns (trailing spaces create phantom columns).\n        TODO: compute RUL:\n                max_cycle = df.groupby('unit_id')['cycle'].transform('max')\n                df['rul'] = max_cycle - df['cycle']\n              Trace through this with a small example before trusting it.\n        TODO: return df\n        \"\"\"\n        raise NotImplementedError\n\n    def load_test(self, subset: str = \"FD001\"):\n        \"\"\"\n        Returns test DataFrame and the true RUL array for final scoring.\n\n        The test files are cut off before failure \u2014 you predict remaining life.\n        The RUL_FD00X.txt file contains one true RUL value per engine.\n\n        TODO: load the test CSV with the same ALL_COLS schema.\n        TODO: load RUL_{subset}.txt as a 1-column array (no header).\n        TODO: for the test set, keep only the LAST cycle per engine\n              (that's the snapshot you're predicting from).\n        TODO: return (test_df, true_rul_array)\n        \"\"\"\n        raise NotImplementedError\n\n    def drop_low_variance_sensors(self, df, threshold: float = 0.01):\n        \"\"\"\n        Returns (trimmed_df, kept_sensor_names).\n\n        TODO: variances = df[SENSOR_COLS].var()\n        TODO: keep = variances[variances > threshold].index.tolist()\n        TODO: return df.drop(columns=[c for c in SENSOR_COLS if c not in keep]), keep\n\n        Why return the list of kept names?\n        Because you MUST apply the same filter to the test set.\n        If you fit on 14 features but predict on 21, your model crashes.\n        This is called \"train-test feature alignment\" \u2014 a common real-world bug.\n        \"\"\"\n        raise NotImplementedError\n\n    def add_rolling_features(self, df, window: int = 10, sensor_cols: list = None):\n        \"\"\"\n        Adds rolling mean and rolling std per sensor per engine.\n\n        TODO: if sensor_cols is None, use SENSOR_COLS.\n        TODO: for col in sensor_cols:\n                  df[f'{col}_rmean'] = df.groupby('unit_id')[col].transform(\n                      lambda x: x.rolling(window, min_periods=1).mean()\n                  )\n                  df[f'{col}_rstd']  = df.groupby('unit_id')[col].transform(\n                      lambda x: x.rolling(window, min_periods=1).std().fillna(0)\n                  )\n        TODO: return df\n\n        Question to answer before running this: why do we group by unit_id\n        before computing the rolling window? What goes wrong if we don't?\n        \"\"\"\n        raise NotImplementedError\n\n    def normalize(self, train_df, test_df, feature_cols: list):\n        \"\"\"\n        Fits a scaler on train_df and applies it to both train and test.\n\n        TODO: use sklearn.preprocessing.MinMaxScaler (or StandardScaler \u2014 know the difference).\n        TODO: scaler.fit(train_df[feature_cols]) \u2014 fit on TRAIN ONLY.\n        TODO: train_scaled = scaler.transform(train_df[feature_cols])\n        TODO: test_scaled  = scaler.transform(test_df[feature_cols])\n        TODO: return train_scaled, test_scaled, scaler\n\n        Why fit only on training data?\n        Data leakage. If test statistics influence the scaler, your reported accuracy\n        is optimistic and will not hold in production. Say this in your README.\n        \"\"\"\n        raise NotImplementedError\n\n\n# ---------------------------------------------------------------------------\n# MODEL\n# ---------------------------------------------------------------------------\n\nclass RULPredictor:\n    \"\"\"\n    XGBoost-based Remaining Useful Life regressor.\n\n    Evaluation metrics you MUST implement (not optional):\n    1. RMSE \u2014 standard regression metric.\n    2. NASA score \u2014 asymmetric function defined in CONSTANTS section above.\n    3. Accuracy within \u00b115 cycles \u2014 business-friendly metric:\n       \"87% of predictions are within 15 cycles of the true failure.\"\n\n    Hyperparameter tuning:\n        Do NOT use GridSearchCV for XGBoost \u2014 the search space is too large.\n        Use Optuna (pip install optuna).\n        An Optuna \"trial\" suggests hyperparameters; you train and return the score.\n        Optuna minimizes (or maximizes) that score across N trials automatically.\n        TODO: look up \"Optuna quickstart\" \u2014 it takes 15 minutes to learn.\n    \"\"\"\n\n    def __init__(self):\n        # TODO: self.model = xgb.XGBRegressor(...)\n        # TODO: reasonable starting hyperparameters:\n        #       n_estimators=200, max_depth=6, learning_rate=0.05,\n        #       subsample=0.8, colsample_bytree=0.8, random_state=42\n        self.model = None\n        self.feature_names: list = []\n\n    def train(self, X_train, y_train, X_val=None, y_val=None):\n        \"\"\"\n        TODO: self.model.fit(X_train, y_train,\n                             eval_set=[(X_val, y_val)] if X_val is not None else None,\n                             early_stopping_rounds=20,\n                             verbose=False)\n        TODO: store feature importances in self.feature_importances_ after fitting.\n              print the top 10 \u2014 which sensors matter most? Add this to your README.\n        TODO: set self.feature_names to the column names passed in.\n        \"\"\"\n        raise NotImplementedError\n\n    def predict(self, X) -> \"np.ndarray\":\n        \"\"\"\n        TODO: preds = self.model.predict(X)\n        TODO: return np.clip(preds, 0, None)\n              Negative RUL is physically meaningless. Clip it.\n        \"\"\"\n        raise NotImplementedError\n\n    def nasa_score(self, y_true, y_pred) -> float:\n        \"\"\"\n        Computes the asymmetric NASA scoring function.\n\n        TODO: implement the formula from CONSTANTS.\n        TODO: lower is better (score starts at 0 for a perfect prediction\n              and grows rapidly for late predictions).\n        \"\"\"\n        raise NotImplementedError\n\n    def evaluate(self, X_test, y_true) -> dict:\n        \"\"\"\n        Returns a dict with keys: rmse, nasa_score, pct_within_15_cycles.\n\n        TODO: y_pred = self.predict(X_test)\n        TODO: rmse = np.sqrt(mean_squared_error(y_true, y_pred))\n        TODO: score = self.nasa_score(y_true, y_pred)\n        TODO: within_15 = np.mean(np.abs(y_pred - y_true) <= 15) * 100\n        TODO: log and return all three.\n        \"\"\"\n        raise NotImplementedError\n\n    def tune_hyperparameters(self, X_train, y_train, X_val, y_val, n_trials: int = 50):\n        \"\"\"\n        Uses Optuna to find better hyperparameters than the defaults.\n\n        TODO: import optuna\n        TODO: define an objective function:\n                def objective(trial):\n                    params = {\n                        \"n_estimators\":    trial.suggest_int(\"n_estimators\", 100, 500),\n                        \"max_depth\":       trial.suggest_int(\"max_depth\", 3, 10),\n                        \"learning_rate\":   trial.suggest_float(\"learning_rate\", 0.01, 0.3, log=True),\n                        \"subsample\":       trial.suggest_float(\"subsample\", 0.5, 1.0),\n                        \"colsample_bytree\":trial.suggest_float(\"colsample_bytree\", 0.5, 1.0),\n                    }\n                    model = xgb.XGBRegressor(**params, random_state=42)\n                    model.fit(X_train, y_train)\n                    preds = np.clip(model.predict(X_val), 0, None)\n                    return self.nasa_score(y_val, preds)\n        TODO: study = optuna.create_study(direction=\"minimize\")\n        TODO: study.optimize(objective, n_trials=n_trials, show_progress_bar=True)\n        TODO: update self.model with study.best_params and re-train on full train set.\n        \"\"\"\n        raise NotImplementedError\n\n\n# ---------------------------------------------------------------------------\n# RAG PIPELINE\n# ---------------------------------------------------------------------------\n\nclass TechnicianNotesStore:\n    \"\"\"\n    Embeds technician maintenance notes and stores them in a vector database\n    for retrieval during report generation.\n\n    What is RAG?\n        Retrieval-Augmented Generation.\n        Instead of relying on the LLM's internal (possibly wrong) knowledge,\n        you retrieve relevant documents and inject them into the prompt.\n        The LLM then reasons over documents it has never seen before.\n\n    Three steps:\n        1. Embed: convert each note to a dense vector (sentence-transformers).\n        2. Store:  insert vectors into ChromaDB.\n        3. Retrieve: embed a query, find the top-k nearest vectors.\n\n    Synthetic data strategy:\n        You don't have real technician notes. Generate them with an LLM.\n        Prompt pattern:\n            \"Write a short technician maintenance note (2-4 sentences) for an\n             aircraft engine showing these sensor patterns: {summary}.\n             Include a probable cause and recommended action.\"\n        Generate ~200 synthetic notes covering different failure modes.\n        This is legitimate data augmentation \u2014 mention it explicitly in your README.\n    \"\"\"\n\n    def __init__(self, embedding_model_name: str = \"all-MiniLM-L6-v2\"):\n        \"\"\"\n        TODO: from sentence_transformers import SentenceTransformer\n        TODO: self.embedder = SentenceTransformer(embedding_model_name)\n        TODO: import chromadb\n        TODO: self.client = chromadb.Client()\n        TODO: self.collection = self.client.create_collection(\"technician_notes\")\n        \"\"\"\n        pass\n\n    def add_notes(self, notes: list[str], metadata: list[dict] = None):\n        \"\"\"\n        Embeds all notes and upserts them into the ChromaDB collection.\n\n        TODO: embeddings = self.embedder.encode(notes).tolist()\n        TODO: ids = [f\"note_{i}\" for i in range(len(notes))]\n        TODO: self.collection.upsert(\n                  ids=ids,\n                  embeddings=embeddings,\n                  documents=notes,\n                  metadatas=metadata or [{} for _ in notes]\n              )\n        \"\"\"\n        raise NotImplementedError\n\n    def retrieve(self, query: str, top_k: int = 3) -> list[str]:\n        \"\"\"\n        Returns the top_k most semantically similar notes to the query.\n\n        TODO: query_embedding = self.embedder.encode([query]).tolist()\n        TODO: results = self.collection.query(\n                  query_embeddings=query_embedding,\n                  n_results=top_k\n              )\n        TODO: return results[\"documents\"][0]   # list of note strings\n\n        The query here will be a natural-language description of the sensor state,\n        e.g. \"high vibration in s4, temperature spike in s11, cycle 180\".\n        \"\"\"\n        raise NotImplementedError\n\n\nclass MaintenanceReportGenerator:\n    \"\"\"\n    Given a predicted low RUL + retrieved notes, generates a structured\n    maintenance report using an LLM.\n\n    Report structure (tell the LLM to follow this):\n        ## Engine {unit_id} \u2014 Maintenance Alert\n        **Predicted RUL:** {rul:.0f} cycles (~{days:.0f} days)\n        **Risk Level:** HIGH / MEDIUM / LOW\n\n        ### Sensor Summary\n        (which sensors are trending abnormally and in what direction)\n\n        ### Diagnosis\n        (probable failure mode based on sensor patterns)\n\n        ### Root Cause\n        (why this failure mode is occurring, grounded in retrieved notes)\n\n        ### Recommended Action\n        (specific maintenance steps)\n\n        ### Sources\n        (cite which retrieved notes were used \u2014 without this, the report is not grounded)\n\n    TODO: the \"Sources\" section is critical for trust. An LLM that doesn't cite sources\n          may be hallucinating. Always show the retrieved documents alongside the output.\n    \"\"\"\n\n    def __init__(self, notes_store: TechnicianNotesStore, llm_client=None):\n        \"\"\"\n        TODO: self.notes_store = notes_store\n        TODO: self.llm = llm_client  (an openai.OpenAI() instance or similar)\n              If llm_client is None, fall back to a template-based report (no LLM).\n              Implementing the fallback forces you to think about what the LLM is\n              actually adding vs. what's just string formatting.\n        \"\"\"\n        pass\n\n    def _build_sensor_summary(self, sensor_values: dict, baseline_means: dict) -> str:\n        \"\"\"\n        Compares current sensor values to their baseline (healthy) means.\n        Returns a plain-English description of which sensors are abnormal.\n\n        TODO: for each sensor, compute deviation = (current - baseline) / baseline * 100\n        TODO: flag sensors with abs(deviation) > 20% as abnormal.\n        TODO: format as: \"Sensor s4 is 34% above baseline (vibration). Sensor s11 is 18% above.\"\n        \"\"\"\n        raise NotImplementedError\n\n    def generate(self, unit_id: int, predicted_rul: float,\n                 sensor_values: dict, baseline_means: dict) -> str:\n        \"\"\"\n        Full report generation pipeline.\n\n        TODO: summary = self._build_sensor_summary(sensor_values, baseline_means)\n        TODO: notes   = self.notes_store.retrieve(summary, top_k=3)\n        TODO: build the LLM prompt:\n                  system: \"You are an aircraft maintenance engineer. Write structured reports.\"\n                  user:   f\"Engine {unit_id}. Predicted RUL: {predicted_rul:.0f} cycles.\n                            Sensor summary: {summary}\n                            Similar past cases from maintenance logs:\n                            {chr(10).join(f'[{i+1}] {n}' for i, n in enumerate(notes))}\n                            Write the maintenance report. Cite sources by number.\"\n        TODO: call self.llm.chat.completions.create(...)\n        TODO: return response.choices[0].message.content\n        \"\"\"\n        raise NotImplementedError\n\n\n# ---------------------------------------------------------------------------\n# STREAMLIT DASHBOARD\n# (implement this only after the full pipeline works in plain Python)\n# ---------------------------------------------------------------------------\n\ndef run_dashboard():\n    \"\"\"\n    Streamlit entry point.  Run with:  streamlit run project2_predictive_maintenance.py\n\n    Layout (suggested):\n        Sidebar:        engine selector (dropdown), subset selector (FD001-FD004).\n        Top row:        three st.metric cards \u2014 predicted RUL, NASA score, % within 15 cycles.\n        Middle row:     left = sensor trend line chart for selected engine,\n                        right = feature importance bar chart.\n        Bottom section: generated maintenance report in st.markdown().\n                        Below it: an expander \"Retrieved source notes\" showing the raw notes.\n\n    Key Streamlit patterns:\n    - @st.cache_resource for the model (trained once, reused across reruns).\n    - @st.cache_data    for the dataset (loaded once per subset selection).\n    - st.spinner(\"Generating report...\") wrapping the LLM call.\n    - st.expander for the source notes \u2014 keeps the UI clean but transparent.\n    \"\"\"\n    # TODO: import streamlit as st\n    # TODO: implement layout\n    raise NotImplementedError\n\n\n# ---------------------------------------------------------------------------\n# ENTRY POINT \u2014 smoke test\n# ---------------------------------------------------------------------------\n\nif __name__ == \"__main__\":\n    logging.basicConfig(level=logging.INFO, format=\"%(levelname)s: %(message)s\")\n\n    # TODO: set DATA_DIR to wherever you downloaded the CMAPSS files.\n    DATA_DIR = \"./data/cmapss\"\n\n    # Smoke test order:\n    # 1. loader = CMAPSSLoader(DATA_DIR)\n    # 2. train_df = loader.load_train(\"FD001\")\n    # 3. print(train_df.head())\n    # 4. print(\"RUL range:\", train_df['rul'].min(), \"\u2013\", train_df['rul'].max())\n    # 5. train_df, kept = loader.drop_low_variance_sensors(train_df)\n    # 6. print(\"Kept sensors:\", kept)\n    # 7. train_df = loader.add_rolling_features(train_df, sensor_cols=kept)\n    # 8. print(\"Columns after rolling features:\", train_df.columns.tolist())\n    # Expected: for FD001, roughly 7-8 sensors survive variance filtering.\n    # If ALL sensors survive, your threshold is too low.\n    # If NO sensors survive, your threshold is too high.\n\n    logging.info(\"No implementation yet. Fill in the TODOs above.\")\n";
+      const readerOutputKey = "readerRun:projects/advanced/project-6-predictive-maintenance/project2_predictive_maintenance.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code>&quot;&quot;&quot;
+PROJECT 2 — Predictive Maintenance with Causal NLP
+====================================================
+Goal: combine sensor time-series data with unstructured technician notes
+to predict *when* a machine will fail AND explain *why*.
+
+Most teams solve only one half. Solving both is the differentiator.
+
+Pipeline:
+    Raw sensor data
+        → feature engineering (rolling stats, variance filtering)
+        → XGBoost RUL regressor
+        → low-RUL trigger
+        → RAG pipeline (retrieve similar historical notes)
+        → LLM report generator
+        → Streamlit dashboard
+
+Suggested libraries (research before importing):
+    pandas, numpy         — data loading and feature engineering
+    xgboost               — gradient-boosted regression
+    scikit-learn          — preprocessing, cross-validation, metrics
+    optuna                — hyperparameter search (better than GridSearch)
+    sentence-transformers — text embeddings for RAG
+    chromadb              — local vector store (no server needed)
+    openai / anthropic    — LLM for report generation
+    streamlit, plotly     — dashboard and charts
+
+Dataset:
+    NASA CMAPSS Turbofan Engine Degradation Simulation Data
+    Search &quot;CMAPSS dataset Kaggle&quot; — several cleaned versions exist.
+    Official source: ti.arc.nasa.gov/tech/dash/groups/pcoe/prognostic-data-repository/
+&quot;&quot;&quot;
+
+import os
+import logging
+from dataclasses import dataclass
+from typing import Optional
+
+# TODO: add imports as you need them
+
+
+# ---------------------------------------------------------------------------
+# CONSTANTS
+# ---------------------------------------------------------------------------
+
+# Column layout of the raw CMAPSS files (space-separated, no header row)
+SENSOR_COLS    = [f&quot;s{i}&quot; for i in range(1, 22)]   # 21 sensor readings
+SETTING_COLS   = [&quot;op1&quot;, &quot;op2&quot;, &quot;op3&quot;]              # 3 operating condition settings
+ALL_COLS       = [&quot;unit_id&quot;, &quot;cycle&quot;] + SETTING_COLS + SENSOR_COLS
+
+# The custom NASA scoring function penalizes late predictions more than early ones.
+# Implement it. Don&#x27;t skip it. Recruiters who know this dataset will ask about it.
+#
+#   d = predicted_RUL - true_RUL
+#   if d &lt; 0:  score_i = exp(-d / 13) - 1
+#   if d &gt;= 0: score_i = exp( d / 10) - 1
+#   total_score = sum(score_i)
+#
+# Why asymmetric? Think about the real-world consequence of a late prediction
+# (engine fails unexpectedly) vs. an early prediction (unnecessary maintenance).
+
+
+# ---------------------------------------------------------------------------
+# DATA LOADING &amp; FEATURE ENGINEERING
+# ---------------------------------------------------------------------------
+
+class CMAPSSLoader:
+    &quot;&quot;&quot;
+    Loads, labels, and engineers features from the NASA CMAPSS dataset.
+
+    File naming convention (after download):
+        train_FD001.txt, train_FD002.txt, train_FD003.txt, train_FD004.txt
+        test_FD001.txt  ...
+        RUL_FD001.txt   ... (true RUL values for test engines)
+
+    Start with FD001. It has one operating condition and one fault mode —
+    simplest to understand. FD003/FD004 are harder and more realistic.
+    &quot;&quot;&quot;
+
+    def __init__(self, data_dir: str):
+        &quot;&quot;&quot;
+        TODO: store data_dir.
+        TODO: verify the directory exists; raise FileNotFoundError if not.
+        &quot;&quot;&quot;
+        self.data_dir = data_dir
+
+    def load_train(self, subset: str = &quot;FD001&quot;):
+        &quot;&quot;&quot;
+        Returns a DataFrame with all sensor columns plus a &#x27;rul&#x27; target column.
+
+        TODO: path = os.path.join(self.data_dir, f&quot;train_{subset}.txt&quot;)
+        TODO: df = pd.read_csv(path, sep=r&#x27;\s+&#x27;, names=ALL_COLS, header=None)
+        TODO: drop any all-NaN columns (trailing spaces create phantom columns).
+        TODO: compute RUL:
+                max_cycle = df.groupby(&#x27;unit_id&#x27;)[&#x27;cycle&#x27;].transform(&#x27;max&#x27;)
+                df[&#x27;rul&#x27;] = max_cycle - df[&#x27;cycle&#x27;]
+              Trace through this with a small example before trusting it.
+        TODO: return df
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+    def load_test(self, subset: str = &quot;FD001&quot;):
+        &quot;&quot;&quot;
+        Returns test DataFrame and the true RUL array for final scoring.
+
+        The test files are cut off before failure — you predict remaining life.
+        The RUL_FD00X.txt file contains one true RUL value per engine.
+
+        TODO: load the test CSV with the same ALL_COLS schema.
+        TODO: load RUL_{subset}.txt as a 1-column array (no header).
+        TODO: for the test set, keep only the LAST cycle per engine
+              (that&#x27;s the snapshot you&#x27;re predicting from).
+        TODO: return (test_df, true_rul_array)
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+    def drop_low_variance_sensors(self, df, threshold: float = 0.01):
+        &quot;&quot;&quot;
+        Returns (trimmed_df, kept_sensor_names).
+
+        TODO: variances = df[SENSOR_COLS].var()
+        TODO: keep = variances[variances &gt; threshold].index.tolist()
+        TODO: return df.drop(columns=[c for c in SENSOR_COLS if c not in keep]), keep
+
+        Why return the list of kept names?
+        Because you MUST apply the same filter to the test set.
+        If you fit on 14 features but predict on 21, your model crashes.
+        This is called &quot;train-test feature alignment&quot; — a common real-world bug.
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+    def add_rolling_features(self, df, window: int = 10, sensor_cols: list = None):
+        &quot;&quot;&quot;
+        Adds rolling mean and rolling std per sensor per engine.
+
+        TODO: if sensor_cols is None, use SENSOR_COLS.
+        TODO: for col in sensor_cols:
+                  df[f&#x27;{col}_rmean&#x27;] = df.groupby(&#x27;unit_id&#x27;)[col].transform(
+                      lambda x: x.rolling(window, min_periods=1).mean()
+                  )
+                  df[f&#x27;{col}_rstd&#x27;]  = df.groupby(&#x27;unit_id&#x27;)[col].transform(
+                      lambda x: x.rolling(window, min_periods=1).std().fillna(0)
+                  )
+        TODO: return df
+
+        Question to answer before running this: why do we group by unit_id
+        before computing the rolling window? What goes wrong if we don&#x27;t?
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+    def normalize(self, train_df, test_df, feature_cols: list):
+        &quot;&quot;&quot;
+        Fits a scaler on train_df and applies it to both train and test.
+
+        TODO: use sklearn.preprocessing.MinMaxScaler (or StandardScaler — know the difference).
+        TODO: scaler.fit(train_df[feature_cols]) — fit on TRAIN ONLY.
+        TODO: train_scaled = scaler.transform(train_df[feature_cols])
+        TODO: test_scaled  = scaler.transform(test_df[feature_cols])
+        TODO: return train_scaled, test_scaled, scaler
+
+        Why fit only on training data?
+        Data leakage. If test statistics influence the scaler, your reported accuracy
+        is optimistic and will not hold in production. Say this in your README.
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+
+# ---------------------------------------------------------------------------
+# MODEL
+# ---------------------------------------------------------------------------
+
+class RULPredictor:
+    &quot;&quot;&quot;
+    XGBoost-based Remaining Useful Life regressor.
+
+    Evaluation metrics you MUST implement (not optional):
+    1. RMSE — standard regression metric.
+    2. NASA score — asymmetric function defined in CONSTANTS section above.
+    3. Accuracy within ±15 cycles — business-friendly metric:
+       &quot;87% of predictions are within 15 cycles of the true failure.&quot;
+
+    Hyperparameter tuning:
+        Do NOT use GridSearchCV for XGBoost — the search space is too large.
+        Use Optuna (pip install optuna).
+        An Optuna &quot;trial&quot; suggests hyperparameters; you train and return the score.
+        Optuna minimizes (or maximizes) that score across N trials automatically.
+        TODO: look up &quot;Optuna quickstart&quot; — it takes 15 minutes to learn.
+    &quot;&quot;&quot;
+
+    def __init__(self):
+        # TODO: self.model = xgb.XGBRegressor(...)
+        # TODO: reasonable starting hyperparameters:
+        #       n_estimators=200, max_depth=6, learning_rate=0.05,
+        #       subsample=0.8, colsample_bytree=0.8, random_state=42
+        self.model = None
+        self.feature_names: list = []
+
+    def train(self, X_train, y_train, X_val=None, y_val=None):
+        &quot;&quot;&quot;
+        TODO: self.model.fit(X_train, y_train,
+                             eval_set=[(X_val, y_val)] if X_val is not None else None,
+                             early_stopping_rounds=20,
+                             verbose=False)
+        TODO: store feature importances in self.feature_importances_ after fitting.
+              print the top 10 — which sensors matter most? Add this to your README.
+        TODO: set self.feature_names to the column names passed in.
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+    def predict(self, X) -&gt; &quot;np.ndarray&quot;:
+        &quot;&quot;&quot;
+        TODO: preds = self.model.predict(X)
+        TODO: return np.clip(preds, 0, None)
+              Negative RUL is physically meaningless. Clip it.
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+    def nasa_score(self, y_true, y_pred) -&gt; float:
+        &quot;&quot;&quot;
+        Computes the asymmetric NASA scoring function.
+
+        TODO: implement the formula from CONSTANTS.
+        TODO: lower is better (score starts at 0 for a perfect prediction
+              and grows rapidly for late predictions).
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+    def evaluate(self, X_test, y_true) -&gt; dict:
+        &quot;&quot;&quot;
+        Returns a dict with keys: rmse, nasa_score, pct_within_15_cycles.
+
+        TODO: y_pred = self.predict(X_test)
+        TODO: rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+        TODO: score = self.nasa_score(y_true, y_pred)
+        TODO: within_15 = np.mean(np.abs(y_pred - y_true) &lt;= 15) * 100
+        TODO: log and return all three.
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+    def tune_hyperparameters(self, X_train, y_train, X_val, y_val, n_trials: int = 50):
+        &quot;&quot;&quot;
+        Uses Optuna to find better hyperparameters than the defaults.
+
+        TODO: import optuna
+        TODO: define an objective function:
+                def objective(trial):
+                    params = {
+                        &quot;n_estimators&quot;:    trial.suggest_int(&quot;n_estimators&quot;, 100, 500),
+                        &quot;max_depth&quot;:       trial.suggest_int(&quot;max_depth&quot;, 3, 10),
+                        &quot;learning_rate&quot;:   trial.suggest_float(&quot;learning_rate&quot;, 0.01, 0.3, log=True),
+                        &quot;subsample&quot;:       trial.suggest_float(&quot;subsample&quot;, 0.5, 1.0),
+                        &quot;colsample_bytree&quot;:trial.suggest_float(&quot;colsample_bytree&quot;, 0.5, 1.0),
+                    }
+                    model = xgb.XGBRegressor(**params, random_state=42)
+                    model.fit(X_train, y_train)
+                    preds = np.clip(model.predict(X_val), 0, None)
+                    return self.nasa_score(y_val, preds)
+        TODO: study = optuna.create_study(direction=&quot;minimize&quot;)
+        TODO: study.optimize(objective, n_trials=n_trials, show_progress_bar=True)
+        TODO: update self.model with study.best_params and re-train on full train set.
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+
+# ---------------------------------------------------------------------------
+# RAG PIPELINE
+# ---------------------------------------------------------------------------
+
+class TechnicianNotesStore:
+    &quot;&quot;&quot;
+    Embeds technician maintenance notes and stores them in a vector database
+    for retrieval during report generation.
+
+    What is RAG?
+        Retrieval-Augmented Generation.
+        Instead of relying on the LLM&#x27;s internal (possibly wrong) knowledge,
+        you retrieve relevant documents and inject them into the prompt.
+        The LLM then reasons over documents it has never seen before.
+
+    Three steps:
+        1. Embed: convert each note to a dense vector (sentence-transformers).
+        2. Store:  insert vectors into ChromaDB.
+        3. Retrieve: embed a query, find the top-k nearest vectors.
+
+    Synthetic data strategy:
+        You don&#x27;t have real technician notes. Generate them with an LLM.
+        Prompt pattern:
+            &quot;Write a short technician maintenance note (2-4 sentences) for an
+             aircraft engine showing these sensor patterns: {summary}.
+             Include a probable cause and recommended action.&quot;
+        Generate ~200 synthetic notes covering different failure modes.
+        This is legitimate data augmentation — mention it explicitly in your README.
+    &quot;&quot;&quot;
+
+    def __init__(self, embedding_model_name: str = &quot;all-MiniLM-L6-v2&quot;):
+        &quot;&quot;&quot;
+        TODO: from sentence_transformers import SentenceTransformer
+        TODO: self.embedder = SentenceTransformer(embedding_model_name)
+        TODO: import chromadb
+        TODO: self.client = chromadb.Client()
+        TODO: self.collection = self.client.create_collection(&quot;technician_notes&quot;)
+        &quot;&quot;&quot;
+        pass
+
+    def add_notes(self, notes: list[str], metadata: list[dict] = None):
+        &quot;&quot;&quot;
+        Embeds all notes and upserts them into the ChromaDB collection.
+
+        TODO: embeddings = self.embedder.encode(notes).tolist()
+        TODO: ids = [f&quot;note_{i}&quot; for i in range(len(notes))]
+        TODO: self.collection.upsert(
+                  ids=ids,
+                  embeddings=embeddings,
+                  documents=notes,
+                  metadatas=metadata or [{} for _ in notes]
+              )
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+    def retrieve(self, query: str, top_k: int = 3) -&gt; list[str]:
+        &quot;&quot;&quot;
+        Returns the top_k most semantically similar notes to the query.
+
+        TODO: query_embedding = self.embedder.encode([query]).tolist()
+        TODO: results = self.collection.query(
+                  query_embeddings=query_embedding,
+                  n_results=top_k
+              )
+        TODO: return results[&quot;documents&quot;][0]   # list of note strings
+
+        The query here will be a natural-language description of the sensor state,
+        e.g. &quot;high vibration in s4, temperature spike in s11, cycle 180&quot;.
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+
+class MaintenanceReportGenerator:
+    &quot;&quot;&quot;
+    Given a predicted low RUL + retrieved notes, generates a structured
+    maintenance report using an LLM.
+
+    Report structure (tell the LLM to follow this):
+        ## Engine {unit_id} — Maintenance Alert
+        **Predicted RUL:** {rul:.0f} cycles (~{days:.0f} days)
+        **Risk Level:** HIGH / MEDIUM / LOW
+
+        ### Sensor Summary
+        (which sensors are trending abnormally and in what direction)
+
+        ### Diagnosis
+        (probable failure mode based on sensor patterns)
+
+        ### Root Cause
+        (why this failure mode is occurring, grounded in retrieved notes)
+
+        ### Recommended Action
+        (specific maintenance steps)
+
+        ### Sources
+        (cite which retrieved notes were used — without this, the report is not grounded)
+
+    TODO: the &quot;Sources&quot; section is critical for trust. An LLM that doesn&#x27;t cite sources
+          may be hallucinating. Always show the retrieved documents alongside the output.
+    &quot;&quot;&quot;
+
+    def __init__(self, notes_store: TechnicianNotesStore, llm_client=None):
+        &quot;&quot;&quot;
+        TODO: self.notes_store = notes_store
+        TODO: self.llm = llm_client  (an openai.OpenAI() instance or similar)
+              If llm_client is None, fall back to a template-based report (no LLM).
+              Implementing the fallback forces you to think about what the LLM is
+              actually adding vs. what&#x27;s just string formatting.
+        &quot;&quot;&quot;
+        pass
+
+    def _build_sensor_summary(self, sensor_values: dict, baseline_means: dict) -&gt; str:
+        &quot;&quot;&quot;
+        Compares current sensor values to their baseline (healthy) means.
+        Returns a plain-English description of which sensors are abnormal.
+
+        TODO: for each sensor, compute deviation = (current - baseline) / baseline * 100
+        TODO: flag sensors with abs(deviation) &gt; 20% as abnormal.
+        TODO: format as: &quot;Sensor s4 is 34% above baseline (vibration). Sensor s11 is 18% above.&quot;
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+    def generate(self, unit_id: int, predicted_rul: float,
+                 sensor_values: dict, baseline_means: dict) -&gt; str:
+        &quot;&quot;&quot;
+        Full report generation pipeline.
+
+        TODO: summary = self._build_sensor_summary(sensor_values, baseline_means)
+        TODO: notes   = self.notes_store.retrieve(summary, top_k=3)
+        TODO: build the LLM prompt:
+                  system: &quot;You are an aircraft maintenance engineer. Write structured reports.&quot;
+                  user:   f&quot;Engine {unit_id}. Predicted RUL: {predicted_rul:.0f} cycles.
+                            Sensor summary: {summary}
+                            Similar past cases from maintenance logs:
+                            {chr(10).join(f&#x27;[{i+1}] {n}&#x27; for i, n in enumerate(notes))}
+                            Write the maintenance report. Cite sources by number.&quot;
+        TODO: call self.llm.chat.completions.create(...)
+        TODO: return response.choices[0].message.content
+        &quot;&quot;&quot;
+        raise NotImplementedError
+
+
+# ---------------------------------------------------------------------------
+# STREAMLIT DASHBOARD
+# (implement this only after the full pipeline works in plain Python)
+# ---------------------------------------------------------------------------
+
+def run_dashboard():
+    &quot;&quot;&quot;
+    Streamlit entry point.  Run with:  streamlit run project2_predictive_maintenance.py
+
+    Layout (suggested):
+        Sidebar:        engine selector (dropdown), subset selector (FD001-FD004).
+        Top row:        three st.metric cards — predicted RUL, NASA score, % within 15 cycles.
+        Middle row:     left = sensor trend line chart for selected engine,
+                        right = feature importance bar chart.
+        Bottom section: generated maintenance report in st.markdown().
+                        Below it: an expander &quot;Retrieved source notes&quot; showing the raw notes.
+
+    Key Streamlit patterns:
+    - @st.cache_resource for the model (trained once, reused across reruns).
+    - @st.cache_data    for the dataset (loaded once per subset selection).
+    - st.spinner(&quot;Generating report...&quot;) wrapping the LLM call.
+    - st.expander for the source notes — keeps the UI clean but transparent.
+    &quot;&quot;&quot;
+    # TODO: import streamlit as st
+    # TODO: implement layout
+    raise NotImplementedError
+
+
+# ---------------------------------------------------------------------------
+# ENTRY POINT — smoke test
+# ---------------------------------------------------------------------------
+
+if __name__ == &quot;__main__&quot;:
+    logging.basicConfig(level=logging.INFO, format=&quot;%(levelname)s: %(message)s&quot;)
+
+    # TODO: set DATA_DIR to wherever you downloaded the CMAPSS files.
+    DATA_DIR = &quot;./data/cmapss&quot;
+
+    # Smoke test order:
+    # 1. loader = CMAPSSLoader(DATA_DIR)
+    # 2. train_df = loader.load_train(&quot;FD001&quot;)
+    # 3. print(train_df.head())
+    # 4. print(&quot;RUL range:&quot;, train_df[&#x27;rul&#x27;].min(), &quot;–&quot;, train_df[&#x27;rul&#x27;].max())
+    # 5. train_df, kept = loader.drop_low_variance_sensors(train_df)
+    # 6. print(&quot;Kept sensors:&quot;, kept)
+    # 7. train_df = loader.add_rolling_features(train_df, sensor_cols=kept)
+    # 8. print(&quot;Columns after rolling features:&quot;, train_df.columns.tolist())
+    # Expected: for FD001, roughly 7-8 sensors survive variance filtering.
+    # If ALL sensors survive, your threshold is too low.
+    # If NO sensors survive, your threshold is too high.
+
+    logging.info(&quot;No implementation yet. Fill in the TODOs above.&quot;)
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

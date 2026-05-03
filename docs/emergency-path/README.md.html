@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Emergency Path - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../index.html">Back to website</a>
+      <a href="../../index.html#python-lab">Python lab</a>
+      <a href="../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Emergency Path</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">emergency-path/README.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="emergency-learning-workspace">Emergency Learning Workspace</h2>
+<p>This folder is your execution environment for a 2-month emergency study plan.</p>
+<ul>
+<li>Month 1: Python, data science, machine learning, deep learning basics, SQL, MongoDB, Git, Linux</li>
+<li>Month 2: Java</li>
+</ul>
+<p>The goal is not to consume content. The goal is to write code every day, review your mistakes, and rebuild small things yourself.</p>
+<h3 id="what-is-already-set-up">What Is Already Set Up</h3>
+<p>This workspace already has:</p>
+<ul>
+<li>a local virtual environment at <code>.venv</code></li>
+<li>core Python packages installed from <code>requirements-core.txt</code></li>
+<li>a Jupyter kernel named <code>Python (emergency-path)</code></li>
+<li>a local Git repository initialized in this folder</li>
+<li>a folder structure for exercises, notebooks, projects, and progress tracking</li>
+<li>an 8-week written roadmap</li>
+<li>a curated GitHub links file for projects and beginner exercise repositories</li>
+</ul>
+<h3 id="what-you-should-do-first">What You Should Do First</h3>
+<p>Follow this order exactly:</p>
+<ol>
+<li>Open <a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\start-here.md">start-here.md</a>.</li>
+<li>Open <a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\day-plans\index.md">day-plans/index.md</a>.</li>
+<li>Start with <a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\day-plans\week-01.md">day-plans/week-01.md</a>.</li>
+<li>Do Day 1 only.</li>
+<li>Put your code in <code>practice/python/day-01/</code>.</li>
+<li>Log mistakes in <a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\progress\mistakes.md">progress/mistakes.md</a>.</li>
+<li>Log your daily summary in <a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\progress\daily-log.md">progress/daily-log.md</a>.</li>
+<li>Commit your work.</li>
+</ol>
+<h3 id="exact-commands-to-use">Exact Commands To Use</h3>
+<p>Open PowerShell in this folder and run:</p>
+<pre><code class="language-powershell">.\scripts\enter.ps1
+python scripts\verify_env.py</code></pre>
+<p>If you want notebooks:</p>
+<pre><code class="language-powershell">.\scripts\start-jupyter.ps1</code></pre>
+<p>If you ever need to reinstall packages:</p>
+<pre><code class="language-powershell">.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements-core.txt</code></pre>
+<p>Optional deep learning packages:</p>
+<pre><code class="language-powershell">pip install -r requirements-dl.txt</code></pre>
+<h3 id="workspace-structure">Workspace Structure</h3>
+<pre><code class="language-text">emergency-path/
+├── .venv/                        # Local Python environment
+├── .vscode/                      # Editor settings for this workspace
+├── day-plans/                    # Full 8-week plan
+├── notebooks/                    # Jupyter notebooks
+├── practice/
+│   ├── python/                   # Python daily exercises
+│   ├── sql/                      # SQL practice and notes
+│   ├── mongodb/                  # MongoDB practice
+│   ├── git-linux/                # Git and Linux command practice
+│   └── java/                     # Java exercises in month 2
+├── projects/
+│   ├── python-cli/
+│   ├── data-analysis/
+│   ├── ml-basics/
+│   ├── pytorch-basics/
+│   ├── mongodb-crud/
+│   └── java-student-system/
+├── progress/
+│   ├── mistakes.md               # Error log
+│   └── daily-log.md              # Daily study log
+├── scripts/
+│   ├── enter.ps1                 # Activate environment
+│   ├── start-jupyter.ps1         # Launch JupyterLab
+│   └── verify_env.py             # Verify installed packages
+├── github-study-links.md         # Curated GitHub repos to study
+├── requirements-core.txt
+├── requirements-dl.txt
+└── start-here.md</code></pre>
+<h3 id="your-8-week-plan">Your 8-Week Plan</h3>
+<p>Use <a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\day-plans\index.md">day-plans/index.md</a> as the master roadmap.</p>
+<h4 id="month-1">Month 1</h4>
+<ul>
+<li><a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\day-plans\week-01.md">Week 1</a>: Python fundamentals, Git basics, Linux basics</li>
+<li><a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\day-plans\week-02.md">Week 2</a>: NumPy, Pandas, visualization, SQL</li>
+<li><a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\day-plans\week-03.md">Week 3</a>: scikit-learn and machine learning workflow</li>
+<li><a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\day-plans\week-04.md">Week 4</a>: PyTorch basics, MongoDB basics, final Month 1 project</li>
+</ul>
+<h4 id="month-2">Month 2</h4>
+<ul>
+<li><a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\day-plans\week-05.md">Week 5</a>: Java syntax and control flow</li>
+<li><a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\day-plans\week-06.md">Week 6</a>: Java OOP</li>
+<li><a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\day-plans\week-07.md">Week 7</a>: collections, exceptions, file I/O, streams</li>
+<li><a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\day-plans\week-08.md">Week 8</a>: JDBC, threads, final Java project</li>
+</ul>
+<h3 id="github-repos-to-study">GitHub Repos To Study</h3>
+<p>Open <a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\github-study-links.md">github-study-links.md</a>.</p>
+<p>That file contains:</p>
+<ul>
+<li>beginner-friendly projects to download and study</li>
+<li>step-by-step exercise repositories</li>
+<li>SQL, Git, Linux, Python, ML, PyTorch, and Java links</li>
+<li>a recommended order</li>
+</ul>
+<h3 id="how-to-study-a-repo-properly">How To Study A Repo Properly</h3>
+<p>Use this process every time:</p>
+<ol>
+<li>Clone only one repository at a time.</li>
+<li>Read the README first.</li>
+<li>Run the code as-is.</li>
+<li>Read one small file or one lesson only.</li>
+<li>Rebuild the same thing in your own folder without copying line by line.</li>
+<li>Compare your version with the original.</li>
+<li>Record your mistakes in <code>progress/mistakes.md</code>.</li>
+</ol>
+<p>Do not download many repos and skim them. That wastes time.</p>
+<h3 id="daily-rules">Daily Rules</h3>
+<ol>
+<li>Activate the environment before coding.</li>
+<li>Put each exercise in the correct <code>practice/</code> folder.</li>
+<li>Put notebooks in <code>notebooks/</code>.</li>
+<li>Put mini projects in <code>projects/</code>.</li>
+<li>Update <code>progress/mistakes.md</code> whenever something breaks.</li>
+<li>Update <code>progress/daily-log.md</code> at the end of the day.</li>
+<li>Commit at least once per day.</li>
+<li>Do not move to the next week unless you finish the current week&#x27;s deliverables.</li>
+</ol>
+<h3 id="minimum-deliverables-by-end-of-month-1">Minimum Deliverables By End Of Month 1</h3>
+<p>You should finish:</p>
+<ul>
+<li>at least 10 Python exercise files</li>
+<li>1 small CLI Python project</li>
+<li>1 cleaned dataset</li>
+<li>1 exploratory data notebook</li>
+<li>at least 20 SQL queries</li>
+<li>2 machine learning notebooks</li>
+<li>1 PyTorch notebook</li>
+<li>1 MongoDB CRUD script</li>
+</ul>
+<h3 id="minimum-deliverables-by-end-of-month-2">Minimum Deliverables By End Of Month 2</h3>
+<p>You should finish:</p>
+<ul>
+<li>at least 10 Java basics files</li>
+<li>1 OOP console app skeleton</li>
+<li>1 intermediate Java console app</li>
+<li>1 JDBC practice app</li>
+<li>1 final Java console project with a README</li>
+</ul>
+<h3 id="what-is-installed-and-what-is-missing">What Is Installed And What Is Missing</h3>
+<p>Current machine state:</p>
+<ul>
+<li>Python is installed</li>
+<li>Git is installed</li>
+<li>Java compiler is installed</li>
+<li>WSL is not enabled yet</li>
+<li>MongoDB shell is not installed yet</li>
+</ul>
+<p>That means:</p>
+<ul>
+<li>you can start Python, SQL with SQLite-style practice, Git, and Java now</li>
+<li>MongoDB will need installation later if you want local practice with <code>mongosh</code> or MongoDB Compass</li>
+<li>Linux command learning can start with Git Bash, PowerShell basics, or WSL later if enabled</li>
+</ul>
+<h3 id="if-you-get-stuck">If You Get Stuck</h3>
+<p>When asking for help, send:</p>
+<ul>
+<li>what you were trying to do</li>
+<li>the file path</li>
+<li>the code</li>
+<li>the exact error message</li>
+<li>what you already tried</li>
+</ul>
+<p>That is enough for fast debugging.</p>
+<h3 id="today-s-starting-point">Today’s Starting Point</h3>
+<p>Start with:</p>
+<ol>
+<li><code>.\scripts\enter.ps1</code></li>
+<li>open <a href="C:\Users\varag\OneDrive\Documents\Projects\Learn and grow\self-internship\emergency-path\start-here.md">start-here.md</a></li>
+<li>complete Day 1 in <code>practice/python/day-01/</code></li>
+<li>update <code>progress/daily-log.md</code></li>
+<li>commit your work</li>
+</ol></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#emergency-learning-workspace">Emergency Learning Workspace</a><a style="margin-left:12px" href="#what-is-already-set-up">What Is Already Set Up</a><a style="margin-left:12px" href="#what-you-should-do-first">What You Should Do First</a><a style="margin-left:12px" href="#exact-commands-to-use">Exact Commands To Use</a><a style="margin-left:12px" href="#workspace-structure">Workspace Structure</a><a style="margin-left:12px" href="#your-8-week-plan">Your 8-Week Plan</a><a style="margin-left:24px" href="#month-1">Month 1</a><a style="margin-left:24px" href="#month-2">Month 2</a><a style="margin-left:12px" href="#github-repos-to-study">GitHub Repos To Study</a><a style="margin-left:12px" href="#how-to-study-a-repo-properly">How To Study A Repo Properly</a><a style="margin-left:12px" href="#daily-rules">Daily Rules</a><a style="margin-left:12px" href="#minimum-deliverables-by-end-of-month-1">Minimum Deliverables By End Of Month 1</a><a style="margin-left:12px" href="#minimum-deliverables-by-end-of-month-2">Minimum Deliverables By End Of Month 2</a><a style="margin-left:12px" href="#what-is-installed-and-what-is-missing">What Is Installed And What Is Missing</a><a style="margin-left:12px" href="#if-you-get-stuck">If You Get Stuck</a><a style="margin-left:12px" href="#today-s-starting-point">Today’s Starting Point</a></aside>
+    </main>
+  </body>
+</html>

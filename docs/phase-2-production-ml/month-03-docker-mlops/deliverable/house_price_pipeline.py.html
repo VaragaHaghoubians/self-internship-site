@@ -1,0 +1,915 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>House Price Pipeline.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>House Price Pipeline.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">phase-2-production-ml/month-03-docker-mlops/deliverable/house_price_pipeline.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "\"\"\"\n=============================================================================\nPROJECT 3 \u2014 HOUSE PRICE PREDICTION: END-TO-END ML PIPELINE\nRole       : ML Engineer\nDataset    : House Prices \u2014 Advanced Regression Techniques (Kaggle)\n            https://www.kaggle.com/competitions/house-prices-advanced-regression-techniques\nAuthor     : [Your Name]\nDate       : [Date]\n=============================================================================\n\nDESCRIPTION:\n    Production-grade ML pipeline for predicting house sale prices.\n    Focuses on ML engineering best practices: sklearn Pipelines,\n    ColumnTransformer, feature engineering, model comparison,\n    hyperparameter tuning, and model persistence.\n\nENGINEERING GOALS:\n    - Build a reusable sklearn Pipeline (no data leakage guaranteed)\n    - Systematically handle 80 features with mixed types and missing values\n    - Compare 5 regression models with cross-validated RMSE\n    - Save the trained pipeline with joblib for deployment\n    - Produce residual analysis plots to validate model assumptions\n\nHOW TO USE:\n    1. Read data_description.txt in the data/ folder BEFORE anything else\n    2. Read INSTRUCTIONS.md for detailed guidance\n    3. Download train.csv and test.csv from Kaggle and put in data/\n    4. Fill in the code below each comment block\n    5. Work through each section in order\n\n=============================================================================\n\"\"\"\n\n\n# =============================================================================\n# STEP 0 \u2014 IMPORTS\n# =============================================================================\n# HINT: Import everything at the top.\n#\n# Core libraries:\n#   - pandas (as pd)\n#   - numpy (as np)\n#   - matplotlib.pyplot (as plt)\n#   - seaborn (as sns)\n#   - warnings\n#\n# From scipy.stats:\n#   - skew         \u2192 to measure how skewed a distribution is\n#   - probplot     \u2192 for Q-Q plots of residuals\n#\n# From sklearn.pipeline:\n#   - Pipeline\n#\n# From sklearn.compose:\n#   - ColumnTransformer\n#\n# From sklearn.preprocessing:\n#   - StandardScaler, OneHotEncoder, OrdinalEncoder\n#\n# From sklearn.impute:\n#   - SimpleImputer\n#\n# From sklearn.model_selection:\n#   - train_test_split, cross_val_score, GridSearchCV, KFold\n#\n# From sklearn.linear_model:\n#   - LinearRegression, Ridge, Lasso\n#\n# From sklearn.ensemble:\n#   - RandomForestRegressor, GradientBoostingRegressor\n#\n# From sklearn.metrics:\n#   - mean_squared_error, r2_score, mean_absolute_error\n#\n# From sklearn.base:\n#   - BaseEstimator, TransformerMixin  \u2190 for writing custom transformers\n#\n# From xgboost:\n#   - XGBRegressor\n#\n# import joblib  \u2190 for saving and loading the trained pipeline\n\n# === YOUR IMPORT CODE HERE ===\n\n\n# =============================================================================\n# STEP 1 \u2014 LOAD AND UNDERSTAND THE DATA\n# =============================================================================\n# HINT: Load train.csv into a DataFrame.\n#       This dataset has 80 columns \u2014 take your time exploring it.\n#\n# IMPORTANT: Before running any code, open data_description.txt and read it.\n#            You must understand what each column means to engineer features correctly.\n#\n# Load the data:\n#   df = pd.read_csv('data/train.csv')\n#\n# Initial exploration:\n#   - df.shape       \u2192 how many rows and columns?\n#   - df.info()      \u2192 column names, types, non-null counts\n#   - df.describe()  \u2192 statistical summary of numerical columns\n#   - df.head()      \u2192 first 5 rows\n#\n# Compute missing value report:\n#   - Create a DataFrame showing: column name, count missing, % missing\n#   - Sort by % missing descending\n#   - Print only columns with > 0% missing\n#   - Some columns may have 90%+ missing \u2014 are they worth keeping?\n#\n# Identify column types by category:\n#   - Numerical continuous: GrLivArea, LotArea, TotalBsmtSF, etc.\n#   - Numerical ordinal (quality scores): OverallQual, OverallCond, etc.\n#   - Categorical nominal: Neighborhood, HouseStyle, MSZoning, etc.\n#   - Note: MSSubClass is an integer but actually represents house type categories!\n#\n# Print a summary of your findings.\n\n# === YOUR DATA LOADING CODE HERE ===\n\n\n# =============================================================================\n# STEP 2 \u2014 EXPLORATORY DATA ANALYSIS\n# =============================================================================\n# HINT: Focus on understanding the target variable and key features.\n#       You don't need exhaustive EDA here \u2014 just enough to motivate your\n#       feature engineering decisions.\n#\n# --------------------------------------------------------------------------\n# PLOT 1 \u2014 Target Variable Distribution (SalePrice)\n# --------------------------------------------------------------------------\n# HINT:\n#   Create a side-by-side plot (1 row, 2 columns using plt.subplots):\n#   Left plot:  Histogram of df['SalePrice'] with kde=True\n#               Title: 'SalePrice Distribution (Original)'\n#               Note: Is it right-skewed? Compute: df['SalePrice'].skew()\n#   Right plot: Histogram of np.log1p(df['SalePrice']) with kde=True\n#               Title: 'SalePrice Distribution (Log-Transformed)'\n#               Note: Is it now more bell-shaped?\n#\n# WHY THIS MATTERS: Linear regression assumes normally distributed errors.\n#   Log-transforming a skewed target makes regression models work much better.\n\n# === YOUR PLOT 1 CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# PLOT 2 \u2014 Feature Correlations with SalePrice\n# --------------------------------------------------------------------------\n# HINT:\n#   Step 1: Compute correlation of all numeric columns with 'SalePrice':\n#           corr_with_target = df.corr()['SalePrice'].sort_values(ascending=False)\n#           print(\"Top 10 positive correlations:\\n\", corr_with_target.head(11))\n#           print(\"Top 5 negative correlations:\\n\", corr_with_target.tail(5))\n#\n#   Step 2: Select top 15 correlated features (including SalePrice):\n#           top_features = corr_with_target.abs().sort_values(ascending=False).head(15).index\n#\n#   Step 3: Plot a heatmap of correlations among those top features:\n#           sns.heatmap(df[top_features].corr(), annot=True, fmt='.2f', cmap='coolwarm')\n#\n# WHAT TO LOOK FOR: Which features are most correlated with SalePrice?\n#                   Which features are correlated with EACH OTHER? (multicollinearity)\n\n# === YOUR PLOT 2 CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# PLOT 3 \u2014 Key Feature Scatter Plots\n# --------------------------------------------------------------------------\n# HINT:\n#   Create a 2x3 grid of scatter plots using plt.subplots(2, 3)\n#   Plot these 6 features vs. SalePrice:\n#     - OverallQual (quality rating 1-10)\n#     - GrLivArea (above ground living area)\n#     - TotalBsmtSF (basement area)\n#     - GarageCars (garage size in cars)\n#     - YearBuilt\n#     - Neighborhood (use boxplot instead of scatter for this one)\n#\n# OUTLIER DETECTION:\n#   In the GrLivArea vs. SalePrice scatter, look for points with\n#   very large GrLivArea but unusually low SalePrice. Note them.\n#   You will remove them in Step 4.\n\n# === YOUR PLOT 3 CODE HERE ===\n\n\n# =============================================================================\n# STEP 3 \u2014 TARGET TRANSFORMATION\n# =============================================================================\n# HINT: Log-transform the target variable before modeling.\n#\n#   y = np.log1p(df['SalePrice'])\n#   X = df.drop(columns=['SalePrice', 'Id'])   <- drop target and ID column\n#\n#   Print: \"SalePrice skewness before log: {:.2f}\".format(df['SalePrice'].skew())\n#   Print: \"SalePrice skewness after log:  {:.2f}\".format(y.skew())\n#\n# IMPORTANT NOTE FOR LATER:\n#   When you generate final predictions, you must REVERSE this transformation:\n#   final_price = np.expm1(log_prediction)\n#   np.expm1 is the inverse of np.log1p\n\n# === YOUR TARGET TRANSFORMATION CODE HERE ===\n\n\n# =============================================================================\n# STEP 4 \u2014 FEATURE ENGINEERING\n# =============================================================================\n# HINT: This is the most impactful step in this project.\n#       Better features beat better algorithms for this dataset.\n#       Read INSTRUCTIONS.md Phase 4 in detail before writing this section.\n#\n# --------------------------------------------------------------------------\n# 4.1 \u2014 Remove Outliers\n# --------------------------------------------------------------------------\n# HINT: Remove the 2\u20134 extreme outliers you identified in Plot 3.\n#       Condition: GrLivArea > 4000 AND SalePrice < 200000\n#       Use boolean indexing to find and drop these rows.\n#       Print how many rows were removed.\n\n# === YOUR OUTLIER REMOVAL CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# 4.2 \u2014 Handle Missing Values (Domain-Informed Imputation)\n# --------------------------------------------------------------------------\n# HINT: For this dataset, most NaN values mean \"feature doesn't exist\",\n#       NOT \"we don't know\". The data description file explains each column.\n#\n# STEP 1 \u2014 Fill categorical NaN with 'None' (means: feature not present):\n#   Columns: PoolQC, MiscFeature, Alley, Fence, FireplaceQu,\n#            GarageType, GarageFinish, GarageQual, GarageCond,\n#            BsmtQual, BsmtCond, BsmtExposure, BsmtFinType1, BsmtFinType2,\n#            MasVnrType\n#\n# STEP 2 \u2014 Fill numerical NaN with 0 (means: area/count of 0):\n#   Columns: GarageYrBlt, GarageArea, GarageCars,\n#            BsmtFinSF1, BsmtFinSF2, BsmtUnfSF, TotalBsmtSF,\n#            BsmtFullBath, BsmtHalfBath, MasVnrArea\n#\n# STEP 3 \u2014 Fill LotFrontage with NEIGHBORHOOD MEDIAN (not global median):\n#   df['LotFrontage'] = df.groupby('Neighborhood')['LotFrontage'].transform(\n#       lambda x: x.fillna(x.median())\n#   )\n#   This is smarter than global median because lot size varies by neighborhood.\n#\n# STEP 4 \u2014 Fill remaining NaN with mode or median:\n#   For other columns with few missing values, use the most common value.\n#\n# VERIFY: After this step, df.isnull().sum().sum() should be 0 (or very close).\n\n# === YOUR MISSING VALUE HANDLING CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# 4.3 \u2014 Encode Ordinal Quality Features\n# --------------------------------------------------------------------------\n# HINT: Some text columns represent ordered quality levels.\n#       Preserve the order by mapping to numbers.\n#\n# Quality scale mapping (use this same mapping for all quality columns):\n#   quality_map = {'None': 0, 'Po': 1, 'Fa': 2, 'TA': 3, 'Gd': 4, 'Ex': 5}\n#\n# Columns to apply this to:\n#   - ExterQual, ExterCond\n#   - BsmtQual, BsmtCond, BsmtExposure (use a different map for this one)\n#   - HeatingQC\n#   - KitchenQual\n#   - FireplaceQu\n#   - GarageQual, GarageCond\n#   - PoolQC\n#\n# Use: df['column'] = df['column'].map(quality_map)\n#      After mapping, verify no NaN values appeared (NaN means a value wasn't in the map)\n\n# === YOUR ORDINAL ENCODING CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# 4.4 \u2014 Create New Features (Feature Engineering)\n# --------------------------------------------------------------------------\n# HINT: Create meaningful new features that combine existing ones.\n#       See INSTRUCTIONS.md Phase 4.2 for the full list.\n#\n# Key features to create:\n#\n# Total square footage (most important feature):\n#   df['TotalSF'] = df['TotalBsmtSF'] + df['1stFlrSF'] + df['2ndFlrSF']\n#\n# Total bathrooms:\n#   df['TotalBath'] = (df['FullBath'] + 0.5 * df['HalfBath'] +\n#                      df['BsmtFullBath'] + 0.5 * df['BsmtHalfBath'])\n#\n# Age-related features:\n#   df['HouseAge']          = df['YrSold'] - df['YearBuilt']\n#   df['YearsSinceRemodel'] = df['YrSold'] - df['YearRemodAdd']\n#\n# Binary indicator features:\n#   df['HasPool']    = (df['PoolArea'] > 0).astype(int)\n#   df['HasGarage']  = (df['GarageArea'] > 0).astype(int)\n#   df['Has2ndFloor'] = (df['2ndFlrSF'] > 0).astype(int)\n#   df['HasFireplace'] = (df['Fireplaces'] > 0).astype(int)\n#\n# Total porch area:\n#   df['TotalPorchSF'] = (df['OpenPorchSF'] + df['EnclosedPorch'] +\n#                          df['3SsnPorch'] + df['ScreenPorch'])\n#\n# Fix MSSubClass type (it's a number but should be a category string):\n#   df['MSSubClass'] = df['MSSubClass'].astype(str)\n#\n# After creating features, print the new shape: df.shape\n\n# === YOUR FEATURE ENGINEERING CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# 4.5 \u2014 Handle Skewed Numerical Features (Optional but Recommended)\n# --------------------------------------------------------------------------\n# HINT: Many numerical features (LotArea, GrLivArea, etc.) are right-skewed.\n#       Log-transforming them can improve linear model performance.\n#\n# Step 1: Compute skewness of all numerical features:\n#   numeric_feats = df.select_dtypes(include=['int64','float64']).columns\n#   skewness = df[numeric_feats].apply(lambda x: x.skew()).sort_values(ascending=False)\n#   high_skew = skewness[skewness > 0.75]\n#\n# Step 2: Apply np.log1p to highly skewed features:\n#   for col in high_skew.index:\n#       df[col] = np.log1p(df[col])\n#\n# Note: Do NOT apply this to the target \u2014 you already did that in Step 3.\n# Note: Do NOT apply this to binary features (0/1 columns).\n\n# === YOUR SKEWNESS HANDLING CODE HERE ===\n\n\n# =============================================================================\n# STEP 5 \u2014 TRAIN/VALIDATION SPLIT\n# =============================================================================\n# HINT: Split your feature-engineered data into training and validation sets.\n#       This split is for your own evaluation \u2014 the actual test set is test.csv\n#\n#   X = df.drop(columns=['SalePrice', 'Id'])   <- if not done in Step 3\n#   y = np.log1p(df['SalePrice'])              <- log-transformed target\n#\n#   Use: train_test_split(X, y, test_size=0.15, random_state=42)\n#   (15% validation \u2014 keeping more for training since data is small)\n#\n#   Print shapes:\n#     print(\"X_train:\", X_train.shape)\n#     print(\"X_val:  \", X_val.shape)\n\n# === YOUR SPLIT CODE HERE ===\n\n\n# =============================================================================\n# STEP 6 \u2014 BUILD THE SKLEARN PIPELINE\n# =============================================================================\n# HINT: Build a reusable Pipeline that handles ALL preprocessing automatically.\n#       Read INSTRUCTIONS.md Phase 5 carefully before writing this.\n#\n# --------------------------------------------------------------------------\n# 6.1 \u2014 Define Column Lists\n# --------------------------------------------------------------------------\n# HINT: Separate your features into:\n#   - numerical_cols: all float and int columns\n#   - categorical_cols: all object (string) columns\n#\n#   numerical_cols = X_train.select_dtypes(include=['int64','float64']).columns.tolist()\n#   categorical_cols = X_train.select_dtypes(include=['object']).columns.tolist()\n#\n#   Print both lists to verify.\n\n# === YOUR COLUMN LISTS CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# 6.2 \u2014 Define the Preprocessing Pipelines\n# --------------------------------------------------------------------------\n# HINT: Create separate pipelines for numerical and categorical columns.\n#\n# Numerical pipeline:\n#   numerical_pipeline = Pipeline(steps=[\n#       ('imputer', SimpleImputer(strategy='median')),\n#       ('scaler', StandardScaler())\n#   ])\n#   (Imputer fills any remaining NaN, scaler normalizes values)\n#\n# Categorical pipeline:\n#   categorical_pipeline = Pipeline(steps=[\n#       ('imputer', SimpleImputer(strategy='most_frequent')),\n#       ('encoder', OneHotEncoder(handle_unknown='ignore', sparse_output=False))\n#   ])\n#   (handle_unknown='ignore' is critical \u2014 prevents crash on unseen categories)\n\n# === YOUR PIPELINE DEFINITION CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# 6.3 \u2014 Combine with ColumnTransformer\n# --------------------------------------------------------------------------\n# HINT:\n#   preprocessor = ColumnTransformer(transformers=[\n#       ('num', numerical_pipeline, numerical_cols),\n#       ('cat', categorical_pipeline, categorical_cols)\n#   ])\n#\n# This applies numerical_pipeline to numerical_cols ONLY,\n# and categorical_pipeline to categorical_cols ONLY.\n\n# === YOUR COLUMNTRANSFORMER CODE HERE ===\n\n\n# --------------------------------------------------------------------------\n# 6.4 \u2014 Build Full Pipeline with a Model\n# --------------------------------------------------------------------------\n# HINT: Add a placeholder model for now. You'll swap it in Step 7.\n#   full_pipeline = Pipeline(steps=[\n#       ('preprocessor', preprocessor),\n#       ('model', Ridge(alpha=10))   <- start with Ridge as your first model\n#   ])\n\n# === YOUR FULL PIPELINE CODE HERE ===\n\n\n# =============================================================================\n# STEP 7 \u2014 MODEL COMPARISON\n# =============================================================================\n# HINT: Train 5 models using cross-validation. Compare their RMSE.\n#       For each model, just swap out the 'model' step in your pipeline.\n#\n# Models to test:\n#   1. LinearRegression()\n#   2. Ridge(alpha=10)\n#   3. Lasso(alpha=0.001)\n#   4. RandomForestRegressor(n_estimators=100, random_state=42)\n#   5. XGBRegressor(n_estimators=500, learning_rate=0.05, random_state=42)\n#\n# For each model:\n#   pipeline.set_params(model=YourModel())   <- replaces the model in the pipeline\n#   scores = cross_val_score(pipeline, X_train, y_train,\n#                            cv=5, scoring='neg_root_mean_squared_error')\n#   rmse = -scores.mean()\n#   std  = scores.std()\n#   print(f\"{ModelName:30s} | RMSE: {rmse:.4f} | Std: {std:.4f}\")\n#\n# IMPORTANT: A lower RMSE is better. Good models score ~0.11\u20130.14 here.\n#\n# After comparing, save the results to a list and print a formatted table.\n# Select the best model for hyperparameter tuning in Step 8.\n\n# === YOUR MODEL COMPARISON CODE HERE ===\n\n\n# =============================================================================\n# STEP 8 \u2014 HYPERPARAMETER TUNING\n# =============================================================================\n# HINT: Tune the best model (likely XGBoost or Ridge) using GridSearchCV.\n#       Note: In a Pipeline, parameter names are prefixed: 'step_name__param_name'\n#\n# For XGBoost:\n#   param_grid = {\n#       'model__n_estimators': [300, 500],\n#       'model__learning_rate': [0.05, 0.1],\n#       'model__max_depth': [3, 4],\n#       'model__subsample': [0.8, 1.0],\n#       'model__colsample_bytree': [0.8, 1.0]\n#   }\n#\n# For Ridge (simpler):\n#   param_grid = {\n#       'model__alpha': [0.1, 1.0, 10.0, 50.0, 100.0]\n#   }\n#\n#   grid_search = GridSearchCV(\n#       full_pipeline,\n#       param_grid,\n#       cv=5,\n#       scoring='neg_root_mean_squared_error',\n#       n_jobs=-1,\n#       verbose=2\n#   )\n#   grid_search.fit(X_train, y_train)\n#\n#   print(\"Best Parameters:\", grid_search.best_params_)\n#   print(\"Best CV RMSE:\", -grid_search.best_score_)\n\n# === YOUR HYPERPARAMETER TUNING CODE HERE ===\n\n\n# =============================================================================\n# STEP 9 \u2014 FINAL EVALUATION ON VALIDATION SET\n# =============================================================================\n# HINT: Use the best pipeline (from GridSearchCV) to evaluate on the held-out\n#       validation set. This gives you an unbiased estimate of performance.\n#\n#   best_pipeline = grid_search.best_estimator_\n#\n#   y_val_pred_log = best_pipeline.predict(X_val)   <- predictions in log scale\n#\n#   val_rmse = np.sqrt(mean_squared_error(y_val, y_val_pred_log))\n#   val_mae  = mean_absolute_error(y_val, y_val_pred_log)\n#   val_r2   = r2_score(y_val, y_val_pred_log)\n#\n#   print(f\"Validation RMSE (log scale): {val_rmse:.4f}\")\n#   print(f\"Validation MAE  (log scale): {val_mae:.4f}\")\n#   print(f\"Validation R\u00b2:               {val_r2:.4f}\")\n#\n# REVERSE the log transform to show error in actual dollars:\n#   y_val_actual    = np.expm1(y_val)\n#   y_val_pred_real = np.expm1(y_val_pred_log)\n#   real_rmse = np.sqrt(mean_squared_error(y_val_actual, y_val_pred_real))\n#   print(f\"Validation RMSE in dollars: ${real_rmse:,.0f}\")\n\n# === YOUR FINAL EVALUATION CODE HERE ===\n\n\n# =============================================================================\n# STEP 10 \u2014 RESIDUAL ANALYSIS\n# =============================================================================\n# HINT: Check whether your model's errors are random (good) or systematic (bad).\n#       Systematic errors mean the model is missing something.\n#\n# residuals = y_val - y_val_pred_log\n#\n# PLOT A \u2014 Residuals vs. Predicted Values:\n#   plt.scatter(y_val_pred_log, residuals, alpha=0.5)\n#   plt.axhline(y=0, color='red', linestyle='--')\n#   plt.xlabel('Predicted Log(SalePrice)')\n#   plt.ylabel('Residuals')\n#   plt.title('Residuals vs. Predicted Values')\n#   Look for: random scatter around y=0 (good)\n#             funnel shape = heteroscedasticity (bad)\n#             U-shape = non-linearity not captured (bad)\n#\n# PLOT B \u2014 Histogram of Residuals:\n#   sns.histplot(residuals, bins=40, kde=True)\n#   Should be approximately normal (bell-shaped).\n#\n# PLOT C \u2014 Q-Q Plot:\n#   from scipy.stats import probplot\n#   probplot(residuals, plot=plt)\n#   Points close to the diagonal line = normally distributed residuals.\n\n# === YOUR RESIDUAL ANALYSIS CODE HERE ===\n\n\n# =============================================================================\n# STEP 11 \u2014 SAVE THE TRAINED PIPELINE\n# =============================================================================\n# HINT: Save your best trained pipeline to disk so it can be deployed\n#       without retraining.\n#\n#   import joblib\n#   joblib.dump(best_pipeline, 'outputs/models/house_price_pipeline.pkl')\n#   print(\"Pipeline saved successfully.\")\n#\n# LOAD AND TEST:\n#   loaded_pipeline = joblib.load('outputs/models/house_price_pipeline.pkl')\n#   test_prediction = loaded_pipeline.predict(X_val.head(1))\n#   print(\"Loaded pipeline prediction (log):\", test_prediction)\n#   print(\"Loaded pipeline prediction ($):\", np.expm1(test_prediction))\n#\n# WHY THIS MATTERS:\n#   A model saved this way can be loaded in a Flask/FastAPI app and\n#   served as a REST API \u2014 that's how real ML systems work.\n\n# === YOUR MODEL PERSISTENCE CODE HERE ===\n\n\n# =============================================================================\n# STEP 12 \u2014 GENERATE TEST SET PREDICTIONS (Kaggle Submission)\n# =============================================================================\n# HINT: Apply the same feature engineering to test.csv and generate predictions.\n#\n# Step 1: Load test data:\n#   df_test = pd.read_csv('data/test.csv')\n#   test_ids = df_test['Id']\n#\n# Step 2: Apply ALL the same feature engineering steps you did in Step 4.\n#         (You may want to write a function that takes a DataFrame\n#          and applies all transformations \u2014 that's a good refactoring exercise!)\n#\n# Step 3: Predict:\n#   log_predictions = best_pipeline.predict(X_test)\n#   final_predictions = np.expm1(log_predictions)   <- reverse log transform\n#\n# Step 4: Save submission:\n#   submission = pd.DataFrame({'Id': test_ids, 'SalePrice': final_predictions})\n#   submission.to_csv('outputs/predictions/test_predictions.csv', index=False)\n#   print(\"Submission file saved!\")\n#   print(submission.head())\n\n# === YOUR TEST PREDICTION CODE HERE ===\n\n\n# =============================================================================\n# END OF PROJECT 3\n# =============================================================================\n# NEXT STEPS (after completing this project):\n#   - Submit to the Kaggle leaderboard! Compare your score with others.\n#   - Try a stacking ensemble: average predictions from multiple models\n#   - Learn about SHAP values for feature importance in tree-based models\n#   - Build a simple Flask API that loads your .pkl file and serves predictions:\n#     from flask import Flask, request, jsonify\n#     import joblib, numpy as np\n#     app = Flask(__name__)\n#     model = joblib.load('outputs/models/house_price_pipeline.pkl')\n#     @app.route('/predict', methods=['POST'])\n#     def predict(): ...\n#   - Try MLflow for experiment tracking: pip install mlflow\n# =============================================================================\n";
+      const readerOutputKey = "readerRun:phase-2-production-ml/month-03-docker-mlops/deliverable/house_price_pipeline.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code>&quot;&quot;&quot;
+=============================================================================
+PROJECT 3 — HOUSE PRICE PREDICTION: END-TO-END ML PIPELINE
+Role       : ML Engineer
+Dataset    : House Prices — Advanced Regression Techniques (Kaggle)
+            https://www.kaggle.com/competitions/house-prices-advanced-regression-techniques
+Author     : [Your Name]
+Date       : [Date]
+=============================================================================
+
+DESCRIPTION:
+    Production-grade ML pipeline for predicting house sale prices.
+    Focuses on ML engineering best practices: sklearn Pipelines,
+    ColumnTransformer, feature engineering, model comparison,
+    hyperparameter tuning, and model persistence.
+
+ENGINEERING GOALS:
+    - Build a reusable sklearn Pipeline (no data leakage guaranteed)
+    - Systematically handle 80 features with mixed types and missing values
+    - Compare 5 regression models with cross-validated RMSE
+    - Save the trained pipeline with joblib for deployment
+    - Produce residual analysis plots to validate model assumptions
+
+HOW TO USE:
+    1. Read data_description.txt in the data/ folder BEFORE anything else
+    2. Read INSTRUCTIONS.md for detailed guidance
+    3. Download train.csv and test.csv from Kaggle and put in data/
+    4. Fill in the code below each comment block
+    5. Work through each section in order
+
+=============================================================================
+&quot;&quot;&quot;
+
+
+# =============================================================================
+# STEP 0 — IMPORTS
+# =============================================================================
+# HINT: Import everything at the top.
+#
+# Core libraries:
+#   - pandas (as pd)
+#   - numpy (as np)
+#   - matplotlib.pyplot (as plt)
+#   - seaborn (as sns)
+#   - warnings
+#
+# From scipy.stats:
+#   - skew         → to measure how skewed a distribution is
+#   - probplot     → for Q-Q plots of residuals
+#
+# From sklearn.pipeline:
+#   - Pipeline
+#
+# From sklearn.compose:
+#   - ColumnTransformer
+#
+# From sklearn.preprocessing:
+#   - StandardScaler, OneHotEncoder, OrdinalEncoder
+#
+# From sklearn.impute:
+#   - SimpleImputer
+#
+# From sklearn.model_selection:
+#   - train_test_split, cross_val_score, GridSearchCV, KFold
+#
+# From sklearn.linear_model:
+#   - LinearRegression, Ridge, Lasso
+#
+# From sklearn.ensemble:
+#   - RandomForestRegressor, GradientBoostingRegressor
+#
+# From sklearn.metrics:
+#   - mean_squared_error, r2_score, mean_absolute_error
+#
+# From sklearn.base:
+#   - BaseEstimator, TransformerMixin  ← for writing custom transformers
+#
+# From xgboost:
+#   - XGBRegressor
+#
+# import joblib  ← for saving and loading the trained pipeline
+
+# === YOUR IMPORT CODE HERE ===
+
+
+# =============================================================================
+# STEP 1 — LOAD AND UNDERSTAND THE DATA
+# =============================================================================
+# HINT: Load train.csv into a DataFrame.
+#       This dataset has 80 columns — take your time exploring it.
+#
+# IMPORTANT: Before running any code, open data_description.txt and read it.
+#            You must understand what each column means to engineer features correctly.
+#
+# Load the data:
+#   df = pd.read_csv(&#x27;data/train.csv&#x27;)
+#
+# Initial exploration:
+#   - df.shape       → how many rows and columns?
+#   - df.info()      → column names, types, non-null counts
+#   - df.describe()  → statistical summary of numerical columns
+#   - df.head()      → first 5 rows
+#
+# Compute missing value report:
+#   - Create a DataFrame showing: column name, count missing, % missing
+#   - Sort by % missing descending
+#   - Print only columns with &gt; 0% missing
+#   - Some columns may have 90%+ missing — are they worth keeping?
+#
+# Identify column types by category:
+#   - Numerical continuous: GrLivArea, LotArea, TotalBsmtSF, etc.
+#   - Numerical ordinal (quality scores): OverallQual, OverallCond, etc.
+#   - Categorical nominal: Neighborhood, HouseStyle, MSZoning, etc.
+#   - Note: MSSubClass is an integer but actually represents house type categories!
+#
+# Print a summary of your findings.
+
+# === YOUR DATA LOADING CODE HERE ===
+
+
+# =============================================================================
+# STEP 2 — EXPLORATORY DATA ANALYSIS
+# =============================================================================
+# HINT: Focus on understanding the target variable and key features.
+#       You don&#x27;t need exhaustive EDA here — just enough to motivate your
+#       feature engineering decisions.
+#
+# --------------------------------------------------------------------------
+# PLOT 1 — Target Variable Distribution (SalePrice)
+# --------------------------------------------------------------------------
+# HINT:
+#   Create a side-by-side plot (1 row, 2 columns using plt.subplots):
+#   Left plot:  Histogram of df[&#x27;SalePrice&#x27;] with kde=True
+#               Title: &#x27;SalePrice Distribution (Original)&#x27;
+#               Note: Is it right-skewed? Compute: df[&#x27;SalePrice&#x27;].skew()
+#   Right plot: Histogram of np.log1p(df[&#x27;SalePrice&#x27;]) with kde=True
+#               Title: &#x27;SalePrice Distribution (Log-Transformed)&#x27;
+#               Note: Is it now more bell-shaped?
+#
+# WHY THIS MATTERS: Linear regression assumes normally distributed errors.
+#   Log-transforming a skewed target makes regression models work much better.
+
+# === YOUR PLOT 1 CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# PLOT 2 — Feature Correlations with SalePrice
+# --------------------------------------------------------------------------
+# HINT:
+#   Step 1: Compute correlation of all numeric columns with &#x27;SalePrice&#x27;:
+#           corr_with_target = df.corr()[&#x27;SalePrice&#x27;].sort_values(ascending=False)
+#           print(&quot;Top 10 positive correlations:\n&quot;, corr_with_target.head(11))
+#           print(&quot;Top 5 negative correlations:\n&quot;, corr_with_target.tail(5))
+#
+#   Step 2: Select top 15 correlated features (including SalePrice):
+#           top_features = corr_with_target.abs().sort_values(ascending=False).head(15).index
+#
+#   Step 3: Plot a heatmap of correlations among those top features:
+#           sns.heatmap(df[top_features].corr(), annot=True, fmt=&#x27;.2f&#x27;, cmap=&#x27;coolwarm&#x27;)
+#
+# WHAT TO LOOK FOR: Which features are most correlated with SalePrice?
+#                   Which features are correlated with EACH OTHER? (multicollinearity)
+
+# === YOUR PLOT 2 CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# PLOT 3 — Key Feature Scatter Plots
+# --------------------------------------------------------------------------
+# HINT:
+#   Create a 2x3 grid of scatter plots using plt.subplots(2, 3)
+#   Plot these 6 features vs. SalePrice:
+#     - OverallQual (quality rating 1-10)
+#     - GrLivArea (above ground living area)
+#     - TotalBsmtSF (basement area)
+#     - GarageCars (garage size in cars)
+#     - YearBuilt
+#     - Neighborhood (use boxplot instead of scatter for this one)
+#
+# OUTLIER DETECTION:
+#   In the GrLivArea vs. SalePrice scatter, look for points with
+#   very large GrLivArea but unusually low SalePrice. Note them.
+#   You will remove them in Step 4.
+
+# === YOUR PLOT 3 CODE HERE ===
+
+
+# =============================================================================
+# STEP 3 — TARGET TRANSFORMATION
+# =============================================================================
+# HINT: Log-transform the target variable before modeling.
+#
+#   y = np.log1p(df[&#x27;SalePrice&#x27;])
+#   X = df.drop(columns=[&#x27;SalePrice&#x27;, &#x27;Id&#x27;])   &lt;- drop target and ID column
+#
+#   Print: &quot;SalePrice skewness before log: {:.2f}&quot;.format(df[&#x27;SalePrice&#x27;].skew())
+#   Print: &quot;SalePrice skewness after log:  {:.2f}&quot;.format(y.skew())
+#
+# IMPORTANT NOTE FOR LATER:
+#   When you generate final predictions, you must REVERSE this transformation:
+#   final_price = np.expm1(log_prediction)
+#   np.expm1 is the inverse of np.log1p
+
+# === YOUR TARGET TRANSFORMATION CODE HERE ===
+
+
+# =============================================================================
+# STEP 4 — FEATURE ENGINEERING
+# =============================================================================
+# HINT: This is the most impactful step in this project.
+#       Better features beat better algorithms for this dataset.
+#       Read INSTRUCTIONS.md Phase 4 in detail before writing this section.
+#
+# --------------------------------------------------------------------------
+# 4.1 — Remove Outliers
+# --------------------------------------------------------------------------
+# HINT: Remove the 2–4 extreme outliers you identified in Plot 3.
+#       Condition: GrLivArea &gt; 4000 AND SalePrice &lt; 200000
+#       Use boolean indexing to find and drop these rows.
+#       Print how many rows were removed.
+
+# === YOUR OUTLIER REMOVAL CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# 4.2 — Handle Missing Values (Domain-Informed Imputation)
+# --------------------------------------------------------------------------
+# HINT: For this dataset, most NaN values mean &quot;feature doesn&#x27;t exist&quot;,
+#       NOT &quot;we don&#x27;t know&quot;. The data description file explains each column.
+#
+# STEP 1 — Fill categorical NaN with &#x27;None&#x27; (means: feature not present):
+#   Columns: PoolQC, MiscFeature, Alley, Fence, FireplaceQu,
+#            GarageType, GarageFinish, GarageQual, GarageCond,
+#            BsmtQual, BsmtCond, BsmtExposure, BsmtFinType1, BsmtFinType2,
+#            MasVnrType
+#
+# STEP 2 — Fill numerical NaN with 0 (means: area/count of 0):
+#   Columns: GarageYrBlt, GarageArea, GarageCars,
+#            BsmtFinSF1, BsmtFinSF2, BsmtUnfSF, TotalBsmtSF,
+#            BsmtFullBath, BsmtHalfBath, MasVnrArea
+#
+# STEP 3 — Fill LotFrontage with NEIGHBORHOOD MEDIAN (not global median):
+#   df[&#x27;LotFrontage&#x27;] = df.groupby(&#x27;Neighborhood&#x27;)[&#x27;LotFrontage&#x27;].transform(
+#       lambda x: x.fillna(x.median())
+#   )
+#   This is smarter than global median because lot size varies by neighborhood.
+#
+# STEP 4 — Fill remaining NaN with mode or median:
+#   For other columns with few missing values, use the most common value.
+#
+# VERIFY: After this step, df.isnull().sum().sum() should be 0 (or very close).
+
+# === YOUR MISSING VALUE HANDLING CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# 4.3 — Encode Ordinal Quality Features
+# --------------------------------------------------------------------------
+# HINT: Some text columns represent ordered quality levels.
+#       Preserve the order by mapping to numbers.
+#
+# Quality scale mapping (use this same mapping for all quality columns):
+#   quality_map = {&#x27;None&#x27;: 0, &#x27;Po&#x27;: 1, &#x27;Fa&#x27;: 2, &#x27;TA&#x27;: 3, &#x27;Gd&#x27;: 4, &#x27;Ex&#x27;: 5}
+#
+# Columns to apply this to:
+#   - ExterQual, ExterCond
+#   - BsmtQual, BsmtCond, BsmtExposure (use a different map for this one)
+#   - HeatingQC
+#   - KitchenQual
+#   - FireplaceQu
+#   - GarageQual, GarageCond
+#   - PoolQC
+#
+# Use: df[&#x27;column&#x27;] = df[&#x27;column&#x27;].map(quality_map)
+#      After mapping, verify no NaN values appeared (NaN means a value wasn&#x27;t in the map)
+
+# === YOUR ORDINAL ENCODING CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# 4.4 — Create New Features (Feature Engineering)
+# --------------------------------------------------------------------------
+# HINT: Create meaningful new features that combine existing ones.
+#       See INSTRUCTIONS.md Phase 4.2 for the full list.
+#
+# Key features to create:
+#
+# Total square footage (most important feature):
+#   df[&#x27;TotalSF&#x27;] = df[&#x27;TotalBsmtSF&#x27;] + df[&#x27;1stFlrSF&#x27;] + df[&#x27;2ndFlrSF&#x27;]
+#
+# Total bathrooms:
+#   df[&#x27;TotalBath&#x27;] = (df[&#x27;FullBath&#x27;] + 0.5 * df[&#x27;HalfBath&#x27;] +
+#                      df[&#x27;BsmtFullBath&#x27;] + 0.5 * df[&#x27;BsmtHalfBath&#x27;])
+#
+# Age-related features:
+#   df[&#x27;HouseAge&#x27;]          = df[&#x27;YrSold&#x27;] - df[&#x27;YearBuilt&#x27;]
+#   df[&#x27;YearsSinceRemodel&#x27;] = df[&#x27;YrSold&#x27;] - df[&#x27;YearRemodAdd&#x27;]
+#
+# Binary indicator features:
+#   df[&#x27;HasPool&#x27;]    = (df[&#x27;PoolArea&#x27;] &gt; 0).astype(int)
+#   df[&#x27;HasGarage&#x27;]  = (df[&#x27;GarageArea&#x27;] &gt; 0).astype(int)
+#   df[&#x27;Has2ndFloor&#x27;] = (df[&#x27;2ndFlrSF&#x27;] &gt; 0).astype(int)
+#   df[&#x27;HasFireplace&#x27;] = (df[&#x27;Fireplaces&#x27;] &gt; 0).astype(int)
+#
+# Total porch area:
+#   df[&#x27;TotalPorchSF&#x27;] = (df[&#x27;OpenPorchSF&#x27;] + df[&#x27;EnclosedPorch&#x27;] +
+#                          df[&#x27;3SsnPorch&#x27;] + df[&#x27;ScreenPorch&#x27;])
+#
+# Fix MSSubClass type (it&#x27;s a number but should be a category string):
+#   df[&#x27;MSSubClass&#x27;] = df[&#x27;MSSubClass&#x27;].astype(str)
+#
+# After creating features, print the new shape: df.shape
+
+# === YOUR FEATURE ENGINEERING CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# 4.5 — Handle Skewed Numerical Features (Optional but Recommended)
+# --------------------------------------------------------------------------
+# HINT: Many numerical features (LotArea, GrLivArea, etc.) are right-skewed.
+#       Log-transforming them can improve linear model performance.
+#
+# Step 1: Compute skewness of all numerical features:
+#   numeric_feats = df.select_dtypes(include=[&#x27;int64&#x27;,&#x27;float64&#x27;]).columns
+#   skewness = df[numeric_feats].apply(lambda x: x.skew()).sort_values(ascending=False)
+#   high_skew = skewness[skewness &gt; 0.75]
+#
+# Step 2: Apply np.log1p to highly skewed features:
+#   for col in high_skew.index:
+#       df[col] = np.log1p(df[col])
+#
+# Note: Do NOT apply this to the target — you already did that in Step 3.
+# Note: Do NOT apply this to binary features (0/1 columns).
+
+# === YOUR SKEWNESS HANDLING CODE HERE ===
+
+
+# =============================================================================
+# STEP 5 — TRAIN/VALIDATION SPLIT
+# =============================================================================
+# HINT: Split your feature-engineered data into training and validation sets.
+#       This split is for your own evaluation — the actual test set is test.csv
+#
+#   X = df.drop(columns=[&#x27;SalePrice&#x27;, &#x27;Id&#x27;])   &lt;- if not done in Step 3
+#   y = np.log1p(df[&#x27;SalePrice&#x27;])              &lt;- log-transformed target
+#
+#   Use: train_test_split(X, y, test_size=0.15, random_state=42)
+#   (15% validation — keeping more for training since data is small)
+#
+#   Print shapes:
+#     print(&quot;X_train:&quot;, X_train.shape)
+#     print(&quot;X_val:  &quot;, X_val.shape)
+
+# === YOUR SPLIT CODE HERE ===
+
+
+# =============================================================================
+# STEP 6 — BUILD THE SKLEARN PIPELINE
+# =============================================================================
+# HINT: Build a reusable Pipeline that handles ALL preprocessing automatically.
+#       Read INSTRUCTIONS.md Phase 5 carefully before writing this.
+#
+# --------------------------------------------------------------------------
+# 6.1 — Define Column Lists
+# --------------------------------------------------------------------------
+# HINT: Separate your features into:
+#   - numerical_cols: all float and int columns
+#   - categorical_cols: all object (string) columns
+#
+#   numerical_cols = X_train.select_dtypes(include=[&#x27;int64&#x27;,&#x27;float64&#x27;]).columns.tolist()
+#   categorical_cols = X_train.select_dtypes(include=[&#x27;object&#x27;]).columns.tolist()
+#
+#   Print both lists to verify.
+
+# === YOUR COLUMN LISTS CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# 6.2 — Define the Preprocessing Pipelines
+# --------------------------------------------------------------------------
+# HINT: Create separate pipelines for numerical and categorical columns.
+#
+# Numerical pipeline:
+#   numerical_pipeline = Pipeline(steps=[
+#       (&#x27;imputer&#x27;, SimpleImputer(strategy=&#x27;median&#x27;)),
+#       (&#x27;scaler&#x27;, StandardScaler())
+#   ])
+#   (Imputer fills any remaining NaN, scaler normalizes values)
+#
+# Categorical pipeline:
+#   categorical_pipeline = Pipeline(steps=[
+#       (&#x27;imputer&#x27;, SimpleImputer(strategy=&#x27;most_frequent&#x27;)),
+#       (&#x27;encoder&#x27;, OneHotEncoder(handle_unknown=&#x27;ignore&#x27;, sparse_output=False))
+#   ])
+#   (handle_unknown=&#x27;ignore&#x27; is critical — prevents crash on unseen categories)
+
+# === YOUR PIPELINE DEFINITION CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# 6.3 — Combine with ColumnTransformer
+# --------------------------------------------------------------------------
+# HINT:
+#   preprocessor = ColumnTransformer(transformers=[
+#       (&#x27;num&#x27;, numerical_pipeline, numerical_cols),
+#       (&#x27;cat&#x27;, categorical_pipeline, categorical_cols)
+#   ])
+#
+# This applies numerical_pipeline to numerical_cols ONLY,
+# and categorical_pipeline to categorical_cols ONLY.
+
+# === YOUR COLUMNTRANSFORMER CODE HERE ===
+
+
+# --------------------------------------------------------------------------
+# 6.4 — Build Full Pipeline with a Model
+# --------------------------------------------------------------------------
+# HINT: Add a placeholder model for now. You&#x27;ll swap it in Step 7.
+#   full_pipeline = Pipeline(steps=[
+#       (&#x27;preprocessor&#x27;, preprocessor),
+#       (&#x27;model&#x27;, Ridge(alpha=10))   &lt;- start with Ridge as your first model
+#   ])
+
+# === YOUR FULL PIPELINE CODE HERE ===
+
+
+# =============================================================================
+# STEP 7 — MODEL COMPARISON
+# =============================================================================
+# HINT: Train 5 models using cross-validation. Compare their RMSE.
+#       For each model, just swap out the &#x27;model&#x27; step in your pipeline.
+#
+# Models to test:
+#   1. LinearRegression()
+#   2. Ridge(alpha=10)
+#   3. Lasso(alpha=0.001)
+#   4. RandomForestRegressor(n_estimators=100, random_state=42)
+#   5. XGBRegressor(n_estimators=500, learning_rate=0.05, random_state=42)
+#
+# For each model:
+#   pipeline.set_params(model=YourModel())   &lt;- replaces the model in the pipeline
+#   scores = cross_val_score(pipeline, X_train, y_train,
+#                            cv=5, scoring=&#x27;neg_root_mean_squared_error&#x27;)
+#   rmse = -scores.mean()
+#   std  = scores.std()
+#   print(f&quot;{ModelName:30s} | RMSE: {rmse:.4f} | Std: {std:.4f}&quot;)
+#
+# IMPORTANT: A lower RMSE is better. Good models score ~0.11–0.14 here.
+#
+# After comparing, save the results to a list and print a formatted table.
+# Select the best model for hyperparameter tuning in Step 8.
+
+# === YOUR MODEL COMPARISON CODE HERE ===
+
+
+# =============================================================================
+# STEP 8 — HYPERPARAMETER TUNING
+# =============================================================================
+# HINT: Tune the best model (likely XGBoost or Ridge) using GridSearchCV.
+#       Note: In a Pipeline, parameter names are prefixed: &#x27;step_name__param_name&#x27;
+#
+# For XGBoost:
+#   param_grid = {
+#       &#x27;model__n_estimators&#x27;: [300, 500],
+#       &#x27;model__learning_rate&#x27;: [0.05, 0.1],
+#       &#x27;model__max_depth&#x27;: [3, 4],
+#       &#x27;model__subsample&#x27;: [0.8, 1.0],
+#       &#x27;model__colsample_bytree&#x27;: [0.8, 1.0]
+#   }
+#
+# For Ridge (simpler):
+#   param_grid = {
+#       &#x27;model__alpha&#x27;: [0.1, 1.0, 10.0, 50.0, 100.0]
+#   }
+#
+#   grid_search = GridSearchCV(
+#       full_pipeline,
+#       param_grid,
+#       cv=5,
+#       scoring=&#x27;neg_root_mean_squared_error&#x27;,
+#       n_jobs=-1,
+#       verbose=2
+#   )
+#   grid_search.fit(X_train, y_train)
+#
+#   print(&quot;Best Parameters:&quot;, grid_search.best_params_)
+#   print(&quot;Best CV RMSE:&quot;, -grid_search.best_score_)
+
+# === YOUR HYPERPARAMETER TUNING CODE HERE ===
+
+
+# =============================================================================
+# STEP 9 — FINAL EVALUATION ON VALIDATION SET
+# =============================================================================
+# HINT: Use the best pipeline (from GridSearchCV) to evaluate on the held-out
+#       validation set. This gives you an unbiased estimate of performance.
+#
+#   best_pipeline = grid_search.best_estimator_
+#
+#   y_val_pred_log = best_pipeline.predict(X_val)   &lt;- predictions in log scale
+#
+#   val_rmse = np.sqrt(mean_squared_error(y_val, y_val_pred_log))
+#   val_mae  = mean_absolute_error(y_val, y_val_pred_log)
+#   val_r2   = r2_score(y_val, y_val_pred_log)
+#
+#   print(f&quot;Validation RMSE (log scale): {val_rmse:.4f}&quot;)
+#   print(f&quot;Validation MAE  (log scale): {val_mae:.4f}&quot;)
+#   print(f&quot;Validation R²:               {val_r2:.4f}&quot;)
+#
+# REVERSE the log transform to show error in actual dollars:
+#   y_val_actual    = np.expm1(y_val)
+#   y_val_pred_real = np.expm1(y_val_pred_log)
+#   real_rmse = np.sqrt(mean_squared_error(y_val_actual, y_val_pred_real))
+#   print(f&quot;Validation RMSE in dollars: ${real_rmse:,.0f}&quot;)
+
+# === YOUR FINAL EVALUATION CODE HERE ===
+
+
+# =============================================================================
+# STEP 10 — RESIDUAL ANALYSIS
+# =============================================================================
+# HINT: Check whether your model&#x27;s errors are random (good) or systematic (bad).
+#       Systematic errors mean the model is missing something.
+#
+# residuals = y_val - y_val_pred_log
+#
+# PLOT A — Residuals vs. Predicted Values:
+#   plt.scatter(y_val_pred_log, residuals, alpha=0.5)
+#   plt.axhline(y=0, color=&#x27;red&#x27;, linestyle=&#x27;--&#x27;)
+#   plt.xlabel(&#x27;Predicted Log(SalePrice)&#x27;)
+#   plt.ylabel(&#x27;Residuals&#x27;)
+#   plt.title(&#x27;Residuals vs. Predicted Values&#x27;)
+#   Look for: random scatter around y=0 (good)
+#             funnel shape = heteroscedasticity (bad)
+#             U-shape = non-linearity not captured (bad)
+#
+# PLOT B — Histogram of Residuals:
+#   sns.histplot(residuals, bins=40, kde=True)
+#   Should be approximately normal (bell-shaped).
+#
+# PLOT C — Q-Q Plot:
+#   from scipy.stats import probplot
+#   probplot(residuals, plot=plt)
+#   Points close to the diagonal line = normally distributed residuals.
+
+# === YOUR RESIDUAL ANALYSIS CODE HERE ===
+
+
+# =============================================================================
+# STEP 11 — SAVE THE TRAINED PIPELINE
+# =============================================================================
+# HINT: Save your best trained pipeline to disk so it can be deployed
+#       without retraining.
+#
+#   import joblib
+#   joblib.dump(best_pipeline, &#x27;outputs/models/house_price_pipeline.pkl&#x27;)
+#   print(&quot;Pipeline saved successfully.&quot;)
+#
+# LOAD AND TEST:
+#   loaded_pipeline = joblib.load(&#x27;outputs/models/house_price_pipeline.pkl&#x27;)
+#   test_prediction = loaded_pipeline.predict(X_val.head(1))
+#   print(&quot;Loaded pipeline prediction (log):&quot;, test_prediction)
+#   print(&quot;Loaded pipeline prediction ($):&quot;, np.expm1(test_prediction))
+#
+# WHY THIS MATTERS:
+#   A model saved this way can be loaded in a Flask/FastAPI app and
+#   served as a REST API — that&#x27;s how real ML systems work.
+
+# === YOUR MODEL PERSISTENCE CODE HERE ===
+
+
+# =============================================================================
+# STEP 12 — GENERATE TEST SET PREDICTIONS (Kaggle Submission)
+# =============================================================================
+# HINT: Apply the same feature engineering to test.csv and generate predictions.
+#
+# Step 1: Load test data:
+#   df_test = pd.read_csv(&#x27;data/test.csv&#x27;)
+#   test_ids = df_test[&#x27;Id&#x27;]
+#
+# Step 2: Apply ALL the same feature engineering steps you did in Step 4.
+#         (You may want to write a function that takes a DataFrame
+#          and applies all transformations — that&#x27;s a good refactoring exercise!)
+#
+# Step 3: Predict:
+#   log_predictions = best_pipeline.predict(X_test)
+#   final_predictions = np.expm1(log_predictions)   &lt;- reverse log transform
+#
+# Step 4: Save submission:
+#   submission = pd.DataFrame({&#x27;Id&#x27;: test_ids, &#x27;SalePrice&#x27;: final_predictions})
+#   submission.to_csv(&#x27;outputs/predictions/test_predictions.csv&#x27;, index=False)
+#   print(&quot;Submission file saved!&quot;)
+#   print(submission.head())
+
+# === YOUR TEST PREDICTION CODE HERE ===
+
+
+# =============================================================================
+# END OF PROJECT 3
+# =============================================================================
+# NEXT STEPS (after completing this project):
+#   - Submit to the Kaggle leaderboard! Compare your score with others.
+#   - Try a stacking ensemble: average predictions from multiple models
+#   - Learn about SHAP values for feature importance in tree-based models
+#   - Build a simple Flask API that loads your .pkl file and serves predictions:
+#     from flask import Flask, request, jsonify
+#     import joblib, numpy as np
+#     app = Flask(__name__)
+#     model = joblib.load(&#x27;outputs/models/house_price_pipeline.pkl&#x27;)
+#     @app.route(&#x27;/predict&#x27;, methods=[&#x27;POST&#x27;])
+#     def predict(): ...
+#   - Try MLflow for experiment tracking: pip install mlflow
+# =============================================================================
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zero To Hero Guides - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../index.html">Back to website</a>
+      <a href="../../../index.html#python-lab">Python lab</a>
+      <a href="../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Zero To Hero Guides</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/README.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="learn-to-code-zero-to-hero-data-science-edition">🚀 Learn to Code — Zero to Hero (Data Science Edition)</h2>
+<p><strong>Built for:</strong> A Master&#x27;s student in Data Science who knows <code>print(&quot;Hello World!&quot;)</code> and wants to go 0 → 100.</p>
+<h3 id="your-learning-roadmap">📚 Your Learning Roadmap</h3>
+<table><thead><tr><th>#</th><th>Topic</th><th>Folder</th><th>File</th><th>Level</th></tr></thead><tbody><tr><td>1</td><td><strong>Python</strong></td><td><code>python/</code></td><td><code>python_zero_to_hero.py</code></td><td>⭐ Start Here</td></tr><tr><td>2</td><td><strong>SQL</strong></td><td><code>sql/</code></td><td><code>sql_zero_to_hero.sql</code></td><td>⭐⭐</td></tr><tr><td>3</td><td><strong>Git</strong></td><td><code>git/</code></td><td><code>git_commands.sh</code></td><td>⭐⭐</td></tr><tr><td>4</td><td><strong>Linux</strong></td><td><code>linux/</code></td><td><code>linux_commands.sh</code></td><td>⭐⭐</td></tr><tr><td>5</td><td><strong>Docker</strong></td><td><code>docker/</code></td><td><code>docker_zero_to_hero.sh</code></td><td>⭐⭐⭐</td></tr><tr><td>6</td><td><strong>Django</strong></td><td><code>django/</code></td><td><code>django_zero_to_hero.py</code></td><td>⭐⭐⭐</td></tr><tr><td>7</td><td><strong>Java</strong></td><td><code>java/</code></td><td><code>JavaZeroToHero.java</code></td><td>⭐⭐⭐</td></tr><tr><td>8</td><td><strong>IoT</strong></td><td><code>iot/</code></td><td><code>iot_zero_to_hero.py</code></td><td>⭐⭐⭐</td></tr><tr><td>9</td><td><strong>Arduino</strong></td><td><code>arduino/</code></td><td><code>arduino_zero_to_hero.ino</code></td><td>⭐⭐⭐</td></tr><tr><td>10</td><td><strong>Optimization</strong></td><td><code>optimization/</code></td><td><code>README.md</code></td><td>⭐⭐⭐⭐ (Month 9)</td></tr><tr><td>11</td><td><strong>Supply Chain AI</strong></td><td><code>supply-chain/</code></td><td><code>README.md</code></td><td>⭐⭐⭐⭐ (Month 9+)</td></tr><tr><td>12</td><td><strong>MIS &amp; BI</strong></td><td><code>mis/</code></td><td><code>README.md</code></td><td>⭐⭐⭐⭐ (Month 5–9)</td></tr></tbody></table>
+<h3 id="recommended-learning-order">🧭 Recommended Learning Order</h3>
+<pre><code class="language-">Week 1-4:   Python        (your foundation for EVERYTHING)
+Week 5-6:   SQL           (query databases like a pro)
+Week 7:     Git           (save your work, collaborate)
+Week 8:     Linux         (professional environment)
+Week 9:     Docker        (containerize everything)
+Week 10-13: Django        (build web apps with Python)
+Week 14-17: Java          (enterprise &amp; Android)
+Week 18-19: IoT           (connect hardware to data)
+Week 20-21: Arduino       (program microcontrollers)
+Week 22-24: Optimization  (OR-Tools, PuLP — Month 9 prep)
+Week 25+:   Supply Chain  (Demand Forecasting, Inventory, Routing)
+Week 25+:   MIS &amp; BI      (ETL, Star Schemas, Dashboards, Automation)</code></pre>
+<h3 id="tools-you-need-to-install">🛠️ Tools You Need to Install</h3>
+<h4 id="python">Python</h4>
+<ul>
+<li>Download: https://www.python.org/downloads/</li>
+<li>IDE: VS Code + Python extension  OR  PyCharm Community</li>
+<li>Run files: <code>python filename.py</code></li>
+</ul>
+<h4 id="sql">SQL</h4>
+<ul>
+<li><strong>Beginner (no install needed):</strong> SQLite — built into Python, use VS Code + &quot;SQLite Viewer&quot; extension</li>
+<li><strong>Advanced:</strong> MySQL Community Server or PostgreSQL</li>
+<li>GUI tool: DBeaver (free, works with all three)</li>
+</ul>
+<h4 id="git">Git</h4>
+<ul>
+<li>Download: https://git-scm.com/downloads</li>
+<li>Run: <code>git --version</code> to verify</li>
+</ul>
+<h4 id="linux">Linux</h4>
+<ul>
+<li>Windows users: Install WSL2 (Windows Subsystem for Linux)</li>
+<li>Run in PowerShell as Admin: <code>wsl --install</code></li>
+<li>OR use Git Bash (comes with Git)</li>
+</ul>
+<h4 id="docker">Docker</h4>
+<ul>
+<li>Download Docker Desktop: https://www.docker.com/products/docker-desktop</li>
+<li>Verify: <code>docker --version</code>  |  <code>docker compose version</code></li>
+<li>No extra installs needed — Docker pulls everything automatically</li>
+</ul>
+<h4 id="java">Java</h4>
+<ul>
+<li>Download JDK 21: https://adoptium.net/</li>
+<li>Verify: <code>java --version</code></li>
+<li>Compile: <code>javac MyFile.java</code>  |  Run: <code>java MyFile</code></li>
+</ul>
+<h4 id="arduino">Arduino</h4>
+<ul>
+<li>Download Arduino IDE: https://www.arduino.cc/en/software</li>
+<li>Board: Arduino Uno or Nano</li>
+</ul>
+<h4 id="django">Django</h4>
+<ul>
+<li>Install after Python: <code>pip install django</code></li>
+</ul>
+<h4 id="iot-raspberry-pi">IoT / Raspberry Pi</h4>
+<ul>
+<li>Install Raspberry Pi OS (if using Pi)</li>
+<li>Python libraries: <code>pip install paho-mqtt RPi.GPIO</code></li>
+</ul>
+<h3 id="how-to-use-these-files">💡 How to Use These Files</h3>
+<p>Each file works like a <strong>textbook + exercise book in one</strong>:</p>
+<ol>
+<li><strong>READ</strong> the comments carefully — they are your teacher</li>
+<li><strong>STUDY</strong> the example code below each lesson</li>
+<li><strong>DO THE EXERCISES</strong> marked with <code># YOUR TURN:</code></li>
+<li><strong>RUN</strong> the file to see results</li>
+<li><strong>MOVE TO NEXT</strong> lesson only after completing the exercise</li>
+</ol>
+<blockquote>⚠️  Don&#x27;t just copy the examples — TYPE them yourself. Muscle memory matters!</blockquote>
+<h3 id="daily-study-plan">📈 Daily Study Plan</h3>
+<table><thead><tr><th>Time</th><th>Activity</th></tr></thead><tbody><tr><td>30 min</td><td>Read the next lesson in the file</td></tr><tr><td>45 min</td><td>Do the exercise — try without help first</td></tr><tr><td>15 min</td><td>Google what you don&#x27;t understand</td></tr><tr><td>15 min</td><td>Review what you wrote today</td></tr></tbody></table>
+<h3 id="final-projects-after-finishing-each-file">🎯 Final Projects (After Finishing Each File)</h3>
+<ul>
+<li><strong>Python:</strong> Data analysis on a real dataset from Kaggle</li>
+<li><strong>SQL:</strong> Design and query a student database</li>
+<li><strong>Git:</strong> Push all your projects to GitHub</li>
+<li><strong>Docker:</strong> Containerize your Django app with PostgreSQL</li>
+<li><strong>Django:</strong> Build a personal portfolio website</li>
+<li><strong>Java:</strong> Build a Student Management System (University, Students, Courses)</li>
+<li><strong>IoT + Arduino:</strong> Read a temperature sensor and log to CSV</li>
+</ul>
+<p><em>Start with <code>python/python_zero_to_hero.py</code> — open it, read the first lesson, and start coding!</em></p></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#learn-to-code-zero-to-hero-data-science-edition">🚀 Learn to Code — Zero to Hero (Data Science Edition)</a><a style="margin-left:12px" href="#your-learning-roadmap">📚 Your Learning Roadmap</a><a style="margin-left:12px" href="#recommended-learning-order">🧭 Recommended Learning Order</a><a style="margin-left:12px" href="#tools-you-need-to-install">🛠️ Tools You Need to Install</a><a style="margin-left:24px" href="#python">Python</a><a style="margin-left:24px" href="#sql">SQL</a><a style="margin-left:24px" href="#git">Git</a><a style="margin-left:24px" href="#linux">Linux</a><a style="margin-left:24px" href="#docker">Docker</a><a style="margin-left:24px" href="#java">Java</a><a style="margin-left:24px" href="#arduino">Arduino</a><a style="margin-left:24px" href="#django">Django</a><a style="margin-left:24px" href="#iot-raspberry-pi">IoT / Raspberry Pi</a><a style="margin-left:12px" href="#how-to-use-these-files">💡 How to Use These Files</a><a style="margin-left:12px" href="#daily-study-plan">📈 Daily Study Plan</a><a style="margin-left:12px" href="#final-projects-after-finishing-each-file">🎯 Final Projects (After Finishing Each File)</a></aside>
+    </main>
+  </body>
+</html>

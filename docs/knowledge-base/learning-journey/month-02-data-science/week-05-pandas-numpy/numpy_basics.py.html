@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Numpy Basics.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../../index.html">Back to website</a>
+      <a href="../../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Numpy Basics.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/learning-journey/month-02-data-science/week-05-pandas-numpy/numpy_basics.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "# ==============================================================\n# WEEK 5: NumPy \u2014 The Math Engine of Data Science\n# FILE: numpy_basics.py\n#\n# TASK: Learn NumPy arrays \u2014 the fundamental data structure\n#       behind Pandas, scikit-learn, TensorFlow, and PyTorch.\n#\n# WHY:  When you pass data to an ML model, it is always a NumPy\n#       array under the hood. Understanding NumPy means you\n#       understand what is actually happening to your data.\n#\n# RULE: NumPy operates on ARRAYS, not lists. The difference:\n#       - Python list: slow, one item at a time, any mix of types\n#       - NumPy array: fast, entire array at once, ONE type only\n#\n# INSTALL: pip install numpy   (usually already installed with pandas)\n#\n# HOW TO RUN: python numpy_basics.py\n# ==============================================================\n\nimport numpy as np\n\nprint(\"=\" * 60)\nprint(\"WEEK 5: NumPy Basics\")\nprint(\"=\" * 60)\n\n\n# ==============================================================\n# PART 1: Creating Arrays\n# ==============================================================\n\nprint(\"\\n--- PART 1: Creating Arrays ---\")\n\n# From a Python list\ntemps = np.array([22.1, 23.5, 21.8, 24.0, 22.7, 23.1, 21.5])\nprint(\"Array from list:\", temps)\nprint(\"Type:\", type(temps))\nprint(\"dtype (data type of elements):\", temps.dtype)\n# float64 means 64-bit floating point numbers\n\n# 2D array \u2014 a matrix (rows \u00d7 columns)\nsensor_matrix = np.array([\n    [22.1, 55, 1013],   # day 1: temp, humidity, pressure\n    [23.5, 60, 1010],   # day 2\n    [21.8, 58, 1015],   # day 3\n    [24.0, 52, 1008],   # day 4\n])\nprint(\"\\n2D array (4 days \u00d7 3 sensors):\")\nprint(sensor_matrix)\nprint(\"Shape:\", sensor_matrix.shape)   # (rows, columns)\nprint(\"Number of dimensions:\", sensor_matrix.ndim)   # 2\n\n# Useful array constructors\nprint(\"\\nArray of zeros (3\u00d74):\")\nprint(np.zeros((3, 4)))\n\nprint(\"\\nArray of ones (2\u00d73):\")\nprint(np.ones((2, 3)))\n\nprint(\"\\nEvenly spaced values from 0 to 1 (6 points):\")\nprint(np.linspace(0, 1, 6))\n# HINT: linspace is great for creating axes on plots\n\nprint(\"\\nRange of integers from 0 to 9:\")\nprint(np.arange(10))\n\nprint(\"\\nRange from 0 to 1, step 0.2:\")\nprint(np.arange(0, 1.1, 0.2))\n\n\n# ==============================================================\n# PART 2: Array Arithmetic \u2014 The Killer Feature\n# ==============================================================\n\nprint(\"\\n--- PART 2: Array Arithmetic ---\")\n\n# With a Python list, you can't do math directly:\n# [1, 2, 3] * 2  \u2192 [1, 2, 3, 1, 2, 3]  (repeats the list!)\n\n# With NumPy, math applies to EVERY element simultaneously:\na = np.array([1, 2, 3, 4, 5])\nprint(\"Original array:\", a)\nprint(\"\u00d7 2:\", a * 2)          # multiply every element by 2\nprint(\"+ 10:\", a + 10)        # add 10 to every element\nprint(\"squared:\", a ** 2)     # square every element\nprint(\"square root:\", np.sqrt(a))\n\n# Celsius \u2192 Fahrenheit for all 7 days in one line:\ncelsius = np.array([22.1, 23.5, 21.8, 24.0, 22.7, 23.1, 21.5])\nfahrenheit = (celsius * 9/5) + 32\nprint(\"\\nCelsius:\", celsius)\nprint(\"Fahrenheit:\", fahrenheit.round(1))\n\n# Operations between two arrays (element-wise)\nhumidity   = np.array([55, 60, 58, 52, 57, 61, 59])\nfeels_like = celsius - (humidity * 0.1)   # simplified feels-like formula\nprint(\"\\nFeels-like temperature:\", feels_like.round(1))\n\n# HINT: This is called \"broadcasting\" \u2014 NumPy automatically applies\n# operations element-by-element when arrays have compatible shapes.\n\n\n# ==============================================================\n# PART 3: Statistics Built Into NumPy\n# ==============================================================\n\nprint(\"\\n--- PART 3: NumPy Statistics ---\")\n\ndata = np.array([14, 18, 11, 13, 6, 8, 2, 17, 14, 21, 4, 14, 8, 9, 14])\nprint(\"Data:\", data)\n\nprint(f\"\\nMean (average):          {np.mean(data):.2f}\")\nprint(f\"Median (middle value):   {np.median(data):.2f}\")\nprint(f\"Std deviation:           {np.std(data):.2f}\")\nprint(f\"Variance:                {np.var(data):.2f}\")\nprint(f\"Min:                     {np.min(data)}\")\nprint(f\"Max:                     {np.max(data)}\")\nprint(f\"Sum:                     {np.sum(data)}\")\n\n# Percentiles \u2014 the value below which X% of data falls\nprint(f\"\\n25th percentile (Q1):    {np.percentile(data, 25):.2f}\")\nprint(f\"50th percentile (Q2):    {np.percentile(data, 50):.2f}\")\nprint(f\"75th percentile (Q3):    {np.percentile(data, 75):.2f}\")\nprint(f\"IQR (Q3 - Q1):           {np.percentile(data, 75) - np.percentile(data, 25):.2f}\")\n\n# 2D statistics: axis=0 means \"across rows\" (per column), axis=1 means \"across columns\" (per row)\nprint(\"\\n2D sensor matrix column means (one average per sensor type):\")\nprint(sensor_matrix.mean(axis=0))   # mean of each column\nprint(\"2D sensor matrix row means (one average per day):\")\nprint(sensor_matrix.mean(axis=1))   # mean of each row\n\n# HINT: axis=0 collapses rows. axis=1 collapses columns.\n# You will see this pattern constantly in Pandas and ML code.\n\n\n# ==============================================================\n# PART 4: Indexing and Slicing\n# ==============================================================\n\nprint(\"\\n--- PART 4: Indexing and Slicing ---\")\n\narr = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])\nprint(\"Array:\", arr)\n\n# Single element (0-indexed)\nprint(\"Index 0 (first):\", arr[0])\nprint(\"Index -1 (last):\", arr[-1])\n\n# Slice: arr[start:stop:step]  (stop is EXCLUDED)\nprint(\"First 3 elements [0:3]:\", arr[0:3])\nprint(\"Every other element [::2]:\", arr[::2])\nprint(\"Last 3 elements [-3:]:\", arr[-3:])\nprint(\"Reversed [::-1]:\", arr[::-1])\n\n# 2D slicing: array[row_slice, column_slice]\nmatrix = np.array([\n    [1,  2,  3,  4],\n    [5,  6,  7,  8],\n    [9, 10, 11, 12],\n])\nprint(\"\\nMatrix:\")\nprint(matrix)\nprint(\"Row 0:\", matrix[0])\nprint(\"Column 2:\", matrix[:, 2])          # all rows, column index 2\nprint(\"Top-left 2\u00d72 block:\", matrix[:2, :2])\nprint(\"Bottom-right 2\u00d72 block:\", matrix[1:, 2:])\n\n\n# ==============================================================\n# PART 5: Boolean Indexing (Filtering with Conditions)\n# ==============================================================\n\nprint(\"\\n--- PART 5: Boolean Indexing ---\")\n\ntemps = np.array([22.1, 23.5, 21.8, 24.0, 22.7, 23.1, 21.5])\n\n# A condition creates a boolean array\nhot = temps > 23\nprint(\"Original temps:\", temps)\nprint(\"temps > 23:\", hot)       # array of True/False\n\n# Use it as a mask to select only matching elements\nprint(\"Only hot days:\", temps[hot])\nprint(\"Shorthand:\", temps[temps > 23])\n\n# Count how many are True\nprint(\"Number of hot days:\", np.sum(temps > 23))\nprint(\"Fraction of hot days:\", np.mean(temps > 23))\n# HINT: np.mean() on a boolean array = fraction of True values (very useful!)\n\n# Combine conditions with & (AND) and | (OR)\nhumidity = np.array([55, 60, 58, 52, 57, 61, 59])\nuncomfortable = (temps > 23) & (humidity > 55)\nprint(\"Hot AND humid days:\", temps[uncomfortable])\n\n# np.where: element-wise if/else\nlabels = np.where(temps > 23, \"HOT\", \"OK\")\nprint(\"Labels:\", labels)\n# HINT: np.where(condition, value_if_true, value_if_false)\n# This is the NumPy equivalent of: [v if c else u for c, v, u in ...]\n\n\n# ==============================================================\n# PART 6: Reshaping Arrays\n# ==============================================================\n\nprint(\"\\n--- PART 6: Reshaping ---\")\n\n# A flat array of 12 sensor readings\nflat = np.arange(1, 13)\nprint(\"Flat array:\", flat)\n\n# Reshape into 3 rows \u00d7 4 columns (3 devices, 4 time slots)\ngrid = flat.reshape(3, 4)\nprint(\"\\nReshaped to (3, 4):\")\nprint(grid)\n\n# Reshape to (4, 3)\nprint(\"\\nReshaped to (4, 3):\")\nprint(flat.reshape(4, 3))\n\n# Use -1 to let NumPy figure out one dimension automatically\nprint(\"\\nReshaped to (2, -1) \u2014 NumPy infers 6 columns:\")\nprint(flat.reshape(2, -1))\n\n# Flatten back to 1D\nprint(\"\\nFlattened back:\", grid.flatten())\n\n# HINT: reshape() is critical for ML \u2014 models often expect a specific shape.\n# For example, a single sample [1, 2, 3] must become [[1, 2, 3]] (shape (1, 3))\n# using: sample.reshape(1, -1)\n\nsingle_sample = np.array([22.1, 55.0, 1013.0])\nprint(\"\\nSingle sample shape:\", single_sample.shape)           # (3,)\nprint(\"Reshaped for model:\", single_sample.reshape(1, -1).shape)  # (1, 3)\n\n\n# ==============================================================\n# PART 7: Random Numbers \u2014 Essential for ML\n# ==============================================================\n\nprint(\"\\n--- PART 7: Random Numbers ---\")\n\n# Set a seed for reproducibility \u2014 same seed = same random numbers every run\nrng = np.random.default_rng(seed=42)   # modern NumPy random generator\n\n# Random floats between 0 and 1\nprint(\"5 random floats:\", rng.random(5).round(3))\n\n# Random integers between low (inclusive) and high (exclusive)\nprint(\"5 random integers (1-10):\", rng.integers(1, 11, size=5))\n\n# Normal (Gaussian) distribution: mean=0, std=1\nnoise = rng.normal(loc=0.0, scale=1.0, size=100)\nprint(f\"\\n100 samples from N(0,1): mean={noise.mean():.3f}, std={noise.std():.3f}\")\n\n# Simulate noisy sensor data\ntrue_temp = 23.0\nnoisy_readings = true_temp + rng.normal(0, 0.5, size=20)   # \u00b10.5\u00b0C noise\nprint(f\"\\n20 noisy temperature readings (true={true_temp}\u00b0C):\")\nprint(noisy_readings.round(2))\nprint(f\"Recovered mean: {noisy_readings.mean():.3f}\u00b0C\")\n\n# HINT: rng.normal(mean, std_dev, size) is how you simulate realistic sensor noise.\n# This is exactly what the learning-journey simulation projects use.\n\n\n# ==============================================================\n# PART 8: NumPy and Pandas Work Together\n# ==============================================================\n\nprint(\"\\n--- PART 8: NumPy + Pandas ---\")\n\nimport pandas as pd\n\n# A Pandas Series/column is a NumPy array with labels on top\ndf = pd.DataFrame({\"temp\": [22.1, 23.5, 21.8, 24.0, 22.7]})\ncol = df[\"temp\"]\n\nprint(\"Pandas column type:\", type(col))\nprint(\"Underlying NumPy array:\", col.values)\nprint(\"Type of .values:\", type(col.values))\n\n# You can pass a NumPy array directly to Pandas\narr = np.random.default_rng(0).normal(20, 2, size=5)\ndf[\"generated\"] = arr\nprint(\"\\nDataFrame with numpy-generated column:\")\nprint(df)\n\n# sklearn expects NumPy arrays \u2014 .values converts a DataFrame column\nX = df.values          # converts the whole DataFrame to a 2D NumPy array\nprint(\"\\nDataFrame as NumPy array (for sklearn):\")\nprint(X)\nprint(\"Shape:\", X.shape)\n\n\n# ==============================================================\n# YOUR TASKS FOR WEEK 5 \u2014 NumPy\n# ==============================================================\n\nprint(\"\\n\" + \"=\" * 60)\nprint(\"YOUR TASKS:\")\nprint(\"=\" * 60)\nprint(\"\"\"\n1. Run this file and read every output carefully.\n\n2. Create a NumPy array of 30 random temperatures using\n   rng.normal(mean=20, scale=3, size=30).\n   Then:\n   a. Print the mean and standard deviation\n   b. Count how many values are above 22\u00b0C\n   c. Find the 10th and 90th percentiles\n\n3. Create a 4\u00d75 matrix of random integers between 1 and 100.\n   a. Print the shape\n   b. Print the mean of each column (axis=0)\n   c. Print the maximum of each row (axis=1)\n   d. Select all values greater than 50\n\n4. Practice reshaping:\n   a. Create np.arange(24) (24 elements)\n   b. Reshape it to (4, 6)\n   c. Reshape it to (2, 3, 4) \u2014 a 3D array!\n   d. Print the element at position [1, 2, 3]\n\n5. CHALLENGE: Standardization (you will do this constantly in ML)\n   Given an array of values, transform each value so that the\n   result has mean=0 and std=1.\n   Formula: z = (x - mean) / std\n   Implement this in one NumPy line (no loops!).\n   Verify: np.mean(z) should be ~0, np.std(z) should be ~1.\n\"\"\")\n";
+      const readerOutputKey = "readerRun:knowledge-base/learning-journey/month-02-data-science/week-05-pandas-numpy/numpy_basics.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code># ==============================================================
+# WEEK 5: NumPy — The Math Engine of Data Science
+# FILE: numpy_basics.py
+#
+# TASK: Learn NumPy arrays — the fundamental data structure
+#       behind Pandas, scikit-learn, TensorFlow, and PyTorch.
+#
+# WHY:  When you pass data to an ML model, it is always a NumPy
+#       array under the hood. Understanding NumPy means you
+#       understand what is actually happening to your data.
+#
+# RULE: NumPy operates on ARRAYS, not lists. The difference:
+#       - Python list: slow, one item at a time, any mix of types
+#       - NumPy array: fast, entire array at once, ONE type only
+#
+# INSTALL: pip install numpy   (usually already installed with pandas)
+#
+# HOW TO RUN: python numpy_basics.py
+# ==============================================================
+
+import numpy as np
+
+print(&quot;=&quot; * 60)
+print(&quot;WEEK 5: NumPy Basics&quot;)
+print(&quot;=&quot; * 60)
+
+
+# ==============================================================
+# PART 1: Creating Arrays
+# ==============================================================
+
+print(&quot;\n--- PART 1: Creating Arrays ---&quot;)
+
+# From a Python list
+temps = np.array([22.1, 23.5, 21.8, 24.0, 22.7, 23.1, 21.5])
+print(&quot;Array from list:&quot;, temps)
+print(&quot;Type:&quot;, type(temps))
+print(&quot;dtype (data type of elements):&quot;, temps.dtype)
+# float64 means 64-bit floating point numbers
+
+# 2D array — a matrix (rows × columns)
+sensor_matrix = np.array([
+    [22.1, 55, 1013],   # day 1: temp, humidity, pressure
+    [23.5, 60, 1010],   # day 2
+    [21.8, 58, 1015],   # day 3
+    [24.0, 52, 1008],   # day 4
+])
+print(&quot;\n2D array (4 days × 3 sensors):&quot;)
+print(sensor_matrix)
+print(&quot;Shape:&quot;, sensor_matrix.shape)   # (rows, columns)
+print(&quot;Number of dimensions:&quot;, sensor_matrix.ndim)   # 2
+
+# Useful array constructors
+print(&quot;\nArray of zeros (3×4):&quot;)
+print(np.zeros((3, 4)))
+
+print(&quot;\nArray of ones (2×3):&quot;)
+print(np.ones((2, 3)))
+
+print(&quot;\nEvenly spaced values from 0 to 1 (6 points):&quot;)
+print(np.linspace(0, 1, 6))
+# HINT: linspace is great for creating axes on plots
+
+print(&quot;\nRange of integers from 0 to 9:&quot;)
+print(np.arange(10))
+
+print(&quot;\nRange from 0 to 1, step 0.2:&quot;)
+print(np.arange(0, 1.1, 0.2))
+
+
+# ==============================================================
+# PART 2: Array Arithmetic — The Killer Feature
+# ==============================================================
+
+print(&quot;\n--- PART 2: Array Arithmetic ---&quot;)
+
+# With a Python list, you can&#x27;t do math directly:
+# [1, 2, 3] * 2  → [1, 2, 3, 1, 2, 3]  (repeats the list!)
+
+# With NumPy, math applies to EVERY element simultaneously:
+a = np.array([1, 2, 3, 4, 5])
+print(&quot;Original array:&quot;, a)
+print(&quot;× 2:&quot;, a * 2)          # multiply every element by 2
+print(&quot;+ 10:&quot;, a + 10)        # add 10 to every element
+print(&quot;squared:&quot;, a ** 2)     # square every element
+print(&quot;square root:&quot;, np.sqrt(a))
+
+# Celsius → Fahrenheit for all 7 days in one line:
+celsius = np.array([22.1, 23.5, 21.8, 24.0, 22.7, 23.1, 21.5])
+fahrenheit = (celsius * 9/5) + 32
+print(&quot;\nCelsius:&quot;, celsius)
+print(&quot;Fahrenheit:&quot;, fahrenheit.round(1))
+
+# Operations between two arrays (element-wise)
+humidity   = np.array([55, 60, 58, 52, 57, 61, 59])
+feels_like = celsius - (humidity * 0.1)   # simplified feels-like formula
+print(&quot;\nFeels-like temperature:&quot;, feels_like.round(1))
+
+# HINT: This is called &quot;broadcasting&quot; — NumPy automatically applies
+# operations element-by-element when arrays have compatible shapes.
+
+
+# ==============================================================
+# PART 3: Statistics Built Into NumPy
+# ==============================================================
+
+print(&quot;\n--- PART 3: NumPy Statistics ---&quot;)
+
+data = np.array([14, 18, 11, 13, 6, 8, 2, 17, 14, 21, 4, 14, 8, 9, 14])
+print(&quot;Data:&quot;, data)
+
+print(f&quot;\nMean (average):          {np.mean(data):.2f}&quot;)
+print(f&quot;Median (middle value):   {np.median(data):.2f}&quot;)
+print(f&quot;Std deviation:           {np.std(data):.2f}&quot;)
+print(f&quot;Variance:                {np.var(data):.2f}&quot;)
+print(f&quot;Min:                     {np.min(data)}&quot;)
+print(f&quot;Max:                     {np.max(data)}&quot;)
+print(f&quot;Sum:                     {np.sum(data)}&quot;)
+
+# Percentiles — the value below which X% of data falls
+print(f&quot;\n25th percentile (Q1):    {np.percentile(data, 25):.2f}&quot;)
+print(f&quot;50th percentile (Q2):    {np.percentile(data, 50):.2f}&quot;)
+print(f&quot;75th percentile (Q3):    {np.percentile(data, 75):.2f}&quot;)
+print(f&quot;IQR (Q3 - Q1):           {np.percentile(data, 75) - np.percentile(data, 25):.2f}&quot;)
+
+# 2D statistics: axis=0 means &quot;across rows&quot; (per column), axis=1 means &quot;across columns&quot; (per row)
+print(&quot;\n2D sensor matrix column means (one average per sensor type):&quot;)
+print(sensor_matrix.mean(axis=0))   # mean of each column
+print(&quot;2D sensor matrix row means (one average per day):&quot;)
+print(sensor_matrix.mean(axis=1))   # mean of each row
+
+# HINT: axis=0 collapses rows. axis=1 collapses columns.
+# You will see this pattern constantly in Pandas and ML code.
+
+
+# ==============================================================
+# PART 4: Indexing and Slicing
+# ==============================================================
+
+print(&quot;\n--- PART 4: Indexing and Slicing ---&quot;)
+
+arr = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
+print(&quot;Array:&quot;, arr)
+
+# Single element (0-indexed)
+print(&quot;Index 0 (first):&quot;, arr[0])
+print(&quot;Index -1 (last):&quot;, arr[-1])
+
+# Slice: arr[start:stop:step]  (stop is EXCLUDED)
+print(&quot;First 3 elements [0:3]:&quot;, arr[0:3])
+print(&quot;Every other element [::2]:&quot;, arr[::2])
+print(&quot;Last 3 elements [-3:]:&quot;, arr[-3:])
+print(&quot;Reversed [::-1]:&quot;, arr[::-1])
+
+# 2D slicing: array[row_slice, column_slice]
+matrix = np.array([
+    [1,  2,  3,  4],
+    [5,  6,  7,  8],
+    [9, 10, 11, 12],
+])
+print(&quot;\nMatrix:&quot;)
+print(matrix)
+print(&quot;Row 0:&quot;, matrix[0])
+print(&quot;Column 2:&quot;, matrix[:, 2])          # all rows, column index 2
+print(&quot;Top-left 2×2 block:&quot;, matrix[:2, :2])
+print(&quot;Bottom-right 2×2 block:&quot;, matrix[1:, 2:])
+
+
+# ==============================================================
+# PART 5: Boolean Indexing (Filtering with Conditions)
+# ==============================================================
+
+print(&quot;\n--- PART 5: Boolean Indexing ---&quot;)
+
+temps = np.array([22.1, 23.5, 21.8, 24.0, 22.7, 23.1, 21.5])
+
+# A condition creates a boolean array
+hot = temps &gt; 23
+print(&quot;Original temps:&quot;, temps)
+print(&quot;temps &gt; 23:&quot;, hot)       # array of True/False
+
+# Use it as a mask to select only matching elements
+print(&quot;Only hot days:&quot;, temps[hot])
+print(&quot;Shorthand:&quot;, temps[temps &gt; 23])
+
+# Count how many are True
+print(&quot;Number of hot days:&quot;, np.sum(temps &gt; 23))
+print(&quot;Fraction of hot days:&quot;, np.mean(temps &gt; 23))
+# HINT: np.mean() on a boolean array = fraction of True values (very useful!)
+
+# Combine conditions with &amp; (AND) and | (OR)
+humidity = np.array([55, 60, 58, 52, 57, 61, 59])
+uncomfortable = (temps &gt; 23) &amp; (humidity &gt; 55)
+print(&quot;Hot AND humid days:&quot;, temps[uncomfortable])
+
+# np.where: element-wise if/else
+labels = np.where(temps &gt; 23, &quot;HOT&quot;, &quot;OK&quot;)
+print(&quot;Labels:&quot;, labels)
+# HINT: np.where(condition, value_if_true, value_if_false)
+# This is the NumPy equivalent of: [v if c else u for c, v, u in ...]
+
+
+# ==============================================================
+# PART 6: Reshaping Arrays
+# ==============================================================
+
+print(&quot;\n--- PART 6: Reshaping ---&quot;)
+
+# A flat array of 12 sensor readings
+flat = np.arange(1, 13)
+print(&quot;Flat array:&quot;, flat)
+
+# Reshape into 3 rows × 4 columns (3 devices, 4 time slots)
+grid = flat.reshape(3, 4)
+print(&quot;\nReshaped to (3, 4):&quot;)
+print(grid)
+
+# Reshape to (4, 3)
+print(&quot;\nReshaped to (4, 3):&quot;)
+print(flat.reshape(4, 3))
+
+# Use -1 to let NumPy figure out one dimension automatically
+print(&quot;\nReshaped to (2, -1) — NumPy infers 6 columns:&quot;)
+print(flat.reshape(2, -1))
+
+# Flatten back to 1D
+print(&quot;\nFlattened back:&quot;, grid.flatten())
+
+# HINT: reshape() is critical for ML — models often expect a specific shape.
+# For example, a single sample [1, 2, 3] must become [[1, 2, 3]] (shape (1, 3))
+# using: sample.reshape(1, -1)
+
+single_sample = np.array([22.1, 55.0, 1013.0])
+print(&quot;\nSingle sample shape:&quot;, single_sample.shape)           # (3,)
+print(&quot;Reshaped for model:&quot;, single_sample.reshape(1, -1).shape)  # (1, 3)
+
+
+# ==============================================================
+# PART 7: Random Numbers — Essential for ML
+# ==============================================================
+
+print(&quot;\n--- PART 7: Random Numbers ---&quot;)
+
+# Set a seed for reproducibility — same seed = same random numbers every run
+rng = np.random.default_rng(seed=42)   # modern NumPy random generator
+
+# Random floats between 0 and 1
+print(&quot;5 random floats:&quot;, rng.random(5).round(3))
+
+# Random integers between low (inclusive) and high (exclusive)
+print(&quot;5 random integers (1-10):&quot;, rng.integers(1, 11, size=5))
+
+# Normal (Gaussian) distribution: mean=0, std=1
+noise = rng.normal(loc=0.0, scale=1.0, size=100)
+print(f&quot;\n100 samples from N(0,1): mean={noise.mean():.3f}, std={noise.std():.3f}&quot;)
+
+# Simulate noisy sensor data
+true_temp = 23.0
+noisy_readings = true_temp + rng.normal(0, 0.5, size=20)   # ±0.5°C noise
+print(f&quot;\n20 noisy temperature readings (true={true_temp}°C):&quot;)
+print(noisy_readings.round(2))
+print(f&quot;Recovered mean: {noisy_readings.mean():.3f}°C&quot;)
+
+# HINT: rng.normal(mean, std_dev, size) is how you simulate realistic sensor noise.
+# This is exactly what the learning-journey simulation projects use.
+
+
+# ==============================================================
+# PART 8: NumPy and Pandas Work Together
+# ==============================================================
+
+print(&quot;\n--- PART 8: NumPy + Pandas ---&quot;)
+
+import pandas as pd
+
+# A Pandas Series/column is a NumPy array with labels on top
+df = pd.DataFrame({&quot;temp&quot;: [22.1, 23.5, 21.8, 24.0, 22.7]})
+col = df[&quot;temp&quot;]
+
+print(&quot;Pandas column type:&quot;, type(col))
+print(&quot;Underlying NumPy array:&quot;, col.values)
+print(&quot;Type of .values:&quot;, type(col.values))
+
+# You can pass a NumPy array directly to Pandas
+arr = np.random.default_rng(0).normal(20, 2, size=5)
+df[&quot;generated&quot;] = arr
+print(&quot;\nDataFrame with numpy-generated column:&quot;)
+print(df)
+
+# sklearn expects NumPy arrays — .values converts a DataFrame column
+X = df.values          # converts the whole DataFrame to a 2D NumPy array
+print(&quot;\nDataFrame as NumPy array (for sklearn):&quot;)
+print(X)
+print(&quot;Shape:&quot;, X.shape)
+
+
+# ==============================================================
+# YOUR TASKS FOR WEEK 5 — NumPy
+# ==============================================================
+
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;YOUR TASKS:&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;&quot;&quot;
+1. Run this file and read every output carefully.
+
+2. Create a NumPy array of 30 random temperatures using
+   rng.normal(mean=20, scale=3, size=30).
+   Then:
+   a. Print the mean and standard deviation
+   b. Count how many values are above 22°C
+   c. Find the 10th and 90th percentiles
+
+3. Create a 4×5 matrix of random integers between 1 and 100.
+   a. Print the shape
+   b. Print the mean of each column (axis=0)
+   c. Print the maximum of each row (axis=1)
+   d. Select all values greater than 50
+
+4. Practice reshaping:
+   a. Create np.arange(24) (24 elements)
+   b. Reshape it to (4, 6)
+   c. Reshape it to (2, 3, 4) — a 3D array!
+   d. Print the element at position [1, 2, 3]
+
+5. CHALLENGE: Standardization (you will do this constantly in ML)
+   Given an array of values, transform each value so that the
+   result has mean=0 and std=1.
+   Formula: z = (x - mean) / std
+   Implement this in one NumPy line (no loops!).
+   Verify: np.mean(z) should be ~0, np.std(z) should be ~1.
+&quot;&quot;&quot;)
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>
