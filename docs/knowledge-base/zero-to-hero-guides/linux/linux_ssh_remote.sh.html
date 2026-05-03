@@ -1,0 +1,907 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Linux Ssh Remote.Sh - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Linux Ssh Remote.Sh</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/linux/linux_ssh_remote.sh</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><pre><code>#!/bin/bash
+# ==============================================================================
+#  LINUX — SSH, REMOTE SERVERS &amp; TMUX
+#  FILE: linux_ssh_remote.sh
+#
+#  TASK: Learn to work on remote machines — servers, cloud VMs, EC2 instances.
+#        Master tmux so long ML training runs survive connection drops.
+#
+#  WHY:  As an ML Engineer at Amazon/Uber/Flexport, your code runs on SERVERS,
+#        not your laptop. Those servers are Linux boxes you access via SSH.
+#        - A training job that takes 8 hours will be KILLED if you close your laptop.
+#        - tmux solves this — your session lives on the server, not your connection.
+#        - SSH tunneling lets you run Jupyter on a powerful remote GPU and access
+#          it in YOUR browser as if it were local.
+#        This is THE skill that separates someone who &quot;can code&quot; from someone who
+#        can actually run production ML workloads.
+#
+#  PREREQ: linux_commands.sh (you know navigation, files, processes)
+#
+#  HOW TO USE:
+#    Run in WSL2, Linux, or macOS Terminal.
+#    For SSH sections: you need a remote server (use a free AWS EC2 t2.micro
+#    or create a second WSL instance to practice with).
+# ==============================================================================
+
+
+# ==============================================================================
+# LESSON 01 — SSH: SECURE SHELL (Connecting to Remote Servers)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# SSH = Secure Shell. It lets you open a terminal session on a REMOTE machine.
+# You type commands on your laptop — they run on a server in a data center.
+#
+# ANATOMY OF THE SSH COMMAND:
+#   ssh  username@hostname_or_IP
+#        │         └── IP address (e.g. 18.234.56.78) OR domain (ml-server.company.com)
+#        └── your username ON the remote machine (not your laptop username!)
+#
+# DEFAULT: SSH uses port 22. Most firewalls allow this.
+# FIRST CONNECT: SSH will ask &quot;Are you sure you want to connect?&quot; → type &#x27;yes&#x27;
+#   This saves the server&#x27;s fingerprint to ~/.ssh/known_hosts to verify future connections.
+
+# Connect to a remote server:
+ssh student@192.168.1.100                # Connect as &#x27;student&#x27; user to that IP
+ssh ubuntu@18.234.56.78                  # Connect to an AWS EC2 Ubuntu instance
+ssh alice@ml-server.company.com          # Connect using a hostname
+
+# Connect on a non-standard port (some servers use 2222 for security):
+ssh -p 2222 alice@ml-server.company.com
+
+# Run a SINGLE command without staying connected:
+ssh ubuntu@18.234.56.78 &#x27;ls ~/projects&#x27;   # List files and disconnect
+ssh ubuntu@18.234.56.78 &#x27;df -h&#x27;           # Check disk space remotely
+ssh ubuntu@18.234.56.78 &#x27;tail -50 training.log&#x27;  # Check training log from laptop
+
+# Exit SSH session (get back to your laptop):
+exit
+# OR: Ctrl+D
+
+
+# ==============================================================================
+# LESSON 02 — SSH KEYS (Log In Without Typing a Password)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Typing a password every time is inconvenient and less secure.
+# SSH KEYS are the professional way to authenticate.
+#
+# HOW SSH KEYS WORK:
+#   1. You generate a KEY PAIR on your laptop:
+#      - PRIVATE KEY (~/.ssh/id_rsa)  ← stays on your laptop ONLY. Never share!
+#      - PUBLIC KEY (~/.ssh/id_rsa.pub) ← give this to servers you want to connect to.
+#   2. The server holds your PUBLIC KEY in ~/.ssh/authorized_keys
+#   3. When you SSH, the server challenges you with a puzzle only your PRIVATE KEY can solve
+#   4. No password needed — math proves you own the private key.
+#
+# ANALOGY: Public key = padlock. Private key = the key that opens it.
+#          You give padlocks to everyone. You keep the key to yourself.
+
+# Step 1: Generate your SSH key pair (do this ONCE on your laptop):
+ssh-keygen -t ed25519 -C &quot;your_email@example.com&quot;
+# -t ed25519 → type: Ed25519 is modern and fast (preferred over RSA in 2024)
+# -C → comment/label (helps you identify the key later)
+# It will ask where to save (press Enter for default: ~/.ssh/id_ed25519)
+# It will ask for a passphrase (optional but recommended for extra security)
+
+# See your keys:
+ls ~/.ssh/
+# id_ed25519      ← private key (NEVER share this!)
+# id_ed25519.pub  ← public key (safe to share)
+cat ~/.ssh/id_ed25519.pub  # See your public key (copy this to servers!)
+
+# Step 2: Copy your public key to the server (the easy way):
+ssh-copy-id ubuntu@18.234.56.78
+# This automatically adds your public key to ~/.ssh/authorized_keys on the server
+
+# Manual alternative (if ssh-copy-id isn&#x27;t available):
+cat ~/.ssh/id_ed25519.pub | ssh ubuntu@18.234.56.78 &#x27;mkdir -p ~/.ssh &amp;&amp; cat &gt;&gt; ~/.ssh/authorized_keys&#x27;
+
+# Step 3: Test — log in without password:
+ssh ubuntu@18.234.56.78    # Should connect without asking for a password!
+
+
+# ==============================================================================
+# LESSON 03 — SSH CONFIG FILE (Never Remember Long Commands Again)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# ssh ubuntu@18.234.56.78 -p 2222 -i ~/.ssh/my_aws_key.pem
+# is painful to type every time. The SSH config file lets you define shortcuts.
+# After setup: just type &#x27;ssh myserver&#x27; and it knows everything automatically.
+
+# Create/edit your SSH config file:
+# On your LAPTOP, run:
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+# nano or vim ~/.ssh/config  ← uncomment this to edit in your terminal
+
+# Example ~/.ssh/config file content:
+cat &lt;&lt; &#x27;EOF&#x27;
+# ~/.ssh/config — SSH connection shortcuts
+
+# AWS EC2 ML Training server
+Host mlserver
+    HostName 18.234.56.78
+    User ubuntu
+    IdentityFile ~/.ssh/aws_ml_key.pem
+    Port 22
+
+# Company internal server (non-standard port)
+Host work-server
+    HostName ml-server.company.com
+    User alice
+    IdentityFile ~/.ssh/id_ed25519
+    Port 2222
+
+# Shortcut with forwarding (for Jupyter — explained in Lesson 05)
+Host jupyter-server
+    HostName 18.234.56.78
+    User ubuntu
+    IdentityFile ~/.ssh/aws_ml_key.pem
+    LocalForward 8888 localhost:8888
+EOF
+
+# After saving the config file:
+chmod 600 ~/.ssh/config    # Must be readable ONLY by you — SSH will refuse otherwise!
+
+# Now connect with just the alias:
+# ssh mlserver            ← equivalent to the long command above
+# ssh work-server
+# ssh jupyter-server      ← connects AND sets up port forwarding automatically
+
+
+# ==============================================================================
+# LESSON 04 — SCP &amp; RSYNC (Transferring Files to/from Servers)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Three scenarios you&#x27;ll face constantly:
+#   1. Upload training data to server before a run
+#   2. Download model outputs / trained weights back to your laptop
+#   3. Sync your local code to the server (faster than git clone every time)
+#
+# SCP (Secure Copy) = simple file transfer via SSH
+# rsync = smarter sync — only transfers CHANGED files (huge speed advantage!)
+
+# SCP — syntax: scp [source] [destination]
+# Use  user@host:path  for remote paths, just path for local
+
+# Upload FROM laptop TO server:
+scp mydata.csv ubuntu@18.234.56.78:~/data/
+scp -r ./models/ ubuntu@18.234.56.78:~/project/models/   # -r for directories
+
+# Download FROM server TO laptop:
+scp ubuntu@18.234.56.78:~/models/churn_v2.pkl ./models/
+scp -r ubuntu@18.234.56.78:~/results/ ./results/
+
+# Using SSH config alias (much shorter!):
+scp mydata.csv mlserver:~/data/
+scp -r mlserver:~/results/ ./results/
+
+# RSYNC — smarter sync (only copies changes):
+# Syntax: rsync [options] [source] [destination]
+
+# Sync your local project TO server (only changed files):
+rsync -avz ./my_project/ mlserver:~/my_project/
+# -a = archive mode (preserves permissions, timestamps, recursive)
+# -v = verbose (shows what&#x27;s being transferred)
+# -z = compress during transfer (faster over slow connections)
+
+# Sync server results BACK to laptop:
+rsync -avz mlserver:~/results/ ./results/
+
+# rsync with EXCLUSIONS (don&#x27;t sync data files or caches):
+rsync -avz --exclude=&#x27;data/&#x27; --exclude=&#x27;__pycache__/&#x27; --exclude=&#x27;*.pyc&#x27; \
+    ./my_project/ mlserver:~/my_project/
+
+# Dry run first (see what WOULD be synced, without actually syncing):
+rsync -avz --dry-run ./my_project/ mlserver:~/my_project/
+
+# Delete remote files that were deleted locally (true sync):
+rsync -avz --delete ./my_project/ mlserver:~/my_project/
+
+
+# ==============================================================================
+# LESSON 05 — SSH TUNNELING (Run Jupyter on a Server, Use It Locally)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Scenario: You have a powerful GPU server (8xA100s) in the cloud.
+# You want to run Jupyter Notebook on THAT server (to use the GPUs)
+# but access it in YOUR browser on your laptop.
+#
+# SSH TUNNELING = &quot;port forwarding&quot;
+# It creates a secure pipe: your laptop&#x27;s port 8888 → server&#x27;s port 8888
+# Your browser thinks Jupyter is local, but it&#x27;s actually running remotely!
+#
+# STEP 1: Start Jupyter on the server (no browser since server has no display)
+# (Run this on the server after SSH-ing in)
+#   jupyter notebook --no-browser --port=8888
+#
+# STEP 2: On your LAPTOP, create the tunnel:
+ssh -L 8888:localhost:8888 ubuntu@18.234.56.78
+# -L = &quot;Local forwarding&quot;
+# 8888:localhost:8888 = &quot;my local port 8888 → server&#x27;s localhost:8888&quot;
+#
+# STEP 3: Open your laptop browser → http://localhost:8888
+# You&#x27;ll see Jupyter — but it&#x27;s running on the server using its GPUs!
+
+# One-liner: start tunnel in background (-N = don&#x27;t execute command, just forward):
+ssh -N -L 8888:localhost:8888 mlserver &amp;
+# Now open browser → localhost:8888
+
+# Multiple port forwards in one command:
+ssh -L 8888:localhost:8888 -L 6006:localhost:6006 mlserver
+# Also forwards TensorBoard port 6006!
+
+# Check your own open tunnels:
+ps aux | grep ssh
+
+
+# ==============================================================================
+# LESSON 06 — TMUX (Never Lose a Running Process When Connection Drops)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# WITHOUT tmux: You SSH into a server, start training (8 hours), your laptop
+#   sleeps or disconnects → the SSH session dies → training STOPS.
+#   8 hours of GPU time, wasted.
+#
+# WITH tmux: Your &quot;session&quot; lives on the SERVER, not in your SSH connection.
+#   You can disconnect and reconnect. The session (and your training) keeps running.
+#   tmux also lets you have multiple &quot;windows&quot; (like browser tabs) in one terminal,
+#   and split the screen into &quot;panes&quot; (like VS Code panels).
+#
+# MENTAL MODEL:
+#   tmux SERVER → lives on the remote machine
+#   tmux SESSION → one workspace (can have many windows)
+#   tmux WINDOW  → one &quot;tab&quot; (like a browser tab)
+#   tmux PANE    → one split section of a window
+#
+# HOW IT WORKS:
+#   You type commands inside a tmux window.
+#   You &quot;detach&quot; from tmux (Ctrl+B, D) → tmux session keeps running on the server.
+#   You disconnect SSH → nothing stops.
+#   You reconnect later → reattach to the session → everything is there.
+#
+# All tmux commands start with PREFIX = Ctrl+B
+#   (Press Ctrl+B, release, THEN press the next key)
+
+# Install tmux:
+sudo apt install tmux            # Ubuntu/Debian
+# brew install tmux              # macOS
+
+# ==============================================================================
+# TMUX SESSION MANAGEMENT
+# ==============================================================================
+
+# Start a new named session (ALWAYS name your sessions!):
+tmux new -s training             # Start session called &quot;training&quot;
+tmux new -s jupyter              # Start session called &quot;jupyter&quot;
+
+# Inside tmux: start your ML training job:
+#   python train.py --epochs=100 --lr=0.001 &gt; train.log 2&gt;&amp;1
+
+# Detach from session (training keeps running!):
+# Press: Ctrl+B, then D
+# You&#x27;re back to your normal shell. The tmux session is still alive.
+
+# List all running sessions:
+tmux ls
+# Output:
+# training: 1 windows (created Mon Apr 21 10:30:00 2026)
+# jupyter:  1 windows (created Mon Apr 21 09:00:00 2026)
+
+# Re-attach to a session (after reconnecting SSH):
+tmux attach -t training          # Rejoin &quot;training&quot; session
+tmux attach -t jupyter           # Rejoin &quot;jupyter&quot; session
+tmux a                           # Attach to most recently used session
+
+# Rename a session (if you forgot to name it):
+tmux rename-session -t 0 training
+
+# Kill a session (when you&#x27;re done with it):
+tmux kill-session -t training
+
+# ==============================================================================
+# TMUX WINDOWS (Tabs)
+# ==============================================================================
+# All window commands start with Ctrl+B
+
+# Create a new window:                  Ctrl+B, C
+# Switch to next window:                Ctrl+B, N
+# Switch to previous window:            Ctrl+B, P
+# Switch to window by number:           Ctrl+B, 0  (or 1, 2, 3...)
+# Rename current window:                Ctrl+B, ,
+# List windows:                         Ctrl+B, W  (then arrow keys to select)
+# Close current window:                 Ctrl+B, &amp;  (confirms before closing)
+
+# ==============================================================================
+# TMUX PANES (Split Screen)
+# ==============================================================================
+
+# Split window HORIZONTALLY (top/bottom):  Ctrl+B, &quot;   (that&#x27;s the &quot; key)
+# Split window VERTICALLY (left/right):    Ctrl+B, %
+# Switch between panes:                    Ctrl+B, Arrow keys
+# Resize pane:                             Ctrl+B, Hold Arrow key
+# Close current pane:                      Ctrl+B, X  (then confirm with &#x27;y&#x27;)
+# Zoom in on current pane (full screen):   Ctrl+B, Z  (press again to zoom out)
+# ==============================================================================
+
+# TYPICAL ML TRAINING WORKFLOW WITH TMUX:
+# 1. SSH into server
+# 2. tmux new -s ml_run
+# 3. Split into 3 panes:
+#    Pane 1 (top-left):  training script output
+#    Pane 2 (top-right): watch -n 5 nvidia-smi   (live GPU monitor)
+#    Pane 3 (bottom):    tail -f train.log        (log file)
+# 4. Start training in pane 1
+# 5. Ctrl+B, D → detach (training runs on server!)
+# 6. Close laptop, go home
+# 7. Come back tomorrow: ssh mlserver → tmux attach -t ml_run
+# 8. See your training results as if you never left!
+
+# Quick one-line tmux setup for ML monitoring:
+cat &lt;&lt; &#x27;SCRIPT&#x27;
+# Run this on the server to set up your ML monitoring layout:
+tmux new -s training \; \
+  send-keys &#x27;python train.py &gt; train.log 2&gt;&amp;1&#x27; Enter \; \
+  split-window -v \; \
+  send-keys &#x27;watch -n 2 nvidia-smi&#x27; Enter \; \
+  split-window -h \; \
+  send-keys &#x27;tail -f train.log&#x27; Enter \; \
+  select-pane -t 0
+SCRIPT
+
+
+# ==============================================================================
+# LESSON 07 — DISK &amp; NETWORK MONITORING (ML Engineer Essentials)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Three things kill ML server jobs without warning:
+#   1. Disk full → training crashes when it can&#x27;t write checkpoints
+#   2. GPU OOM (out of memory) → training crashes with CUDA error
+#   3. Network timeout → data loading stalls
+# Learn to spot these BEFORE they become problems.
+
+# Check available disk space:
+df -h                            # All mounted filesystems, human-readable
+df -h /                          # Just the root filesystem
+df -h /data                      # Check the data partition specifically
+
+# Find what&#x27;s eating your disk:
+du -sh *                         # Size of each item in current directory
+du -sh --max-depth=1 ~/          # Top-level disk usage of home directory
+du -sh ~/.cache                  # How big is your cache?
+du -sh ~/data/* | sort -h        # Sort by size (smallest first)
+du -sh ~/data/* | sort -rh       # Sort by size (LARGEST first) ← most useful!
+
+# Clean up disk space:
+find . -name &quot;*.pyc&quot; -delete               # Delete compiled Python files
+find . -type d -name &quot;__pycache__&quot; -exec rm -rf {} +   # Delete all pycache
+rm -rf ~/.cache/pip                        # Clear pip download cache
+
+# Monitor network traffic:
+# Check if data is downloading (is wget still running?):
+ps aux | grep wget
+# See network connections:
+ss -tlnp                                   # What ports are listening?
+# Or older tool:
+netstat -tlnp 2&gt;/dev/null                  # Same thing (if installed)
+
+# Which process is using a port?
+ss -tlnp | grep 8888                       # Who&#x27;s on port 8888? (Jupyter?)
+ss -tlnp | grep 8000                       # Who&#x27;s on port 8000? (FastAPI?)
+
+# Check if your API server is actually running:
+curl -s http://localhost:8000/health &amp;&amp; echo &quot;✓ Server is up&quot; || echo &quot;✗ Server is down&quot;
+
+
+# ==============================================================================
+# LESSON 08 — DISK &amp; ARCHIVE TOOLS (tar, gzip, zip)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Datasets come compressed. Model checkpoints need to be archived.
+# These commands handle all compressed file formats.
+#
+# tar  = creates/extracts archives (like a box that holds files)
+# gzip = compresses individual files (.gz extension)
+# zip  = ZIP format (Windows-compatible)
+#
+# MOST COMMON PATTERN: .tar.gz (a &quot;tarball&quot;) = tar archive + gzip compression
+# OPTIONS for tar: c=create, x=extract, z=gzip, v=verbose, f=filename
+#   MEMORIZE:  c=compress, x=extract, z=zip, v=verbose, f=file
+#              CVF → Create Very Fine archive 😄
+
+# Create a .tar.gz archive:
+tar -czf models_backup.tar.gz ./models/          # Archive the models/ folder
+tar -czf data_v1.tar.gz data/raw/ data/processed/ # Archive multiple folders
+
+# Extract a .tar.gz archive:
+tar -xzf models_backup.tar.gz                    # Extract in current directory
+tar -xzf models_backup.tar.gz -C /target/path/  # Extract to specific location
+
+# List contents without extracting:
+tar -tzf models_backup.tar.gz                    # Preview what&#x27;s inside
+
+# Compress/decompress single files:
+gzip large_file.csv                              # Creates large_file.csv.gz, removes original
+gzip -d large_file.csv.gz                        # Decompress (or: gunzip large_file.csv.gz)
+gzip -k large_file.csv                           # Keep original after compressing (-k flag)
+
+# ZIP format (for sharing with Windows users):
+zip -r archive.zip ./my_folder/                  # Create zip
+unzip archive.zip                                # Extract zip
+unzip -l archive.zip                             # List contents
+
+# Check file type (what kind of compressed file is this?):
+file unknown_archive                             # Shows: &quot;POSIX tar archive (gzip compressed)&quot;
+
+# Pro tip — compress and transfer in one pipeline:
+tar -czf - ./models/ | ssh mlserver &#x27;tar -xzf - -C ~/backup/&#x27;
+# Creates archive → pipes directly into SSH → extracts on server
+# Never writes a local file! Great when disk space is tight.
+
+
+# ==============================================================================
+# LESSON 09 — jq: JSON PROCESSING FROM THE TERMINAL
+# ==============================================================================
+#
+# TEACHER SAYS:
+# APIs return JSON. Your ML pipeline configs are JSON. Your metrics are JSON.
+# jq is to JSON what awk is to CSV — it lets you filter, extract, and transform
+# JSON directly in the terminal without writing Python.
+#
+# WHY LEARN THIS:
+#   When debugging at 2 AM on a production server, you don&#x27;t want to
+#   write a Python script just to read one value from a JSON file.
+#   jq lets you do it in one line.
+
+# Install jq:
+sudo apt install jq              # Ubuntu/Debian
+# brew install jq                # macOS
+
+# Create a sample JSON file to practice with:
+cat &gt; metrics.json &lt;&lt; &#x27;EOF&#x27;
+{
+  &quot;experiment&quot;: &quot;churn_v3&quot;,
+  &quot;model&quot;: &quot;random_forest&quot;,
+  &quot;hyperparams&quot;: {
+    &quot;n_estimators&quot;: 200,
+    &quot;max_depth&quot;: 10,
+    &quot;learning_rate&quot;: 0.001
+  },
+  &quot;results&quot;: {
+    &quot;train_f1&quot;: 0.923,
+    &quot;val_f1&quot;: 0.847,
+    &quot;test_f1&quot;: 0.841,
+    &quot;auc_roc&quot;: 0.912
+  },
+  &quot;runs&quot;: [
+    {&quot;epoch&quot;: 1, &quot;loss&quot;: 0.45, &quot;f1&quot;: 0.72},
+    {&quot;epoch&quot;: 2, &quot;loss&quot;: 0.31, &quot;f1&quot;: 0.81},
+    {&quot;epoch&quot;: 3, &quot;loss&quot;: 0.22, &quot;f1&quot;: 0.85}
+  ]
+}
+EOF
+
+# . means &quot;the whole document&quot; (the root):
+cat metrics.json | jq &#x27;.&#x27;                        # Pretty-print the whole file
+
+# Access a field:
+cat metrics.json | jq &#x27;.model&#x27;                   # &quot;random_forest&quot;
+cat metrics.json | jq &#x27;.experiment&#x27;              # &quot;churn_v3&quot;
+
+# Nested fields:
+cat metrics.json | jq &#x27;.results.val_f1&#x27;          # 0.847
+cat metrics.json | jq &#x27;.hyperparams.n_estimators&#x27; # 200
+
+# Multiple fields (output as object):
+cat metrics.json | jq &#x27;{model: .model, val_f1: .results.val_f1}&#x27;
+
+# Array access:
+cat metrics.json | jq &#x27;.runs[0]&#x27;                 # First run object
+cat metrics.json | jq &#x27;.runs[-1]&#x27;                # Last run object
+cat metrics.json | jq &#x27;.runs[].loss&#x27;             # All loss values
+
+# Filter array elements:
+cat metrics.json | jq &#x27;.runs[] | select(.f1 &gt; 0.80)&#x27;  # Runs where f1 &gt; 0.80
+
+# Raw output (no quotes — useful for piping to other commands):
+cat metrics.json | jq -r &#x27;.model&#x27;                # random_forest (no quotes)
+
+# Read from file directly (no cat needed):
+jq &#x27;.results&#x27; metrics.json
+
+# Real-world use: extract val_f1 from many experiment files and compare:
+for f in experiments/*.json; do
+    echo &quot;$f: $(jq -r &#x27;.results.val_f1&#x27; &quot;$f&quot;)&quot;
+done
+# Output:
+# experiments/run1.json: 0.832
+# experiments/run2.json: 0.847
+# experiments/run3.json: 0.851
+
+
+# ==============================================================================
+# LESSON 10 — THE COMPLETE ML WORKFLOW ON A REMOTE SERVER
+# ==============================================================================
+#
+# TEACHER SAYS:
+# This is the full professional workflow. Every step matters.
+# Do this once and you&#x27;ll never need a tutorial again.
+
+cat &lt;&lt; &#x27;WORKFLOW&#x27;
+=================================================================
+ COMPLETE REMOTE ML SERVER WORKFLOW
+=================================================================
+
+STEP 1: SET UP SSH KEY (one-time setup)
+  Local:
+    ssh-keygen -t ed25519 -C &quot;your_email@example.com&quot;
+    ssh-copy-id ubuntu@YOUR_SERVER_IP
+
+STEP 2: ADD SERVER TO SSH CONFIG (one-time setup)
+  Edit ~/.ssh/config:
+    Host mlserver
+        HostName YOUR_SERVER_IP
+        User ubuntu
+        IdentityFile ~/.ssh/id_ed25519
+
+STEP 3: SYNC YOUR CODE TO SERVER
+  Local:
+    rsync -avz --exclude=&#x27;data/&#x27; --exclude=&#x27;__pycache__/&#x27; \
+      ./my_project/ mlserver:~/my_project/
+
+STEP 4: SSH IN AND START TMUX
+  Local:
+    ssh mlserver
+  On server:
+    tmux new -s training
+
+STEP 5: SET UP ENVIRONMENT ON SERVER (first time)
+  On server (inside tmux):
+    cd ~/my_project
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+
+STEP 6: SET UP MONITORING PANES
+  In tmux:
+    Ctrl+B, &quot;         → split horizontally
+    In bottom pane:
+    watch -n 2 nvidia-smi    → live GPU monitor
+
+    Ctrl+B, Up arrow         → go back to top pane
+    Ctrl+B, %                → split vertically
+    In right pane:
+    tail -f training.log     → live log
+
+STEP 7: START TRAINING (in the main pane)
+    python train.py &gt; training.log 2&gt;&amp;1
+
+STEP 8: DETACH AND WALK AWAY
+    Ctrl+B, D                → detach from tmux
+    exit                     → disconnect SSH
+    → Training continues on server!
+
+STEP 9: CHECK PROGRESS LATER (from anywhere)
+  Local:
+    ssh mlserver &#x27;tail -20 ~/my_project/training.log&#x27;
+    OR:
+    ssh mlserver
+    tmux attach -t training
+
+STEP 10: DOWNLOAD RESULTS
+  Local:
+    rsync -avz mlserver:~/my_project/models/ ./models/
+    rsync -avz mlserver:~/my_project/results/ ./results/
+
+STEP 11: CHECK METRICS
+  Local (if metrics saved as JSON):
+    jq &#x27;.results&#x27; models/churn_v3_metrics.json
+=================================================================
+WORKFLOW
+
+
+# ==============================================================================
+# 🎯 YOUR TASKS
+# ==============================================================================
+echo &quot;&quot;
+echo &quot;==================================================================&quot;
+echo &quot;YOUR TURN — SSH, Remote &amp; tmux Practice&quot;
+echo &quot;==================================================================&quot;
+cat &lt;&lt; &#x27;EOF&#x27;
+
+TASK 1 — SSH KEYS:
+    a) Generate an Ed25519 SSH key pair: ssh-keygen -t ed25519 -C &quot;your@email.com&quot;
+    b) View your public key: cat ~/.ssh/id_ed25519.pub
+    c) Create a second user on your LOCAL machine (or use WSL):
+       sudo adduser testserver
+    d) Set up SSH access to that user using ssh-copy-id (practice the flow!)
+    e) Connect to it: ssh testserver@localhost
+    f) Run a command remotely: ssh testserver@localhost &#x27;ls ~&#x27;
+
+TASK 2 — SSH CONFIG:
+    Create ~/.ssh/config with at least 2 entries:
+    - One for &#x27;localhost&#x27; (alias: &#x27;local&#x27;) → Host: localhost, User: your username
+    - One for any real server you have access to (GitHub, AWS free tier, etc.)
+    Test: ssh local (should connect without typing the full command)
+
+TASK 3 — SCP PRACTICE:
+    a) Create a file on your machine: echo &quot;hello server&quot; &gt; test_upload.txt
+    b) SCP it to another location (even localhost works): scp test_upload.txt local:~/
+    c) SCP it back with a new name: scp local:~/test_upload.txt downloaded_file.txt
+    d) Verify they match: diff test_upload.txt downloaded_file.txt
+
+TASK 4 — TMUX SESSION WORKFLOW:
+    a) Start a named session: tmux new -s practice
+    b) Run a command that takes a while: for i in $(seq 1 30); do echo &quot;step $i&quot;; sleep 1; done
+    c) While it&#x27;s running: DETACH (Ctrl+B, D)
+    d) Verify you&#x27;re back to normal shell: the loop is still running!
+    e) List sessions: tmux ls
+    f) Reattach: tmux attach -t practice
+    g) Watch it complete, then: exit (to close the session)
+
+TASK 5 — TMUX SPLIT SCREEN:
+    a) Start a new tmux session: tmux new -s monitor
+    b) Split horizontally: Ctrl+B, &quot;
+    c) In bottom pane: watch -n 1 date   (live clock!)
+    d) Go back to top: Ctrl+B, Up arrow
+    e) Split vertically: Ctrl+B, %
+    f) In right pane: top
+    g) Navigate between all 3 panes using Ctrl+B + arrow keys
+    h) Kill all panes: Ctrl+B, X (repeat for each pane)
+
+TASK 6 — ARCHIVE &amp; TRANSFER:
+    a) Create a mock ML project folder with some files:
+       mkdir -p ml_project/{data,models,logs}
+       touch ml_project/data/train.csv ml_project/models/model.pkl ml_project/logs/train.log
+    b) Archive it: tar -czf ml_project_backup.tar.gz ml_project/
+    c) Check the size: ls -lh ml_project_backup.tar.gz
+    d) List contents without extracting: tar -tzf ml_project_backup.tar.gz
+    e) Extract to a different location: mkdir restore &amp;&amp; tar -xzf ml_project_backup.tar.gz -C restore/
+    f) Verify: ls -la restore/ml_project/
+
+TASK 7 — jq JSON PROCESSING:
+    a) Create the metrics.json file from LESSON 09 above
+    b) Extract just the model name
+    c) Extract the val_f1 score
+    d) Filter to only show runs where loss &lt; 0.35
+    e) Create your own experiment JSON with at least 5 fields and practice
+       extracting different values
+
+TASK 8 — SSH TUNNELING (if you have a server):
+    a) SSH into any server
+    b) Run a simple Python HTTP server: python3 -m http.server 8080
+    c) On your LOCAL machine, open a tunnel: ssh -L 8080:localhost:8080 your_server
+    d) Open browser → http://localhost:8080
+    e) You should see the remote server&#x27;s directory listing served to your local browser!
+    f) This is EXACTLY how Jupyter tunneling works.
+
+Write your experience and lessons learned in a comment below:
+EOF
+
+echo &quot;&quot;
+echo &quot;linux_ssh_remote.sh complete!&quot;
+echo &quot;Next: linux_bash_scripting.sh (variables, loops, functions, cron, environment)&quot;
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

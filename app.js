@@ -394,6 +394,169 @@ const monthGithubLinks = {
   ],
 };
 
+const learningLibrary = [
+  {
+    category: "📐 Math & Foundations",
+    id: "math",
+    months: "Months 1–3 — study alongside coding",
+    items: [
+      { type: "book", label: "Mathematics for Machine Learning", url: "https://mml-book.github.io/book/mml-book.pdf", desc: "Free PDF — the only math book you need. Read chapters on linear algebra and probability in Month 1." },
+      { type: "course", label: "MIT 18.06 Linear Algebra (Gilbert Strang)", url: "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/", desc: "Free MIT course. Watch 2 lectures per week in Month 1 — the best linear algebra explanation ever recorded." },
+      { type: "video", label: "3Blue1Brown — Essence of Linear Algebra", url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi", desc: "15-minute animated videos. Watch the whole playlist in one weekend — makes matrices visual and intuitive." },
+      { type: "video", label: "3Blue1Brown — Essence of Calculus", url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDNPOjrTGVgfzC6U7hoxuKx", desc: "Animated calculus series. Watch in Month 2 to understand gradients and backpropagation visually." },
+      { type: "book", label: "Convex Optimization — Boyd & Vandenberghe", url: "https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf", desc: "Free PDF — reference for optimization theory used in OR-Tools and PuLP in Months 4 and 9." },
+      { type: "course", label: "Stanford CS229 Math Prerequisites", url: "https://cs229.stanford.edu/syllabus-fall2020.html", desc: "The exact math checklist Stanford requires before ML. Use as a self-assessment in Month 1." },
+    ],
+  },
+  {
+    category: "📚 Free Books",
+    id: "books",
+    months: "Read 1 chapter per day alongside the matching month",
+    items: [
+      { type: "book", label: "Hands-On ML with Scikit-Learn, Keras & TensorFlow", url: "https://github.com/ageron/handson-ml3", desc: "🟢 YOUR MAIN ML TEXTBOOK — notebooks included. Read Chapter 1-4 in Month 1-2, Chapter 5-9 in Month 3-6, Chapter 10+ in Month 10-12." },
+      { type: "book", label: "Python for Data Analysis — Wes McKinney", url: "https://wesmckinney.com/book/", desc: "Free online. The pandas author's official book — read Chapters 1-6 in Month 1-2 alongside your SQL work." },
+      { type: "book", label: "Deep Learning — Goodfellow, Bengio, Courville", url: "https://www.deeplearningbook.org/", desc: "Free online — the deep learning bible. Read Part 1 (Applied Math) in Month 1, Part 2 (Deep Networks) in Month 10." },
+      { type: "book", label: "Speech and Language Processing — Jurafsky & Martin", url: "https://web.stanford.edu/~jurafsky/slp3/", desc: "Free PDF — NLP theory. Read Chapters 6-7 (neural text classification) in Month 10, Chapters 10-11 in Month 11." },
+      { type: "book", label: "Designing Machine Learning Systems — Chip Huyen", url: "https://huyenchip.com/books/", desc: "Production ML bible. Read Chapter 1-4 in Month 3 (Docker/MLOps), Chapter 7-9 in Month 4 (deployment)." },
+      { type: "book", label: "Hands-On Large Language Models — Alammar & Grootendorst", url: "https://www.llm-book.com/", desc: "The best practical LLM book. Read alongside Month 10-11 — covers embeddings, RAG, and fine-tuning with code." },
+      { type: "book", label: "Build a Large Language Model from Scratch — Raschka", url: "https://www.manning.com/books/build-a-large-language-model-from-scratch", desc: "Build GPT step by step. Read in Month 10 — the best way to understand how LLMs actually work." },
+      { type: "book", label: "Reinforcement Learning: An Introduction — Sutton & Barto", url: "http://incompleteideas.net/book/the-book-2nd.html", desc: "Free PDF — RL theory. Read Chapters 1-3 in Month 12 to understand the ReAct agent loop theoretically." },
+      { type: "book", label: "Probabilistic ML: Advanced Topics — Kevin Murphy", url: "https://probml.github.io/book2", desc: "Advanced reference. Browse the Gaussian Processes and Bayesian chapters when you need theory for Month 6 ML work." },
+    ],
+  },
+  {
+    category: "🎓 Free Courses",
+    id: "courses",
+    months: "Pick one course per phase — don't do all at once",
+    items: [
+      { type: "course", label: "Machine Learning Specialization — DeepLearning.AI", url: "https://www.coursera.org/specializations/machine-learning-introduction", desc: "🟢 START HERE for ML — Andrew Ng's updated course. Do Course 1 in Month 2, Course 2-3 in Month 6. Free to audit." },
+      { type: "course", label: "Deep Learning Specialization — DeepLearning.AI", url: "https://www.coursera.org/specializations/deep-learning", desc: "5-course deep learning path by Andrew Ng. Do Courses 1-2 in Month 10, Courses 3-5 in Month 11-12." },
+      { type: "course", label: "MLOps Specialization — DeepLearning.AI", url: "https://www.deeplearning.ai/courses/machine-learning-in-production/", desc: "Production ML course. Do Module 1 in Month 3 (Docker), Module 3-4 in Month 4 (CI/CD and deployment)." },
+      { type: "course", label: "Generative AI with LLMs — DeepLearning.AI", url: "https://www.coursera.org/learn/generative-ai-with-llms", desc: "3-week course on LLMs, fine-tuning, and RLHF. Do this in Week 37-38 of Month 10. Free to audit." },
+      { type: "course", label: "Hugging Face NLP Course", url: "https://huggingface.co/learn/llm-course/en/chapter1/1", desc: "🟢 Free and practical — the best NLP + LLM course available. Do Chapters 1-4 in Month 10, Chapters 5-9 in Month 11." },
+      { type: "course", label: "Multi AI Agent Systems with CrewAI — DeepLearning.AI", url: "https://www.deeplearning.ai/short-courses/multi-ai-agent-systems-with-crewai/", desc: "Free short course. Do this in Week 46 of Month 12 — directly applies to the multi-agent system you're building." },
+      { type: "course", label: "Finetuning Large Language Models — DeepLearning.AI", url: "https://www.deeplearning.ai/short-courses/finetuning-large-language-models/", desc: "Free 1-hour course. Do in Month 11 Week 43 — adds fine-tuning skill to your RAG pipeline." },
+      { type: "course", label: "fast.ai Practical Deep Learning", url: "https://course.fast.ai/", desc: "Top-down, code-first deep learning course. Start Lesson 1 in Month 10 — very practical, no PhD required." },
+      { type: "course", label: "Stanford CS224N — NLP with Deep Learning", url: "https://web.stanford.edu/class/cs224n/", desc: "Stanford's NLP course (lecture videos on YouTube). Watch Lectures 1-4 in Month 10 for transformer theory." },
+      { type: "course", label: "MLOps Zoomcamp — DataTalks.Club", url: "https://github.com/DataTalksClub/mlops-zoomcamp", desc: "Free MLOps course with code. 9 modules — do Module 1-2 in Month 3, Module 4-5 in Month 4. Best free MLOps course." },
+      { type: "course", label: "Full Stack LLM Bootcamp — FSDL", url: "https://fullstackdeeplearning.com/llm-bootcamp/", desc: "Free bootcamp covering LLM apps from scratch. Watch the lectures in Month 10-11 for practical LLM engineering." },
+    ],
+  },
+  {
+    category: "📄 Key Papers to Read",
+    id: "papers",
+    months: "Read each paper when you reach the matching month",
+    items: [
+      { type: "paper", label: "Attention Is All You Need (Vaswani et al., 2017)", url: "https://arxiv.org/abs/1706.03762", desc: "The transformer paper — read in Month 10 Week 38 before touching HuggingFace. 15-page paper that changed everything." },
+      { type: "paper", label: "BERT: Pre-training Deep Bidirectional Transformers (Devlin, 2019)", url: "https://arxiv.org/abs/1810.04805", desc: "Read after the transformer paper in Month 10 — shows how pre-training works for text classification tasks." },
+      { type: "paper", label: "Language Models are Few-Shot Learners — GPT-3 (Brown, 2020)", url: "https://arxiv.org/abs/2005.14165", desc: "GPT-3 paper — read in Month 10 Week 39 when you make your first OpenAI API call. Explains in-context learning." },
+      { type: "paper", label: "ReAct: Synergizing Reasoning and Acting (Yao et al., 2023)", url: "https://arxiv.org/abs/2210.03629", desc: "🟢 READ THIS in Month 12 Week 45 — the exact reasoning loop your agentic AI system will follow." },
+      { type: "paper", label: "Retrieval-Augmented Generation for NLP Tasks (Lewis, 2020)", url: "https://arxiv.org/abs/2005.11401", desc: "The original RAG paper — read in Month 11 Week 41 before building your RAG pipeline. Short and practical." },
+      { type: "paper", label: "Toolformer: Language Models Can Use Tools (Schick, 2023)", url: "https://arxiv.org/abs/2302.04761", desc: "Read in Month 12 Week 45 — explains how LLMs learn to call external tools, directly relevant to your agent." },
+      { type: "paper", label: "Reflexion: Language Agents with Verbal RL (Shinn, 2023)", url: "https://arxiv.org/abs/2303.11366", desc: "Read in Month 12 Week 47 — explains how agents learn from their own mistakes, useful for guardrails design." },
+      { type: "paper", label: "Tree of Thoughts: Deliberate Problem Solving (Yao, 2023)", url: "https://arxiv.org/abs/2305.10601", desc: "Read in Month 12 — shows advanced agent reasoning patterns beyond simple ReAct." },
+      { type: "paper", label: "Direct Preference Optimization — DPO (Rafailov, 2023)", url: "https://arxiv.org/abs/2305.18290", desc: "Read in Month 11-12 — the modern replacement for RLHF when fine-tuning LLMs. Important for Month 11 fine-tuning work." },
+      { type: "paper", label: "LLaMA: Open and Efficient Foundation LMs (Touvron, 2023)", url: "https://arxiv.org/abs/2302.13971", desc: "Read in Month 10 — explains how open-source LLMs work and why they can run locally without OpenAI." },
+      { type: "paper", label: "Precise Zero-Shot Dense Retrieval — HyDE (Gao, 2023)", url: "https://arxiv.org/abs/2212.10496", desc: "Read in Month 11 Week 43 — advanced RAG technique for better document retrieval in your pipeline." },
+    ],
+  },
+  {
+    category: "🛠️ Tools & Official Docs",
+    id: "tools",
+    months: "Open the docs page when you start using each tool",
+    items: [
+      { type: "tool", label: "Python Official Docs", url: "https://www.python.org/", desc: "Month 1 — bookmark the Python 3 docs. Use Ctrl+F to search functions when you forget syntax." },
+      { type: "tool", label: "pandas Documentation", url: "https://pandas.pydata.org/", desc: "Month 1-2 — the official pandas docs. Read the '10 minutes to pandas' guide first." },
+      { type: "tool", label: "scikit-learn Documentation", url: "https://scikit-learn.org/", desc: "Month 2-6 — read the User Guide section matching what you're building (classification, pipelines, etc.)." },
+      { type: "tool", label: "FastAPI Documentation", url: "https://fastapi.tiangolo.com/", desc: "Month 2 — follow the official Tutorial - User Guide from the start. One of the best docs ever written." },
+      { type: "tool", label: "Docker Documentation", url: "https://www.docker.com/", desc: "Month 3 — read the Get Started guide, then the Dockerfile reference when you hit issues." },
+      { type: "tool", label: "MLflow Documentation", url: "https://mlflow.org/", desc: "Month 3 — read the Tracking and Projects quickstarts to set up experiment logging." },
+      { type: "tool", label: "Weights & Biases (wandb)", url: "https://wandb.ai/site/", desc: "Month 3-6 — alternative to MLflow. Better visualizations. Free for individuals — try it for experiment tracking." },
+      { type: "tool", label: "PyTorch Documentation", url: "https://pytorch.org/", desc: "Month 10 — read the 60-minute blitz tutorial. Then the tensor and autograd guides before touching transformers." },
+      { type: "tool", label: "Hugging Face Transformers Docs", url: "https://huggingface.co/docs/transformers/index", desc: "Month 10-11 — read the Quick Tour and Task guides for text classification, summarization, and embeddings." },
+      { type: "tool", label: "LangChain Documentation", url: "https://www.langchain.com/", desc: "Month 11 — read the RAG tutorial first, then the Agents tutorial in Month 12." },
+      { type: "tool", label: "LangGraph Documentation", url: "https://www.langchain.com/langgraph", desc: "Month 12 — read the How-To guides for stateful graphs and agent loops." },
+      { type: "tool", label: "OR-Tools Documentation", url: "https://developers.google.com/optimization", desc: "Month 9 — read the Linear Optimization and Routing sections for the capstone optimizer." },
+      { type: "tool", label: "Plotly Documentation", url: "https://plotly.com/", desc: "Month 6 & 9 — read the Python Express quickstart for charts in your Django dashboard and capstone." },
+      { type: "tool", label: "ChromaDB Documentation", url: "https://www.trychroma.com/", desc: "Month 11 — read the Getting Started guide to set up vector storage for your RAG pipeline." },
+      { type: "tool", label: "SimPy Discrete-Event Simulation", url: "https://simpy.readthedocs.io/", desc: "Month 9 — use for factory simulation in the capstone. Read the Car example and Bank Checkout tutorial." },
+      { type: "tool", label: "DVC — Data Version Control", url: "https://dvc.org/", desc: "Month 3-4 — version your datasets alongside your code. Read the Get Started guide." },
+      { type: "tool", label: "Evidently AI — ML Monitoring", url: "https://www.evidentlyai.com/", desc: "Month 4-6 — monitor your ML models for data drift. Read the Quickstart for classification models." },
+    ],
+  },
+  {
+    category: "🗄️ Vector Databases",
+    id: "vectordbs",
+    months: "Month 11 — pick ONE and master it",
+    items: [
+      { type: "tool", label: "ChromaDB — Local Vector DB", url: "https://www.trychroma.com/", desc: "🟢 START HERE — easiest to set up locally with no account needed. Perfect for Month 11 RAG pipeline." },
+      { type: "tool", label: "pgvector — PostgreSQL Extension", url: "https://github.com/pgvector/pgvector", desc: "Add vector search to your existing Django PostgreSQL database — the production choice for Month 11." },
+      { type: "tool", label: "Pinecone — Cloud Vector DB", url: "https://www.pinecone.io/", desc: "Cloud-hosted vector database — use if you want a hosted solution without managing your own server." },
+      { type: "tool", label: "Weaviate — Open Source Vector DB", url: "https://weaviate.io/", desc: "Open source with a GraphQL API. Use as an alternative to ChromaDB for more complex search needs." },
+      { type: "tool", label: "Qdrant — High-Performance Vector DB", url: "https://qdrant.tech/", desc: "Fast Rust-based vector DB with a Python client. Good production choice with better performance than Chroma." },
+      { type: "tool", label: "Milvus — Distributed Vector DB", url: "https://milvus.io/", desc: "Enterprise-grade distributed vector database. Study this for the expert-level capstone extension work." },
+    ],
+  },
+  {
+    category: "🐙 GitHub Repos to Study",
+    id: "github",
+    months: "Star and clone each when you reach the matching month",
+    items: [
+      { type: "github", label: "ageron/handson-ml3", url: "https://github.com/ageron/handson-ml3", desc: "🟢 CLONE THIS FIRST — the Hands-On ML book notebooks. Run one notebook per week from Month 2 onwards." },
+      { type: "github", label: "langchain-ai/langchain", url: "https://github.com/langchain-ai/langchain", desc: "Month 11-12 — the main RAG and agent framework. Browse /cookbook/ for ready-to-run examples." },
+      { type: "github", label: "vllm-project/vllm", url: "https://github.com/vllm-project/vllm", desc: "Month 12 — fast LLM inference engine. Study if you want to serve your own model without OpenAI API." },
+      { type: "github", label: "ggerganov/llama.cpp", url: "https://github.com/ggerganov/llama.cpp", desc: "Month 10-12 — run LLMs locally on CPU. Use to test your RAG pipeline without API costs." },
+      { type: "github", label: "luo-junyu/awesome-agent-papers", url: "https://github.com/luo-junyu/awesome-agent-papers", desc: "Month 12 — curated list of every important agent paper. Browse by category to find what to read next." },
+      { type: "github", label: "e2b-dev/awesome-ai-agents", url: "https://github.com/e2b-dev/awesome-ai-agents", desc: "Month 12 — curated list of all AI agent frameworks. Use to compare LangGraph, AutoGen, CrewAI, and others." },
+      { type: "github", label: "microsoft/autogen", url: "https://github.com/microsoft/autogen", desc: "Month 12 — Microsoft multi-agent framework. Read /notebook/ for multi-agent conversation examples." },
+      { type: "github", label: "crewaiinc/crewAI", url: "https://github.com/crewaiinc/crewAI", desc: "Month 12 — role-based multi-agent framework. Easier than AutoGen for structured agent workflows." },
+      { type: "github", label: "mlflow/mlflow", url: "https://github.com/mlflow/mlflow", desc: "Month 3 — experiment tracking. Clone and run /examples/sklearn_elasticnet_wine/ as your first tracking exercise." },
+      { type: "github", label: "pydantic/pydantic-ai", url: "https://github.com/pydantic/pydantic-ai", desc: "Month 12 — new agent framework from the Pydantic team. Cleaner than LangChain for structured agent outputs." },
+      { type: "github", label: "DataTalksClub/mlops-zoomcamp", url: "https://github.com/DataTalksClub/mlops-zoomcamp", desc: "Month 3-4 — free MLOps course with all code. Clone and run the notebooks for each module." },
+      { type: "github", label: "GokuMohandas/Made-With-ML", url: "https://github.com/GokuMohandas/Made-With-ML", desc: "Month 3-4 — full ML engineering course on GitHub. Read the MLOps and Data sections as reference." },
+    ],
+  },
+];
+
+function renderLearningLibrary() {
+  const section = document.getElementById("learningLibraryContent");
+  if (!section) return;
+  const activeTab = section.dataset.tab || "math";
+  const category = learningLibrary.find(c => c.id === activeTab) || learningLibrary[0];
+
+  const typeIcon = { book: "📖", course: "🎓", paper: "📄", tool: "🔧", github: "🐙", video: "🎬" };
+  const typeColor = { book: "lib-book", course: "lib-course", paper: "lib-paper", tool: "lib-tool", github: "lib-github", video: "lib-video" };
+
+  section.innerHTML = `
+    <div class="lib-tabs" role="tablist">
+      ${learningLibrary.map(c => `
+        <button class="lib-tab ${c.id === activeTab ? "lib-tab-active" : ""}" data-cat="${c.id}" type="button" role="tab">
+          ${c.category}
+        </button>
+      `).join("")}
+    </div>
+    <p class="lib-months">⏰ When to use: <strong>${category.months}</strong></p>
+    <div class="lib-grid">
+      ${category.items.map(item => `
+        <a class="lib-card ${typeColor[item.type] || ""}" href="${item.url}" target="_blank" rel="noreferrer">
+          <div class="lib-card-top">
+            <span class="lib-type-badge">${typeIcon[item.type] || "🔗"} ${item.type}</span>
+          </div>
+          <strong class="lib-card-name">${item.label}</strong>
+          <p class="lib-card-desc">${item.desc}</p>
+        </a>
+      `).join("")}
+    </div>
+  `;
+
+  section.querySelectorAll(".lib-tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      section.dataset.tab = btn.dataset.cat;
+      renderLearningLibrary();
+    });
+  });
+}
+
 const folders = [
   ["knowledge-base/", "Your reference library: resources, learning journey, and zero-to-hero guides.", "knowledge-base/RESOURCES.md"],
   ["knowledge-base/learning-journey/", "A numbered week-by-week program with small tasks and code examples.", "knowledge-base/learning-journey/README.md"],
@@ -2523,6 +2686,26 @@ function normalizeGitHubRepoBase(value) {
     .replace(/\.git$/i, "");
 }
 
+function detectGitHubRepoBaseFromLocation() {
+  try {
+    const { hostname, pathname, origin } = window.location;
+    if (/github\.io$/i.test(hostname)) {
+      const owner = hostname.replace(/\.github\.io$/i, "");
+      const firstSegment = pathname.split("/").filter(Boolean)[0];
+      if (owner && firstSegment) return `https://github.com/${owner}/${firstSegment}`;
+    }
+    if (/github\.com$/i.test(hostname)) {
+      const parts = pathname.split("/").filter(Boolean);
+      if (parts.length >= 2) return `${origin}/${parts[0]}/${parts[1]}`;
+    }
+  } catch {}
+  return "";
+}
+
+function getEffectiveGitHubRepoBase() {
+  return normalizeGitHubRepoBase(state.githubRepoBase) || detectGitHubRepoBaseFromLocation();
+}
+
 function encodeGitHubPath(path) {
   return String(path || "")
     .split("/")
@@ -2537,7 +2720,7 @@ function isLikelyFilePath(path) {
 }
 
 function githubLink(path) {
-  const repo = normalizeGitHubRepoBase(state.githubRepoBase);
+  const repo = getEffectiveGitHubRepoBase();
   if (!repo || !path) return "";
   const mode = isLikelyFilePath(path) ? "blob" : "tree";
   return `${repo}/${mode}/main/${encodeGitHubPath(path)}`;
@@ -3019,12 +3202,16 @@ function renderMissionControl() {
 
   const githubInput = document.getElementById("githubRepoBase");
   const githubStatus = document.getElementById("githubRepoStatus");
-  const normalizedRepo = normalizeGitHubRepoBase(state.githubRepoBase);
+  const manualRepo = normalizeGitHubRepoBase(state.githubRepoBase);
+  const autoRepo = detectGitHubRepoBaseFromLocation();
+  const effectiveRepo = getEffectiveGitHubRepoBase();
   if (githubInput) githubInput.value = state.githubRepoBase;
   if (githubStatus) {
-    githubStatus.textContent = normalizedRepo
-      ? `GitHub source links are active for ${normalizedRepo}.`
-      : "Add your GitHub repository URL to unlock source links for months, weeks, projects, and files.";
+    githubStatus.textContent = manualRepo
+      ? `GitHub source links are active for ${manualRepo}.`
+      : autoRepo
+        ? `GitHub source links were detected automatically from this website: ${effectiveRepo}.`
+        : "Add your GitHub repository URL to unlock source links for months, weeks, projects, and files.";
   }
 
   renderEvidence();
@@ -3091,7 +3278,9 @@ function bindMissionControl() {
     if (githubStatus) {
       githubStatus.textContent = state.githubRepoBase
         ? `Saved GitHub repository URL: ${state.githubRepoBase}`
-        : "GitHub repository URL cleared. Add it again to enable GitHub links.";
+        : detectGitHubRepoBaseFromLocation()
+          ? `Manual GitHub repository URL cleared. Auto-detected repo is active: ${getEffectiveGitHubRepoBase()}`
+          : "GitHub repository URL cleared. Add it again to enable GitHub links.";
     }
     renderMonthDetail();
     renderProjects();
@@ -3921,6 +4110,7 @@ function renderResourceChips() {
   const chips = [
     ["all", "All"],
     ["Guide", "Guides"],
+    ["github", "GitHub"],
     ["Python", "Python"],
     ["SQL", "SQL"],
     ["Arduino", "Arduino"],
@@ -3952,9 +4142,19 @@ function renderResources() {
     item.path,
     item.url,
   ]);
+  const githubResources = Object.entries(monthGithubLinks).flatMap(([monthId, links]) =>
+    links.map((item) => [
+      `Month ${monthId}: ${item.label}`,
+      item.desc,
+      "github",
+      item.url,
+      item.url,
+    ])
+  );
   const allResources = [
     ...resources.map(([title, note, tag, path]) => [title, note, tag, path, link(path)]),
     ...manifestResources,
+    ...githubResources,
   ];
   const seen = new Set();
   const filtered = allResources.filter(([title, note, tag, path]) => {
@@ -3975,10 +4175,12 @@ function renderResources() {
           <div class="resource-path">${path}</div>
         </div>
         <div class="source-link-actions">
-          <a class="file-link" href="${url}">Local</a>
-          ${githubLink(path)
+          <a class="file-link" href="${url}" ${/^https?:/i.test(url) ? 'target="_blank" rel="noreferrer"' : ""}>${/^https?:/i.test(url) ? "Open" : "Local"}</a>
+          ${!/^https?:/i.test(path) && githubLink(path)
             ? `<a class="file-link" href="${githubLink(path)}" target="_blank" rel="noreferrer">GitHub</a>`
-            : `<span class="muted-note">GitHub URL not set</span>`}
+            : !/^https?:/i.test(path)
+              ? `<span class="muted-note">GitHub URL not set</span>`
+              : ""}
         </div>
       </article>
     `)
@@ -4005,6 +4207,7 @@ function bindTheme() {
 function init() {
   renderSuperpowers();
   renderMissionControl();
+  renderLearningLibrary();
   renderReference();
   renderMonths();
   renderMonthDetail();

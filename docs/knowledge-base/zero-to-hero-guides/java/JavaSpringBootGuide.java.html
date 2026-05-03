@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Javaspringbootguide.Java - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Javaspringbootguide.Java</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/java/JavaSpringBootGuide.java</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><pre><code>// ==============================================================================
+//  SPRING BOOT REST API — The ML Engineer&#x27;s Java Framework
+//  FILE: JavaSpringBootGuide.java
+//
+//  TASK: Learn Spring Boot — Java&#x27;s most important framework for building
+//        REST APIs, ML serving endpoints, and production backends.
+//
+//  WHY:  An ML model is only useful if other systems can call it.
+//        Spring Boot is HOW Java serves ML predictions in production:
+//          → Amazon uses Spring Boot (Java) for many backend services
+//          → Uber&#x27;s dispatch system is Spring-based
+//          → You can wrap a Python ML model call inside a Spring endpoint
+//
+//        Spring Boot = FastAPI for Java (but more powerful + more verbose)
+//
+//  PREREQ: JavaZeroToHero.java (OOP), JavaStreamsLambda.java (lambdas)
+//
+//  ⚠️  THIS IS A GUIDE FILE — NOT directly compilable as a single .java file.
+//      Spring Boot requires a Maven/Gradle project setup.
+//      Follow SETUP INSTRUCTIONS at the bottom.
+//      Then copy each class into its proper file within your project.
+//
+//  SETUP (two options):
+//  Option A — Spring Initializr (fastest):
+//    1. Go to https://start.spring.io
+//    2. Select: Maven, Java, Spring Boot 3.x
+//    3. Add dependencies: Spring Web, Spring Boot DevTools
+//    4. Generate → Download → Unzip → open in IntelliJ / VS Code
+//
+//  Option B — Manual pom.xml (see PART 0 below)
+// ==============================================================================
+
+
+// ==============================================================================
+// PART 0 — MAVEN POM.XML (copy this into your project&#x27;s pom.xml)
+// ==============================================================================
+/*
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;3.2.0&lt;/version&gt;
+    &lt;/parent&gt;
+
+    &lt;groupId&gt;com.internship&lt;/groupId&gt;
+    &lt;artifactId&gt;churn-api&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;name&gt;Customer Churn API&lt;/name&gt;
+
+    &lt;properties&gt;
+        &lt;java.version&gt;21&lt;/java.version&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencies&gt;
+        &lt;!-- Spring Web: REST controllers, embedded Tomcat server --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- DevTools: hot reload during development --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- Jackson: JSON serialization (included via spring-boot-starter-web) --&gt;
+        &lt;!-- No explicit dependency needed — Spring Web brings it automatically --&gt;
+
+        &lt;!-- Optional: Validation (@Valid, @NotBlank, @Min, @Max) --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-validation&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+&lt;/project&gt;
+*/
+
+
+// ==============================================================================
+// PART 1 — APPLICATION ENTRY POINT
+// ==============================================================================
+// File: src/main/java/com/internship/churnapi/ChurnApiApplication.java
+/*
+package com.internship.churnapi;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+// @SpringBootApplication = @Configuration + @EnableAutoConfiguration + @ComponentScan
+// It tells Spring Boot: &quot;set everything up automatically in this package&quot;
+@SpringBootApplication
+public class ChurnApiApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ChurnApiApplication.class, args);
+        // This starts an embedded Tomcat server on http://localhost:8080
+        // No external server install needed!
+    }
+}
+*/
+
+
+// ==============================================================================
+// PART 2 — MODEL CLASSES (DTOs — Data Transfer Objects)
+// ==============================================================================
+// DTOs carry data IN and OUT of your API as JSON.
+// Jackson automatically converts: JSON ↔ Java object (serialization)
+//
+// File: src/main/java/com/internship/churnapi/model/CustomerRequest.java
+/*
+package com.internship.churnapi.model;
+
+import jakarta.validation.constraints.*;
+
+// This class represents the JSON body of a POST /predict request.
+// Jackson maps JSON fields to Java fields by name.
+public class CustomerRequest {
+
+    @NotBlank(message = &quot;customer_id is required&quot;)
+    private String customerId;
+
+    @Min(value = 18, message = &quot;Age must be &gt;= 18&quot;)
+    @Max(value = 100, message = &quot;Age must be &lt;= 100&quot;)
+    private int age;
+
+    @DecimalMin(value = &quot;0.0&quot;, message = &quot;Monthly spend cannot be negative&quot;)
+    private double monthlySpend;
+
+    @Min(0) @Max(50)
+    private int supportCalls;
+
+    @Min(1)
+    private int contractMonths;
+
+    @NotBlank
+    private String plan;    // &quot;Basic&quot;, &quot;Pro&quot;, &quot;Enterprise&quot;
+
+    @NotBlank
+    private String region;  // &quot;North&quot;, &quot;South&quot;, &quot;East&quot;, &quot;West&quot;
+
+    // Constructors:
+    public CustomerRequest() {}  // Required by Jackson for deserialization
+
+    // Getters and Setters (Jackson needs these):
+    public String getCustomerId()   { return customerId; }
+    public void setCustomerId(String customerId) { this.customerId = customerId; }
+
+    public int getAge()             { return age; }
+    public void setAge(int age)     { this.age = age; }
+
+    public double getMonthlySpend() { return monthlySpend; }
+    public void setMonthlySpend(double monthlySpend) { this.monthlySpend = monthlySpend; }
+
+    public int getSupportCalls()    { return supportCalls; }
+    public void setSupportCalls(int supportCalls) { this.supportCalls = supportCalls; }
+
+    public int getContractMonths()  { return contractMonths; }
+    public void setContractMonths(int contractMonths) { this.contractMonths = contractMonths; }
+
+    public String getPlan()         { return plan; }
+    public void setPlan(String plan){ this.plan = plan; }
+
+    public String getRegion()       { return region; }
+    public void setRegion(String region) { this.region = region; }
+}
+*/
+
+// File: src/main/java/com/internship/churnapi/model/PredictionResponse.java
+/*
+package com.internship.churnapi.model;
+
+// This class represents the JSON response body of the /predict endpoint.
+public class PredictionResponse {
+
+    private final String  customerId;
+    private final boolean willChurn;
+    private final double  churnProbability;
+    private final double  stayProbability;
+    private final String  riskLevel;
+    private final String  recommendation;
+
+    public PredictionResponse(String customerId, boolean willChurn,
+                               double churnProbability) {
+        this.customerId       = customerId;
+        this.willChurn        = willChurn;
+        this.churnProbability = Math.round(churnProbability * 10000.0) / 10000.0;
+        this.stayProbability  = Math.round((1 - churnProbability) * 10000.0) / 10000.0;
+        this.riskLevel        = churnProbability &gt;= 0.7 ? &quot;High&quot;
+                              : churnProbability &gt;= 0.4 ? &quot;Medium&quot;
+                              : &quot;Low&quot;;
+        this.recommendation   = willChurn
+                              ? &quot;Offer retention discount or upgrade plan&quot;
+                              : &quot;No action needed&quot;;
+    }
+
+    // Getters only (response is read-only):
+    public String  getCustomerId()       { return customerId; }
+    public boolean isWillChurn()         { return willChurn; }
+    public double  getChurnProbability() { return churnProbability; }
+    public double  getStayProbability()  { return stayProbability; }
+    public String  getRiskLevel()        { return riskLevel; }
+    public String  getRecommendation()   { return recommendation; }
+}
+*/
+
+
+// ==============================================================================
+// PART 3 — SERVICE LAYER (Business Logic)
+// ==============================================================================
+// The SERVICE holds business logic and ML model calls.
+// Controllers call services — services don&#x27;t know about HTTP.
+// This separation makes code TESTABLE (you can test service without HTTP).
+//
+// File: src/main/java/com/internship/churnapi/service/ChurnPredictionService.java
+/*
+package com.internship.churnapi.service;
+
+import com.internship.churnapi.model.CustomerRequest;
+import com.internship.churnapi.model.PredictionResponse;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+
+// @Service marks this as a Spring &quot;bean&quot; — Spring creates ONE instance (singleton)
+// and injects it wherever needed automatically.
+@Service
+public class ChurnPredictionService {
+
+    // In a real system, you would:
+    //   1. Load a serialized model file (e.g., via ONNX or a Python subprocess call)
+    //   2. Or call a Python FastAPI ML service via HTTP
+    // Here we simulate with a rule-based score for learning purposes.
+
+    public PredictionResponse predict(CustomerRequest customer) {
+        double score = computeChurnScore(customer);
+        return new PredictionResponse(
+                customer.getCustomerId(),
+                score &gt;= 0.5,
+                score
+        );
+    }
+
+    public List&lt;PredictionResponse&gt; predictBatch(List&lt;CustomerRequest&gt; customers) {
+        return customers.stream()
+                .map(this::predict)
+                .toList();
+    }
+
+    // Simulate a model: rule-based scoring (replace with real model in production)
+    private double computeChurnScore(CustomerRequest c) {
+        double score = 0.0;
+
+        // High support calls → high churn risk:
+        if (c.getSupportCalls() &gt; 8) score += 0.40;
+        else if (c.getSupportCalls() &gt; 5) score += 0.20;
+
+        // Low spend → high churn risk:
+        if (c.getMonthlySpend() &lt; 50)  score += 0.30;
+        else if (c.getMonthlySpend() &lt; 100) score += 0.15;
+
+        // Short contract → high churn risk:
+        if (c.getContractMonths() &lt; 6)  score += 0.20;
+        else if (c.getContractMonths() &lt; 12) score += 0.10;
+
+        // Basic plan → slightly higher risk:
+        if (&quot;Basic&quot;.equals(c.getPlan())) score += 0.10;
+
+        return Math.min(score, 0.99);   // Cap at 99%
+    }
+}
+*/
+
+
+// ==============================================================================
+// PART 4 — REST CONTROLLER (HTTP Endpoints)
+// ==============================================================================
+// The CONTROLLER handles HTTP requests and delegates to services.
+// It knows about HTTP (status codes, headers) but NOT business logic.
+//
+// Key Spring MVC annotations:
+//   @RestController           → mark class as REST controller (returns JSON)
+//   @RequestMapping(&quot;/api/v1&quot;) → base URL prefix for all endpoints in this class
+//   @GetMapping(&quot;/path&quot;)      → handle GET requests
+//   @PostMapping(&quot;/path&quot;)     → handle POST requests
+//   @PathVariable             → extract {id} from URL path
+//   @RequestBody              → parse JSON body into a Java object
+//   @RequestParam             → parse query param ?key=value
+//   @Valid                    → trigger validation on @RequestBody
+//   ResponseEntity&lt;T&gt;         → control HTTP status code AND body
+//
+// File: src/main/java/com/internship/churnapi/controller/ChurnController.java
+/*
+package com.internship.churnapi.controller;
+
+import com.internship.churnapi.model.CustomerRequest;
+import com.internship.churnapi.model.PredictionResponse;
+import com.internship.churnapi.service.ChurnPredictionService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping(&quot;/api/v1&quot;)
+public class ChurnController {
+
+    // Spring injects the service automatically (Dependency Injection):
+    private final ChurnPredictionService predictionService;
+
+    public ChurnController(ChurnPredictionService predictionService) {
+        this.predictionService = predictionService;
+    }
+
+    // GET /api/v1/health → health check (no body, no auth needed)
+    @GetMapping(&quot;/health&quot;)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; health() {
+        return ResponseEntity.ok(Map.of(
+            &quot;status&quot;,    &quot;healthy&quot;,
+            &quot;model&quot;,     &quot;ChurnPredictorV1&quot;,
+            &quot;timestamp&quot;, Instant.now().toString()
+        ));
+    }
+
+    // GET /api/v1/info → model information
+    @GetMapping(&quot;/info&quot;)
+    public Map&lt;String, Object&gt; info() {
+        return Map.of(
+            &quot;model_name&quot;,   &quot;CustomerChurnPredictor&quot;,
+            &quot;version&quot;,      &quot;1.0.0&quot;,
+            &quot;description&quot;,  &quot;Predicts customer churn probability&quot;,
+            &quot;endpoints&quot;,    List.of(&quot;/health&quot;, &quot;/info&quot;, &quot;/predict&quot;, &quot;/predict/batch&quot;)
+        );
+    }
+
+    // POST /api/v1/predict → single customer prediction
+    // @Valid triggers validation rules defined in CustomerRequest
+    @PostMapping(&quot;/predict&quot;)
+    public ResponseEntity&lt;PredictionResponse&gt; predict(
+            @Valid @RequestBody CustomerRequest customer) {
+
+        PredictionResponse response = predictionService.predict(customer);
+        return ResponseEntity.ok(response);
+    }
+
+    // POST /api/v1/predict/batch → predict for multiple customers at once
+    @PostMapping(&quot;/predict/batch&quot;)
+    public ResponseEntity&lt;?&gt; predictBatch(
+            @Valid @RequestBody List&lt;CustomerRequest&gt; customers) {
+
+        if (customers.isEmpty()) {
+            return ResponseEntity
+                .badRequest()
+                .body(Map.of(&quot;error&quot;, &quot;Customer list cannot be empty&quot;));
+        }
+        if (customers.size() &gt; 100) {
+            return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(Map.of(&quot;error&quot;, &quot;Maximum 100 customers per batch&quot;));
+        }
+
+        List&lt;PredictionResponse&gt; results = predictionService.predictBatch(customers);
+        long highRisk = results.stream().filter(PredictionResponse::isWillChurn).count();
+
+        return ResponseEntity.ok(Map.of(
+            &quot;total&quot;,          customers.size(),
+            &quot;high_risk_count&quot;, highRisk,
+            &quot;predictions&quot;,    results
+        ));
+    }
+
+    // GET /api/v1/customers/{id}/score → score by customer ID (path variable)
+    @GetMapping(&quot;/customers/{customerId}/score&quot;)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; getScoreByPath(
+            @PathVariable String customerId,
+            @RequestParam(defaultValue = &quot;Basic&quot;) String plan) {
+
+        // In production: load customer data from DB, then score
+        return ResponseEntity.ok(Map.of(
+            &quot;customer_id&quot;, customerId,
+            &quot;plan&quot;,        plan,
+            &quot;message&quot;,     &quot;In production, load data from DB then call predict()&quot;
+        ));
+    }
+}
+*/
+
+
+// ==============================================================================
+// PART 5 — EXCEPTION HANDLING (Global Error Handler)
+// ==============================================================================
+// File: src/main/java/com/internship/churnapi/exception/GlobalExceptionHandler.java
+/*
+package com.internship.churnapi.exception;
+
+import org.springframework.http.*;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+
+// @ControllerAdvice makes this class handle exceptions across ALL controllers
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    // Handle validation errors (@Valid failures):
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleValidationError(
+            MethodArgumentNotValidException ex) {
+
+        List&lt;String&gt; errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(fe -&gt; fe.getField() + &quot;: &quot; + fe.getDefaultMessage())
+                .toList();
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                    &quot;error&quot;,   &quot;Validation failed&quot;,
+                    &quot;details&quot;, errors
+                ));
+    }
+
+    // Handle unexpected errors:
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleGeneral(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of(
+                    &quot;error&quot;,   &quot;Internal server error&quot;,
+                    &quot;message&quot;, ex.getMessage()
+                ));
+    }
+}
+*/
+
+
+// ==============================================================================
+// PART 6 — TESTING YOUR API
+// ==============================================================================
+/*
+After running: mvn spring-boot:run (or run ChurnApiApplication.java)
+Server starts at: http://localhost:8080
+
+1. Health check (browser or curl):
+   GET http://localhost:8080/api/v1/health
+
+2. Single prediction (curl):
+   curl -X POST http://localhost:8080/api/v1/predict \
+        -H &quot;Content-Type: application/json&quot; \
+        -d &#x27;{
+              &quot;customerId&quot;: &quot;C001&quot;,
+              &quot;age&quot;: 32,
+              &quot;monthlySpend&quot;: 35.0,
+              &quot;supportCalls&quot;: 12,
+              &quot;contractMonths&quot;: 2,
+              &quot;plan&quot;: &quot;Basic&quot;,
+              &quot;region&quot;: &quot;South&quot;
+            }&#x27;
+
+   Expected response:
+   {
+     &quot;customerId&quot;:       &quot;C001&quot;,
+     &quot;willChurn&quot;:        true,
+     &quot;churnProbability&quot;: 0.9,
+     &quot;stayProbability&quot;:  0.1,
+     &quot;riskLevel&quot;:        &quot;High&quot;,
+     &quot;recommendation&quot;:   &quot;Offer retention discount or upgrade plan&quot;
+   }
+
+3. Batch prediction:
+   curl -X POST http://localhost:8080/api/v1/predict/batch \
+        -H &quot;Content-Type: application/json&quot; \
+        -d &#x27;[
+              {&quot;customerId&quot;:&quot;C001&quot;,&quot;age&quot;:32,&quot;monthlySpend&quot;:35.0,&quot;supportCalls&quot;:12,
+               &quot;contractMonths&quot;:2,&quot;plan&quot;:&quot;Basic&quot;,&quot;region&quot;:&quot;South&quot;},
+              {&quot;customerId&quot;:&quot;C002&quot;,&quot;age&quot;:45,&quot;monthlySpend&quot;:200.0,&quot;supportCalls&quot;:1,
+               &quot;contractMonths&quot;:24,&quot;plan&quot;:&quot;Pro&quot;,&quot;region&quot;:&quot;North&quot;}
+            ]&#x27;
+
+4. Swagger UI (automatic API documentation):
+   Add to pom.xml:
+   &lt;dependency&gt;
+       &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+       &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+       &lt;version&gt;2.3.0&lt;/version&gt;
+   &lt;/dependency&gt;
+   Then open: http://localhost:8080/swagger-ui.html
+*/
+
+
+// ==============================================================================
+// PART 7 — SPRING BOOT QUICK REFERENCE
+// ==============================================================================
+/*
+ANNOTATION        WHAT IT DOES
+──────────────────────────────────────────────────────────────────
+@SpringBootApplication   Entry point — auto-configures everything
+@RestController          Class handles REST requests, returns JSON
+@RequestMapping(&quot;/path&quot;) Base URL prefix for all methods in class
+@GetMapping(&quot;/path&quot;)     Handle GET /path
+@PostMapping(&quot;/path&quot;)    Handle POST /path
+@PutMapping(&quot;/path&quot;)     Handle PUT /path
+@DeleteMapping(&quot;/path&quot;)  Handle DELETE /path
+@PathVariable            Bind URL path segment: /users/{id}
+@RequestParam            Bind query string: /search?term=java
+@RequestBody             Parse JSON request body to Java object
+@Valid                   Validate @RequestBody using constraints
+@Service                 Business logic bean (Spring manages lifecycle)
+@Repository              Data access bean (DB layer)
+@Component               Generic Spring-managed bean
+@Autowired               Inject dependency (prefer constructor injection)
+ResponseEntity&lt;T&gt;        Control HTTP status + body
+
+HTTP STATUS CODES (always return the right one):
+  200 OK          → successful GET or POST
+  201 CREATED     → resource created (POST that creates something)
+  400 BAD REQUEST → bad input, validation error
+  401 UNAUTHORIZED → not authenticated
+  403 FORBIDDEN   → authenticated but no permission
+  404 NOT FOUND   → resource doesn&#x27;t exist
+  422 UNPROCESSABLE → valid JSON but semantically wrong
+  500 SERVER ERROR → bug in your code
+*/
+
+
+// ==============================================================================
+// 🎯 YOUR TASKS
+// ==============================================================================
+/*
+TASK 1 — SETUP:
+    a) Go to https://start.spring.io
+    b) Configure: Maven, Java 21, Spring Boot 3.2
+    c) Dependencies: Spring Web, Spring Boot DevTools, Validation
+    d) Generate → Download → Unzip
+    e) Open in VS Code or IntelliJ
+    f) Run: mvn spring-boot:run
+    g) Verify: GET http://localhost:8080 (you&#x27;ll see a 404 — server IS running!)
+
+TASK 2 — FIRST ENDPOINT:
+    Create a controller with ONE endpoint:
+    GET /api/hello → returns {&quot;message&quot;: &quot;Hello from Spring Boot!&quot;}
+    Test with: curl http://localhost:8080/api/hello
+
+TASK 3 — PREDICTION API (the big task):
+    Copy the model classes, service, and controller from this guide.
+    Place each in its own .java file in the correct package.
+    Test all endpoints with curl (commands in Part 6).
+
+TASK 4 — ADD AN ENDPOINT:
+    Add: GET /api/v1/stats → return summary stats about the model:
+    {
+      &quot;model&quot;: &quot;ChurnPredictor&quot;,
+      &quot;totalPredictionsToday&quot;: 42,   ← use an AtomicInteger counter in the service
+      &quot;highRiskRate&quot;: 0.35,
+      &quot;lastUpdated&quot;: &quot;2026-04-21&quot;
+    }
+    HINT: inject the service into the controller, add a counter field.
+
+TASK 5 — CONNECT PYTHON MODEL:
+    In ChurnPredictionService.computeChurnScore(), replace the rule-based logic
+    with an HTTP call to the Python FastAPI model from model_deployment.py:
+
+    Add RestTemplate or WebClient to call your Python API:
+      String pythonApiUrl = &quot;http://localhost:8000/predict&quot;;
+      RestTemplate restTemplate = new RestTemplate();
+      ResponseEntity&lt;Map&gt; response = restTemplate.postForEntity(
+          pythonApiUrl, customer, Map.class);
+      double churnProb = ((Number) response.getBody().get(&quot;churn_probability&quot;)).doubleValue();
+
+    This is the REAL-WORLD pattern: Java handles routing/auth/scaling,
+    Python handles the ML model.
+*/
+
+
+// This placeholder class makes the file syntactically valid Java so your IDE
+// can open it without errors. In a real project, each section is a separate file.
+public class JavaSpringBootGuide {
+    public static void main(String[] args) {
+        System.out.println(&quot;=== Spring Boot Guide ===&quot;);
+        System.out.println(&quot;This file is a GUIDE — not a runnable single file.&quot;);
+        System.out.println(&quot;Follow the setup instructions in PART 0:&quot;);
+        System.out.println(&quot;  1. Use Spring Initializr: https://start.spring.io&quot;);
+        System.out.println(&quot;  2. Add: Spring Web, Validation, DevTools&quot;);
+        System.out.println(&quot;  3. Copy each class into the correct package&quot;);
+        System.out.println(&quot;  4. Run: mvn spring-boot:run&quot;);
+        System.out.println(&quot;  5. Test: curl http://localhost:8080/api/v1/health&quot;);
+        System.out.println();
+        System.out.println(&quot;Key concepts covered:&quot;);
+        System.out.println(&quot;  @RestController  → HTTP endpoint class&quot;);
+        System.out.println(&quot;  @GetMapping      → handle GET requests&quot;);
+        System.out.println(&quot;  @PostMapping     → handle POST requests (JSON body)&quot;);
+        System.out.println(&quot;  @Service         → business logic / ML inference&quot;);
+        System.out.println(&quot;  @Valid           → input validation&quot;);
+        System.out.println(&quot;  ResponseEntity   → control HTTP status codes&quot;);
+        System.out.println(&quot;  @ControllerAdvice → global exception handling&quot;);
+        System.out.println();
+        System.out.println(&quot;Real-world pattern:&quot;);
+        System.out.println(&quot;  Java Spring Boot  →  receives request, validates, routes&quot;);
+        System.out.println(&quot;  calls Python FastAPI →  runs ML model, returns score&quot;);
+        System.out.println(&quot;  Java Spring Boot  →  formats response, sends back to client&quot;);
+    }
+}
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

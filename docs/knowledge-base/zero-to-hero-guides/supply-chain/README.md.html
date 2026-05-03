@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Supply Chain - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Supply Chain</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">knowledge-base/zero-to-hero-guides/supply-chain/README.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="zero-to-hero-guide-supply-chain-ai-in-python">Zero-to-Hero Guide: Supply Chain AI in Python</h2>
+<blockquote><strong>Your target industry.</strong> Your IE background means you already understand the physics of a supply chain — how factories, warehouses, and transport networks connect. This guide shows you how to express that knowledge in Python and ML so companies like Amazon, FedEx, and Walmart see you as a domain expert, not a generic data scientist.</blockquote>
+<h3 id="the-three-technical-pillars">The Three Technical Pillars</h3>
+<pre><code class="language-">Pillar 1: Demand Forecasting    → predict WHAT to order and HOW MUCH
+Pillar 2: Inventory Optimization → decide HOW MUCH to keep in stock
+Pillar 3: Route Optimization     → figure out HOW to deliver it</code></pre>
+<p>All three are required for a real supply chain. Most data scientists only know one. Knowing all three and how they chain together is what gets you hired at Amazon Logistics.</p>
+<h3 id="pillar-1-demand-forecasting-predicting-the-future">Pillar 1 — Demand Forecasting (Predicting the Future)</h3>
+<p><strong>The Business Problem:</strong> A company needs to know how many units to produce or order before customers ask for them. Over-forecast → wasted inventory. Under-forecast → stockout, lost revenue.</p>
+<p><strong>The Data Science Skill:</strong> Time-Series Forecasting</p>
+<h4 id="1a-statistical-models-arima-and-sarima">1a. Statistical Models: ARIMA and SARIMA</h4>
+<p>ARIMA (AutoRegressive Integrated Moving Average) is the classical method. You already covered this in <code>knowledge-base/learning-journey/month-03-machine-learning/</code> — here it is applied to demand data.</p>
+<pre><code class="language-python">import pandas as pd
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from sklearn.metrics import mean_absolute_error
+import warnings
+warnings.filterwarnings(&quot;ignore&quot;)
+
+def fit_sarima_demand(train_series: pd.Series, order=(1,1,1), seasonal_order=(1,1,1,52)):
+    &quot;&quot;&quot;
+    Fits a SARIMA model to weekly demand data.
+
+    order = (p, d, q)   — AR, differencing, MA terms
+    seasonal_order = (P, D, Q, m) — seasonal terms; m=52 for weekly data, m=12 for monthly
+
+    When to use SARIMA vs Prophet:
+    - SARIMA: better when you have &lt;2 years of data and clean seasonality
+    - Prophet: better when you have multiple seasonalities, holidays, or missing data
+
+    TODO: fit the model and return (model_fit, aic_score)
+    &quot;&quot;&quot;
+    model = SARIMAX(
+        train_series,
+        order=order,
+        seasonal_order=seasonal_order,
+        enforce_stationarity=False,
+        enforce_invertibility=False,
+    )
+    model_fit = model.fit(disp=False)
+    return model_fit, model_fit.aic
+
+
+def forecast_demand(model_fit, steps: int) -&gt; pd.Series:
+    &quot;&quot;&quot;
+    Returns the next `steps` periods of demand forecast with confidence intervals.
+
+    TODO: forecast = model_fit.get_forecast(steps=steps)
+    TODO: return forecast.predicted_mean
+    &quot;&quot;&quot;
+    forecast = model_fit.get_forecast(steps=steps)
+    pred_mean = forecast.predicted_mean
+    pred_ci   = forecast.conf_int()  # confidence interval
+    return pred_mean, pred_ci</code></pre>
+<h4 id="1b-modern-ml-prophet-meta-x27-s-forecasting-library">1b. Modern ML: Prophet (Meta&#x27;s Forecasting Library)</h4>
+<p>Prophet handles multiple seasonalities, holidays, and missing data — ARIMA cannot. For retail demand forecasting, Prophet is almost always the first tool to try.</p>
+<pre><code class="language-python"># pip install prophet
+from prophet import Prophet
+import pandas as pd
+
+def fit_prophet_demand(df: pd.DataFrame, country_holidays: str = None):
+    &quot;&quot;&quot;
+    Fits a Prophet model to demand data.
+
+    Args:
+        df: DataFrame with two columns: &#x27;ds&#x27; (datetime) and &#x27;y&#x27; (demand value)
+        country_holidays: ISO country code (e.g. &#x27;US&#x27;, &#x27;BR&#x27;) to add public holidays
+
+    Prophet automatically detects:
+    - Weekly seasonality (higher demand on weekends)
+    - Yearly seasonality (seasonal products)
+    - Trend changepoints (growth/decline)
+
+    TODO: m = Prophet(seasonality_mode=&#x27;multiplicative&#x27;)
+          # multiplicative = seasonality scales with trend (realistic for growing businesses)
+          # additive = seasonality is flat (use for stable, mature markets)
+    TODO: if country_holidays: m.add_country_holidays(country_name=country_holidays)
+    TODO: m.fit(df)
+    TODO: return m
+    &quot;&quot;&quot;
+    m = Prophet(
+        seasonality_mode=&quot;multiplicative&quot;,
+        yearly_seasonality=True,
+        weekly_seasonality=True,
+        daily_seasonality=False,
+    )
+    if country_holidays:
+        m.add_country_holidays(country_name=country_holidays)
+    m.fit(df)
+    return m
+
+
+def prophet_forecast(model, periods: int, freq: str = &quot;W&quot;) -&gt; pd.DataFrame:
+    &quot;&quot;&quot;
+    Returns a DataFrame with columns: ds, yhat, yhat_lower, yhat_upper.
+
+    yhat = point forecast
+    yhat_lower / yhat_upper = 80% uncertainty interval
+
+    Args:
+        freq: &#x27;D&#x27; = daily, &#x27;W&#x27; = weekly, &#x27;M&#x27; = monthly
+
+    TODO: future = model.make_future_dataframe(periods=periods, freq=freq)
+    TODO: forecast = model.predict(future)
+    TODO: return forecast[[&#x27;ds&#x27;, &#x27;yhat&#x27;, &#x27;yhat_lower&#x27;, &#x27;yhat_upper&#x27;]].tail(periods)
+    &quot;&quot;&quot;
+    future   = model.make_future_dataframe(periods=periods, freq=freq)
+    forecast = model.predict(future)
+    return forecast[[&quot;ds&quot;, &quot;yhat&quot;, &quot;yhat_lower&quot;, &quot;yhat_upper&quot;]].tail(periods)</code></pre>
+<h4 id="1c-xgboost-for-tabular-demand-forecasting">1c. XGBoost for Tabular Demand Forecasting</h4>
+<p>When you have many features (promotions, price, weather, store type), XGBoost outperforms ARIMA and Prophet because it can learn non-linear relationships between features and demand.</p>
+<pre><code class="language-python">import pandas as pd
+import numpy as np
+import xgboost as xgb
+from sklearn.model_selection import TimeSeriesSplit
+from sklearn.metrics import mean_absolute_percentage_error
+
+def create_lag_features(df: pd.DataFrame, target_col: str, lags: list[int]) -&gt; pd.DataFrame:
+    &quot;&quot;&quot;
+    Creates lagged versions of the target column as features for XGBoost.
+
+    Example: lags=[1, 7, 14] creates:
+        demand_lag_1  = demand from 1 period ago
+        demand_lag_7  = demand from 7 periods ago (last week)
+        demand_lag_14 = demand from 14 periods ago (2 weeks ago)
+
+    WHY: XGBoost is not a time-series model — it treats each row independently.
+    By adding lagged values as features, you give it the temporal context it needs.
+    This is called &quot;supervised learning on time-series&quot; and is the most common
+    technique in Kaggle demand forecasting competitions.
+
+    TODO: for lag in lags:
+              df[f&#x27;{target_col}_lag_{lag}&#x27;] = df[target_col].shift(lag)
+    TODO: df = df.dropna()   # remove rows where lags go before the series start
+    TODO: return df
+    &quot;&quot;&quot;
+    for lag in lags:
+        df[f&quot;{target_col}_lag_{lag}&quot;] = df[target_col].shift(lag)
+    return df.dropna()
+
+
+def train_xgb_demand(X_train, y_train, X_val, y_val):
+    &quot;&quot;&quot;
+    Trains an XGBoost regressor for demand forecasting.
+
+    Key hyperparameters to tune:
+    - n_estimators: number of trees (start at 500, tune with early stopping)
+    - max_depth:    tree depth (3–6 for tabular data)
+    - learning_rate: 0.01–0.1 (lower = more trees needed, often better)
+    - subsample:    fraction of rows per tree (0.8 reduces overfitting)
+
+    TODO: model = xgb.XGBRegressor(
+              n_estimators=500,
+              max_depth=5,
+              learning_rate=0.05,
+              subsample=0.8,
+              early_stopping_rounds=50,
+              eval_metric=&#x27;mae&#x27;,
+          )
+    TODO: model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
+    TODO: mape = mean_absolute_percentage_error(y_val, model.predict(X_val))
+    TODO: return model, mape
+    &quot;&quot;&quot;
+    model = xgb.XGBRegressor(
+        n_estimators=500,
+        max_depth=5,
+        learning_rate=0.05,
+        subsample=0.8,
+        early_stopping_rounds=50,
+        eval_metric=&quot;mae&quot;,
+    )
+    model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
+    mape = mean_absolute_percentage_error(y_val, model.predict(X_val))
+    return model, mape
+
+
+# --- Practice Dataset ---
+# Kaggle: &quot;Store Item Demand Forecasting Challenge&quot;
+# URL: https://www.kaggle.com/competitions/demand-forecasting-kernels-only
+# Task: predict 3 months of daily item sales for 10 stores × 50 items = 500 time series
+# Start with one (store=1, item=1), get it working, then scale to all 500.</code></pre>
+<h3 id="pillar-2-inventory-optimization-balancing-the-scale">Pillar 2 — Inventory Optimization (Balancing the Scale)</h3>
+<p><strong>The Business Problem:</strong> You know demand is roughly 500 units/week. How many units should you keep in your warehouse at all times? Too many = storage cost. Too few = stockout = lost revenue.</p>
+<p><strong>The Data Science Skill:</strong> Stochastic Modeling and Simulation</p>
+<h4 id="2a-economic-order-quantity-eoq">2a. Economic Order Quantity (EOQ)</h4>
+<p>The EOQ formula gives you the optimal batch size for a single product with deterministic demand. You know this from your IE degree — here it is in Python.</p>
+<pre><code class="language-python">import numpy as np
+
+def economic_order_quantity(
+    annual_demand: float,
+    order_cost: float,
+    holding_cost_per_unit_year: float,
+) -&gt; dict:
+    &quot;&quot;&quot;
+    Computes the EOQ and derived inventory policy metrics.
+
+    Formula: EOQ = sqrt(2 * D * S / H)
+        D = annual demand (units/year)
+        S = ordering cost ($/order) — cost to place one purchase order
+        H = holding cost ($/unit/year) — warehouse, insurance, capital cost
+
+    Returns a dict with:
+        eoq:                optimal order quantity
+        orders_per_year:    how many times to reorder annually
+        cycle_time_days:    average days between orders
+        annual_total_cost:  ordering cost + holding cost (minimized at EOQ)
+
+    Note: EOQ assumes deterministic demand (no randomness). In reality,
+    demand is stochastic, which is why we add safety stock in 2b below.
+    &quot;&quot;&quot;
+    eoq = np.sqrt((2 * annual_demand * order_cost) / holding_cost_per_unit_year)
+    orders_per_year = annual_demand / eoq
+    cycle_time_days = 365 / orders_per_year
+    annual_total_cost = (
+        (annual_demand / eoq) * order_cost       # ordering cost component
+        + (eoq / 2) * holding_cost_per_unit_year  # holding cost component
+    )
+    return {
+        &quot;eoq&quot;: round(eoq),
+        &quot;orders_per_year&quot;: round(orders_per_year, 1),
+        &quot;cycle_time_days&quot;: round(cycle_time_days, 1),
+        &quot;annual_total_cost_usd&quot;: round(annual_total_cost, 2),
+    }
+
+
+# Example:
+result = economic_order_quantity(
+    annual_demand=5200,          # 100 units/week * 52 weeks
+    order_cost=50.0,             # $50 to place each order
+    holding_cost_per_unit_year=2.0,  # $2/unit/year to store
+)
+print(result)
+# → {&#x27;eoq&#x27;: 510, &#x27;orders_per_year&#x27;: 10.2, &#x27;cycle_time_days&#x27;: 35.8, &#x27;annual_total_cost_usd&#x27;: 1020.0}</code></pre>
+<h4 id="2b-safety-stock-with-monte-carlo-simulation">2b. Safety Stock with Monte Carlo Simulation</h4>
+<p>EOQ assumes demand is constant. Reality: demand fluctuates randomly. Safety stock is the buffer inventory you keep to cover demand spikes during lead time.</p>
+<pre><code class="language-python">import numpy as np
+
+def simulate_safety_stock(
+    demand_mean: float,
+    demand_std: float,
+    lead_time_days: int,
+    service_level: float = 0.95,
+    n_simulations: int = 100_000,
+) -&gt; dict:
+    &quot;&quot;&quot;
+    Uses Monte Carlo simulation to find the safety stock level that achieves
+    the target service level (probability of not stocking out).
+
+    Why Monte Carlo instead of the analytical formula?
+    The analytical formula (safety_stock = Z * std * sqrt(lead_time)) assumes
+    demand is normally distributed. Real demand often has:
+    - Heavy tails (occasional massive orders)
+    - Seasonality
+    - Autocorrelation (today&#x27;s demand correlates with yesterday&#x27;s)
+    Monte Carlo makes NO distributional assumptions — you simulate thousands
+    of scenarios from your actual historical demand distribution.
+
+    TODO: simulate total demand during lead time for n_simulations scenarios:
+          total_demands = np.array([
+              np.sum(np.random.normal(demand_mean, demand_std, lead_time_days))
+              for _ in range(n_simulations)
+          ])
+
+          Vectorized (faster):
+          daily_demands = np.random.normal(demand_mean, demand_std,
+                                           (n_simulations, lead_time_days))
+          total_demands = daily_demands.sum(axis=1)
+
+    TODO: safety_stock = np.percentile(total_demands, service_level * 100) - (demand_mean * lead_time_days)
+    TODO: reorder_point = demand_mean * lead_time_days + safety_stock
+
+    Returns:
+        safety_stock: units to keep as buffer
+        reorder_point: order when inventory drops to this level
+        service_level_achieved: verify the simulation matches the target
+    &quot;&quot;&quot;
+    rng = np.random.default_rng(seed=42)
+    daily_demands = rng.normal(demand_mean, demand_std, (n_simulations, lead_time_days))
+    daily_demands = np.maximum(0, daily_demands)   # demand cannot be negative
+    total_demands = daily_demands.sum(axis=1)
+
+    expected_demand_lt = demand_mean * lead_time_days
+    safety_stock  = np.percentile(total_demands, service_level * 100) - expected_demand_lt
+    reorder_point = expected_demand_lt + safety_stock
+
+    # Verify: what fraction of simulations are covered by this safety stock?
+    actual_service_level = np.mean(total_demands &lt;= reorder_point)
+
+    return {
+        &quot;safety_stock_units&quot;: round(safety_stock),
+        &quot;reorder_point_units&quot;: round(reorder_point),
+        &quot;expected_demand_during_lt&quot;: round(expected_demand_lt),
+        &quot;service_level_achieved&quot;: round(actual_service_level, 4),
+    }
+
+
+# Example:
+result = simulate_safety_stock(
+    demand_mean=100,      # 100 units/day average
+    demand_std=20,        # std dev of 20 units/day
+    lead_time_days=7,     # 7-day supplier lead time
+    service_level=0.95,   # 95% in-stock probability
+)
+print(result)
+# → {&#x27;safety_stock_units&#x27;: 53, &#x27;reorder_point_units&#x27;: 753, ...}</code></pre>
+<h3 id="pillar-3-network-amp-route-optimization-moving-the-goods">Pillar 3 — Network &amp; Route Optimization (Moving the Goods)</h3>
+<blockquote>This pillar is covered in full in <code>knowledge-base/zero-to-hero-guides/optimization/README.md</code>.</blockquote>
+<blockquote>Key tools: <strong>Google OR-Tools</strong> (VRP), <strong>PuLP</strong> (LP), <strong>NetworkX</strong> (graph analysis).</blockquote>
+<h4 id="networkx-mapping-the-supply-chain-as-a-graph">NetworkX: Mapping the Supply Chain as a Graph</h4>
+<p>Before you optimize routes, you model the supply chain as a directed graph. NetworkX is the standard library for this.</p>
+<pre><code class="language-python"># pip install networkx
+import networkx as nx
+import matplotlib.pyplot as plt
+
+def build_supply_chain_graph(facilities: list[dict], routes: list[dict]) -&gt; nx.DiGraph:
+    &quot;&quot;&quot;
+    Builds a directed graph of the supply chain network.
+
+    Args:
+        facilities: list of dicts with keys: id, name, type (supplier/warehouse/demand)
+        routes:     list of dicts with keys: from_id, to_id, cost, lead_time_days
+
+    Why a directed graph?
+    - Flow goes in one direction (supplier → warehouse → demand point)
+    - A DiGraph preserves this directionality
+    - NetworkX algorithms (shortest path, max flow) all work on DiGraph
+
+    TODO: G = nx.DiGraph()
+    TODO: for f in facilities: G.add_node(f[&#x27;id&#x27;], **f)
+    TODO: for r in routes:     G.add_edge(r[&#x27;from_id&#x27;], r[&#x27;to_id&#x27;], **r)
+    TODO: return G
+    &quot;&quot;&quot;
+    G = nx.DiGraph()
+    for f in facilities:
+        G.add_node(f[&quot;id&quot;], label=f[&quot;name&quot;], node_type=f[&quot;type&quot;])
+    for r in routes:
+        G.add_edge(r[&quot;from_id&quot;], r[&quot;to_id&quot;],
+                   cost=r[&quot;cost&quot;], lead_time_days=r[&quot;lead_time_days&quot;])
+    return G
+
+
+def find_cheapest_path(G: nx.DiGraph, source: str, target: str) -&gt; dict:
+    &quot;&quot;&quot;
+    Finds the lowest-cost path from source to target in the supply chain graph.
+
+    Uses Dijkstra&#x27;s algorithm — the same algorithm used in GPS navigation.
+    Edge weight = cost per unit shipped along that route.
+
+    TODO: path = nx.dijkstra_path(G, source, target, weight=&#x27;cost&#x27;)
+    TODO: cost = nx.dijkstra_path_length(G, source, target, weight=&#x27;cost&#x27;)
+    TODO: return {&#x27;path&#x27;: path, &#x27;total_cost&#x27;: cost}
+    &quot;&quot;&quot;
+    path = nx.dijkstra_path(G, source, target, weight=&quot;cost&quot;)
+    cost = nx.dijkstra_path_length(G, source, target, weight=&quot;cost&quot;)
+    return {&quot;path&quot;: path, &quot;total_cost_per_unit&quot;: cost}
+
+
+def identify_bottleneck_nodes(G: nx.DiGraph) -&gt; list[tuple]:
+    &quot;&quot;&quot;
+    Returns nodes sorted by betweenness centrality — the nodes that most
+    supply chain flow passes through.
+
+    A high-centrality node is a single point of failure. If it goes down
+    (port strike, natural disaster), the whole network is disrupted.
+    This is how you do resilience analysis.
+
+    betweenness_centrality(v) = fraction of all shortest paths that pass through v
+    High value → this node is critical. Low value → easily bypassed.
+
+    TODO: centrality = nx.betweenness_centrality(G, weight=&#x27;cost&#x27;)
+    TODO: return sorted(centrality.items(), key=lambda x: x[1], reverse=True)
+    &quot;&quot;&quot;
+    centrality = nx.betweenness_centrality(G, weight=&quot;cost&quot;)
+    return sorted(centrality.items(), key=lambda x: x[1], reverse=True)</code></pre>
+<h3 id="chaining-the-three-pillars-together">Chaining the Three Pillars Together</h3>
+<p>This is the full pipeline you build in <code>projects/advanced/project-7-supply-chain/</code>:</p>
+<pre><code class="language-">[Pillar 1] Demand Forecast
+    Prophet predicts next month&#x27;s demand per location
+            ↓
+[Pillar 2] Inventory Policy
+    EOQ + Monte Carlo → how much to order, when to reorder
+            ↓
+[Pillar 3] Route Optimization
+    OR-Tools VRP → optimal truck routes to fulfil the orders
+            ↓
+[Dashboard]
+    Plotly map: nodes = facilities, edges = active routes
+    Table: demand forecast vs. current stock vs. reorder point
+    Financial summary: total logistics cost + stockout risk ($)</code></pre>
+<p>The key insight: <strong>each pillar feeds the next.</strong> The demand forecast tells the inventory optimizer how much to order. The inventory optimizer tells the route optimizer how many units to move and where. The dashboard translates all of it into dollars.</p>
+<h3 id="recommended-datasets-in-order-of-difficulty">Recommended Datasets (in order of difficulty)</h3>
+<table><thead><tr><th>Dataset</th><th>Kaggle URL</th><th>What to practise</th><th>Difficulty</th></tr></thead><tbody><tr><td>Store Item Demand Forecasting</td><td>https://www.kaggle.com/competitions/demand-forecasting-kernels-only</td><td>Pillar 1: ARIMA, Prophet, XGBoost forecasting</td><td>Beginner</td></tr><tr><td>Olist Brazilian E-Commerce</td><td>https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce</td><td>Delivery delay analysis, logistics KPIs</td><td>Beginner-Intermediate</td></tr><tr><td>DataCo Smart Supply Chain</td><td>https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis</td><td>All 3 pillars: demand + inventory + routing</td><td>Intermediate</td></tr></tbody></table>
+<p><strong>How to use a Kaggle dataset:</strong></p>
+<ol>
+<li>Open the dataset page</li>
+<li>Click &quot;Code&quot; tab → sort by &quot;Most Votes&quot;</li>
+<li>Read the top 3 notebooks before writing any code</li>
+<li>Fork one, strip out their code, and re-implement from scratch</li>
+</ol>
+<h3 id="learning-path-study-these-in-order">Learning Path (Study These in Order)</h3>
+<p><strong>Week 1 — Demand Forecasting</strong></p>
+<ul>
+<li>[ ] Download the Store Item Demand dataset from Kaggle</li>
+<li>[ ] Implement the SARIMA model above on one store + item</li>
+<li>[ ] Implement Prophet on the same data — compare MAE</li>
+<li>[ ] Read: <a href="https://www.edx.org/learn/supply-chain-management/massachusetts-institute-of-technology-supply-chain-analytics">MITx Supply Chain Analytics on edX</a> (audit for free)</li>
+</ul>
+<p><strong>Week 2 — Inventory Optimization</strong></p>
+<ul>
+<li>[ ] Implement <code>economic_order_quantity()</code> with real numbers from a Kaggle dataset</li>
+<li>[ ] Implement <code>simulate_safety_stock()</code> — run 100k simulations, verify the service level</li>
+<li>[ ] Search &quot;Inventory Management using Python&quot; on Towards Data Science</li>
+</ul>
+<p><strong>Week 3 — Network Optimization</strong></p>
+<ul>
+<li>[ ] Build a NetworkX graph with 5 facilities and 8 routes (use real city coordinates)</li>
+<li>[ ] Run <code>find_cheapest_path()</code> and <code>identify_bottleneck_nodes()</code></li>
+<li>[ ] Connect to OR-Tools VRP from <code>optimization/README.md</code> — route trucks across the graph</li>
+</ul>
+<p><strong>Week 4 — Chain Them Together</strong></p>
+<ul>
+<li>[ ] Use Prophet demand output as input to <code>simulate_safety_stock()</code></li>
+<li>[ ] Use the reorder quantities as node demands in the OR-Tools VRP</li>
+<li>[ ] Build a Plotly map showing the network and the optimal routes</li>
+</ul>
+<h3 id="interview-questions-to-practise">Interview Questions to Practise</h3>
+<table><thead><tr><th>Question</th><th>What to say</th></tr></thead><tbody><tr><td>&quot;What&#x27;s the difference between ARIMA and Prophet?&quot;</td><td>&quot;ARIMA is a statistical model that requires stationarity and manual tuning of p,d,q. Prophet handles multiple seasonalities, missing data, and holidays automatically. For retail demand with weekly + yearly patterns, Prophet is faster to deploy. For simple monthly series with few data points, ARIMA often wins on accuracy.&quot;</td></tr><tr><td>&quot;How do you calculate safety stock?&quot;</td><td>&quot;The analytical formula assumes normal demand — Z <em> σ </em> √L. In production I use Monte Carlo simulation: simulate 100,000 lead time scenarios from the actual demand distribution, then find the inventory level that covers 95% of them. It makes no distributional assumptions and is easy to explain to non-technical managers.&quot;</td></tr><tr><td>&quot;What is the VRP and how does it connect to demand forecasting?&quot;</td><td>&quot;The VRP finds optimal truck routes given a set of delivery demands. The demands come from the demand forecast. So the full pipeline is: forecast → inventory policy (how much to ship) → VRP (how to route the trucks). They&#x27;re not separate problems — they&#x27;re three sequential decisions.&quot;</td></tr><tr><td>&quot;What KPIs do you track for supply chain performance?&quot;</td><td>&quot;OTIF (On-Time In-Full delivery rate), Inventory Turnover (Cost of Goods Sold / Avg Inventory), Days of Supply, Stockout Rate, and Total Logistics Cost as % of Revenue. When I build a dashboard, I show these alongside the model outputs so stakeholders see the business impact, not just model accuracy.&quot;</td></tr></tbody></table></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#zero-to-hero-guide-supply-chain-ai-in-python">Zero-to-Hero Guide: Supply Chain AI in Python</a><a style="margin-left:12px" href="#the-three-technical-pillars">The Three Technical Pillars</a><a style="margin-left:12px" href="#pillar-1-demand-forecasting-predicting-the-future">Pillar 1 — Demand Forecasting (Predicting the Future)</a><a style="margin-left:24px" href="#1a-statistical-models-arima-and-sarima">1a. Statistical Models: ARIMA and SARIMA</a><a style="margin-left:24px" href="#1b-modern-ml-prophet-meta-x27-s-forecasting-library">1b. Modern ML: Prophet (Meta&#x27;s Forecasting Library)</a><a style="margin-left:24px" href="#1c-xgboost-for-tabular-demand-forecasting">1c. XGBoost for Tabular Demand Forecasting</a><a style="margin-left:12px" href="#pillar-2-inventory-optimization-balancing-the-scale">Pillar 2 — Inventory Optimization (Balancing the Scale)</a><a style="margin-left:24px" href="#2a-economic-order-quantity-eoq">2a. Economic Order Quantity (EOQ)</a><a style="margin-left:24px" href="#2b-safety-stock-with-monte-carlo-simulation">2b. Safety Stock with Monte Carlo Simulation</a><a style="margin-left:12px" href="#pillar-3-network-amp-route-optimization-moving-the-goods">Pillar 3 — Network &amp; Route Optimization (Moving the Goods)</a><a style="margin-left:24px" href="#networkx-mapping-the-supply-chain-as-a-graph">NetworkX: Mapping the Supply Chain as a Graph</a><a style="margin-left:12px" href="#chaining-the-three-pillars-together">Chaining the Three Pillars Together</a><a style="margin-left:12px" href="#recommended-datasets-in-order-of-difficulty">Recommended Datasets (in order of difficulty)</a><a style="margin-left:12px" href="#learning-path-study-these-in-order">Learning Path (Study These in Order)</a><a style="margin-left:12px" href="#interview-questions-to-practise">Interview Questions to Practise</a></aside>
+    </main>
+  </body>
+</html>

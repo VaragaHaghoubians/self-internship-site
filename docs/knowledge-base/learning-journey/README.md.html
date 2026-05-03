@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learning Journey - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../index.html">Back to website</a>
+      <a href="../../../index.html#python-lab">Python lab</a>
+      <a href="../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Learning Journey</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">knowledge-base/learning-journey/README.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="my-learning-journey-from-beginner-to-data-scientist-iot-engineer">🚀 My Learning Journey: From Beginner to Data Scientist + IoT Engineer</h2>
+<p>Welcome! This folder is your <strong>entire roadmap</strong> broken into small, doable steps. Every subfolder = one month. Every week inside has its own folder with:</p>
+<ul>
+<li>A <code>README.md</code> that explains WHAT to do and WHY</li>
+<li>A <code>.py</code> Python file with code examples and hints in the comments</li>
+</ul>
+<h3 id="the-two-types-of-files-and-how-they-work-together">THE TWO TYPES OF FILES — AND HOW THEY WORK TOGETHER</h3>
+<pre><code class="language-">knowledge-base/
+│
+├── learning-journey/          ← YOUR WEEKLY WORK PROGRAM
+│   └── (this folder)          Read these in strict order, one week at a time.
+│                              Each file has tasks you must complete.
+│
+└── zero-to-hero-guides/       ← REFERENCE TEXTBOOKS
+    └── python/, sql/, etc.    Read the relevant guide BEFORE starting the
+                               learning-journey week that uses that tool.
+                               Keep them open as a reference while working.</code></pre>
+<p><strong>Learning journey</strong> = what you DO each week (applied, project-driven). <strong>Zero-to-hero guides</strong> = what you READ to prepare (deep dives, cheatsheets).</p>
+<p>They are not redundant — they work together. The table below shows exactly when.</p>
+<h3 id="complete-numbered-learning-order">📋 COMPLETE NUMBERED LEARNING ORDER</h3>
+<blockquote>Follow this table top to bottom. Never skip a row.</blockquote>
+<blockquote>&quot;Read first&quot; = open that zero-to-hero guide before starting the week&#x27;s tasks.</blockquote>
+<table><thead><tr><th>#</th><th>Week</th><th>Learning Journey File</th><th>Read First (Zero-to-Hero)</th><th>Deliverable</th></tr></thead><tbody><tr><td><strong>1</strong></td><td>Week 1</td><td><code>month-01/week-01-terminal-commands/README.md</code></td><td><code>linux/linux_commands.sh</code> (sections 1–3)</td><td>Can navigate filesystem in terminal</td></tr><tr><td><strong>2</strong></td><td>Week 2</td><td><code>month-01/week-02-git-github/README.md</code></td><td><code>git/git_commands.sh</code> (sections 1–2)</td><td>First commit pushed to GitHub</td></tr><tr><td><strong>3</strong></td><td>Week 3</td><td><code>month-01/week-03-python-environment/setup_guide.py</code></td><td><code>python/python_zero_to_hero.py</code> (Days 1–10)</td><td>Virtual env working, Python runs in VS Code</td></tr><tr><td><strong>4</strong></td><td>Week 4</td><td><code>month-01/week-04-jupyter/first_steps.py</code></td><td><code>python/python_zero_to_hero.py</code> (Days 11–20)</td><td>First Jupyter notebook pushed to GitHub</td></tr><tr><td><strong>5</strong></td><td>Week 5</td><td><code>month-02/week-05-pandas-numpy/numpy_basics.py</code></td><td><code>python/python_zero_to_hero.py</code> (Days 21–30)</td><td>NumPy exercises complete</td></tr><tr><td><strong>6</strong></td><td>Week 5</td><td><code>month-02/week-05-pandas-numpy/pandas_basics.py</code></td><td><em>(continue from above)</em></td><td>Pandas groupby + merge working</td></tr><tr><td><strong>7</strong></td><td>Week 5</td><td><code>month-02/week-05-pandas-numpy/statistics_basics.py</code></td><td><em>(no guide — just the file)</em></td><td>t-test and chi-square working</td></tr><tr><td><strong>8</strong></td><td>Week 5</td><td><code>month-02/week-05-pandas-numpy/visualization_basics.py</code></td><td><em>(no guide — just the file)</em></td><td>5 chart types saved as PNG</td></tr><tr><td><strong>9</strong></td><td>Week 6a</td><td><code>month-02/week-06-data-cleaning/data_cleaning.py</code></td><td><em>(no guide — just the file)</em></td><td>Messy CSV cleaned and exported</td></tr><tr><td><strong>10</strong></td><td>Week 6b</td><td><code>month-02/week-06-sql/sql_basics.py</code></td><td><code>sql/sql_zero_to_hero.sql</code></td><td>All SQL queries run in SQLite</td></tr><tr><td><strong>11</strong></td><td>Week 7</td><td><code>month-02/week-07-apis/fetch_api_data.py</code></td><td><em>(no guide — just the file)</em></td><td>Weather data saved to CSV via API</td></tr><tr><td><strong>12</strong></td><td>Week 8</td><td><code>month-02/week-08-arduino/read_serial_data.py</code></td><td><code>arduino/arduino_zero_to_hero.ino</code></td><td>Arduino DHT11 data logged to CSV</td></tr><tr><td><strong>13</strong></td><td>Week 9a</td><td><code>month-03/week-09-ssh-productivity/README.md</code></td><td><code>linux/linux_commands.sh</code> (sections 4–6)</td><td>SSH key set up, GitHub uses SSH</td></tr><tr><td><strong>14</strong></td><td>Week 9b</td><td><code>month-03/week-09-time-series/time_series_analysis.py</code></td><td><em>(no guide — self-contained, 14 parts)</em></td><td>All 5 tasks complete, PNGs saved</td></tr><tr><td><strong>15</strong></td><td>Week 10</td><td><code>month-03/week-10-linear-regression/linear_regression.py</code></td><td><em>(no guide — just the file)</em></td><td>Housing price model, R² &gt; 0.6</td></tr><tr><td><strong>16</strong></td><td>Week 11</td><td><code>month-03/week-11-classification/random_forest.py</code></td><td><em>(no guide — just the file)</em></td><td>Random forest trained</td></tr><tr><td><strong>17</strong></td><td>Week 11</td><td><code>month-03/week-11-classification/model_evaluation.py</code></td><td><em>(no guide — just the file)</em></td><td>Confusion matrix + ROC curve saved</td></tr><tr><td><strong>18</strong></td><td>Week 11</td><td><code>month-03/week-11-classification/test_ml_basics.py</code></td><td><em>(no guide — just the file)</em></td><td>All pytest tests pass: <code>pytest -v</code></td></tr><tr><td><strong>19</strong></td><td>Week 12</td><td><code>month-03/week-12-docker/ml_script.py</code> + <code>Dockerfile</code></td><td><code>docker/docker_zero_to_hero.sh</code></td><td>Docker image builds and runs</td></tr><tr><td><strong>20</strong></td><td>Week 13</td><td><code>month-04/week-13-esp32-setup/README.md</code></td><td><code>iot/iot_zero_to_hero.py</code> (sections 1–2)</td><td>ESP32 connects to WiFi, blinks LED</td></tr><tr><td><strong>21</strong></td><td>Week 14</td><td><code>month-04/week-14-flask-api/flask_server.py</code></td><td><em>(no guide — Django guide is next)</em></td><td>Flask API receives POST, saves to SQLite</td></tr><tr><td><strong>22</strong></td><td>Week 15</td><td><code>month-04/week-15-wireless-data/esp32_sensor.ino</code></td><td><code>arduino/arduino_zero_to_hero.ino</code> (advanced sections)</td><td>ESP32 sends sensor data to Flask</td></tr><tr><td><strong>23</strong></td><td>Week 16</td><td><code>month-04/week-16-live-dashboard/dashboard_app.py</code></td><td><em>(no guide — just the file)</em></td><td>Live chart updates in browser</td></tr><tr><td>—</td><td>—</td><td><strong>APPLY FOR JOBS NOW</strong> — you are a Junior Data Analyst at this point</td><td>—</td><td>—</td></tr><tr><td><strong>24</strong></td><td>Capstone 1</td><td><code>CAPSTONE_ROADMAP.md</code> → Month 5</td><td><code>django/django_zero_to_hero.py</code></td><td>Django app live on AWS EC2</td></tr><tr><td><strong>25</strong></td><td>Capstone 2</td><td><code>CAPSTONE_ROADMAP.md</code> → Month 6</td><td><em>(no guide — apply Capstone 1 skills)</em></td><td>Predictive maintenance with email alerts</td></tr><tr><td><strong>26</strong></td><td>Capstone 3</td><td><code>CAPSTONE_ROADMAP.md</code> → Month 7</td><td><code>supply-chain/README.md</code> (Pillar 1)</td><td>Demand forecasting dashboard</td></tr><tr><td><strong>27</strong></td><td>Capstone 4</td><td><code>CAPSTONE_ROADMAP.md</code> → Month 8</td><td><code>optimization/README.md</code> + <code>supply-chain/README.md</code> (Pillars 2–3)</td><td>Inventory + route optimizer</td></tr><tr><td><strong>28</strong></td><td>Capstone 5</td><td><code>CAPSTONE_ROADMAP.md</code> → Month 9</td><td><code>mis/README.md</code></td><td>Cold chain intelligence system</td></tr></tbody></table>
+<p><strong>Zero-to-hero guides NOT in the table above (optional):</strong></p>
+<ul>
+<li><code>java/JavaZeroToHero.java</code> — only if you choose Month 5 Track B (enterprise Java)</li>
+<li><code>linux/linux_commands.sh</code> sections 7+ — advanced shell scripting, optional</li>
+</ul>
+<h3 id="folder-structure">📁 Folder Structure</h3>
+<pre><code class="language-">learning-journey/
+│
+├── month-01-linux-python-basics/     ← START HERE (rows 1–4 above)
+│   ├── week-01-terminal-commands/
+│   ├── week-02-git-github/
+│   ├── week-03-python-environment/
+│   └── week-04-jupyter/
+│
+├── month-02-data-science/            ← rows 5–12
+│   ├── week-05-pandas-numpy/
+│   ├── week-06-data-cleaning/
+│   ├── week-06-sql/
+│   ├── week-07-apis/
+│   └── week-08-arduino/
+│
+├── month-03-machine-learning/        ← rows 13–19
+│   ├── week-09-ssh-productivity/
+│   ├── week-09-time-series/
+│   ├── week-10-linear-regression/
+│   ├── week-11-classification/
+│   └── week-12-docker/
+│
+├── month-04-iot-smart-home/          ← rows 20–23
+│   ├── week-13-esp32-setup/
+│   ├── week-14-flask-api/
+│   ├── week-15-wireless-data/
+│   └── week-16-live-dashboard/
+│
+├── month-05-advanced/                ← row 24 (Capstone 1)
+│
+└── CAPSTONE_ROADMAP.md               ← rows 24–28 (Capstones 1–5)</code></pre>
+<h3 id="rule-1-one-week-at-a-time">✅ Rule #1: One Week at a Time</h3>
+<p>Do NOT open month-03 before finishing month-02. Do NOT skip the small tasks. They build on each other.</p>
+<h3 id="things-to-buy-now-before-month-2-week-8">🛒 Things to Buy NOW (before Month 2, Week 8)</h3>
+<p>Order these from Amazon so they arrive in time:</p>
+<ol>
+<li><strong>ELEGOO UNO R3 Most Complete Starter Kit</strong> — ~$50-60</li>
+</ol>
+<ul>
+<li>This is your Arduino board + all sensors + wires + PDF guide</li>
+</ul>
+<ol>
+<li><strong>ESP32 Development Board 3-pack</strong> — ~$12-15</li>
+</ol>
+<ul>
+<li>This has built-in WiFi (needed for Month 4)</li>
+</ul>
+<p>Total: ~$65-75</p>
+<h3 id="software-to-install-now-free">💻 Software to Install NOW (free)</h3>
+<ol>
+<li><strong>VS Code</strong> → https://code.visualstudio.com/</li>
+</ol>
+<ul>
+<li>Install the &quot;Python&quot; extension inside VS Code</li>
+</ul>
+<ol>
+<li><strong>Git</strong> → https://git-scm.com/download/win</li>
+<li><strong>Python 3.11+</strong> → https://www.python.org/downloads/</li>
+</ol>
+<ul>
+<li>During install: CHECK the box &quot;Add Python to PATH&quot;</li>
+</ul>
+<ol>
+<li><strong>Arduino IDE</strong> → https://www.arduino.cc/en/software (install when kit arrives)</li>
+</ol>
+<h3 id="portfolio-projects-you-will-build">🏆 Portfolio Projects You Will Build</h3>
+<p>By the end of this journey, your GitHub will have:</p>
+<ol>
+<li><code>linux-data-journey</code> — your notes and terminal practice</li>
+<li><code>sensor-eda-analysis</code> — Pandas analysis of your own Arduino data</li>
+<li><code>housing-price-predictor</code> — ML model with Scikit-Learn</li>
+<li><code>smart-home-dashboard</code> — live IoT dashboard (ESP32 → Flask → browser chart)</li>
+</ol>
+<h3 id="how-to-use-each-python-file">📌 How to Use Each Python File</h3>
+<p>Every <code>.py</code> file in this project has this structure:</p>
+<pre><code class="language-python"># ==============================================================
+# TASK: What you need to do
+# WHY:  Why this skill matters
+# HOW:  Step-by-step instructions
+# ==============================================================
+
+# --- STEP 1: Do this first ---
+# (your code goes here)
+
+# --- STEP 2: Then do this ---
+# (more code)
+
+# HINT: If you get stuck, read the comment above each line carefully</code></pre>
+<p>Open each file in VS Code, read every comment, and run the code.</p>
+<p><strong>Start now → open <code>month-01-linux-python-basics/README.md</code></strong></p></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#my-learning-journey-from-beginner-to-data-scientist-iot-engineer">🚀 My Learning Journey: From Beginner to Data Scientist + IoT Engineer</a><a style="margin-left:12px" href="#the-two-types-of-files-and-how-they-work-together">THE TWO TYPES OF FILES — AND HOW THEY WORK TOGETHER</a><a style="margin-left:12px" href="#complete-numbered-learning-order">📋 COMPLETE NUMBERED LEARNING ORDER</a><a style="margin-left:12px" href="#folder-structure">📁 Folder Structure</a><a style="margin-left:12px" href="#rule-1-one-week-at-a-time">✅ Rule #1: One Week at a Time</a><a style="margin-left:12px" href="#things-to-buy-now-before-month-2-week-8">🛒 Things to Buy NOW (before Month 2, Week 8)</a><a style="margin-left:12px" href="#software-to-install-now-free">💻 Software to Install NOW (free)</a><a style="margin-left:12px" href="#portfolio-projects-you-will-build">🏆 Portfolio Projects You Will Build</a><a style="margin-left:12px" href="#how-to-use-each-python-file">📌 How to Use Each Python File</a></aside>
+    </main>
+  </body>
+</html>

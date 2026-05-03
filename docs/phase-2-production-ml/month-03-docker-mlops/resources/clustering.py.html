@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clustering.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Clustering.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">phase-2-production-ml/month-03-docker-mlops/resources/clustering.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "# ==============================================================\n# CLUSTERING \u2014 Unsupervised Learning\n# FILE: clustering.py\n#\n# TASK: Learn to find hidden groups in data WITHOUT labels.\n#       Master K-Means and DBSCAN, the two most important\n#       clustering algorithms.\n#\n# WHY:  Clustering is \"learning without a teacher.\"\n#       You have data but NO target column (no y).\n#       It answers: \"Are there natural groups hiding in this data?\"\n#       Operations use cases:\n#         \u2192 Customer segmentation (Group buyers by behavior)\n#         \u2192 Anomaly detection in logistics (which shipments look weird?)\n#         \u2192 Warehouse zone planning (group similar SKUs together)\n#\n# PREREQ: numpy_basics.py, pandas_basics.py, linear_regression.py\n# INSTALL: pip install scikit-learn matplotlib seaborn pandas numpy\n# HOW TO RUN: python clustering.py\n# ==============================================================\n\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\nfrom sklearn.cluster import KMeans, DBSCAN\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.metrics import silhouette_score\nfrom sklearn.datasets import make_blobs, make_moons\n\nsns.set_theme(style=\"whitegrid\")\nnp.random.seed(42)\n\nprint(\"=\" * 65)\nprint(\"  CLUSTERING \u2014 Finding Hidden Groups in Data\")\nprint(\"=\" * 65)\n\n\n# ==============================================================\n# PART 1: THE BIG IDEA \u2014 What is Clustering?\n# ==============================================================\nprint(\"\\n--- PART 1: What is Clustering? ---\")\nprint(\"\"\"\nSUPERVISED learning:    You have X (features) AND y (labels/target).\n                        The model learns to predict y.\n\nUNSUPERVISED learning:  You ONLY have X. No labels.\n                        The model finds structure in X itself.\n\nCLUSTERING = grouping data points so that:\n  - Points in the SAME cluster are SIMILAR to each other\n  - Points in DIFFERENT clusters are DIFFERENT from each other\n\nThe algorithm figures out the groups \u2014 you don't tell it what they are.\n\nReal examples:\n  \u2192 Group customers by purchase frequency + basket size\n  \u2192 Group delivery routes by density\n  \u2192 Group machine readings to find normal vs abnormal behavior\n\"\"\")\n\n\n# ==============================================================\n# PART 2: K-MEANS CLUSTERING\n# ==============================================================\nprint(\"\\n--- PART 2: K-Means Clustering ---\")\nprint(\"\"\"\nHow K-Means works (4 steps):\n  1. You CHOOSE k (number of clusters)\n  2. Place k random \"centroids\" (cluster centers)\n  3. Assign each point to the NEAREST centroid\n  4. Move each centroid to the MEAN of its assigned points\n  5. Repeat steps 3-4 until centroids stop moving\n\nK-Means limitations:\n  - You must choose k in advance\n  - Assumes clusters are roughly spherical and equal-sized\n  - Sensitive to outliers\n  - May converge to local minimum (use n_init > 1)\n\"\"\")\n\n# Generate clean cluster data to visualize the concept:\nX_blob, y_true = make_blobs(n_samples=300, centers=4, cluster_std=0.8, random_state=42)\n\n# Step 1: ALWAYS scale your features before clustering\nscaler   = StandardScaler()\nX_scaled = scaler.fit_transform(X_blob)\n\n# Step 2: Fit K-Means with k=4\nkmeans = KMeans(n_clusters=4, n_init=10, random_state=42)\nkmeans.fit(X_scaled)\n\nlabels     = kmeans.labels_       # Cluster assignment for each point (0, 1, 2, or 3)\ncentroids  = kmeans.cluster_centers_\n\nprint(f\"Cluster assignments (first 20): {labels[:20]}\")\nprint(f\"Inertia (within-cluster sum of squares): {kmeans.inertia_:.2f}\")\nprint(\"  \u2192 Lower inertia = tighter clusters (but always lower with more k)\")\nprint(f\"Unique clusters found: {np.unique(labels)}\")\n\n# How many points in each cluster?\ncluster_counts = pd.Series(labels).value_counts().sort_index()\nprint(\"\\nPoints per cluster:\")\nprint(cluster_counts)\n\n# Visualize clusters:\nfig, axes = plt.subplots(1, 2, figsize=(14, 5))\n\naxes[0].scatter(X_scaled[:, 0], X_scaled[:, 1], c=labels, cmap=\"tab10\", alpha=0.7, s=40)\naxes[0].scatter(centroids[:, 0], centroids[:, 1], c=\"black\", s=200, marker=\"X\", label=\"Centroids\")\naxes[0].set_title(\"K-Means Result (k=4)\")\naxes[0].legend()\n\n# True labels for comparison:\naxes[1].scatter(X_scaled[:, 0], X_scaled[:, 1], c=y_true, cmap=\"tab10\", alpha=0.7, s=40)\naxes[1].set_title(\"True Labels (for comparison)\")\n\nplt.suptitle(\"K-Means vs True Labels\", fontsize=13)\nplt.tight_layout()\nplt.savefig(\"plot_cluster_01_kmeans.png\", dpi=150)\nplt.close()\nprint(\"\\nSaved: plot_cluster_01_kmeans.png\")\n\n\n# ==============================================================\n# PART 3: THE ELBOW METHOD \u2014 How to Choose k\n# ==============================================================\nprint(\"\\n--- PART 3: Choosing k \u2014 The Elbow Method ---\")\nprint(\"\"\"\nProblem: K-Means requires you to choose k BEFORE running.\nSolution: Try multiple values of k and look for the \"elbow.\"\n\nInertia = total within-cluster sum of squared distances.\n  - Always decreases as k increases (more clusters = tighter fit)\n  - The \"elbow\" is where decreasing k stops giving big gains\n  - That elbow point is your best k\n\nAlso use: Silhouette Score (Part 4)\n\"\"\")\n\ninertias          = []\nsilhouette_scores = []\nk_range           = range(2, 10)\n\nfor k in k_range:\n    km = KMeans(n_clusters=k, n_init=10, random_state=42)\n    km.fit(X_scaled)\n    inertias.append(km.inertia_)\n    silhouette_scores.append(silhouette_score(X_scaled, km.labels_))\n\nfig, axes = plt.subplots(1, 2, figsize=(14, 5))\n\n# Elbow plot:\naxes[0].plot(k_range, inertias, \"bo-\", linewidth=2)\naxes[0].axvline(x=4, color=\"red\", linestyle=\"--\", label=\"Elbow at k=4\")\naxes[0].set_xlabel(\"Number of Clusters (k)\")\naxes[0].set_ylabel(\"Inertia\")\naxes[0].set_title(\"Elbow Method \u2014 Choose k Where Inertia Bends\")\naxes[0].legend()\n\n# Silhouette score plot:\naxes[1].plot(k_range, silhouette_scores, \"go-\", linewidth=2)\naxes[1].axvline(x=4, color=\"red\", linestyle=\"--\", label=\"Best k=4\")\naxes[1].set_xlabel(\"Number of Clusters (k)\")\naxes[1].set_ylabel(\"Silhouette Score\")\naxes[1].set_title(\"Silhouette Score \u2014 Higher is Better\")\naxes[1].legend()\n\nplt.tight_layout()\nplt.savefig(\"plot_cluster_02_elbow.png\", dpi=150)\nplt.close()\nprint(\"Saved: plot_cluster_02_elbow.png\")\n\nbest_k = k_range[np.argmax(silhouette_scores)]\nprint(f\"\\nBest k by Silhouette Score: {best_k}\")\nprint(\"Silhouette Score interpretation:\")\nprint(\"  0.7 \u2013 1.0  = excellent structure\")\nprint(\"  0.5 \u2013 0.7  = reasonable structure\")\nprint(\"  0.25 \u2013 0.5 = weak structure\")\nprint(\"  < 0.25     = no real structure\")\n\n\n# ==============================================================\n# PART 4: SILHOUETTE SCORE \u2014 Measure Cluster Quality\n# ==============================================================\nprint(\"\\n--- PART 4: Silhouette Score ---\")\nprint(\"\"\"\nSilhouette score for a single point:\n  s(i) = (b - a) / max(a, b)\n\n  a = average distance to other points in the SAME cluster\n  b = average distance to points in the NEAREST OTHER cluster\n\n  s close to +1 = well clustered (far from other clusters)\n  s close to  0 = on the boundary between two clusters\n  s close to -1 = probably in the WRONG cluster\n\nOverall silhouette score = mean of all individual scores.\n\"\"\")\n\nkm_best = KMeans(n_clusters=4, n_init=10, random_state=42)\nkm_best.fit(X_scaled)\n\noverall_score = silhouette_score(X_scaled, km_best.labels_)\nprint(f\"Overall Silhouette Score (k=4): {overall_score:.3f}\")\n\n\n# ==============================================================\n# PART 5: DBSCAN \u2014 Density-Based Clustering\n# ==============================================================\nprint(\"\\n--- PART 5: DBSCAN \u2014 When Clusters Aren't Round ---\")\nprint(\"\"\"\nDBSCAN (Density-Based Spatial Clustering of Applications with Noise)\n\nHow it works:\n  - A \"core point\" has at least min_samples points within radius eps\n  - Points within eps of a core point join its cluster\n  - Points NOT reachable from any core point are OUTLIERS (label = -1)\n\nDBSCAN advantages over K-Means:\n  \u2705 You don't need to choose k in advance\n  \u2705 Can find ANY shape of clusters (not just round blobs)\n  \u2705 Automatically labels outliers as noise (-1)\n\nDBSCAN disadvantages:\n  \u274c Sensitive to eps and min_samples choices\n  \u274c Struggles with clusters of very different densities\n\nParameters:\n  eps         = radius of neighborhood (try 0.3 to 1.0, scaled data)\n  min_samples = min points to form a core point (try 5 to 20)\n\"\"\")\n\n# Generate crescent-shaped data that K-Means fails on:\nX_moon, _ = make_moons(n_samples=300, noise=0.08, random_state=42)\nX_moon_scaled = StandardScaler().fit_transform(X_moon)\n\n# K-Means fails:\nkm_moon   = KMeans(n_clusters=2, n_init=10, random_state=42)\nlabels_km = km_moon.fit_predict(X_moon_scaled)\n\n# DBSCAN succeeds:\ndbscan      = DBSCAN(eps=0.3, min_samples=5)\nlabels_db   = dbscan.fit_predict(X_moon_scaled)\n\nn_clusters  = len(set(labels_db)) - (1 if -1 in labels_db else 0)\nn_noise     = np.sum(labels_db == -1)\n\nprint(f\"DBSCAN found: {n_clusters} clusters, {n_noise} noise points (label = -1)\")\n\nfig, axes = plt.subplots(1, 2, figsize=(14, 5))\n\naxes[0].scatter(X_moon_scaled[:, 0], X_moon_scaled[:, 1], c=labels_km, cmap=\"bwr\", alpha=0.7, s=40)\naxes[0].set_title(\"K-Means FAILS on crescent shapes\")\n\n# Color noise points separately:\ncolors = np.where(labels_db == -1, \"gray\", np.where(labels_db == 0, \"steelblue\", \"coral\"))\naxes[1].scatter(X_moon_scaled[:, 0], X_moon_scaled[:, 1], c=colors, alpha=0.7, s=40)\naxes[1].set_title(f\"DBSCAN SUCCEEDS \u2014 {n_clusters} clusters, {n_noise} noise\")\n\nplt.suptitle(\"K-Means vs DBSCAN on Non-Spherical Data\", fontsize=13)\nplt.tight_layout()\nplt.savefig(\"plot_cluster_03_dbscan.png\", dpi=150)\nplt.close()\nprint(\"Saved: plot_cluster_03_dbscan.png\")\n\n\n# ==============================================================\n# PART 6: REAL BUSINESS EXAMPLE \u2014 Customer Segmentation\n# ==============================================================\nprint(\"\\n--- PART 6: Real Example \u2014 Customer Segmentation ---\")\n\nnp.random.seed(2026)\nn = 200\n\ncustomers = pd.DataFrame({\n    \"customer_id\":      range(1, n + 1),\n    \"orders_per_month\": np.concatenate([\n        np.random.normal(1.5, 0.4, 60),   # Low-freq buyers\n        np.random.normal(4.5, 0.6, 80),   # Mid-freq buyers\n        np.random.normal(10, 1.2, 60),    # High-freq buyers\n    ]),\n    \"avg_order_value\":  np.concatenate([\n        np.random.normal(25, 8, 60),      # Budget buyers\n        np.random.normal(80, 15, 80),     # Mid-value buyers\n        np.random.normal(200, 30, 60),    # Premium buyers\n    ]),\n})\ncustomers[\"orders_per_month\"] = customers[\"orders_per_month\"].clip(0.5)\ncustomers[\"avg_order_value\"]  = customers[\"avg_order_value\"].clip(10)\n\n# Scale features:\nX_cust = customers[[\"orders_per_month\", \"avg_order_value\"]].values\nX_cust_scaled = StandardScaler().fit_transform(X_cust)\n\n# Run K-Means with k=3:\nkm_cust = KMeans(n_clusters=3, n_init=10, random_state=42)\ncustomers[\"segment\"] = km_cust.fit_predict(X_cust_scaled)\n\n# Map clusters to meaningful labels based on centroid values:\ncentroids_orig = scaler.fit_transform(X_cust)   # Refit to get correct inverse\ncentroid_df    = pd.DataFrame(\n    km_cust.cluster_centers_,\n    columns=[\"orders_scaled\", \"value_scaled\"]\n)\nprint(\"Cluster centroids (scaled):\")\nprint(centroid_df.round(2))\n\n# Business-friendly summary:\nsegment_summary = customers.groupby(\"segment\").agg(\n    customers=(\"customer_id\", \"count\"),\n    avg_orders=(\"orders_per_month\", \"mean\"),\n    avg_value=(\"avg_order_value\", \"mean\")\n).round(2)\nprint(\"\\nCustomer Segment Summary:\")\nprint(segment_summary)\n\n# Visualize:\nplt.figure(figsize=(9, 6))\ncolors_seg = {0: \"steelblue\", 1: \"coral\", 2: \"green\"}\nfor seg in [0, 1, 2]:\n    mask = customers[\"segment\"] == seg\n    plt.scatter(\n        customers.loc[mask, \"orders_per_month\"],\n        customers.loc[mask, \"avg_order_value\"],\n        label=f\"Segment {seg}  (n={mask.sum()})\",\n        color=colors_seg[seg],\n        alpha=0.7, s=60\n    )\nplt.xlabel(\"Orders per Month\")\nplt.ylabel(\"Avg Order Value ($)\")\nplt.title(\"Customer Segmentation \u2014 K-Means (k=3)\")\nplt.legend()\nplt.tight_layout()\nplt.savefig(\"plot_cluster_04_customers.png\", dpi=150)\nplt.close()\nprint(\"\\nSaved: plot_cluster_04_customers.png\")\n\nprint(\"\\nKey insight: segment with highest orders AND value = VIP customers.\")\nprint(\"Targeted marketing by segment \u2192 higher ROI than blasting everyone.\")\n\n\n# ==============================================================\n# QUICK REFERENCE: K-Means vs DBSCAN\n# ==============================================================\nprint(\"\\n\" + \"=\" * 65)\nprint(\"QUICK REFERENCE: When to Use What\")\nprint(\"=\" * 65)\nprint(\"\"\"\n                        K-MEANS         DBSCAN\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nNeed to set k?          YES             NO\nHandles non-round?      NO              YES\nDetects outliers?       NO              YES (labels = -1)\nSpeed (large data)?     Fast            Slower\nSensitive to scale?     YES             YES\nBest for?               Business segs   Geo clustering,\n                        known k         anomaly detection\n\nALWAYS scale features with StandardScaler BEFORE either!\n\"\"\")\n\n\n# ==============================================================\n# \ud83c\udfaf YOUR TASKS\n# ==============================================================\nprint(\"=\" * 65)\nprint(\"YOUR TURN \u2014 Clustering Practice\")\nprint(\"=\" * 65)\nprint(\"\"\"\nTASK 1 \u2014 ELBOW METHOD:\n    Generate data with make_blobs(centers=5, random_state=7).\n    Run K-Means for k = 2 to 12.\n    Plot inertia (elbow) AND silhouette score.\n    Which k would you choose and why?\n\nTASK 2 \u2014 DBSCAN TUNING:\n    Run DBSCAN on the crescent moon data (X_moon_scaled above) with:\n    a) eps=0.5, min_samples=5\n    b) eps=0.2, min_samples=5\n    c) eps=0.3, min_samples=2\n    For each, print: number of clusters, number of noise points.\n    Which configuration works best? What happens if eps is too large?\n\nTASK 3 \u2014 REAL DATA (Iris dataset):\n    from sklearn.datasets import load_iris\n    iris = load_iris()\n    X = iris.data        \u2190 4 features, 150 samples\n    y = iris.target      \u2190 3 species (DON'T use this for clustering)\n\n    a) Scale the data with StandardScaler\n    b) Run K-Means with k=3\n    c) Print silhouette score\n    d) Make a scatter plot of the first 2 features, colored by cluster\n    e) Compare your cluster labels to y_true \u2014 do they match?\n       HINT: pd.crosstab(y, km.labels_)\n\nTASK 4 \u2014 WAREHOUSE SIMULATION:\n    Create a DataFrame of 150 warehouses with:\n      lat:   np.random.uniform(30, 48, 150)   (latitude \u2014 US range)\n      lon:   np.random.uniform(-120, -70, 150) (longitude)\n      daily_volume: np.random.randint(100, 5000, 150)\n\n    a) Cluster warehouses into 5 regional groups using K-Means\n       (scale lat, lon, and daily_volume first!)\n    b) Print mean daily_volume per cluster\n    c) Plot clusters on a scatter using lat/lon as x/y, colored by cluster\n    d) BONUS: Try DBSCAN to identify dense hub areas\n\nWrite your solutions below:\n\"\"\")\n\n# YOUR SOLUTIONS HERE:\n\n\nprint(\"\\nClustering complete! Saved 4 plots to current folder.\")\n";
+      const readerOutputKey = "readerRun:phase-2-production-ml/month-03-docker-mlops/resources/clustering.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code># ==============================================================
+# CLUSTERING — Unsupervised Learning
+# FILE: clustering.py
+#
+# TASK: Learn to find hidden groups in data WITHOUT labels.
+#       Master K-Means and DBSCAN, the two most important
+#       clustering algorithms.
+#
+# WHY:  Clustering is &quot;learning without a teacher.&quot;
+#       You have data but NO target column (no y).
+#       It answers: &quot;Are there natural groups hiding in this data?&quot;
+#       Operations use cases:
+#         → Customer segmentation (Group buyers by behavior)
+#         → Anomaly detection in logistics (which shipments look weird?)
+#         → Warehouse zone planning (group similar SKUs together)
+#
+# PREREQ: numpy_basics.py, pandas_basics.py, linear_regression.py
+# INSTALL: pip install scikit-learn matplotlib seaborn pandas numpy
+# HOW TO RUN: python clustering.py
+# ==============================================================
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.cluster import KMeans, DBSCAN
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+from sklearn.datasets import make_blobs, make_moons
+
+sns.set_theme(style=&quot;whitegrid&quot;)
+np.random.seed(42)
+
+print(&quot;=&quot; * 65)
+print(&quot;  CLUSTERING — Finding Hidden Groups in Data&quot;)
+print(&quot;=&quot; * 65)
+
+
+# ==============================================================
+# PART 1: THE BIG IDEA — What is Clustering?
+# ==============================================================
+print(&quot;\n--- PART 1: What is Clustering? ---&quot;)
+print(&quot;&quot;&quot;
+SUPERVISED learning:    You have X (features) AND y (labels/target).
+                        The model learns to predict y.
+
+UNSUPERVISED learning:  You ONLY have X. No labels.
+                        The model finds structure in X itself.
+
+CLUSTERING = grouping data points so that:
+  - Points in the SAME cluster are SIMILAR to each other
+  - Points in DIFFERENT clusters are DIFFERENT from each other
+
+The algorithm figures out the groups — you don&#x27;t tell it what they are.
+
+Real examples:
+  → Group customers by purchase frequency + basket size
+  → Group delivery routes by density
+  → Group machine readings to find normal vs abnormal behavior
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# PART 2: K-MEANS CLUSTERING
+# ==============================================================
+print(&quot;\n--- PART 2: K-Means Clustering ---&quot;)
+print(&quot;&quot;&quot;
+How K-Means works (4 steps):
+  1. You CHOOSE k (number of clusters)
+  2. Place k random &quot;centroids&quot; (cluster centers)
+  3. Assign each point to the NEAREST centroid
+  4. Move each centroid to the MEAN of its assigned points
+  5. Repeat steps 3-4 until centroids stop moving
+
+K-Means limitations:
+  - You must choose k in advance
+  - Assumes clusters are roughly spherical and equal-sized
+  - Sensitive to outliers
+  - May converge to local minimum (use n_init &gt; 1)
+&quot;&quot;&quot;)
+
+# Generate clean cluster data to visualize the concept:
+X_blob, y_true = make_blobs(n_samples=300, centers=4, cluster_std=0.8, random_state=42)
+
+# Step 1: ALWAYS scale your features before clustering
+scaler   = StandardScaler()
+X_scaled = scaler.fit_transform(X_blob)
+
+# Step 2: Fit K-Means with k=4
+kmeans = KMeans(n_clusters=4, n_init=10, random_state=42)
+kmeans.fit(X_scaled)
+
+labels     = kmeans.labels_       # Cluster assignment for each point (0, 1, 2, or 3)
+centroids  = kmeans.cluster_centers_
+
+print(f&quot;Cluster assignments (first 20): {labels[:20]}&quot;)
+print(f&quot;Inertia (within-cluster sum of squares): {kmeans.inertia_:.2f}&quot;)
+print(&quot;  → Lower inertia = tighter clusters (but always lower with more k)&quot;)
+print(f&quot;Unique clusters found: {np.unique(labels)}&quot;)
+
+# How many points in each cluster?
+cluster_counts = pd.Series(labels).value_counts().sort_index()
+print(&quot;\nPoints per cluster:&quot;)
+print(cluster_counts)
+
+# Visualize clusters:
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+axes[0].scatter(X_scaled[:, 0], X_scaled[:, 1], c=labels, cmap=&quot;tab10&quot;, alpha=0.7, s=40)
+axes[0].scatter(centroids[:, 0], centroids[:, 1], c=&quot;black&quot;, s=200, marker=&quot;X&quot;, label=&quot;Centroids&quot;)
+axes[0].set_title(&quot;K-Means Result (k=4)&quot;)
+axes[0].legend()
+
+# True labels for comparison:
+axes[1].scatter(X_scaled[:, 0], X_scaled[:, 1], c=y_true, cmap=&quot;tab10&quot;, alpha=0.7, s=40)
+axes[1].set_title(&quot;True Labels (for comparison)&quot;)
+
+plt.suptitle(&quot;K-Means vs True Labels&quot;, fontsize=13)
+plt.tight_layout()
+plt.savefig(&quot;plot_cluster_01_kmeans.png&quot;, dpi=150)
+plt.close()
+print(&quot;\nSaved: plot_cluster_01_kmeans.png&quot;)
+
+
+# ==============================================================
+# PART 3: THE ELBOW METHOD — How to Choose k
+# ==============================================================
+print(&quot;\n--- PART 3: Choosing k — The Elbow Method ---&quot;)
+print(&quot;&quot;&quot;
+Problem: K-Means requires you to choose k BEFORE running.
+Solution: Try multiple values of k and look for the &quot;elbow.&quot;
+
+Inertia = total within-cluster sum of squared distances.
+  - Always decreases as k increases (more clusters = tighter fit)
+  - The &quot;elbow&quot; is where decreasing k stops giving big gains
+  - That elbow point is your best k
+
+Also use: Silhouette Score (Part 4)
+&quot;&quot;&quot;)
+
+inertias          = []
+silhouette_scores = []
+k_range           = range(2, 10)
+
+for k in k_range:
+    km = KMeans(n_clusters=k, n_init=10, random_state=42)
+    km.fit(X_scaled)
+    inertias.append(km.inertia_)
+    silhouette_scores.append(silhouette_score(X_scaled, km.labels_))
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+# Elbow plot:
+axes[0].plot(k_range, inertias, &quot;bo-&quot;, linewidth=2)
+axes[0].axvline(x=4, color=&quot;red&quot;, linestyle=&quot;--&quot;, label=&quot;Elbow at k=4&quot;)
+axes[0].set_xlabel(&quot;Number of Clusters (k)&quot;)
+axes[0].set_ylabel(&quot;Inertia&quot;)
+axes[0].set_title(&quot;Elbow Method — Choose k Where Inertia Bends&quot;)
+axes[0].legend()
+
+# Silhouette score plot:
+axes[1].plot(k_range, silhouette_scores, &quot;go-&quot;, linewidth=2)
+axes[1].axvline(x=4, color=&quot;red&quot;, linestyle=&quot;--&quot;, label=&quot;Best k=4&quot;)
+axes[1].set_xlabel(&quot;Number of Clusters (k)&quot;)
+axes[1].set_ylabel(&quot;Silhouette Score&quot;)
+axes[1].set_title(&quot;Silhouette Score — Higher is Better&quot;)
+axes[1].legend()
+
+plt.tight_layout()
+plt.savefig(&quot;plot_cluster_02_elbow.png&quot;, dpi=150)
+plt.close()
+print(&quot;Saved: plot_cluster_02_elbow.png&quot;)
+
+best_k = k_range[np.argmax(silhouette_scores)]
+print(f&quot;\nBest k by Silhouette Score: {best_k}&quot;)
+print(&quot;Silhouette Score interpretation:&quot;)
+print(&quot;  0.7 – 1.0  = excellent structure&quot;)
+print(&quot;  0.5 – 0.7  = reasonable structure&quot;)
+print(&quot;  0.25 – 0.5 = weak structure&quot;)
+print(&quot;  &lt; 0.25     = no real structure&quot;)
+
+
+# ==============================================================
+# PART 4: SILHOUETTE SCORE — Measure Cluster Quality
+# ==============================================================
+print(&quot;\n--- PART 4: Silhouette Score ---&quot;)
+print(&quot;&quot;&quot;
+Silhouette score for a single point:
+  s(i) = (b - a) / max(a, b)
+
+  a = average distance to other points in the SAME cluster
+  b = average distance to points in the NEAREST OTHER cluster
+
+  s close to +1 = well clustered (far from other clusters)
+  s close to  0 = on the boundary between two clusters
+  s close to -1 = probably in the WRONG cluster
+
+Overall silhouette score = mean of all individual scores.
+&quot;&quot;&quot;)
+
+km_best = KMeans(n_clusters=4, n_init=10, random_state=42)
+km_best.fit(X_scaled)
+
+overall_score = silhouette_score(X_scaled, km_best.labels_)
+print(f&quot;Overall Silhouette Score (k=4): {overall_score:.3f}&quot;)
+
+
+# ==============================================================
+# PART 5: DBSCAN — Density-Based Clustering
+# ==============================================================
+print(&quot;\n--- PART 5: DBSCAN — When Clusters Aren&#x27;t Round ---&quot;)
+print(&quot;&quot;&quot;
+DBSCAN (Density-Based Spatial Clustering of Applications with Noise)
+
+How it works:
+  - A &quot;core point&quot; has at least min_samples points within radius eps
+  - Points within eps of a core point join its cluster
+  - Points NOT reachable from any core point are OUTLIERS (label = -1)
+
+DBSCAN advantages over K-Means:
+  ✅ You don&#x27;t need to choose k in advance
+  ✅ Can find ANY shape of clusters (not just round blobs)
+  ✅ Automatically labels outliers as noise (-1)
+
+DBSCAN disadvantages:
+  ❌ Sensitive to eps and min_samples choices
+  ❌ Struggles with clusters of very different densities
+
+Parameters:
+  eps         = radius of neighborhood (try 0.3 to 1.0, scaled data)
+  min_samples = min points to form a core point (try 5 to 20)
+&quot;&quot;&quot;)
+
+# Generate crescent-shaped data that K-Means fails on:
+X_moon, _ = make_moons(n_samples=300, noise=0.08, random_state=42)
+X_moon_scaled = StandardScaler().fit_transform(X_moon)
+
+# K-Means fails:
+km_moon   = KMeans(n_clusters=2, n_init=10, random_state=42)
+labels_km = km_moon.fit_predict(X_moon_scaled)
+
+# DBSCAN succeeds:
+dbscan      = DBSCAN(eps=0.3, min_samples=5)
+labels_db   = dbscan.fit_predict(X_moon_scaled)
+
+n_clusters  = len(set(labels_db)) - (1 if -1 in labels_db else 0)
+n_noise     = np.sum(labels_db == -1)
+
+print(f&quot;DBSCAN found: {n_clusters} clusters, {n_noise} noise points (label = -1)&quot;)
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+axes[0].scatter(X_moon_scaled[:, 0], X_moon_scaled[:, 1], c=labels_km, cmap=&quot;bwr&quot;, alpha=0.7, s=40)
+axes[0].set_title(&quot;K-Means FAILS on crescent shapes&quot;)
+
+# Color noise points separately:
+colors = np.where(labels_db == -1, &quot;gray&quot;, np.where(labels_db == 0, &quot;steelblue&quot;, &quot;coral&quot;))
+axes[1].scatter(X_moon_scaled[:, 0], X_moon_scaled[:, 1], c=colors, alpha=0.7, s=40)
+axes[1].set_title(f&quot;DBSCAN SUCCEEDS — {n_clusters} clusters, {n_noise} noise&quot;)
+
+plt.suptitle(&quot;K-Means vs DBSCAN on Non-Spherical Data&quot;, fontsize=13)
+plt.tight_layout()
+plt.savefig(&quot;plot_cluster_03_dbscan.png&quot;, dpi=150)
+plt.close()
+print(&quot;Saved: plot_cluster_03_dbscan.png&quot;)
+
+
+# ==============================================================
+# PART 6: REAL BUSINESS EXAMPLE — Customer Segmentation
+# ==============================================================
+print(&quot;\n--- PART 6: Real Example — Customer Segmentation ---&quot;)
+
+np.random.seed(2026)
+n = 200
+
+customers = pd.DataFrame({
+    &quot;customer_id&quot;:      range(1, n + 1),
+    &quot;orders_per_month&quot;: np.concatenate([
+        np.random.normal(1.5, 0.4, 60),   # Low-freq buyers
+        np.random.normal(4.5, 0.6, 80),   # Mid-freq buyers
+        np.random.normal(10, 1.2, 60),    # High-freq buyers
+    ]),
+    &quot;avg_order_value&quot;:  np.concatenate([
+        np.random.normal(25, 8, 60),      # Budget buyers
+        np.random.normal(80, 15, 80),     # Mid-value buyers
+        np.random.normal(200, 30, 60),    # Premium buyers
+    ]),
+})
+customers[&quot;orders_per_month&quot;] = customers[&quot;orders_per_month&quot;].clip(0.5)
+customers[&quot;avg_order_value&quot;]  = customers[&quot;avg_order_value&quot;].clip(10)
+
+# Scale features:
+X_cust = customers[[&quot;orders_per_month&quot;, &quot;avg_order_value&quot;]].values
+X_cust_scaled = StandardScaler().fit_transform(X_cust)
+
+# Run K-Means with k=3:
+km_cust = KMeans(n_clusters=3, n_init=10, random_state=42)
+customers[&quot;segment&quot;] = km_cust.fit_predict(X_cust_scaled)
+
+# Map clusters to meaningful labels based on centroid values:
+centroids_orig = scaler.fit_transform(X_cust)   # Refit to get correct inverse
+centroid_df    = pd.DataFrame(
+    km_cust.cluster_centers_,
+    columns=[&quot;orders_scaled&quot;, &quot;value_scaled&quot;]
+)
+print(&quot;Cluster centroids (scaled):&quot;)
+print(centroid_df.round(2))
+
+# Business-friendly summary:
+segment_summary = customers.groupby(&quot;segment&quot;).agg(
+    customers=(&quot;customer_id&quot;, &quot;count&quot;),
+    avg_orders=(&quot;orders_per_month&quot;, &quot;mean&quot;),
+    avg_value=(&quot;avg_order_value&quot;, &quot;mean&quot;)
+).round(2)
+print(&quot;\nCustomer Segment Summary:&quot;)
+print(segment_summary)
+
+# Visualize:
+plt.figure(figsize=(9, 6))
+colors_seg = {0: &quot;steelblue&quot;, 1: &quot;coral&quot;, 2: &quot;green&quot;}
+for seg in [0, 1, 2]:
+    mask = customers[&quot;segment&quot;] == seg
+    plt.scatter(
+        customers.loc[mask, &quot;orders_per_month&quot;],
+        customers.loc[mask, &quot;avg_order_value&quot;],
+        label=f&quot;Segment {seg}  (n={mask.sum()})&quot;,
+        color=colors_seg[seg],
+        alpha=0.7, s=60
+    )
+plt.xlabel(&quot;Orders per Month&quot;)
+plt.ylabel(&quot;Avg Order Value ($)&quot;)
+plt.title(&quot;Customer Segmentation — K-Means (k=3)&quot;)
+plt.legend()
+plt.tight_layout()
+plt.savefig(&quot;plot_cluster_04_customers.png&quot;, dpi=150)
+plt.close()
+print(&quot;\nSaved: plot_cluster_04_customers.png&quot;)
+
+print(&quot;\nKey insight: segment with highest orders AND value = VIP customers.&quot;)
+print(&quot;Targeted marketing by segment → higher ROI than blasting everyone.&quot;)
+
+
+# ==============================================================
+# QUICK REFERENCE: K-Means vs DBSCAN
+# ==============================================================
+print(&quot;\n&quot; + &quot;=&quot; * 65)
+print(&quot;QUICK REFERENCE: When to Use What&quot;)
+print(&quot;=&quot; * 65)
+print(&quot;&quot;&quot;
+                        K-MEANS         DBSCAN
+──────────────────────────────────────────────────────────
+Need to set k?          YES             NO
+Handles non-round?      NO              YES
+Detects outliers?       NO              YES (labels = -1)
+Speed (large data)?     Fast            Slower
+Sensitive to scale?     YES             YES
+Best for?               Business segs   Geo clustering,
+                        known k         anomaly detection
+
+ALWAYS scale features with StandardScaler BEFORE either!
+&quot;&quot;&quot;)
+
+
+# ==============================================================
+# 🎯 YOUR TASKS
+# ==============================================================
+print(&quot;=&quot; * 65)
+print(&quot;YOUR TURN — Clustering Practice&quot;)
+print(&quot;=&quot; * 65)
+print(&quot;&quot;&quot;
+TASK 1 — ELBOW METHOD:
+    Generate data with make_blobs(centers=5, random_state=7).
+    Run K-Means for k = 2 to 12.
+    Plot inertia (elbow) AND silhouette score.
+    Which k would you choose and why?
+
+TASK 2 — DBSCAN TUNING:
+    Run DBSCAN on the crescent moon data (X_moon_scaled above) with:
+    a) eps=0.5, min_samples=5
+    b) eps=0.2, min_samples=5
+    c) eps=0.3, min_samples=2
+    For each, print: number of clusters, number of noise points.
+    Which configuration works best? What happens if eps is too large?
+
+TASK 3 — REAL DATA (Iris dataset):
+    from sklearn.datasets import load_iris
+    iris = load_iris()
+    X = iris.data        ← 4 features, 150 samples
+    y = iris.target      ← 3 species (DON&#x27;T use this for clustering)
+
+    a) Scale the data with StandardScaler
+    b) Run K-Means with k=3
+    c) Print silhouette score
+    d) Make a scatter plot of the first 2 features, colored by cluster
+    e) Compare your cluster labels to y_true — do they match?
+       HINT: pd.crosstab(y, km.labels_)
+
+TASK 4 — WAREHOUSE SIMULATION:
+    Create a DataFrame of 150 warehouses with:
+      lat:   np.random.uniform(30, 48, 150)   (latitude — US range)
+      lon:   np.random.uniform(-120, -70, 150) (longitude)
+      daily_volume: np.random.randint(100, 5000, 150)
+
+    a) Cluster warehouses into 5 regional groups using K-Means
+       (scale lat, lon, and daily_volume first!)
+    b) Print mean daily_volume per cluster
+    c) Plot clusters on a scatter using lat/lon as x/y, colored by cluster
+    d) BONUS: Try DBSCAN to identify dense hub areas
+
+Write your solutions below:
+&quot;&quot;&quot;)
+
+# YOUR SOLUTIONS HERE:
+
+
+print(&quot;\nClustering complete! Saved 4 plots to current folder.&quot;)
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>

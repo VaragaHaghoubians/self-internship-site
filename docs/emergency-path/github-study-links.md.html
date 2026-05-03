@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Github Study Links - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../index.html">Back to website</a>
+      <a href="../../index.html#python-lab">Python lab</a>
+      <a href="../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Github Study Links</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">emergency-path/github-study-links.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="github-study-links">GitHub Study Links</h2>
+<p>Curated repositories to download, study, and rebuild yourself.</p>
+<h3 id="projects-to-read-and-rebuild">Projects To Read And Rebuild</h3>
+<h4 id="1-easiest-python-script-repos">1. Easiest Python Script Repos</h4>
+<ul>
+<li>GeekComputers Python Scripts</li>
+</ul>
+<p>https://github.com/geekcomputers/Python</p>
+<ul>
+<li>Python Mini Projects</li>
+</ul>
+<p>https://github.com/Python-World/python-mini-projects</p>
+<ul>
+<li>100 Python Projects</li>
+</ul>
+<p>https://github.com/natnew/100-Python-Projects</p>
+<h4 id="2-beginner-data-and-ml-repos">2. Beginner Data And ML Repos</h4>
+<ul>
+<li>Data Science For Beginners</li>
+</ul>
+<p>https://github.com/microsoft/Data-Science-For-Beginners</p>
+<ul>
+<li>ML For Beginners</li>
+</ul>
+<p>https://github.com/microsoft/ML-For-Beginners</p>
+<ul>
+<li>Machine Learning With Python</li>
+</ul>
+<p>https://github.com/dr-mushtaq/Machine-Learning</p>
+<h4 id="3-sql-and-database-study-projects">3. SQL And Database Study Projects</h4>
+<ul>
+<li>SQL Mysteries</li>
+</ul>
+<p>https://github.com/NUKnightLab/sql-mysteries</p>
+<h4 id="4-deep-learning-repos">4. Deep Learning Repos</h4>
+<ul>
+<li>Official PyTorch Tutorials</li>
+</ul>
+<p>https://github.com/pytorch/tutorials</p>
+<ul>
+<li>Yunjey PyTorch Tutorial</li>
+</ul>
+<p>https://github.com/yunjey/pytorch-tutorial</p>
+<ul>
+<li>Nico Nielsen PyTorch Tutorials</li>
+</ul>
+<p>https://github.com/niconielsen32/pytorch-tutorials</p>
+<h4 id="5-java-rebuild-repos">5. Java Rebuild Repos</h4>
+<ul>
+<li>Java Beginner Projects</li>
+</ul>
+<p>https://github.com/Janani-Balasooriya/Java-Beginner-Projects</p>
+<h3 id="beginner-exercise-repositories">Beginner Exercise Repositories</h3>
+<h4 id="python">Python</h4>
+<ul>
+<li>Beginner Projects List</li>
+</ul>
+<p>https://github.com/LearnToCodeSec/beginner-projects</p>
+<ul>
+<li>Interactive Coding Challenges</li>
+</ul>
+<p>https://github.com/donnemartin/interactive-coding-challenges</p>
+<h4 id="sql">SQL</h4>
+<ul>
+<li>Learn SQL</li>
+</ul>
+<p>https://github.com/WebDevSimplified/Learn-SQL</p>
+<ul>
+<li>SQL 101</li>
+</ul>
+<p>https://github.com/s-shemmee/SQL-101</p>
+<ul>
+<li>SQL Mysteries</li>
+</ul>
+<p>https://github.com/NUKnightLab/sql-mysteries</p>
+<h4 id="git">Git</h4>
+<ul>
+<li>Git Katas</li>
+</ul>
+<p>https://github.com/eficode-academy/git-katas</p>
+<ul>
+<li>Simple Git Practice</li>
+</ul>
+<p>https://github.com/PIC16B/git-practice</p>
+<h4 id="linux-and-shell">Linux And Shell</h4>
+<ul>
+<li>Unix 101</li>
+</ul>
+<p>https://github.com/uwcsc/Unix-101</p>
+<ul>
+<li>Shell Scripting Tutorial</li>
+</ul>
+<p>https://github.com/techarkit/shell-scripting-tutorial</p>
+<ul>
+<li>Easy Linux Commands</li>
+</ul>
+<p>https://github.com/rks101/eglinux</p>
+<h4 id="java">Java</h4>
+<ul>
+<li>Java Course For Beginners</li>
+</ul>
+<p>https://github.com/in28minutes/java-a-course-for-beginners</p>
+<ul>
+<li>Java Programming Tutorial Exercises</li>
+</ul>
+<p>https://github.com/giakinh0823/java-programming-tutorial</p>
+<ul>
+<li>Java Beginner Projects</li>
+</ul>
+<p>https://github.com/Janani-Balasooriya/Java-Beginner-Projects</p>
+<h3 id="recommended-order">Recommended Order</h3>
+<ol>
+<li>GeekComputers Python Scripts</li>
+<li>Python Mini Projects</li>
+<li>Git Katas</li>
+<li>Learn SQL</li>
+<li>SQL Mysteries</li>
+<li>Data Science For Beginners</li>
+<li>ML For Beginners</li>
+<li>Official PyTorch Tutorials</li>
+<li>Java Course For Beginners</li>
+<li>Java Beginner Projects</li>
+</ol>
+<h3 id="how-to-use-these-repos">How To Use These Repos</h3>
+<ol>
+<li>Clone one repo only.</li>
+<li>Read the README first.</li>
+<li>Run the code.</li>
+<li>Rebuild the same thing in your own folder without copying.</li>
+<li>Compare your code to the original.</li>
+<li>Write mistakes in <code>progress/mistakes.md</code>.</li>
+</ol></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#github-study-links">GitHub Study Links</a><a style="margin-left:12px" href="#projects-to-read-and-rebuild">Projects To Read And Rebuild</a><a style="margin-left:24px" href="#1-easiest-python-script-repos">1. Easiest Python Script Repos</a><a style="margin-left:24px" href="#2-beginner-data-and-ml-repos">2. Beginner Data And ML Repos</a><a style="margin-left:24px" href="#3-sql-and-database-study-projects">3. SQL And Database Study Projects</a><a style="margin-left:24px" href="#4-deep-learning-repos">4. Deep Learning Repos</a><a style="margin-left:24px" href="#5-java-rebuild-repos">5. Java Rebuild Repos</a><a style="margin-left:12px" href="#beginner-exercise-repositories">Beginner Exercise Repositories</a><a style="margin-left:24px" href="#python">Python</a><a style="margin-left:24px" href="#sql">SQL</a><a style="margin-left:24px" href="#git">Git</a><a style="margin-left:24px" href="#linux-and-shell">Linux And Shell</a><a style="margin-left:24px" href="#java">Java</a><a style="margin-left:12px" href="#recommended-order">Recommended Order</a><a style="margin-left:12px" href="#how-to-use-these-repos">How To Use These Repos</a></aside>
+    </main>
+  </body>
+</html>

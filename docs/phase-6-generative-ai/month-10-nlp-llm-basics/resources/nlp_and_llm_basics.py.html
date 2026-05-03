@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nlp And Llm Basics.Py - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../../../../index.html">Back to website</a>
+      <a href="../../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Nlp And Llm Basics.Py</h1>
+      <p>Clean code reading view for studying, copying, and comparing your own implementation.</p>
+      <div class="path">phase-6-generative-ai/month-10-nlp-llm-basics/resources/nlp_and_llm_basics.py</div>
+    </header>
+    
+    <section class="run-panel" aria-label="Run this Python file">
+      <div class="run-actions">
+        <button class="run-button" id="runReaderCode" type="button">Run Python</button>
+        <button class="run-button" id="clearReaderOutput" type="button">Clear saved output</button>
+        <p class="run-note" id="runStatus">Runs the exact Python code shown below. Output is saved in this browser.</p>
+      </div>
+      <pre class="run-output" id="runOutput"></pre>
+    </section>
+    <script>
+      const readerCode = "# ==============================================================================\n# PHASE 6 \u2014 MONTH 10: NLP Foundations & LLM Basics\n# FILE: nlp_and_llm_basics.py\n#\n# GOAL: Understand how computers read text \u2014 from basic counting tricks\n#       all the way to calling a real large language model (LLM) API.\n#\n# WHY:  Everything in modern AI \u2014 chatbots, document search, AI agents,\n#       RAG systems \u2014 starts here. You need to understand what a token is,\n#       what an embedding is, and what \"context window\" means before you\n#       can build anything serious with LLMs.\n#\n# PRE-REQUISITES: You have completed Phases 1\u20135. You can:\n#   - Build and deploy a FastAPI endpoint\n#   - Work with Python classes and virtual environments\n#   - Understand train/test splits and model evaluation\n#\n# WHAT YOU WILL LEARN IN THIS FILE:\n#   Part 1  \u2014 Classical NLP: cleaning text, tokenization, TF-IDF\n#   Part 2  \u2014 Text classification with sklearn\n#   Part 3  \u2014 Word embeddings (Word2Vec concept)\n#   Part 4  \u2014 The Transformer architecture (intuition, no math)\n#   Part 5  \u2014 Hugging Face: using a pre-trained model in 5 lines\n#   Part 6  \u2014 Prompt engineering: zero-shot, few-shot, chain-of-thought\n#   Part 7  \u2014 Calling the OpenAI API\n#   Part 8  \u2014 Wrapping an LLM in your own FastAPI endpoint\n#\n# INSTALL (inside your virtual environment):\n#   pip install scikit-learn nltk transformers datasets openai fastapi uvicorn\n#\n# API KEY:\n#   You need an OpenAI API key for Part 7.\n#   Sign up at https://platform.openai.com/ and store the key in a .env file.\n#   NEVER hardcode your API key into source code.\n#\n# HOW TO RUN:\n#   python nlp_and_llm_basics.py\n# ==============================================================================\n\n\n# ==============================================================================\n# PART 1 \u2014 CLASSICAL NLP: TEXT CLEANING & TOKENIZATION\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Before any model touches your text, it needs to be cleaned.\n# Raw text from the internet is messy \u2014 full of HTML, punctuation,\n# uppercase letters, and filler words like \"the\", \"a\", \"is\".\n# These are called STOP WORDS and they add noise without meaning.\n#\n# Tokenization = splitting text into individual units (words or sub-words).\n\nimport re\nimport string\nimport nltk\nfrom nltk.tokenize import word_tokenize\nfrom nltk.corpus import stopwords\nfrom nltk.stem import PorterStemmer, WordNetLemmatizer\n\n# Download required NLTK data (only needed the first time):\nnltk.download('punkt', quiet=True)\nnltk.download('stopwords', quiet=True)\nnltk.download('wordnet', quiet=True)\nnltk.download('punkt_tab', quiet=True)\n\nsample_text = \"\"\"\nNatural Language Processing (NLP) is a subfield of Artificial Intelligence\nthat deals with the interaction between computers and human language.\nIt's used in chatbots, search engines, and translation tools!\n\"\"\"\n\nprint(\"=\" * 60)\nprint(\"PART 1: TEXT CLEANING\")\nprint(\"=\" * 60)\n\n# Step 1: Lowercase\ntext = sample_text.lower()\nprint(\"After lowercase:\", text[:80])\n\n# Step 2: Remove punctuation and special characters\ntext = re.sub(r\"[^a-z\\s]\", \"\", text)\nprint(\"After removing punctuation:\", text[:80])\n\n# Step 3: Tokenize (split into individual words)\ntokens = word_tokenize(text)\nprint(\"\\nTokens:\", tokens[:15])\n\n# Step 4: Remove stop words (filler words like \"is\", \"the\", \"and\")\nstop_words = set(stopwords.words('english'))\nfiltered_tokens = [w for w in tokens if w not in stop_words]\nprint(\"After removing stop words:\", filtered_tokens[:15])\n\n# Step 5: Stemming vs Lemmatization\n# Stemming: chops word endings aggressively (running \u2192 run, better \u2192 better)\n# Lemmatization: uses vocabulary to find base form (running \u2192 run, better \u2192 good)\nstemmer = PorterStemmer()\nlemmatizer = WordNetLemmatizer()\n\nwords_to_test = [\"running\", \"flies\", \"better\", \"studying\", \"computers\"]\nprint(\"\\nWord          | Stemmed      | Lemmatized\")\nprint(\"-\" * 45)\nfor word in words_to_test:\n    print(f\"{word:<14} | {stemmer.stem(word):<12} | {lemmatizer.lemmatize(word)}\")\n\n# YOUR TURN:\n# 1. Take a news headline and apply the full cleaning pipeline above\n# 2. What happens when you lemmatize \"better\"? Why is it different from stemming?\n\n\n# ==============================================================================\n# PART 2 \u2014 TF-IDF: TURNING TEXT INTO NUMBERS\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Machine learning models cannot read words \u2014 they need numbers.\n# TF-IDF (Term Frequency\u2013Inverse Document Frequency) converts text into\n# a numerical matrix where each number represents how \"important\" a word is.\n#\n# TF  = how often a word appears in THIS document\n# IDF = how rare the word is ACROSS ALL documents (rare = more important)\n# TF-IDF = TF \u00d7 IDF\n#\n# A word like \"the\" appears everywhere \u2192 low IDF \u2192 low score (not important)\n# A word like \"neural\" appears rarely  \u2192 high IDF \u2192 high score (very important)\n\nfrom sklearn.feature_extraction.text import TfidfVectorizer\nfrom sklearn.naive_bayes import MultinomialNB\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.metrics import classification_report\n\nprint(\"\\n\" + \"=\" * 60)\nprint(\"PART 2: TEXT CLASSIFICATION WITH TF-IDF\")\nprint(\"=\" * 60)\n\n# Sample dataset: emails labeled as spam or not spam\nemails = [\n    (\"Win a FREE iPhone! Click here now!\", \"spam\"),\n    (\"Congratulations! You've been selected for a prize!\", \"spam\"),\n    (\"Buy cheap meds online \u2014 no prescription needed\", \"spam\"),\n    (\"URGENT: Your account has been compromised, verify now\", \"spam\"),\n    (\"Make money fast from home \u2014 guaranteed results!\", \"spam\"),\n    (\"Hey, are you free for lunch tomorrow?\", \"ham\"),\n    (\"The meeting is rescheduled to 3pm on Friday\", \"ham\"),\n    (\"Could you review the attached report before Tuesday?\", \"ham\"),\n    (\"Thanks for your help with the project last week\", \"ham\"),\n    (\"Just checking in \u2014 how is everything going?\", \"ham\"),\n    (\"Reminder: your dentist appointment is next Monday\", \"ham\"),\n    (\"Here is the invoice for your recent order\", \"ham\"),\n]\n\ntexts, labels = zip(*emails)\n\n# Convert text to TF-IDF matrix\nvectorizer = TfidfVectorizer(stop_words='english', max_features=100)\nX = vectorizer.fit_transform(texts)\nprint(f\"\\nTF-IDF matrix shape: {X.shape}\")  # (12 emails, up to 100 features)\nprint(f\"Most important words: {vectorizer.get_feature_names_out()[:10]}\")\n\n# Split and train a simple classifier\nX_train, X_test, y_train, y_test = train_test_split(\n    X, labels, test_size=0.3, random_state=42\n)\n\nmodel = LogisticRegression()\nmodel.fit(X_train, y_train)\npredictions = model.predict(X_test)\nprint(\"\\nClassification Report:\")\nprint(classification_report(y_test, predictions, zero_division=0))\n\n# Predict on a new email:\nnew_email = [\"Claim your FREE vacation package today!\"]\nnew_vec = vectorizer.transform(new_email)\nprint(f\"New email prediction: {model.predict(new_vec)[0]}\")\n\n# YOUR TURN:\n# 1. Add more emails to the dataset and retrain\n# 2. Try MultinomialNB instead of LogisticRegression \u2014 is it better or worse?\n# 3. What happens if you remove stop_words='english' from TfidfVectorizer?\n\n\n# ==============================================================================\n# PART 3 \u2014 WORD EMBEDDINGS: WORDS AS VECTORS IN SPACE\n# ==============================================================================\n#\n# TEACHER SAYS:\n# TF-IDF treats every word independently. It doesn't know that\n# \"king\" and \"queen\" are related, or that \"Paris\" and \"France\" go together.\n#\n# WORD EMBEDDINGS solve this. Each word becomes a vector (list of numbers)\n# where SIMILAR words are CLOSE to each other in that space.\n# Famous example: king - man + woman \u2248 queen\n#\n# Modern LLMs use a more powerful version called \"contextual embeddings\" \u2014\n# the same word gets DIFFERENT vectors depending on the sentence context.\n# \"bank\" in \"river bank\" vs \"bank account\" \u2192 different vectors.\n#\n# We'll use a pre-trained model from Hugging Face to get real embeddings.\n\nprint(\"\\n\" + \"=\" * 60)\nprint(\"PART 3: WORD EMBEDDINGS (using sentence-transformers)\")\nprint(\"=\" * 60)\nprint(\"\"\"\nCONCEPT (no code needed for intuition):\n\nStatic embeddings (Word2Vec, GloVe):\n  king  \u2192 [0.52, -0.31, 0.85, 0.14, ...]  (300 numbers)\n  queen \u2192 [0.49, -0.28, 0.83, 0.22, ...]  (very similar to king!)\n  apple \u2192 [0.03,  0.72, 0.11, -0.61, ...] (very different from king)\n\n  king - man + woman \u2248 queen  (vector arithmetic!)\n\nContextual embeddings (BERT, GPT):\n  \"I went to the BANK to get money\"\n  \"I sat by the BANK of the river\"\n  \n  Same word \"bank\" \u2192 DIFFERENT embedding vectors in each sentence.\n  This is why LLMs understand context and TF-IDF does not.\n\nTo generate real embeddings:\n  pip install sentence-transformers\n  \n  from sentence_transformers import SentenceTransformer\n  model = SentenceTransformer('all-MiniLM-L6-v2')\n  embeddings = model.encode([\"Hello world\", \"Goodbye world\"])\n  # embeddings[0] and embeddings[1] are similar because both are greetings\n\"\"\")\n\n\n# ==============================================================================\n# PART 4 \u2014 THE TRANSFORMER ARCHITECTURE (INTUITION)\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Every modern LLM (GPT-4, Claude, Llama, Gemini) is built on the\n# TRANSFORMER architecture. You don't need to implement it, but you must\n# understand what it does to work with these models effectively.\n#\n# KEY CONCEPTS:\n#\n# TOKENS: LLMs don't read words \u2014 they read \"tokens\" (word pieces).\n#   \"unbelievable\" \u2192 [\"un\", \"believ\", \"able\"]  (3 tokens)\n#   \"hello\"        \u2192 [\"hello\"]                  (1 token)\n#   1 token \u2248 0.75 words on average\n#\n# CONTEXT WINDOW: The maximum number of tokens an LLM can \"see\" at once.\n#   GPT-3.5 \u2192 4,096 tokens (~3,000 words)\n#   GPT-4   \u2192 128,000 tokens (~96,000 words)\n#   Claude  \u2192 200,000 tokens (~150,000 words)\n#   If your prompt + document exceed this \u2192 the model forgets earlier content.\n#\n# ATTENTION: The core mechanism. For every word, the model \"pays attention\"\n#   to all other words in the context to understand meaning.\n#   \"The animal didn't cross the street because IT was too tired.\"\n#   \u2192 Attention figures out that \"it\" refers to \"animal\", not \"street\".\n#\n# TEMPERATURE: Controls creativity vs. consistency of outputs.\n#   temperature=0.0 \u2192 always the most likely/deterministic answer (good for code)\n#   temperature=1.0 \u2192 creative, varied responses (good for writing)\n#   temperature=2.0 \u2192 chaotic, often nonsensical\n\nprint(\"\\n\" + \"=\" * 60)\nprint(\"PART 4: KEY LLM CONCEPTS\")\nprint(\"=\" * 60)\nprint(\"\"\"\nQuick reference:\n  Token         = smallest unit of text the model processes\n  Embedding     = a token represented as a vector (list of numbers)\n  Context window = max tokens the model can process at once\n  Temperature   = randomness of output (0 = deterministic, 2 = chaotic)\n  Top-p         = nucleus sampling (only consider top % of likely tokens)\n  Max tokens    = limit on how long the response can be\n\nCost awareness:\n  You are billed per TOKEN (input + output).\n  GPT-4 is ~100x more expensive per token than GPT-3.5-turbo.\n  Always track your token usage in production with tiktoken or the API response.\n\"\"\")\n\n\n# ==============================================================================\n# PART 5 \u2014 HUGGING FACE: PRE-TRAINED MODELS IN 5 LINES\n# ==============================================================================\n#\n# TEACHER SAYS:\n# Hugging Face is the GitHub of AI models \u2014 over 500,000 free models\n# for text classification, translation, summarization, Q&A, and more.\n# The \"pipeline\" abstraction loads a model and makes it usable in seconds.\n\nprint(\"\\n\" + \"=\" * 60)\nprint(\"PART 5: HUGGING FACE PIPELINE\")\nprint(\"=\" * 60)\n\ntry:\n    from transformers import pipeline\n\n    # Sentiment analysis \u2014 5 lines of code:\n    print(\"\\nLoading sentiment analysis model (first run downloads ~270MB)...\")\n    sentiment = pipeline(\"sentiment-analysis\",\n                         model=\"distilbert-base-uncased-finetuned-sst-2-english\")\n\n    texts_to_analyze = [\n        \"I absolutely love this product! Best purchase ever.\",\n        \"This was a complete waste of money. Terrible quality.\",\n        \"It's okay. Nothing special but does what it says.\",\n    ]\n\n    results = sentiment(texts_to_analyze)\n    for text, result in zip(texts_to_analyze, results):\n        print(f\"  [{result['label']:8}] ({result['score']:.2%}) \u2192 {text[:50]}...\")\n\n    # Text summarization:\n    print(\"\\nLoading summarization model...\")\n    summarizer = pipeline(\"summarization\", model=\"facebook/bart-large-cnn\")\n    long_text = \"\"\"\n    Machine learning is a method of data analysis that automates analytical model building.\n    It is based on the idea that systems can learn from data, identify patterns and make decisions\n    with minimal human intervention. Machine learning algorithms are trained on large datasets,\n    and they use statistical techniques to make predictions or decisions without being explicitly\n    programmed to perform those specific tasks.\n    \"\"\"\n    summary = summarizer(long_text, max_length=50, min_length=20, do_sample=False)\n    print(f\"Summary: {summary[0]['summary_text']}\")\n\nexcept ImportError:\n    print(\"Run: pip install transformers torch\")\nexcept Exception as e:\n    print(f\"Model download error (check internet): {e}\")\n\n# YOUR TURN:\n# 1. Try pipeline(\"text-classification\") on your own texts\n# 2. Try pipeline(\"translation_en_to_fr\") to translate English to French\n# 3. Try pipeline(\"question-answering\") with a context and a question\n\n\n# ==============================================================================\n# PART 6 \u2014 PROMPT ENGINEERING\n# ==============================================================================\n#\n# TEACHER SAYS:\n# The quality of your LLM output is almost entirely determined by how\n# well you write your prompt. This is called \"prompt engineering.\"\n# It's not magic \u2014 it follows predictable patterns.\n\nprint(\"\\n\" + \"=\" * 60)\nprint(\"PART 6: PROMPT ENGINEERING PATTERNS\")\nprint(\"=\" * 60)\nprint(\"\"\"\n1. ZERO-SHOT: Ask directly with no examples.\n   \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n   Prompt: \"Classify the sentiment of this review as POSITIVE, NEGATIVE,\n            or NEUTRAL: 'The battery life is great but the screen is dim.'\"\n   Output: \"NEUTRAL\"\n\n2. FEW-SHOT: Give 2-3 examples before your real question.\n   \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n   Prompt: \"Classify sentiment.\n            Review: 'Amazing product!' \u2192 POSITIVE\n            Review: 'Complete junk.'   \u2192 NEGATIVE\n            Review: 'It is average.'   \u2192 NEUTRAL\n            Review: 'Works sometimes.' \u2192 \"\n   Output: \"NEUTRAL\"\n   \n   Why it works: Examples show the model the EXACT format you expect.\n\n3. CHAIN-OF-THOUGHT (CoT): Tell the model to reason step by step.\n   \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n   Bad prompt:  \"What is 17 \u00d7 24?\"\n   Good prompt: \"What is 17 \u00d7 24? Think step by step.\"\n   \n   Output: \"17 \u00d7 24: First, 17 \u00d7 20 = 340.\n            Then, 17 \u00d7 4 = 68.\n            Finally, 340 + 68 = 408.\"\n   \n   Why it works: Forces the model to show its work, which reduces errors.\n\n4. SYSTEM + USER roles (for chat models):\n   \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n   System: \"You are a senior Python engineer. Respond only with code.\n            No explanations unless asked.\"\n   User:   \"Write a function to flatten a nested list.\"\n   \n   The SYSTEM message controls the model's persona and rules for the\n   entire conversation. Always use it in production.\n\n5. STRUCTURED OUTPUT: Ask for JSON/XML.\n   \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n   Prompt: \"Extract the name, age, and city from this text.\n            Return ONLY valid JSON with keys: name, age, city.\n            Text: 'John Smith is a 34-year-old engineer from Berlin.'\"\n   Output: {\"name\": \"John Smith\", \"age\": 34, \"city\": \"Berlin\"}\n\"\"\")\n\n\n# ==============================================================================\n# PART 7 \u2014 CALLING THE OPENAI API\n# ==============================================================================\n#\n# TEACHER SAYS:\n# The OpenAI API is how you talk to GPT-4 from your Python code.\n# Store your API key in a .env file \u2014 NEVER hardcode it in your script.\n#\n# Setup:\n#   pip install openai python-dotenv\n#   Create .env file: OPENAI_API_KEY=sk-...your-key-here...\n\nimport os\n\nprint(\"\\n\" + \"=\" * 60)\nprint(\"PART 7: OPENAI API\")\nprint(\"=\" * 60)\n\ntry:\n    from openai import OpenAI\n    from dotenv import load_dotenv\n\n    load_dotenv()  # Loads OPENAI_API_KEY from .env file\n    api_key = os.getenv(\"OPENAI_API_KEY\")\n\n    if not api_key:\n        print(\"No API key found. Create a .env file with: OPENAI_API_KEY=sk-...\")\n    else:\n        client = OpenAI(api_key=api_key)\n\n        # Basic chat completion:\n        response = client.chat.completions.create(\n            model=\"gpt-4o-mini\",       # Cheapest capable model \u2014 use for dev/testing\n            temperature=0.2,            # Low temp = consistent, factual answers\n            max_tokens=200,\n            messages=[\n                {\n                    \"role\": \"system\",\n                    \"content\": \"You are a helpful data science tutor. Be concise.\"\n                },\n                {\n                    \"role\": \"user\",\n                    \"content\": \"Explain what a transformer model is in 3 sentences.\"\n                }\n            ]\n        )\n\n        print(f\"\\nModel: {response.model}\")\n        print(f\"Tokens used: {response.usage.total_tokens} \"\n              f\"(prompt={response.usage.prompt_tokens}, \"\n              f\"completion={response.usage.completion_tokens})\")\n        print(f\"\\nResponse:\\n{response.choices[0].message.content}\")\n\n        # STRUCTURED OUTPUT \u2014 ask for JSON:\n        structured_response = client.chat.completions.create(\n            model=\"gpt-4o-mini\",\n            temperature=0,\n            messages=[\n                {\"role\": \"system\", \"content\": \"You are a data extractor. Return only valid JSON.\"},\n                {\"role\": \"user\",   \"content\": (\n                    \"Extract name, role, and company from: \"\n                    \"'Sarah Chen is a Machine Learning Engineer at DeepMind.' \"\n                    \"Return JSON with keys: name, role, company.\"\n                )}\n            ]\n        )\n        import json\n        raw = structured_response.choices[0].message.content\n        parsed = json.loads(raw)\n        print(f\"\\nStructured extraction: {parsed}\")\n\nexcept ImportError:\n    print(\"Run: pip install openai python-dotenv\")\nexcept Exception as e:\n    print(f\"API error: {e}\")\n\n# YOUR TURN:\n# 1. Build a simple Q&A chatbot that maintains a conversation history\n#    HINT: Keep a list of messages and append each turn to it before calling the API\n# 2. Use structured output to extract entities from a news headline\n# 3. Experiment with temperature=0 vs temperature=1 \u2014 what changes?\n\n\n# ==============================================================================\n# PART 8 \u2014 WRAPPING YOUR LLM IN A FASTAPI ENDPOINT\n# ==============================================================================\n#\n# TEACHER SAYS:\n# An LLM sitting in a Python script is not useful to the world.\n# Wrapping it in FastAPI makes it a service any app can call.\n# This is the exact pattern used by OpenAI, Anthropic, and every AI startup.\n#\n# Save this as a SEPARATE file: llm_api.py\n# Run with: uvicorn llm_api:app --reload\n\nLLM_API_CODE = '''\n# llm_api.py \u2014 Your personal LLM API endpoint\nfrom fastapi import FastAPI, HTTPException\nfrom pydantic import BaseModel\nfrom openai import OpenAI\nfrom dotenv import load_dotenv\nimport os\n\nload_dotenv()\napp = FastAPI(title=\"My LLM API\")\nclient = OpenAI(api_key=os.getenv(\"OPENAI_API_KEY\"))\n\nclass QuestionRequest(BaseModel):\n    question: str\n    system_prompt: str = \"You are a helpful assistant. Be concise.\"\n    temperature: float = 0.3\n    max_tokens: int = 300\n\nclass AnswerResponse(BaseModel):\n    answer: str\n    tokens_used: int\n    model: str\n\n@app.post(\"/ask\", response_model=AnswerResponse)\nasync def ask_llm(request: QuestionRequest):\n    if not request.question.strip():\n        raise HTTPException(status_code=400, detail=\"Question cannot be empty\")\n\n    response = client.chat.completions.create(\n        model=\"gpt-4o-mini\",\n        temperature=request.temperature,\n        max_tokens=request.max_tokens,\n        messages=[\n            {\"role\": \"system\", \"content\": request.system_prompt},\n            {\"role\": \"user\",   \"content\": request.question},\n        ]\n    )\n    return AnswerResponse(\n        answer=response.choices[0].message.content,\n        tokens_used=response.usage.total_tokens,\n        model=response.model\n    )\n\n@app.get(\"/health\")\ndef health_check():\n    return {\"status\": \"ok\"}\n'''\n\nprint(\"\\n\" + \"=\" * 60)\nprint(\"PART 8: FASTAPI LLM ENDPOINT\")\nprint(\"=\" * 60)\nprint(\"Save this as 'llm_api.py' and run: uvicorn llm_api:app --reload\")\nprint(LLM_API_CODE)\n\nprint(\"\\nTest it with curl:\")\nprint(\"\"\"  curl -X POST http://localhost:8000/ask \\\\\n    -H \"Content-Type: application/json\" \\\\\n    -d '{\"question\": \"What is a neural network?\"}'\n\"\"\")\n\n# YOUR TURN (MONTH 10 DELIVERABLE):\n# Build a FastAPI app that:\n# 1. Accepts a block of text via POST\n# 2. Classifies its sentiment using the Hugging Face pipeline from Part 5\n# 3. Also summarizes it using the LLM API from Part 7\n# 4. Returns both results as JSON\n# 5. Containerize it with Docker (you already know how from Month 3!)\n\nprint(\"\\n\" + \"=\" * 60)\nprint(\"MONTH 10 COMPLETE \u2014 What you now know:\")\nprint(\"=\" * 60)\nprint(\"\"\"\n  \u2713 Clean and tokenize raw text\n  \u2713 Convert text to numbers with TF-IDF\n  \u2713 Build a text classifier with sklearn\n  \u2713 Understand tokens, embeddings, and context windows\n  \u2713 Use Hugging Face pre-trained models\n  \u2713 Write effective prompts (zero-shot, few-shot, CoT)\n  \u2713 Call the OpenAI API from Python\n  \u2713 Wrap an LLM in a FastAPI endpoint\n\n  NEXT \u2192 Month 11: RAG \u2014 make your LLM answer questions\n         about YOUR documents (not just its training data)\n\"\"\")\n";
+      const readerOutputKey = "readerRun:phase-6-generative-ai/month-10-nlp-llm-basics/resources/nlp_and_llm_basics.py";
+      const output = document.getElementById("runOutput");
+      const status = document.getElementById("runStatus");
+      const saved = localStorage.getItem(readerOutputKey);
+      if (saved) {
+        output.textContent = saved;
+        output.classList.add("is-visible");
+        status.textContent = "Saved output restored. You do not need to run again unless you change the file.";
+      }
+
+      let pyodideReady = null;
+      async function ensurePyodide() {
+        if (window.pyodide) return window.pyodide;
+        if (!pyodideReady) {
+          status.textContent = "Loading Python runner from CDN...";
+          pyodideReady = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+            script.onload = async () => {
+              try {
+                window.pyodide = await loadPyodide();
+                resolve(window.pyodide);
+              } catch (error) {
+                reject(error);
+              }
+            };
+            script.onerror = () => reject(new Error("Could not load Pyodide. Check internet access."));
+            document.head.appendChild(script);
+          });
+        }
+        return pyodideReady;
+      }
+
+      function indentPython(source) {
+        return source.split("\n").map((line) => "    " + line).join("\n");
+      }
+
+      document.getElementById("runReaderCode").addEventListener("click", async () => {
+        output.classList.add("is-visible");
+        output.textContent = "Running...";
+        try {
+          const pyodide = await ensurePyodide();
+          const wrapped = `
+import sys, io, traceback
+_stdout = io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _stdout
+try:
+${indentPython(readerCode)}
+except Exception:
+    traceback.print_exc(file=_stdout)
+finally:
+    sys.stdout = _old_stdout
+_reader_output = _stdout.getvalue()
+`;
+          pyodide.runPython(wrapped);
+          const result = pyodide.globals.get("_reader_output") || "Code ran with no printed output.";
+          output.textContent = result;
+          localStorage.setItem(readerOutputKey, result);
+          status.textContent = "Output saved. It will appear again after refresh.";
+        } catch (error) {
+          const message = String(error.message || error);
+          output.textContent = message + "\n\nSome project files need packages such as pandas, scikit-learn, Django, FastAPI, or hardware access. Those may need to be run locally in your Python environment.";
+          localStorage.setItem(readerOutputKey, output.textContent);
+          status.textContent = "Runner could not complete this file.";
+        }
+      });
+
+      document.getElementById("clearReaderOutput").addEventListener("click", () => {
+        localStorage.removeItem(readerOutputKey);
+        output.textContent = "";
+        output.classList.remove("is-visible");
+        status.textContent = "Saved output cleared.";
+      });
+    </script>
+    
+    <main class="layout">
+      <article class="content"><pre><code># ==============================================================================
+# PHASE 6 — MONTH 10: NLP Foundations &amp; LLM Basics
+# FILE: nlp_and_llm_basics.py
+#
+# GOAL: Understand how computers read text — from basic counting tricks
+#       all the way to calling a real large language model (LLM) API.
+#
+# WHY:  Everything in modern AI — chatbots, document search, AI agents,
+#       RAG systems — starts here. You need to understand what a token is,
+#       what an embedding is, and what &quot;context window&quot; means before you
+#       can build anything serious with LLMs.
+#
+# PRE-REQUISITES: You have completed Phases 1–5. You can:
+#   - Build and deploy a FastAPI endpoint
+#   - Work with Python classes and virtual environments
+#   - Understand train/test splits and model evaluation
+#
+# WHAT YOU WILL LEARN IN THIS FILE:
+#   Part 1  — Classical NLP: cleaning text, tokenization, TF-IDF
+#   Part 2  — Text classification with sklearn
+#   Part 3  — Word embeddings (Word2Vec concept)
+#   Part 4  — The Transformer architecture (intuition, no math)
+#   Part 5  — Hugging Face: using a pre-trained model in 5 lines
+#   Part 6  — Prompt engineering: zero-shot, few-shot, chain-of-thought
+#   Part 7  — Calling the OpenAI API
+#   Part 8  — Wrapping an LLM in your own FastAPI endpoint
+#
+# INSTALL (inside your virtual environment):
+#   pip install scikit-learn nltk transformers datasets openai fastapi uvicorn
+#
+# API KEY:
+#   You need an OpenAI API key for Part 7.
+#   Sign up at https://platform.openai.com/ and store the key in a .env file.
+#   NEVER hardcode your API key into source code.
+#
+# HOW TO RUN:
+#   python nlp_and_llm_basics.py
+# ==============================================================================
+
+
+# ==============================================================================
+# PART 1 — CLASSICAL NLP: TEXT CLEANING &amp; TOKENIZATION
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Before any model touches your text, it needs to be cleaned.
+# Raw text from the internet is messy — full of HTML, punctuation,
+# uppercase letters, and filler words like &quot;the&quot;, &quot;a&quot;, &quot;is&quot;.
+# These are called STOP WORDS and they add noise without meaning.
+#
+# Tokenization = splitting text into individual units (words or sub-words).
+
+import re
+import string
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+
+# Download required NLTK data (only needed the first time):
+nltk.download(&#x27;punkt&#x27;, quiet=True)
+nltk.download(&#x27;stopwords&#x27;, quiet=True)
+nltk.download(&#x27;wordnet&#x27;, quiet=True)
+nltk.download(&#x27;punkt_tab&#x27;, quiet=True)
+
+sample_text = &quot;&quot;&quot;
+Natural Language Processing (NLP) is a subfield of Artificial Intelligence
+that deals with the interaction between computers and human language.
+It&#x27;s used in chatbots, search engines, and translation tools!
+&quot;&quot;&quot;
+
+print(&quot;=&quot; * 60)
+print(&quot;PART 1: TEXT CLEANING&quot;)
+print(&quot;=&quot; * 60)
+
+# Step 1: Lowercase
+text = sample_text.lower()
+print(&quot;After lowercase:&quot;, text[:80])
+
+# Step 2: Remove punctuation and special characters
+text = re.sub(r&quot;[^a-z\s]&quot;, &quot;&quot;, text)
+print(&quot;After removing punctuation:&quot;, text[:80])
+
+# Step 3: Tokenize (split into individual words)
+tokens = word_tokenize(text)
+print(&quot;\nTokens:&quot;, tokens[:15])
+
+# Step 4: Remove stop words (filler words like &quot;is&quot;, &quot;the&quot;, &quot;and&quot;)
+stop_words = set(stopwords.words(&#x27;english&#x27;))
+filtered_tokens = [w for w in tokens if w not in stop_words]
+print(&quot;After removing stop words:&quot;, filtered_tokens[:15])
+
+# Step 5: Stemming vs Lemmatization
+# Stemming: chops word endings aggressively (running → run, better → better)
+# Lemmatization: uses vocabulary to find base form (running → run, better → good)
+stemmer = PorterStemmer()
+lemmatizer = WordNetLemmatizer()
+
+words_to_test = [&quot;running&quot;, &quot;flies&quot;, &quot;better&quot;, &quot;studying&quot;, &quot;computers&quot;]
+print(&quot;\nWord          | Stemmed      | Lemmatized&quot;)
+print(&quot;-&quot; * 45)
+for word in words_to_test:
+    print(f&quot;{word:&lt;14} | {stemmer.stem(word):&lt;12} | {lemmatizer.lemmatize(word)}&quot;)
+
+# YOUR TURN:
+# 1. Take a news headline and apply the full cleaning pipeline above
+# 2. What happens when you lemmatize &quot;better&quot;? Why is it different from stemming?
+
+
+# ==============================================================================
+# PART 2 — TF-IDF: TURNING TEXT INTO NUMBERS
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Machine learning models cannot read words — they need numbers.
+# TF-IDF (Term Frequency–Inverse Document Frequency) converts text into
+# a numerical matrix where each number represents how &quot;important&quot; a word is.
+#
+# TF  = how often a word appears in THIS document
+# IDF = how rare the word is ACROSS ALL documents (rare = more important)
+# TF-IDF = TF × IDF
+#
+# A word like &quot;the&quot; appears everywhere → low IDF → low score (not important)
+# A word like &quot;neural&quot; appears rarely  → high IDF → high score (very important)
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;PART 2: TEXT CLASSIFICATION WITH TF-IDF&quot;)
+print(&quot;=&quot; * 60)
+
+# Sample dataset: emails labeled as spam or not spam
+emails = [
+    (&quot;Win a FREE iPhone! Click here now!&quot;, &quot;spam&quot;),
+    (&quot;Congratulations! You&#x27;ve been selected for a prize!&quot;, &quot;spam&quot;),
+    (&quot;Buy cheap meds online — no prescription needed&quot;, &quot;spam&quot;),
+    (&quot;URGENT: Your account has been compromised, verify now&quot;, &quot;spam&quot;),
+    (&quot;Make money fast from home — guaranteed results!&quot;, &quot;spam&quot;),
+    (&quot;Hey, are you free for lunch tomorrow?&quot;, &quot;ham&quot;),
+    (&quot;The meeting is rescheduled to 3pm on Friday&quot;, &quot;ham&quot;),
+    (&quot;Could you review the attached report before Tuesday?&quot;, &quot;ham&quot;),
+    (&quot;Thanks for your help with the project last week&quot;, &quot;ham&quot;),
+    (&quot;Just checking in — how is everything going?&quot;, &quot;ham&quot;),
+    (&quot;Reminder: your dentist appointment is next Monday&quot;, &quot;ham&quot;),
+    (&quot;Here is the invoice for your recent order&quot;, &quot;ham&quot;),
+]
+
+texts, labels = zip(*emails)
+
+# Convert text to TF-IDF matrix
+vectorizer = TfidfVectorizer(stop_words=&#x27;english&#x27;, max_features=100)
+X = vectorizer.fit_transform(texts)
+print(f&quot;\nTF-IDF matrix shape: {X.shape}&quot;)  # (12 emails, up to 100 features)
+print(f&quot;Most important words: {vectorizer.get_feature_names_out()[:10]}&quot;)
+
+# Split and train a simple classifier
+X_train, X_test, y_train, y_test = train_test_split(
+    X, labels, test_size=0.3, random_state=42
+)
+
+model = LogisticRegression()
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+print(&quot;\nClassification Report:&quot;)
+print(classification_report(y_test, predictions, zero_division=0))
+
+# Predict on a new email:
+new_email = [&quot;Claim your FREE vacation package today!&quot;]
+new_vec = vectorizer.transform(new_email)
+print(f&quot;New email prediction: {model.predict(new_vec)[0]}&quot;)
+
+# YOUR TURN:
+# 1. Add more emails to the dataset and retrain
+# 2. Try MultinomialNB instead of LogisticRegression — is it better or worse?
+# 3. What happens if you remove stop_words=&#x27;english&#x27; from TfidfVectorizer?
+
+
+# ==============================================================================
+# PART 3 — WORD EMBEDDINGS: WORDS AS VECTORS IN SPACE
+# ==============================================================================
+#
+# TEACHER SAYS:
+# TF-IDF treats every word independently. It doesn&#x27;t know that
+# &quot;king&quot; and &quot;queen&quot; are related, or that &quot;Paris&quot; and &quot;France&quot; go together.
+#
+# WORD EMBEDDINGS solve this. Each word becomes a vector (list of numbers)
+# where SIMILAR words are CLOSE to each other in that space.
+# Famous example: king - man + woman ≈ queen
+#
+# Modern LLMs use a more powerful version called &quot;contextual embeddings&quot; —
+# the same word gets DIFFERENT vectors depending on the sentence context.
+# &quot;bank&quot; in &quot;river bank&quot; vs &quot;bank account&quot; → different vectors.
+#
+# We&#x27;ll use a pre-trained model from Hugging Face to get real embeddings.
+
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;PART 3: WORD EMBEDDINGS (using sentence-transformers)&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;&quot;&quot;
+CONCEPT (no code needed for intuition):
+
+Static embeddings (Word2Vec, GloVe):
+  king  → [0.52, -0.31, 0.85, 0.14, ...]  (300 numbers)
+  queen → [0.49, -0.28, 0.83, 0.22, ...]  (very similar to king!)
+  apple → [0.03,  0.72, 0.11, -0.61, ...] (very different from king)
+
+  king - man + woman ≈ queen  (vector arithmetic!)
+
+Contextual embeddings (BERT, GPT):
+  &quot;I went to the BANK to get money&quot;
+  &quot;I sat by the BANK of the river&quot;
+  
+  Same word &quot;bank&quot; → DIFFERENT embedding vectors in each sentence.
+  This is why LLMs understand context and TF-IDF does not.
+
+To generate real embeddings:
+  pip install sentence-transformers
+  
+  from sentence_transformers import SentenceTransformer
+  model = SentenceTransformer(&#x27;all-MiniLM-L6-v2&#x27;)
+  embeddings = model.encode([&quot;Hello world&quot;, &quot;Goodbye world&quot;])
+  # embeddings[0] and embeddings[1] are similar because both are greetings
+&quot;&quot;&quot;)
+
+
+# ==============================================================================
+# PART 4 — THE TRANSFORMER ARCHITECTURE (INTUITION)
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Every modern LLM (GPT-4, Claude, Llama, Gemini) is built on the
+# TRANSFORMER architecture. You don&#x27;t need to implement it, but you must
+# understand what it does to work with these models effectively.
+#
+# KEY CONCEPTS:
+#
+# TOKENS: LLMs don&#x27;t read words — they read &quot;tokens&quot; (word pieces).
+#   &quot;unbelievable&quot; → [&quot;un&quot;, &quot;believ&quot;, &quot;able&quot;]  (3 tokens)
+#   &quot;hello&quot;        → [&quot;hello&quot;]                  (1 token)
+#   1 token ≈ 0.75 words on average
+#
+# CONTEXT WINDOW: The maximum number of tokens an LLM can &quot;see&quot; at once.
+#   GPT-3.5 → 4,096 tokens (~3,000 words)
+#   GPT-4   → 128,000 tokens (~96,000 words)
+#   Claude  → 200,000 tokens (~150,000 words)
+#   If your prompt + document exceed this → the model forgets earlier content.
+#
+# ATTENTION: The core mechanism. For every word, the model &quot;pays attention&quot;
+#   to all other words in the context to understand meaning.
+#   &quot;The animal didn&#x27;t cross the street because IT was too tired.&quot;
+#   → Attention figures out that &quot;it&quot; refers to &quot;animal&quot;, not &quot;street&quot;.
+#
+# TEMPERATURE: Controls creativity vs. consistency of outputs.
+#   temperature=0.0 → always the most likely/deterministic answer (good for code)
+#   temperature=1.0 → creative, varied responses (good for writing)
+#   temperature=2.0 → chaotic, often nonsensical
+
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;PART 4: KEY LLM CONCEPTS&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;&quot;&quot;
+Quick reference:
+  Token         = smallest unit of text the model processes
+  Embedding     = a token represented as a vector (list of numbers)
+  Context window = max tokens the model can process at once
+  Temperature   = randomness of output (0 = deterministic, 2 = chaotic)
+  Top-p         = nucleus sampling (only consider top % of likely tokens)
+  Max tokens    = limit on how long the response can be
+
+Cost awareness:
+  You are billed per TOKEN (input + output).
+  GPT-4 is ~100x more expensive per token than GPT-3.5-turbo.
+  Always track your token usage in production with tiktoken or the API response.
+&quot;&quot;&quot;)
+
+
+# ==============================================================================
+# PART 5 — HUGGING FACE: PRE-TRAINED MODELS IN 5 LINES
+# ==============================================================================
+#
+# TEACHER SAYS:
+# Hugging Face is the GitHub of AI models — over 500,000 free models
+# for text classification, translation, summarization, Q&amp;A, and more.
+# The &quot;pipeline&quot; abstraction loads a model and makes it usable in seconds.
+
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;PART 5: HUGGING FACE PIPELINE&quot;)
+print(&quot;=&quot; * 60)
+
+try:
+    from transformers import pipeline
+
+    # Sentiment analysis — 5 lines of code:
+    print(&quot;\nLoading sentiment analysis model (first run downloads ~270MB)...&quot;)
+    sentiment = pipeline(&quot;sentiment-analysis&quot;,
+                         model=&quot;distilbert-base-uncased-finetuned-sst-2-english&quot;)
+
+    texts_to_analyze = [
+        &quot;I absolutely love this product! Best purchase ever.&quot;,
+        &quot;This was a complete waste of money. Terrible quality.&quot;,
+        &quot;It&#x27;s okay. Nothing special but does what it says.&quot;,
+    ]
+
+    results = sentiment(texts_to_analyze)
+    for text, result in zip(texts_to_analyze, results):
+        print(f&quot;  [{result[&#x27;label&#x27;]:8}] ({result[&#x27;score&#x27;]:.2%}) → {text[:50]}...&quot;)
+
+    # Text summarization:
+    print(&quot;\nLoading summarization model...&quot;)
+    summarizer = pipeline(&quot;summarization&quot;, model=&quot;facebook/bart-large-cnn&quot;)
+    long_text = &quot;&quot;&quot;
+    Machine learning is a method of data analysis that automates analytical model building.
+    It is based on the idea that systems can learn from data, identify patterns and make decisions
+    with minimal human intervention. Machine learning algorithms are trained on large datasets,
+    and they use statistical techniques to make predictions or decisions without being explicitly
+    programmed to perform those specific tasks.
+    &quot;&quot;&quot;
+    summary = summarizer(long_text, max_length=50, min_length=20, do_sample=False)
+    print(f&quot;Summary: {summary[0][&#x27;summary_text&#x27;]}&quot;)
+
+except ImportError:
+    print(&quot;Run: pip install transformers torch&quot;)
+except Exception as e:
+    print(f&quot;Model download error (check internet): {e}&quot;)
+
+# YOUR TURN:
+# 1. Try pipeline(&quot;text-classification&quot;) on your own texts
+# 2. Try pipeline(&quot;translation_en_to_fr&quot;) to translate English to French
+# 3. Try pipeline(&quot;question-answering&quot;) with a context and a question
+
+
+# ==============================================================================
+# PART 6 — PROMPT ENGINEERING
+# ==============================================================================
+#
+# TEACHER SAYS:
+# The quality of your LLM output is almost entirely determined by how
+# well you write your prompt. This is called &quot;prompt engineering.&quot;
+# It&#x27;s not magic — it follows predictable patterns.
+
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;PART 6: PROMPT ENGINEERING PATTERNS&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;&quot;&quot;
+1. ZERO-SHOT: Ask directly with no examples.
+   ─────────────────────────────────────────
+   Prompt: &quot;Classify the sentiment of this review as POSITIVE, NEGATIVE,
+            or NEUTRAL: &#x27;The battery life is great but the screen is dim.&#x27;&quot;
+   Output: &quot;NEUTRAL&quot;
+
+2. FEW-SHOT: Give 2-3 examples before your real question.
+   ───────────────────────────────────────────────────────
+   Prompt: &quot;Classify sentiment.
+            Review: &#x27;Amazing product!&#x27; → POSITIVE
+            Review: &#x27;Complete junk.&#x27;   → NEGATIVE
+            Review: &#x27;It is average.&#x27;   → NEUTRAL
+            Review: &#x27;Works sometimes.&#x27; → &quot;
+   Output: &quot;NEUTRAL&quot;
+   
+   Why it works: Examples show the model the EXACT format you expect.
+
+3. CHAIN-OF-THOUGHT (CoT): Tell the model to reason step by step.
+   ────────────────────────────────────────────────────────────────
+   Bad prompt:  &quot;What is 17 × 24?&quot;
+   Good prompt: &quot;What is 17 × 24? Think step by step.&quot;
+   
+   Output: &quot;17 × 24: First, 17 × 20 = 340.
+            Then, 17 × 4 = 68.
+            Finally, 340 + 68 = 408.&quot;
+   
+   Why it works: Forces the model to show its work, which reduces errors.
+
+4. SYSTEM + USER roles (for chat models):
+   ─────────────────────────────────────────
+   System: &quot;You are a senior Python engineer. Respond only with code.
+            No explanations unless asked.&quot;
+   User:   &quot;Write a function to flatten a nested list.&quot;
+   
+   The SYSTEM message controls the model&#x27;s persona and rules for the
+   entire conversation. Always use it in production.
+
+5. STRUCTURED OUTPUT: Ask for JSON/XML.
+   ─────────────────────────────────────
+   Prompt: &quot;Extract the name, age, and city from this text.
+            Return ONLY valid JSON with keys: name, age, city.
+            Text: &#x27;John Smith is a 34-year-old engineer from Berlin.&#x27;&quot;
+   Output: {&quot;name&quot;: &quot;John Smith&quot;, &quot;age&quot;: 34, &quot;city&quot;: &quot;Berlin&quot;}
+&quot;&quot;&quot;)
+
+
+# ==============================================================================
+# PART 7 — CALLING THE OPENAI API
+# ==============================================================================
+#
+# TEACHER SAYS:
+# The OpenAI API is how you talk to GPT-4 from your Python code.
+# Store your API key in a .env file — NEVER hardcode it in your script.
+#
+# Setup:
+#   pip install openai python-dotenv
+#   Create .env file: OPENAI_API_KEY=sk-...your-key-here...
+
+import os
+
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;PART 7: OPENAI API&quot;)
+print(&quot;=&quot; * 60)
+
+try:
+    from openai import OpenAI
+    from dotenv import load_dotenv
+
+    load_dotenv()  # Loads OPENAI_API_KEY from .env file
+    api_key = os.getenv(&quot;OPENAI_API_KEY&quot;)
+
+    if not api_key:
+        print(&quot;No API key found. Create a .env file with: OPENAI_API_KEY=sk-...&quot;)
+    else:
+        client = OpenAI(api_key=api_key)
+
+        # Basic chat completion:
+        response = client.chat.completions.create(
+            model=&quot;gpt-4o-mini&quot;,       # Cheapest capable model — use for dev/testing
+            temperature=0.2,            # Low temp = consistent, factual answers
+            max_tokens=200,
+            messages=[
+                {
+                    &quot;role&quot;: &quot;system&quot;,
+                    &quot;content&quot;: &quot;You are a helpful data science tutor. Be concise.&quot;
+                },
+                {
+                    &quot;role&quot;: &quot;user&quot;,
+                    &quot;content&quot;: &quot;Explain what a transformer model is in 3 sentences.&quot;
+                }
+            ]
+        )
+
+        print(f&quot;\nModel: {response.model}&quot;)
+        print(f&quot;Tokens used: {response.usage.total_tokens} &quot;
+              f&quot;(prompt={response.usage.prompt_tokens}, &quot;
+              f&quot;completion={response.usage.completion_tokens})&quot;)
+        print(f&quot;\nResponse:\n{response.choices[0].message.content}&quot;)
+
+        # STRUCTURED OUTPUT — ask for JSON:
+        structured_response = client.chat.completions.create(
+            model=&quot;gpt-4o-mini&quot;,
+            temperature=0,
+            messages=[
+                {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are a data extractor. Return only valid JSON.&quot;},
+                {&quot;role&quot;: &quot;user&quot;,   &quot;content&quot;: (
+                    &quot;Extract name, role, and company from: &quot;
+                    &quot;&#x27;Sarah Chen is a Machine Learning Engineer at DeepMind.&#x27; &quot;
+                    &quot;Return JSON with keys: name, role, company.&quot;
+                )}
+            ]
+        )
+        import json
+        raw = structured_response.choices[0].message.content
+        parsed = json.loads(raw)
+        print(f&quot;\nStructured extraction: {parsed}&quot;)
+
+except ImportError:
+    print(&quot;Run: pip install openai python-dotenv&quot;)
+except Exception as e:
+    print(f&quot;API error: {e}&quot;)
+
+# YOUR TURN:
+# 1. Build a simple Q&amp;A chatbot that maintains a conversation history
+#    HINT: Keep a list of messages and append each turn to it before calling the API
+# 2. Use structured output to extract entities from a news headline
+# 3. Experiment with temperature=0 vs temperature=1 — what changes?
+
+
+# ==============================================================================
+# PART 8 — WRAPPING YOUR LLM IN A FASTAPI ENDPOINT
+# ==============================================================================
+#
+# TEACHER SAYS:
+# An LLM sitting in a Python script is not useful to the world.
+# Wrapping it in FastAPI makes it a service any app can call.
+# This is the exact pattern used by OpenAI, Anthropic, and every AI startup.
+#
+# Save this as a SEPARATE file: llm_api.py
+# Run with: uvicorn llm_api:app --reload
+
+LLM_API_CODE = &#x27;&#x27;&#x27;
+# llm_api.py — Your personal LLM API endpoint
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from openai import OpenAI
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+app = FastAPI(title=&quot;My LLM API&quot;)
+client = OpenAI(api_key=os.getenv(&quot;OPENAI_API_KEY&quot;))
+
+class QuestionRequest(BaseModel):
+    question: str
+    system_prompt: str = &quot;You are a helpful assistant. Be concise.&quot;
+    temperature: float = 0.3
+    max_tokens: int = 300
+
+class AnswerResponse(BaseModel):
+    answer: str
+    tokens_used: int
+    model: str
+
+@app.post(&quot;/ask&quot;, response_model=AnswerResponse)
+async def ask_llm(request: QuestionRequest):
+    if not request.question.strip():
+        raise HTTPException(status_code=400, detail=&quot;Question cannot be empty&quot;)
+
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        temperature=request.temperature,
+        max_tokens=request.max_tokens,
+        messages=[
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: request.system_prompt},
+            {&quot;role&quot;: &quot;user&quot;,   &quot;content&quot;: request.question},
+        ]
+    )
+    return AnswerResponse(
+        answer=response.choices[0].message.content,
+        tokens_used=response.usage.total_tokens,
+        model=response.model
+    )
+
+@app.get(&quot;/health&quot;)
+def health_check():
+    return {&quot;status&quot;: &quot;ok&quot;}
+&#x27;&#x27;&#x27;
+
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;PART 8: FASTAPI LLM ENDPOINT&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;Save this as &#x27;llm_api.py&#x27; and run: uvicorn llm_api:app --reload&quot;)
+print(LLM_API_CODE)
+
+print(&quot;\nTest it with curl:&quot;)
+print(&quot;&quot;&quot;  curl -X POST http://localhost:8000/ask \\
+    -H &quot;Content-Type: application/json&quot; \\
+    -d &#x27;{&quot;question&quot;: &quot;What is a neural network?&quot;}&#x27;
+&quot;&quot;&quot;)
+
+# YOUR TURN (MONTH 10 DELIVERABLE):
+# Build a FastAPI app that:
+# 1. Accepts a block of text via POST
+# 2. Classifies its sentiment using the Hugging Face pipeline from Part 5
+# 3. Also summarizes it using the LLM API from Part 7
+# 4. Returns both results as JSON
+# 5. Containerize it with Docker (you already know how from Month 3!)
+
+print(&quot;\n&quot; + &quot;=&quot; * 60)
+print(&quot;MONTH 10 COMPLETE — What you now know:&quot;)
+print(&quot;=&quot; * 60)
+print(&quot;&quot;&quot;
+  ✓ Clean and tokenize raw text
+  ✓ Convert text to numbers with TF-IDF
+  ✓ Build a text classifier with sklearn
+  ✓ Understand tokens, embeddings, and context windows
+  ✓ Use Hugging Face pre-trained models
+  ✓ Write effective prompts (zero-shot, few-shot, CoT)
+  ✓ Call the OpenAI API from Python
+  ✓ Wrap an LLM in a FastAPI endpoint
+
+  NEXT → Month 11: RAG — make your LLM answer questions
+         about YOUR documents (not just its training data)
+&quot;&quot;&quot;)
+</code></pre></article>
+      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+    </main>
+  </body>
+</html>
