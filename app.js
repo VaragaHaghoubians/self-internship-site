@@ -312,6 +312,411 @@ const months = [
   },
 ];
 
+// ─── Extended Roadmap: Phase 7 + Phase 8 (from 3 PDF roadmaps) ────────────────
+const extendedMonths = [
+  // ── Phase 7: Advanced AI Systems (Months 13-18) ──
+  {
+    id: 13,
+    phase: "Phase 7",
+    label: "Advanced AI Systems",
+    title: "LLM Fine-Tuning and Evaluation",
+    focus: "LoRA, QLoRA, PEFT, training dynamics, formal model evaluation",
+    why: "Prompting alone is not enough for specialized tasks. Fine-tuning adapts a model's weights to your domain data. Evaluation frameworks measure whether your model actually improved.",
+    learn: [
+      "LoRA and QLoRA: parameter-efficient fine-tuning",
+      "Hugging Face PEFT and Trainer API",
+      "Dataset preparation, tokenization, and batching",
+      "Training dynamics: loss curves, overfitting, learning rate",
+      "Evaluation: BLEU, ROUGE, BERTScore, human eval",
+      "MT-Bench and LLM-as-judge evaluation patterns",
+    ],
+    build: "Fine-tune a small open-source LLM (Mistral-7B or similar) on a domain-specific dataset, evaluate it with automated metrics, and compare against the base model.",
+    resources: [
+      { label: "Hugging Face PEFT", url: "https://github.com/huggingface/peft" },
+      { label: "LLM Evaluation Harness", url: "https://github.com/EleutherAI/lm-evaluation-harness" },
+      { label: "QLoRA paper", url: "https://arxiv.org/abs/2305.14314" },
+      { label: "Fine-tuning guide (HF)", url: "https://huggingface.co/docs/transformers/training" },
+    ],
+    tags: ["LLM", "Fine-tuning", "LoRA", "Evaluation"],
+  },
+  {
+    id: 14,
+    phase: "Phase 7",
+    label: "Advanced AI Systems",
+    title: "Quantization and Efficient Inference",
+    focus: "GPTQ, AWQ, GGUF, vLLM, serving tradeoffs, inference benchmarking",
+    why: "Large models are too slow and expensive to run naively. Quantization reduces precision to shrink models and speed up inference without retraining. Serving frameworks handle batching and throughput.",
+    learn: [
+      "INT8, INT4, FP16 quantization concepts",
+      "GPTQ, AWQ, and GGUF formats and tradeoffs",
+      "llama.cpp for local quantized inference",
+      "vLLM and continuous batching for high-throughput serving",
+      "Latency vs. throughput vs. accuracy tradeoffs",
+      "Inference benchmarking: tokens/sec, time-to-first-token",
+    ],
+    build: "Quantize a 7B model with two methods (GPTQ and GGUF), benchmark both on the same prompt set, compare quality and speed, and write a decision guide for which to use in production.",
+    resources: [
+      { label: "AutoGPTQ", url: "https://github.com/PanQiWei/AutoGPTQ" },
+      { label: "llama.cpp", url: "https://github.com/ggerganov/llama.cpp" },
+      { label: "vLLM", url: "https://github.com/vllm-project/vllm" },
+      { label: "AWQ paper", url: "https://arxiv.org/abs/2306.00978" },
+    ],
+    tags: ["Quantization", "Inference", "vLLM", "Performance"],
+  },
+  {
+    id: 15,
+    phase: "Phase 7",
+    label: "Advanced AI Systems",
+    title: "Advanced Agent Systems",
+    focus: "Evaluation harnesses, observability, retries, multi-agent design",
+    why: "Month 12 built a working agent. This month builds a production-grade one. Real agents fail silently, loop infinitely, and produce untraceable outputs. You need evaluation, observability, and failure recovery.",
+    learn: [
+      "Agent evaluation: AgentBench, GAIA benchmark",
+      "Tracing with LangSmith, Arize Phoenix, or OpenTelemetry",
+      "Retry logic, circuit breakers, and step limits",
+      "Multi-agent patterns: supervisor, peer-to-peer, critic",
+      "Long-term memory with vector stores + episodic memory",
+      "Human-in-the-loop checkpoints",
+    ],
+    build: "Add full observability (tracing every tool call and LLM request) and an evaluation suite to your Month 12 agent. Introduce a second agent that acts as critic/reviewer and create a test harness with 20 graded tasks.",
+    resources: [
+      { label: "LangSmith", url: "https://smith.langchain.com" },
+      { label: "LangGraph", url: "https://github.com/langchain-ai/langgraph" },
+      { label: "AgentBench", url: "https://github.com/THUDM/AgentBench" },
+      { label: "AutoGen multi-agent", url: "https://github.com/microsoft/autogen" },
+    ],
+    tags: ["Agents", "Observability", "Multi-agent", "Evaluation"],
+  },
+  {
+    id: 16,
+    phase: "Phase 7",
+    label: "Advanced AI Systems",
+    title: "ML System Design and Reliability",
+    focus: "Drift detection, SLOs, canary deploys, shadow mode, incident readiness",
+    why: "An ML model deployed once will degrade silently over time. Reliability engineering means defining what 'good' looks like, detecting when it breaks, and recovering safely without downtime.",
+    learn: [
+      "Data drift: distribution shift, covariate shift, concept drift",
+      "Evidently AI and Alibi Detect for drift monitoring",
+      "SLOs for ML: latency P99, error rate, prediction quality",
+      "Canary deployment, A/B testing, and shadow mode",
+      "Rollback strategies and safe model promotion",
+      "Incident runbooks for ML systems",
+    ],
+    build: "Add drift detection and alerting to your Month 9 capstone. Implement canary deployment for a model update and write a rollback plan. Define SLOs and create a dashboard showing whether they're met.",
+    resources: [
+      { label: "Evidently AI", url: "https://github.com/evidentlyai/evidently" },
+      { label: "Alibi Detect", url: "https://github.com/SeldonIO/alibi-detect" },
+      { label: "ML observability guide", url: "https://github.com/DataTalksClub/mlops-zoomcamp" },
+      { label: "Google SRE book (free)", url: "https://sre.google/sre-book/table-of-contents/" },
+    ],
+    tags: ["MLOps", "Reliability", "Drift", "SLOs"],
+  },
+  {
+    id: 17,
+    phase: "Phase 7",
+    label: "Advanced AI Systems",
+    title: "Industrial AI and Optimization",
+    focus: "Digital twins, causal analysis, graph OR, edge AI deployment",
+    why: "This month deepens the industrial IE angle. Digital twins simulate physical systems before you change them. Causal analysis avoids optimizing the wrong metric. Edge AI brings inference to the device.",
+    learn: [
+      "Digital twin concepts and simulation with SimPy",
+      "Causal graphs, do-calculus fundamentals, and DoWhy",
+      "Graph-based optimization with NetworkX + OR-Tools",
+      "Edge AI: TensorFlow Lite, ONNX, CoreML basics",
+      "Energy and latency constraints for on-device inference",
+      "Industrial AI case studies: predictive quality, yield optimization",
+    ],
+    build: "Build a digital twin simulation of a production line (SimPy), run causal analysis to identify the true bottleneck, optimize with OR-Tools, and deploy a lightweight anomaly model to ESP32 or a Raspberry Pi.",
+    resources: [
+      { label: "SimPy (simulation)", url: "https://simpy.readthedocs.io" },
+      { label: "DoWhy (causal)", url: "https://github.com/py-why/dowhy" },
+      { label: "TensorFlow Lite", url: "https://www.tensorflow.org/lite/guide" },
+      { label: "EfficientML.ai", url: "https://efficientai.mit.edu" },
+    ],
+    tags: ["Digital Twin", "Causal AI", "Edge AI", "Industrial IE"],
+  },
+  {
+    id: 18,
+    phase: "Phase 7",
+    label: "Advanced AI Systems",
+    title: "Advanced Integration Project",
+    focus: "Combine Phase 7 topics into one production-grade system",
+    why: "Every Phase 7 month is only valuable when it connects to the others. This month builds the integration that proves you can deliver an advanced AI system end to end.",
+    learn: [
+      "System design for advanced AI products",
+      "Combining fine-tuned LLM + RAG + agents + monitoring",
+      "Cost control: caching, batching, model routing",
+      "Production readiness checklist for AI systems",
+      "Technical writing: architecture decision records (ADRs)",
+      "Presenting complex systems to non-technical stakeholders",
+    ],
+    build: "Design and build an advanced AI system that combines at least 3 Phase 7 skills: e.g., a fine-tuned domain model served with quantized inference, wrapped in a monitored agent with drift detection on inputs.",
+    resources: [
+      { label: "System design primer", url: "https://github.com/donnemartin/system-design-primer" },
+      { label: "Chip Huyen's ML Systems Design", url: "https://huyenchip.com/machine-learning-systems-design/toc.html" },
+      { label: "Designing ML Systems (book)", url: "https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/" },
+      { label: "LLM patterns collection", url: "https://github.com/Trusted-AI/AIF360" },
+    ],
+    tags: ["System Design", "Integration", "Production AI", "Architecture"],
+  },
+  // ── Phase 8: Research and Expert Track (Months 19-24) ──
+  {
+    id: 19,
+    phase: "Phase 8",
+    label: "Research & Expert Track",
+    title: "Research Methodology",
+    focus: "Paper reading, reproduction, experiment design, technical writing",
+    why: "Engineering excellence requires understanding where techniques come from. Reading and reproducing papers builds the deep intuition that separates senior engineers from juniors.",
+    learn: [
+      "How to read an ML paper efficiently (abstract → experiments → method)",
+      "Experiment design: hypothesis, baselines, ablations",
+      "Reproducing a published result from scratch",
+      "Technical writing: blog posts, experiment reports, postmortems",
+      "LaTeX and academic writing conventions",
+      "Finding and evaluating papers: ArXiv, Semantic Scholar, PapersWithCode",
+    ],
+    build: "Select one significant paper from the last 2 years (e.g., LoRA, RLHF, or a RAG improvement). Reproduce its key experiment, write a structured summary, and publish it as a public blog post or GitHub repo.",
+    resources: [
+      { label: "Papers With Code", url: "https://paperswithcode.com" },
+      { label: "ArXiv.org", url: "https://arxiv.org/list/cs.LG/recent" },
+      { label: "Andrej Karpathy's paper reading guide", url: "https://twitter.com/karpathy/status/1444157007226306562" },
+      { label: "Semantic Scholar", url: "https://www.semanticscholar.org" },
+    ],
+    tags: ["Research", "Paper Reading", "Technical Writing", "Methodology"],
+  },
+  {
+    id: 20,
+    phase: "Phase 8",
+    label: "Research & Expert Track",
+    title: "Novel Architectures",
+    focus: "Transformer variants, multimodal systems, or a novel system idea",
+    why: "Understanding architecture-level choices gives you the vocabulary to read the research frontier and design non-standard solutions when off-the-shelf models are not enough.",
+    learn: [
+      "Transformer internals: attention, positional encoding, layer norms",
+      "Variants: BERT, GPT, T5, Mamba (SSM), Mistral, Mixtral (MoE)",
+      "Multimodal: CLIP, LLaVA, image/audio tokenization",
+      "Efficient attention: Flash Attention, sliding window attention",
+      "Building a mini transformer from scratch (educational)",
+      "When to design custom vs. use pretrained models",
+    ],
+    build: "Implement a small transformer from scratch (character-level or word-level LM), train it on a domain dataset, then compare it to a fine-tuned pretrained model. Write an analysis of the tradeoffs.",
+    resources: [
+      { label: "Karpathy's nanoGPT", url: "https://github.com/karpathy/nanoGPT" },
+      { label: "Annotated Transformer", url: "https://nlp.seas.harvard.edu/annotated-transformer/" },
+      { label: "Flash Attention", url: "https://github.com/Dao-AILab/flash-attention" },
+      { label: "LLaVA multimodal", url: "https://github.com/haotian-liu/LLaVA" },
+    ],
+    tags: ["Transformers", "Architectures", "Multimodal", "Deep Learning"],
+  },
+  {
+    id: 21,
+    phase: "Phase 8",
+    label: "Research & Expert Track",
+    title: "Large-Scale Systems",
+    focus: "Scale, throughput, orchestration, infrastructure design",
+    why: "Individual models and apps are just components. Senior engineers design systems that handle millions of requests, coordinate multiple models, and stay reliable under load.",
+    learn: [
+      "Distributed training: data parallelism, model parallelism, ZeRO",
+      "Large-scale serving: load balancing, auto-scaling, request routing",
+      "Kubernetes and Helm for ML workloads",
+      "Batch inference pipelines vs. real-time serving",
+      "Cost modeling for large-scale AI deployments",
+      "Observability at scale: centralized logging, distributed tracing",
+    ],
+    build: "Design (and partially implement) a large-scale inference system that can handle 1000+ requests/min using vLLM, a load balancer, and auto-scaling. Document the architecture with diagrams and cost analysis.",
+    resources: [
+      { label: "Ray Serve", url: "https://docs.ray.io/en/latest/serve/index.html" },
+      { label: "vLLM production", url: "https://github.com/vllm-project/vllm" },
+      { label: "ML infrastructure guide", url: "https://github.com/chiphuyen/dmls-book" },
+      { label: "Kubernetes for ML", url: "https://kubeflow.org/docs/started/introduction/" },
+    ],
+    tags: ["Scale", "Infrastructure", "Kubernetes", "Distributed Systems"],
+  },
+  {
+    id: 22,
+    phase: "Phase 8",
+    label: "Research & Expert Track",
+    title: "Open-Source and Thought Leadership",
+    focus: "OSS contribution, public writing, engineering communication",
+    why: "Your skills are only visible when they are public. Open-source contributions prove that you can work in large codebases with standards. Writing shows you can communicate complex ideas clearly.",
+    learn: [
+      "Finding good first issues in major ML repos",
+      "OSS contribution workflow: fork, branch, PR, review, merge",
+      "Writing for technical audiences: tutorials, READMEs, docs",
+      "Conference talks and meetup presentations",
+      "Building a technical brand: LinkedIn, blog, GitHub profile",
+      "Code review skills: giving and receiving feedback",
+    ],
+    build: "Make a meaningful contribution to one major open-source ML project (not just fixing typos). Simultaneously publish 2 technical blog posts and give one short talk or demo at a local meetup or recorded video.",
+    resources: [
+      { label: "First timers only", url: "https://www.firsttimersonly.com" },
+      { label: "Good first issues (ML)", url: "https://github.com/topics/good-first-issue" },
+      { label: "How to write a technical blog", url: "https://simonwillison.net/2022/Nov/6/what-to-blog-about/" },
+      { label: "Hashnode (free blogging)", url: "https://hashnode.com" },
+    ],
+    tags: ["Open Source", "Writing", "Community", "Thought Leadership"],
+  },
+  {
+    id: 23,
+    phase: "Phase 8",
+    label: "Research & Expert Track",
+    title: "Research Contribution",
+    focus: "Serious OSS contribution, benchmark suite, or research-style artifact",
+    why: "This month produces an artifact that demonstrates research-engineering capability: something original, rigorous, and publicly useful. It is the highest-signal portfolio item possible.",
+    learn: [
+      "Designing a benchmark: task definition, metrics, baselines, leaderboard",
+      "Ablation studies and systematic experimentation",
+      "Writing a technical report or workshop paper",
+      "Dataset creation and curation for ML",
+      "Responsible AI: bias auditing, fairness metrics, safety evaluation",
+      "Reproducibility standards: code, data, environment, seeds",
+    ],
+    build: "Create one of: (a) a benchmark dataset + evaluation suite for a real problem in your domain, (b) a research-style ablation study comparing 3+ approaches with reproducible code, or (c) a substantial OSS tool used by others.",
+    resources: [
+      { label: "Hugging Face datasets", url: "https://huggingface.co/docs/datasets" },
+      { label: "Responsible AI toolkit (Microsoft)", url: "https://github.com/microsoft/responsible-ai-toolbox" },
+      { label: "EleutherAI eval harness", url: "https://github.com/EleutherAI/lm-evaluation-harness" },
+      { label: "ML reproducibility checklist", url: "https://www.cs.mcgill.ca/~jpineau/ReproducibilityChecklist.pdf" },
+    ],
+    tags: ["Research", "Benchmarks", "Responsible AI", "Reproducibility"],
+  },
+  {
+    id: 24,
+    phase: "Phase 8",
+    label: "Research & Expert Track",
+    title: "Expert Portfolio",
+    focus: "Consolidate all work into a leadership-grade portfolio and interview narrative",
+    why: "24 months of work is only valuable if you can present it clearly and confidently. This month packages everything into a narrative that positions you for senior, staff, or research roles.",
+    learn: [
+      "Portfolio architecture: what to include, what to trim",
+      "Writing a senior engineer narrative: impact, ownership, tradeoffs",
+      "System design interview preparation",
+      "ML design interview: model selection, tradeoffs, production concerns",
+      "Salary negotiation and offer evaluation for senior roles",
+      "Contributing to team and technical strategy discussions",
+    ],
+    build: "Build a polished public portfolio: a GitHub profile README that links all 24 months of work, a personal site or blog with project summaries, and a one-page impact summary (not a resume — a narrative of what you built and why it mattered).",
+    resources: [
+      { label: "ML interview guide", url: "https://github.com/khangich/machine-learning-interview" },
+      { label: "System design for ML", url: "https://github.com/chiphuyen/machine-learning-systems-design" },
+      { label: "Senior engineer reading list", url: "https://github.com/yashbonde/awesome-ml-papers" },
+      { label: "Grokking the ML Interview", url: "https://www.educative.io/courses/grokking-the-machine-learning-interview" },
+    ],
+    tags: ["Portfolio", "Career", "Interview", "Leadership"],
+  },
+];
+
+// Continuous tracks that run alongside Phase 7 and Phase 8
+const continuousTracks = [
+  {
+    id: "math",
+    icon: "🧮",
+    title: "Math Foundations",
+    desc: "Linear algebra, calculus, probability, statistics, information theory — run this track in parallel every week.",
+    resources: [
+      { label: "3Blue1Brown (Linear Algebra)", url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab" },
+      { label: "3Blue1Brown (Calculus)", url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr" },
+      { label: "Probability for ML (cheatsheet)", url: "https://stanford.edu/~shervine/teaching/cs-229/cheatsheet-probabilities" },
+      { label: "Mathematics for ML (free book)", url: "https://mml-book.github.io" },
+      { label: "StatQuest (YouTube)", url: "https://www.youtube.com/@statquest" },
+    ],
+  },
+  {
+    id: "papers",
+    icon: "📄",
+    title: "Weekly Paper Reading",
+    desc: "Read at least one ML paper per week. Use Papers With Code to find recent high-impact work. Write a 3-sentence summary after each read.",
+    resources: [
+      { label: "Papers With Code (trending)", url: "https://paperswithcode.com/latest" },
+      { label: "ArXiv CS.LG daily", url: "https://arxiv.org/list/cs.LG/recent" },
+      { label: "The Batch (newsletter)", url: "https://www.deeplearning.ai/the-batch/" },
+      { label: "ML Paper Explainers (YouTube)", url: "https://www.youtube.com/@YannicKilcher" },
+    ],
+  },
+  {
+    id: "writing",
+    icon: "✍️",
+    title: "Monthly Technical Writing",
+    desc: "Write one technical note, blog draft, or postmortem every month. Writing forces clarity and becomes your public portfolio over time.",
+    resources: [
+      { label: "Simon Willison's blog (inspiration)", url: "https://simonwillison.net" },
+      { label: "Hashnode (free blog)", url: "https://hashnode.com" },
+      { label: "How to write a postmortem", url: "https://www.atlassian.com/incident-management/postmortem/templates" },
+      { label: "Technical writing guide (Google)", url: "https://developers.google.com/tech-writing" },
+    ],
+  },
+];
+
+function renderExtendedRoadmap() {
+  const section = document.getElementById("extendedRoadmapContent");
+  if (!section) return;
+
+  const phase7 = extendedMonths.filter(m => m.phase === "Phase 7");
+  const phase8 = extendedMonths.filter(m => m.phase === "Phase 8");
+
+  const phaseHtml = (months, phaseId, phaseLabel, phaseDesc) => `
+    <div class="ext-phase">
+      <div class="ext-phase-header">
+        <div class="ext-phase-badge">${phaseId}</div>
+        <div>
+          <strong>${phaseLabel}</strong>
+          <span>${phaseDesc}</span>
+        </div>
+      </div>
+      <div class="ext-month-grid">
+        ${months.map(m => `
+          <div class="ext-month-card">
+            <div class="ext-month-top">
+              <span class="ext-month-num">Month ${m.id}</span>
+              <div class="ext-month-tags">${m.tags.map(t => `<span class="ext-tag">${t}</span>`).join("")}</div>
+            </div>
+            <h4>${m.title}</h4>
+            <p class="ext-focus">${m.focus}</p>
+            <p class="ext-why">${m.why}</p>
+            <div class="ext-learn-list">
+              <strong>You will learn:</strong>
+              <ul>${m.learn.map(l => `<li>${l}</li>`).join("")}</ul>
+            </div>
+            <div class="ext-deliverable">
+              <strong>Deliverable:</strong> ${m.build}
+            </div>
+            <div class="ext-resources">
+              ${m.resources.map(r => `<a class="ext-res-link" href="${r.url}" target="_blank" rel="noreferrer">↗ ${r.label}</a>`).join("")}
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+
+  const tracksHtml = `
+    <div class="ext-continuous">
+      <h3 class="ext-continuous-title">🔄 Continuous Tracks (run alongside Phase 7 & 8)</h3>
+      <div class="ext-tracks-grid">
+        ${continuousTracks.map(t => `
+          <div class="ext-track-card">
+            <div class="ext-track-icon">${t.icon}</div>
+            <h4>${t.title}</h4>
+            <p>${t.desc}</p>
+            <div class="ext-track-links">
+              ${t.resources.map(r => `<a href="${r.url}" target="_blank" rel="noreferrer">↗ ${r.label}</a>`).join("")}
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+
+  section.innerHTML = `
+    <div class="ext-intro">
+      <p>Your 12-month core roadmap covers software engineering, production ML, IoT, and generative AI. The 3 external AI/ML roadmaps you shared add <strong>12 more months</strong> of advanced topics that build on top of the core. Think of months 1-12 as your engineering foundation and months 13-24 as your path to senior/research-level work.</p>
+    </div>
+    ${phaseHtml(phase7, "Phase 7", "Advanced AI Systems", "Months 13–18 · LLM mastery, quantization, advanced agents, ML reliability, industrial AI")}
+    ${phaseHtml(phase8, "Phase 8", "Research & Expert Track", "Months 19–24 · Research methodology, novel architectures, large-scale systems, open-source, expert portfolio")}
+    ${tracksHtml}
+  `;
+}
+
 const monthGithubLinks = {
   1: [
     { label: "trekhleb/learn-python", url: "https://github.com/trekhleb/learn-python", desc: "🟢 START HERE — 30 Python topic scripts. Clone the repo, open each .py file, read it line by line, then re-type it yourself from scratch." },
@@ -4204,6 +4609,7 @@ function init() {
   renderSuperpowers();
   renderMissionControl();
   renderLearningLibrary();
+  renderExtendedRoadmap();
   renderReference();
   renderMonths();
   renderMonthDetail();

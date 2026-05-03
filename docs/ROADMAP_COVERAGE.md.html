@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Roadmap Coverage - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../index.html">Back to website</a>
+      <a href="../index.html#python-lab">Python lab</a>
+      <a href="index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Roadmap Coverage</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">ROADMAP_COVERAGE.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="ai-ml-roadmap-coverage-for-this-self-internship">AI/ML Roadmap Coverage for This Self-Internship</h2>
+<p>This file maps the external <code>Comprehensive AI/ML Learning &amp; Research Roadmap</code> into this repository so the internship explicitly covers the same domains and stages.</p>
+<p>Companion source mapping:</p>
+<ul>
+<li><a href="ROADMAP_SOURCES.md">ROADMAP_SOURCES.md</a></li>
+</ul>
+<h3 id="what-changed">What changed</h3>
+<p>The original self-internship already covered the engineering core well:</p>
+<ul>
+<li>Software engineering</li>
+<li>Production ML / MLOps</li>
+<li>Full-stack delivery</li>
+<li>IoT and industrial data</li>
+<li>Capstone integration</li>
+<li>NLP, RAG, and agentic AI</li>
+</ul>
+<p>The external roadmap adds several advanced and expert-level requirements that were not explicit in the original 12-month plan:</p>
+<ul>
+<li>Mathematical foundations as a continuous track</li>
+<li>LLM fine-tuning and formal evaluation</li>
+<li>Model quantization and efficient inference</li>
+<li>Advanced agent reliability, observability, and evaluation</li>
+<li>Monitoring, drift detection, SLOs, and safe rollout patterns</li>
+<li>Research methodology, paper reproduction, and open-source contribution</li>
+<li>Large-scale systems and expert-level portfolio work</li>
+</ul>
+<p>This repository now treats the internship as:</p>
+<ul>
+<li>Months 1-12: core engineering internship</li>
+<li>Months 13-18: advanced AI systems track</li>
+<li>Months 19-24: research and expert track</li>
+</ul>
+<h3 id="domain-coverage-map">Domain coverage map</h3>
+<table><thead><tr><th>External roadmap domain</th><th>Coverage in this repository</th><th>Status</th></tr></thead><tbody><tr><td>LLMs and quantization</td><td>Phase 6 covers NLP, LLM APIs, RAG, and agents. Phase 7 now adds fine-tuning, evaluation, quantization, vLLM-style serving, and efficient inference.</td><td>Covered with extension</td></tr><tr><td>AI agents and agentic systems</td><td>Phase 6 Month 12 covers tool use, memory, and multi-step agents. Phase 7 now adds agent evaluation, observability, failure handling, and advanced multi-agent patterns.</td><td>Covered with extension</td></tr><tr><td>Natural language processing</td><td>Foundation NLP project plus Phase 6 Month 10 and Month 11 cover NLP, embeddings, vector search, and document Q&amp;A.</td><td>Covered</td></tr><tr><td>Data science</td><td>Foundation projects, SQL work, predictive maintenance, dashboards, and analytics already cover practical data science. Phase 7 adds stronger evaluation, causal thinking, and industrial experimentation.</td><td>Covered with extension</td></tr><tr><td>Machine learning engineering</td><td>Phase 2 already covers Docker, MLflow, deployment, and CI/CD. Phase 7 adds monitoring, drift detection, rollout strategy, latency targets, and reliability engineering.</td><td>Covered with extension</td></tr><tr><td>AI engineering</td><td>Phase 6 covers LLM application development. Phase 7 adds prompt and RAG evaluation, cost control, caching, guardrails, and production AI application design.</td><td>Covered with extension</td></tr><tr><td>Industrial engineering with AI</td><td>Optimization, predictive maintenance, IoT, supply chain, and capstone work already align strongly with this domain. Phase 7 adds digital twins, graph-aware optimization, and edge AI deployment.</td><td>Covered with extension</td></tr></tbody></table>
+<h3 id="stage-coverage-map">Stage coverage map</h3>
+<table><thead><tr><th>External stage</th><th>Repo coverage</th><th>Notes</th></tr></thead><tbody><tr><td>Beginner (Months 1-6)</td><td>Phases 1-3</td><td>Software, SQL, FastAPI, Docker, MLflow, deployment basics, Django</td></tr><tr><td>Intermediate (Months 6-12)</td><td>Phases 2-6</td><td>Production ML, cloud delivery, IoT integration, NLP, RAG, agents</td></tr><tr><td>Advanced (Months 12-18)</td><td>New Phase 7</td><td>Fine-tuning, quantization, advanced agents, reliability, industrial AI integration</td></tr><tr><td>Expert (Months 18-24)</td><td>New Phase 8</td><td>Research method, novel systems, open-source contribution, expert portfolio</td></tr></tbody></table>
+<h3 id="continuous-tracks-that-must-run-across-all-phases">Continuous tracks that must run across all phases</h3>
+<ul>
+<li>Math refresh: linear algebra, calculus, probability, statistics, information theory</li>
+<li>Paper reading: at least one paper or technical deep dive each week</li>
+<li>Writing: one technical note, blog draft, or postmortem each month</li>
+<li>Evaluation discipline: define success metrics before building</li>
+<li>Portfolio discipline: every major month should end with a demo artifact and README</li>
+</ul>
+<h3 id="new-extension-phases">New extension phases</h3>
+<h4 id="phase-7-advanced-ai-systems-months-13-18">Phase 7: Advanced AI Systems (Months 13-18)</h4>
+<table><thead><tr><th>Month</th><th>Focus</th><th>Why it exists</th></tr></thead><tbody><tr><td>13</td><td>LLM fine-tuning and evaluation</td><td>Covers LoRA/QLoRA, training dynamics, and formal model evaluation</td></tr><tr><td>14</td><td>Quantization and efficient inference</td><td>Covers GPTQ/AWQ/GGUF concepts, serving tradeoffs, and inference benchmarking</td></tr><tr><td>15</td><td>Advanced agent systems</td><td>Covers evaluation harnesses, observability, retries, memory, and multi-agent design</td></tr><tr><td>16</td><td>ML system design and reliability</td><td>Covers drift detection, SLOs, canaries, shadow deploys, and incident readiness</td></tr><tr><td>17</td><td>Industrial AI and optimization</td><td>Covers digital twins, causal analysis, advanced OR integration, and graph-based industrial reasoning</td></tr><tr><td>18</td><td>Advanced integration project</td><td>Combines Phase 7 topics into one production-grade system</td></tr></tbody></table>
+<h4 id="phase-8-research-and-expert-track-months-19-24">Phase 8: Research and Expert Track (Months 19-24)</h4>
+<table><thead><tr><th>Month</th><th>Focus</th><th>Why it exists</th></tr></thead><tbody><tr><td>19</td><td>Research methodology</td><td>Paper reading, reproduction, experiment design, and technical writing</td></tr><tr><td>20</td><td>Novel architectures</td><td>Transformer variants, multimodal systems, or a new systems idea</td></tr><tr><td>21</td><td>Large-scale systems</td><td>Scale, throughput, orchestration, and infrastructure design</td></tr><tr><td>22</td><td>Open-source and thought leadership</td><td>Public writing, OSS contribution, and engineering communication</td></tr><tr><td>23</td><td>Research contribution</td><td>Submit a serious OSS contribution, benchmark suite, or research-style artifact</td></tr><tr><td>24</td><td>Expert portfolio</td><td>Consolidate work into a leadership-grade portfolio and interview narrative</td></tr></tbody></table>
+<h3 id="gaps-that-were-implicit-before-and-are-now-explicit">Gaps that were implicit before and are now explicit</h3>
+<ul>
+<li>Fine-tuning beyond prompting</li>
+<li>Quantization beyond basic local inference</li>
+<li>Agent evaluation beyond &quot;it works&quot;</li>
+<li>Monitoring beyond dashboards</li>
+<li>Reliability engineering for ML and AI systems</li>
+<li>Research habits, paper reproduction, and publication-quality output</li>
+</ul>
+<h3 id="how-to-use-this-file">How to use this file</h3>
+<ol>
+<li>Treat the original 12-month roadmap as the core engineering internship.</li>
+<li>Treat Phase 7 and Phase 8 as required if the goal is alignment with the full external AI/ML roadmap.</li>
+<li>Use <a href="ROADMAP_SOURCES.md">ROADMAP_SOURCES.md</a> to choose the exact books, papers, tools, and courses for that phase.</li>
+<li>When updating any monthly plan, check whether it advances at least one domain and one stage competency from the external roadmap.</li>
+</ol></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#ai-ml-roadmap-coverage-for-this-self-internship">AI/ML Roadmap Coverage for This Self-Internship</a><a style="margin-left:12px" href="#what-changed">What changed</a><a style="margin-left:12px" href="#domain-coverage-map">Domain coverage map</a><a style="margin-left:12px" href="#stage-coverage-map">Stage coverage map</a><a style="margin-left:12px" href="#continuous-tracks-that-must-run-across-all-phases">Continuous tracks that must run across all phases</a><a style="margin-left:12px" href="#new-extension-phases">New extension phases</a><a style="margin-left:24px" href="#phase-7-advanced-ai-systems-months-13-18">Phase 7: Advanced AI Systems (Months 13-18)</a><a style="margin-left:24px" href="#phase-8-research-and-expert-track-months-19-24">Phase 8: Research and Expert Track (Months 19-24)</a><a style="margin-left:12px" href="#gaps-that-were-implicit-before-and-are-now-explicit">Gaps that were implicit before and are now explicit</a><a style="margin-left:12px" href="#how-to-use-this-file">How to use this file</a></aside>
+    </main>
+  </body>
+</html>

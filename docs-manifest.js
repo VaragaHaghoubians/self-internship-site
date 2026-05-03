@@ -12,6 +12,120 @@ window.DOCS_MANIFEST = [
     "url": "docs/CLOUD-CODING-SETUP.md.html"
   },
   {
+    "title": "extensions.json",
+    "kind": "File",
+    "path": "emergency-path/.vscode/extensions.json",
+    "url": "docs/emergency-path/.vscode/extensions.json.html"
+  },
+  {
+    "title": "settings.json",
+    "kind": "File",
+    "path": "emergency-path/.vscode/settings.json",
+    "url": "docs/emergency-path/.vscode/settings.json.html"
+  },
+  {
+    "title": "index.md",
+    "kind": "Guide",
+    "path": "emergency-path/day-plans/index.md",
+    "url": "docs/emergency-path/day-plans/index.md.html"
+  },
+  {
+    "title": "week-01.md",
+    "kind": "Guide",
+    "path": "emergency-path/day-plans/week-01.md",
+    "url": "docs/emergency-path/day-plans/week-01.md.html"
+  },
+  {
+    "title": "week-02.md",
+    "kind": "Guide",
+    "path": "emergency-path/day-plans/week-02.md",
+    "url": "docs/emergency-path/day-plans/week-02.md.html"
+  },
+  {
+    "title": "week-03.md",
+    "kind": "Guide",
+    "path": "emergency-path/day-plans/week-03.md",
+    "url": "docs/emergency-path/day-plans/week-03.md.html"
+  },
+  {
+    "title": "week-04.md",
+    "kind": "Guide",
+    "path": "emergency-path/day-plans/week-04.md",
+    "url": "docs/emergency-path/day-plans/week-04.md.html"
+  },
+  {
+    "title": "week-05.md",
+    "kind": "Guide",
+    "path": "emergency-path/day-plans/week-05.md",
+    "url": "docs/emergency-path/day-plans/week-05.md.html"
+  },
+  {
+    "title": "week-06.md",
+    "kind": "Guide",
+    "path": "emergency-path/day-plans/week-06.md",
+    "url": "docs/emergency-path/day-plans/week-06.md.html"
+  },
+  {
+    "title": "week-07.md",
+    "kind": "Guide",
+    "path": "emergency-path/day-plans/week-07.md",
+    "url": "docs/emergency-path/day-plans/week-07.md.html"
+  },
+  {
+    "title": "week-08.md",
+    "kind": "Guide",
+    "path": "emergency-path/day-plans/week-08.md",
+    "url": "docs/emergency-path/day-plans/week-08.md.html"
+  },
+  {
+    "title": "github-study-links.md",
+    "kind": "Guide",
+    "path": "emergency-path/github-study-links.md",
+    "url": "docs/emergency-path/github-study-links.md.html"
+  },
+  {
+    "title": "daily-log.md",
+    "kind": "Guide",
+    "path": "emergency-path/progress/daily-log.md",
+    "url": "docs/emergency-path/progress/daily-log.md.html"
+  },
+  {
+    "title": "mistakes.md",
+    "kind": "Guide",
+    "path": "emergency-path/progress/mistakes.md",
+    "url": "docs/emergency-path/progress/mistakes.md.html"
+  },
+  {
+    "title": "Emergency Path README",
+    "kind": "Guide",
+    "path": "emergency-path/README.md",
+    "url": "docs/emergency-path/README.md.html"
+  },
+  {
+    "title": "requirements-core.txt",
+    "kind": "File",
+    "path": "emergency-path/requirements-core.txt",
+    "url": "docs/emergency-path/requirements-core.txt.html"
+  },
+  {
+    "title": "requirements-dl.txt",
+    "kind": "File",
+    "path": "emergency-path/requirements-dl.txt",
+    "url": "docs/emergency-path/requirements-dl.txt.html"
+  },
+  {
+    "title": "verify_env.py",
+    "kind": "Python",
+    "path": "emergency-path/scripts/verify_env.py",
+    "url": "docs/emergency-path/scripts/verify_env.py.html"
+  },
+  {
+    "title": "start-here.md",
+    "kind": "Guide",
+    "path": "emergency-path/start-here.md",
+    "url": "docs/emergency-path/start-here.md.html"
+  },
+  {
     "title": "CAPSTONE_ROADMAP.md",
     "kind": "Guide",
     "path": "knowledge-base/learning-journey/CAPSTONE_ROADMAP.md",
@@ -402,6 +516,12 @@ window.DOCS_MANIFEST = [
     "url": "docs/knowledge-base/zero-to-hero-guides/supply-chain/README.md.html"
   },
   {
+    "title": "NETLIFY_DEPLOY.md",
+    "kind": "Guide",
+    "path": "NETLIFY_DEPLOY.md",
+    "url": "docs/NETLIFY_DEPLOY.md.html"
+  },
+  {
     "title": "first_steps.py",
     "kind": "Python",
     "path": "phase-1-software-engineering/month-01-python-oop-git/resources/first_steps.py",
@@ -726,6 +846,78 @@ window.DOCS_MANIFEST = [
     "url": "docs/phase-6-generative-ai/README.md.html"
   },
   {
+    "title": "Month 13 Llm Finetuning Evaluation README",
+    "kind": "Guide",
+    "path": "phase-7-advanced-ai-systems/month-13-llm-finetuning-evaluation/README.md",
+    "url": "docs/phase-7-advanced-ai-systems/month-13-llm-finetuning-evaluation/README.md.html"
+  },
+  {
+    "title": "Month 14 Quantization Efficient Inference README",
+    "kind": "Guide",
+    "path": "phase-7-advanced-ai-systems/month-14-quantization-efficient-inference/README.md",
+    "url": "docs/phase-7-advanced-ai-systems/month-14-quantization-efficient-inference/README.md.html"
+  },
+  {
+    "title": "Month 15 Advanced Agent Systems README",
+    "kind": "Guide",
+    "path": "phase-7-advanced-ai-systems/month-15-advanced-agent-systems/README.md",
+    "url": "docs/phase-7-advanced-ai-systems/month-15-advanced-agent-systems/README.md.html"
+  },
+  {
+    "title": "Month 16 Ml System Design Reliability README",
+    "kind": "Guide",
+    "path": "phase-7-advanced-ai-systems/month-16-ml-system-design-reliability/README.md",
+    "url": "docs/phase-7-advanced-ai-systems/month-16-ml-system-design-reliability/README.md.html"
+  },
+  {
+    "title": "Month 17 Industrial Ai Optimization README",
+    "kind": "Guide",
+    "path": "phase-7-advanced-ai-systems/month-17-industrial-ai-optimization/README.md",
+    "url": "docs/phase-7-advanced-ai-systems/month-17-industrial-ai-optimization/README.md.html"
+  },
+  {
+    "title": "Month 18 Advanced Integration Project README",
+    "kind": "Guide",
+    "path": "phase-7-advanced-ai-systems/month-18-advanced-integration-project/README.md",
+    "url": "docs/phase-7-advanced-ai-systems/month-18-advanced-integration-project/README.md.html"
+  },
+  {
+    "title": "Month 19 Research Methodology README",
+    "kind": "Guide",
+    "path": "phase-8-research-expert-track/month-19-research-methodology/README.md",
+    "url": "docs/phase-8-research-expert-track/month-19-research-methodology/README.md.html"
+  },
+  {
+    "title": "Month 20 Novel Architectures README",
+    "kind": "Guide",
+    "path": "phase-8-research-expert-track/month-20-novel-architectures/README.md",
+    "url": "docs/phase-8-research-expert-track/month-20-novel-architectures/README.md.html"
+  },
+  {
+    "title": "Month 21 Large Scale Systems README",
+    "kind": "Guide",
+    "path": "phase-8-research-expert-track/month-21-large-scale-systems/README.md",
+    "url": "docs/phase-8-research-expert-track/month-21-large-scale-systems/README.md.html"
+  },
+  {
+    "title": "Month 22 Open Source Thought Leadership README",
+    "kind": "Guide",
+    "path": "phase-8-research-expert-track/month-22-open-source-thought-leadership/README.md",
+    "url": "docs/phase-8-research-expert-track/month-22-open-source-thought-leadership/README.md.html"
+  },
+  {
+    "title": "Month 23 Research Contribution README",
+    "kind": "Guide",
+    "path": "phase-8-research-expert-track/month-23-research-contribution/README.md",
+    "url": "docs/phase-8-research-expert-track/month-23-research-contribution/README.md.html"
+  },
+  {
+    "title": "Month 24 Expert Portfolio README",
+    "kind": "Guide",
+    "path": "phase-8-research-expert-track/month-24-expert-portfolio/README.md",
+    "url": "docs/phase-8-research-expert-track/month-24-expert-portfolio/README.md.html"
+  },
+  {
     "title": "PREREQUISITES.md",
     "kind": "Guide",
     "path": "projects/advanced/project-5-factory-twin/PREREQUISITES.md",
@@ -868,5 +1060,17 @@ window.DOCS_MANIFEST = [
     "kind": "Guide",
     "path": "README.md",
     "url": "docs/README.md.html"
+  },
+  {
+    "title": "ROADMAP_COVERAGE.md",
+    "kind": "Guide",
+    "path": "ROADMAP_COVERAGE.md",
+    "url": "docs/ROADMAP_COVERAGE.md.html"
+  },
+  {
+    "title": "ROADMAP_SOURCES.md",
+    "kind": "Guide",
+    "path": "ROADMAP_SOURCES.md",
+    "url": "docs/ROADMAP_SOURCES.md.html"
   }
 ];
