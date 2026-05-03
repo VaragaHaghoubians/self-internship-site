@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Roadmap Sources - Self-Internship Reader</title>
+    <style>
+      :root {
+        --bg: #f7f5ef;
+        --surface: #fffdf8;
+        --ink: #171812;
+        --muted: #696a61;
+        --line: #d9d1c2;
+        --accent: #0f766e;
+        --accent-soft: #d8f1ea;
+        --code: #101511;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .reader-top {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        min-height: 60px;
+        padding: 0 5vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 245, 239, 0.92);
+        backdrop-filter: blur(14px);
+      }
+      .reader-top a { color: var(--ink); }
+      .hero {
+        padding: 64px 5vw 38px;
+        color: white;
+        background:
+          linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
+          radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
+          #1e2b26;
+      }
+      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
+      .run-panel {
+        display: grid;
+        gap: 14px;
+        padding: 22px 5vw;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+      }
+      .run-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .run-button {
+        min-height: 42px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 8px;
+        color: #06231f;
+        background: #5eead4;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 900;
+      }
+      .run-note {
+        margin: 0;
+        color: var(--muted);
+      }
+      .run-output {
+        display: none;
+        max-height: 420px;
+        overflow: auto;
+        margin: 0;
+      }
+      .run-output.is-visible { display: block; }
+      h1 {
+        max-width: 980px;
+        margin: 0 0 16px;
+        font-size: clamp(38px, 6vw, 82px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+      .path {
+        display: inline-block;
+        max-width: 100%;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 36px;
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 44px 5vw 90px;
+      }
+      .content {
+        min-width: 0;
+        padding: 32px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc {
+        position: sticky;
+        top: 86px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
+      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
+      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
+      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
+      h3 { margin-top: 32px; font-size: 26px; }
+      h4 { margin-top: 24px; font-size: 19px; }
+      p { margin: 0 0 18px; }
+      ul, ol { padding-left: 24px; }
+      li { margin: 6px 0; }
+      blockquote {
+        margin: 24px 0;
+        padding: 18px 20px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border-collapse: collapse;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 15px;
+      }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { text-align: left; background: var(--accent-soft); }
+      tr:last-child td { border-bottom: 0; }
+      code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: #ece7da;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+      pre {
+        overflow: auto;
+        margin: 24px 0;
+        padding: 18px;
+        border-radius: 8px;
+        color: #f5f1e8;
+        background: var(--code);
+        line-height: 1.55;
+      }
+      pre code { padding: 0; color: inherit; background: transparent; }
+      .dir-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .dir-item {
+        display: grid;
+        gap: 4px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+      }
+      .dir-item span {
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+        .toc { position: static; order: -1; }
+        .content { padding: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="reader-top">
+      <a href="../index.html">Back to website</a>
+      <a href="../index.html#python-lab">Python lab</a>
+      <a href="index.html">Docs index</a>
+    </nav>
+    <header class="hero">
+      <h1>Roadmap Sources</h1>
+      <p>Clean reading view with headings, tables, lists, links, and code blocks rendered for study.</p>
+      <div class="path">ROADMAP_SOURCES.md</div>
+    </header>
+    
+    <main class="layout">
+      <article class="content"><h2 id="ai-ml-roadmap-sources-map">AI/ML Roadmap Sources Map</h2>
+<p>This file integrates the companion source list PDF into the self-internship so the roadmap, coverage plan, and learning resources stay in one place.</p>
+<p>Source file provided by the user:</p>
+<ul>
+<li><a href="/C:/Users/varag/Downloads/AI_ML_Learning_Roadmap_Comprehensive_Sources_List.pdf">AI_ML_Learning_Roadmap_Comprehensive_Sources_List.pdf</a></li>
+</ul>
+<p>Use this document as the working source map. The PDF remains the raw companion list; this file maps those sources to phases, domains, and advanced tracks in the repo.</p>
+<h3 id="core-foundations">Core foundations</h3>
+<h4 id="math-and-theory">Math and theory</h4>
+<ul>
+<li><a href="https://mml-book.github.io/book/mml-book.pdf">Mathematics for Machine Learning</a></li>
+<li><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/">MIT 18.06 Linear Algebra</a></li>
+<li><a href="https://cs229.stanford.edu/syllabus-fall2020.html">Stanford CS229 Math Prerequisites</a></li>
+<li><a href="https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf">Convex Optimization</a></li>
+<li><a href="https://www.inference.org.uk/itprnn/book.pdf">Information Theory, Inference, and Learning Algorithms</a></li>
+<li><a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi">3Blue1Brown: Essence of Linear Algebra</a></li>
+<li><a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDNPOjrT6GVgfzC6U7hoxuKx">3Blue1Brown: Essence of Calculus</a></li>
+</ul>
+<h4 id="core-books">Core books</h4>
+<ul>
+<li><a href="https://wesmckinney.com/book/">Python for Data Analysis</a></li>
+<li><a href="https://github.com/ageron/handson-ml3">Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow</a></li>
+<li><a href="https://www.deeplearningbook.org/">Deep Learning</a></li>
+<li><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf">Pattern Recognition and Machine Learning</a></li>
+<li><a href="https://probml.github.io/book2">Probabilistic Machine Learning: Advanced Topics</a></li>
+</ul>
+<h3 id="phase-mapping">Phase mapping</h3>
+<h4 id="phase-1-software-engineering-foundation">Phase 1: Software engineering foundation</h4>
+<p>Focus:</p>
+<ul>
+<li>Python fluency</li>
+<li>data manipulation</li>
+<li>SQL thinking</li>
+<li>basic ML evaluation discipline</li>
+</ul>
+<p>Primary sources:</p>
+<ul>
+<li><a href="https://wesmckinney.com/book/">Python for Data Analysis</a></li>
+<li><a href="https://github.com/ageron/handson-ml3">Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow</a></li>
+<li><a href="https://mml-book.github.io/book/mml-book.pdf">Mathematics for Machine Learning</a></li>
+<li><a href="https://cs229.stanford.edu/syllabus-fall2020.html">Stanford CS229 Math Prerequisites</a></li>
+<li><a href="https://git-scm.com/">Git</a></li>
+<li><a href="https://pandas.pydata.org/">Pandas</a></li>
+<li><a href="https://numpy.org/">NumPy</a></li>
+<li><a href="https://scikit-learn.org/">Scikit-learn</a></li>
+<li><a href="https://fastapi.tiangolo.com/">FastAPI</a></li>
+</ul>
+<h4 id="phase-2-production-ml-and-mlops">Phase 2: Production ML and MLOps</h4>
+<p>Focus:</p>
+<ul>
+<li>experiment tracking</li>
+<li>containerization</li>
+<li>deployment</li>
+<li>reproducibility</li>
+</ul>
+<p>Primary sources:</p>
+<ul>
+<li><a href="https://www.deeplearning.ai/courses/machine-learning-in-production/">Machine Learning Engineering for Production (MLOps)</a></li>
+<li><a href="https://huyenchip.com/books/">Designing Machine Learning Systems</a></li>
+<li><a href="https://mlflow.org/">MLflow</a></li>
+<li><a href="https://wandb.ai/site/">Weights &amp; Biases</a></li>
+<li><a href="https://dvc.org/">DVC</a></li>
+<li><a href="https://www.docker.com/">Docker</a></li>
+<li><a href="https://www.bentoml.com/">BentoML</a></li>
+<li><a href="https://spark.apache.org/">Apache Spark</a></li>
+<li><a href="https://www.getdbt.com/">dbt</a></li>
+</ul>
+<h4 id="phase-3-full-stack-web-and-analytics-delivery">Phase 3: Full-stack web and analytics delivery</h4>
+<p>Focus:</p>
+<ul>
+<li>user-facing applications</li>
+<li>ETL and dashboarding</li>
+<li>async workloads</li>
+</ul>
+<p>Primary sources:</p>
+<ul>
+<li><a href="https://fastapi.tiangolo.com/">FastAPI</a></li>
+<li><a href="https://plotly.com/">Plotly</a></li>
+<li><a href="https://matplotlib.org/">Matplotlib</a></li>
+<li><a href="https://seaborn.pydata.org/">Seaborn</a></li>
+<li><a href="https://pola.rs/">Polars</a></li>
+<li><a href="https://jupyter.org/">Jupyter</a></li>
+<li><a href="https://code.visualstudio.com/">VS Code</a></li>
+</ul>
+<h4 id="phase-4-iot-streaming-and-industrial-data">Phase 4: IoT, streaming, and industrial data</h4>
+<p>Focus:</p>
+<ul>
+<li>edge-generated data</li>
+<li>operational monitoring</li>
+<li>industrial systems context</li>
+</ul>
+<p>Primary sources:</p>
+<ul>
+<li><a href="https://www.cisco.com/site/us/en/solutions/networking/industrial-iot/industrial-networking-report/index.html">Cisco 2026 State of Industrial AI Report</a></li>
+<li><a href="https://www.sciencedirect.com/science/article/abs/pii/S0360835225007648">Next-generation manufacturing: leveraging AI for industrial engineering</a></li>
+<li><a href="https://developers.google.com/optimization">OR-Tools</a></li>
+<li><a href="https://coin-or.github.io/pulp/">PuLP</a></li>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/optimize.html">SciPy Optimize</a></li>
+<li><a href="https://www.pyomo.org/">Pyomo</a></li>
+<li><a href="https://www.anylogic.com/">AnyLogic</a></li>
+<li><a href="https://simpy.readthedocs.io/">SimPy</a></li>
+</ul>
+<h4 id="phase-5-capstone-integration">Phase 5: Capstone integration</h4>
+<p>Focus:</p>
+<ul>
+<li>ML plus optimization</li>
+<li>business impact</li>
+<li>system integration</li>
+</ul>
+<p>Primary sources:</p>
+<ul>
+<li><a href="https://huyenchip.com/books/">Designing Machine Learning Systems</a></li>
+<li><a href="https://www.deeplearning.ai/courses/machine-learning-in-production/">Machine Learning Engineering for Production (MLOps)</a></li>
+<li><a href="https://developers.google.com/optimization">OR-Tools</a></li>
+<li><a href="https://prometheus.io/">Prometheus</a></li>
+<li><a href="https://grafana.com/">Grafana</a></li>
+<li><a href="https://www.evidentlyai.com/">Evidently AI</a></li>
+</ul>
+<h4 id="phase-6-nlp-llms-rag-and-agents">Phase 6: NLP, LLMs, RAG, and agents</h4>
+<h4 id="month-10-nlp-and-llm-basics">Month 10: NLP and LLM basics</h4>
+<ul>
+<li><a href="https://web.stanford.edu/~jurafsky/slp3/">Speech and Language Processing</a></li>
+<li><a href="https://huggingface.co/learn/llm-course/en/chapter1/1">Hugging Face NLP Course</a></li>
+<li><a href="https://web.stanford.edu/class/cs224n/">CS224N</a></li>
+<li><a href="https://www.coursera.org/learn/generative-ai-with-llms">Generative AI with Large Language Models</a></li>
+<li><a href="https://www.llm-book.com/">Hands-On Large Language Models</a></li>
+<li><a href="https://www.manning.com/books/build-a-large-language-model-from-scratch">Build a Large Language Model (from Scratch)</a></li>
+<li><a href="https://jalammar.github.io/illustrated-transformer/">The Illustrated Transformer</a></li>
+</ul>
+<p>Core papers:</p>
+<ul>
+<li><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></li>
+<li><a href="https://arxiv.org/abs/1810.04805">BERT</a></li>
+<li><a href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners</a></li>
+<li><a href="https://arxiv.org/abs/2302.13971">LLaMA</a></li>
+</ul>
+<h4 id="month-11-rag-and-vector-databases">Month 11: RAG and vector databases</h4>
+<ul>
+<li><a href="https://fullstackdeeplearning.com/llm-bootcamp/">Full Stack LLM Bootcamp</a></li>
+<li><a href="https://arxiv.org/abs/2005.11401">Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</a></li>
+<li><a href="https://arxiv.org/abs/2212.10496">HyDE</a></li>
+<li><a href="https://www.trychroma.com/">ChromaDB</a></li>
+<li><a href="https://github.com/pgvector/pgvector">pgvector</a></li>
+<li><a href="https://www.pinecone.io/">Pinecone</a></li>
+<li><a href="https://weaviate.io/">Weaviate</a></li>
+<li><a href="https://qdrant.tech/">Qdrant</a></li>
+<li><a href="https://milvus.io/">Milvus</a></li>
+</ul>
+<h4 id="month-12-agentic-ai">Month 12: agentic AI</h4>
+<ul>
+<li><a href="https://www.deeplearning.ai/short-courses/multi-ai-agent-systems-with-crewai/">Multi AI Agent Systems with CrewAI</a></li>
+<li><a href="https://www.langchain.com/">LangChain</a></li>
+<li><a href="https://www.langchain.com/langgraph">LangGraph</a></li>
+<li><a href="https://www.crewai.com/">CrewAI</a></li>
+<li><a href="https://microsoft.github.io/autogen/">AutoGen</a></li>
+<li><a href="https://github.com/pydantic/pydantic-ai">PydanticAI</a></li>
+</ul>
+<p>Core papers:</p>
+<ul>
+<li><a href="https://arxiv.org/abs/2210.03629">ReAct</a></li>
+<li><a href="https://arxiv.org/abs/2302.04761">Toolformer</a></li>
+<li><a href="https://arxiv.org/abs/2303.11366">Reflexion</a></li>
+<li><a href="https://arxiv.org/abs/2305.10601">Tree of Thoughts</a></li>
+</ul>
+<h3 id="phase-7-advanced-ai-systems">Phase 7: advanced AI systems</h3>
+<h4 id="month-13-fine-tuning-and-evaluation">Month 13: fine-tuning and evaluation</h4>
+<ul>
+<li><a href="https://www.deeplearning.ai/short-courses/finetuning-large-language-models/">Finetuning Large Language Models</a></li>
+<li><a href="https://www.manning.com/books/build-a-large-language-model-from-scratch">Build a Large Language Model (from Scratch)</a></li>
+<li><a href="https://arxiv.org/abs/2203.02155">InstructGPT</a></li>
+<li><a href="https://arxiv.org/abs/2305.18290">Direct Preference Optimization</a></li>
+</ul>
+<h4 id="month-14-quantization-and-efficient-inference">Month 14: quantization and efficient inference</h4>
+<ul>
+<li><a href="https://arxiv.org/abs/2210.17323">GPTQ</a></li>
+<li><a href="https://arxiv.org/abs/2306.00978">AWQ</a></li>
+<li><a href="https://arxiv.org/abs/2502.02631">ParetoQ</a></li>
+<li><a href="https://arxiv.org/abs/2505.06653">BOF4</a></li>
+<li><a href="https://github.com/NVlabs/QeRL">QeRL</a></li>
+<li><a href="https://vllm.ai/">vLLM</a></li>
+<li><a href="https://github.com/ggerganov/llama.cpp">llama.cpp</a></li>
+<li><a href="https://developer.nvidia.com/tensorrt-llm">TensorRT-LLM</a></li>
+<li><a href="https://developer.nvidia.com/triton-inference-server">Triton Inference Server</a></li>
+<li><a href="https://github.com/AutoGPTQ/AutoGPTQ">AutoGPTQ</a></li>
+<li><a href="https://github.com/casper-hansen/AutoAWQ">AutoAWQ</a></li>
+<li><a href="https://www.deepspeed.ai/">DeepSpeed</a></li>
+<li><a href="https://huggingface.co/docs/accelerate/index">Accelerate</a></li>
+</ul>
+<h4 id="month-15-advanced-agents">Month 15: advanced agents</h4>
+<ul>
+<li><a href="https://github.com/luo-junyu/awesome-agent-papers">Awesome-Agent-Papers</a></li>
+<li><a href="https://github.com/ARUNAGIRINATHAN-K/awesome-ai-agents">Awesome-AI-Agents</a></li>
+<li><a href="https://github.com/crewaiinc/crewAI">CrewAI</a></li>
+<li><a href="https://github.com/microsoft/autogen">AutoGen</a></li>
+<li><a href="https://github.com/pydantic/pydantic-ai">PydanticAI</a></li>
+<li><a href="https://arxiv.org/abs/2210.03629">ReAct</a></li>
+<li><a href="https://arxiv.org/abs/2303.11366">Reflexion</a></li>
+<li><a href="https://arxiv.org/abs/2305.10601">Tree of Thoughts</a></li>
+</ul>
+<h4 id="month-16-monitoring-serving-and-reliability">Month 16: monitoring, serving, and reliability</h4>
+<ul>
+<li><a href="https://prometheus.io/">Prometheus</a></li>
+<li><a href="https://grafana.com/">Grafana</a></li>
+<li><a href="https://www.evidentlyai.com/">Evidently AI</a></li>
+<li><a href="https://whylabs.ai/">WhyLabs</a></li>
+<li><a href="https://www.datadoghq.com/">Datadog</a></li>
+<li><a href="https://kubernetes.io/">Kubernetes</a></li>
+<li><a href="https://www.kubeflow.org/">Kubeflow</a></li>
+<li><a href="https://airflow.apache.org/">Airflow</a></li>
+<li><a href="https://www.terraform.io/">Terraform</a></li>
+<li><a href="https://www.pulumi.com/">Pulumi</a></li>
+</ul>
+<h4 id="month-17-industrial-ai-and-optimization">Month 17: industrial AI and optimization</h4>
+<ul>
+<li><a href="https://developers.google.com/optimization">OR-Tools</a></li>
+<li><a href="https://coin-or.github.io/pulp/">PuLP</a></li>
+<li><a href="https://www.pyomo.org/">Pyomo</a></li>
+<li><a href="https://www.gurobi.com/">Gurobi</a></li>
+<li><a href="https://www.ibm.com/products/ilog-cplex-optimization-studio">CPLEX</a></li>
+<li><a href="https://www.anylogic.com/">AnyLogic</a></li>
+<li><a href="https://simpy.readthedocs.io/">SimPy</a></li>
+<li><a href="https://www.cisco.com/site/us/en/solutions/networking/industrial-iot/industrial-networking-report/index.html">Cisco 2026 State of Industrial AI Report</a></li>
+<li><a href="https://www.sciencedirect.com/science/article/abs/pii/S0360835225007648">Next-generation manufacturing: leveraging AI for industrial engineering</a></li>
+</ul>
+<h4 id="month-18-advanced-integration-project">Month 18: advanced integration project</h4>
+<p>Combine sources from Months 13-17 and choose one of these stacks explicitly:</p>
+<ul>
+<li>Fine-tuned model + quantized inference + monitored serving</li>
+<li>Agent system + observability + fallback strategy</li>
+<li>Industrial AI system + optimization + reliability dashboard</li>
+</ul>
+<h3 id="phase-8-research-and-expert-track">Phase 8: research and expert track</h3>
+<h4 id="research-systems-and-experimentation">Research, systems, and experimentation</h4>
+<ul>
+<li><a href="https://rail.eecs.berkeley.edu/deeprlcourse/">CS285 Deep Reinforcement Learning</a></li>
+<li><a href="http://incompleteideas.net/book/the-book-2nd.html">Reinforcement Learning: An Introduction</a></li>
+<li><a href="https://github.com/jax-ml/jax">JAX</a></li>
+<li><a href="https://github.com/google/flax">Flax</a></li>
+<li><a href="https://github.com/nvidia/megatron-lm">Megatron-LM</a></li>
+<li><a href="https://www.ray.io/">Ray</a></li>
+<li><a href="https://github.com/alpa-projects/alpa">Alpa</a></li>
+<li><a href="https://openai.com/research/triton">Triton (OpenAI)</a></li>
+<li><a href="https://developer.nvidia.com/cuda-toolkit">CUDA Toolkit</a></li>
+</ul>
+<h4 id="quantization-and-frontier-llm-references">Quantization and frontier LLM references</h4>
+<ul>
+<li><a href="https://github.com/pprp/awesome-llm-quantization">Awesome-LLM-Quantization</a></li>
+<li><a href="https://github.com/Kai-Liu001/Awesome-Model-Quantization">Awesome-Model-Quantization</a></li>
+<li><a href="https://developer.nvidia.com/tensorrt-llm">TensorRT-LLM</a></li>
+<li><a href="https://github.com/vllm-project/vllm">vLLM</a></li>
+<li><a href="https://github.com/ggerganov/llama.cpp">llama.cpp</a></li>
+</ul>
+<h3 id="how-to-use-this-file">How to use this file</h3>
+<ol>
+<li>Start with the phase you are currently in.</li>
+<li>Pull only the sources relevant to that month instead of trying to read everything at once.</li>
+<li>For advanced and expert months, combine one book or course, one paper, and one implementation tool.</li>
+<li>When you update a monthly plan, add the exact sources you actually used.</li>
+</ol></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#ai-ml-roadmap-sources-map">AI/ML Roadmap Sources Map</a><a style="margin-left:12px" href="#core-foundations">Core foundations</a><a style="margin-left:24px" href="#math-and-theory">Math and theory</a><a style="margin-left:24px" href="#core-books">Core books</a><a style="margin-left:12px" href="#phase-mapping">Phase mapping</a><a style="margin-left:24px" href="#phase-1-software-engineering-foundation">Phase 1: Software engineering foundation</a><a style="margin-left:24px" href="#phase-2-production-ml-and-mlops">Phase 2: Production ML and MLOps</a><a style="margin-left:24px" href="#phase-3-full-stack-web-and-analytics-delivery">Phase 3: Full-stack web and analytics delivery</a><a style="margin-left:24px" href="#phase-4-iot-streaming-and-industrial-data">Phase 4: IoT, streaming, and industrial data</a><a style="margin-left:24px" href="#phase-5-capstone-integration">Phase 5: Capstone integration</a><a style="margin-left:24px" href="#phase-6-nlp-llms-rag-and-agents">Phase 6: NLP, LLMs, RAG, and agents</a><a style="margin-left:24px" href="#month-10-nlp-and-llm-basics">Month 10: NLP and LLM basics</a><a style="margin-left:24px" href="#month-11-rag-and-vector-databases">Month 11: RAG and vector databases</a><a style="margin-left:24px" href="#month-12-agentic-ai">Month 12: agentic AI</a><a style="margin-left:12px" href="#phase-7-advanced-ai-systems">Phase 7: advanced AI systems</a><a style="margin-left:24px" href="#month-13-fine-tuning-and-evaluation">Month 13: fine-tuning and evaluation</a><a style="margin-left:24px" href="#month-14-quantization-and-efficient-inference">Month 14: quantization and efficient inference</a><a style="margin-left:24px" href="#month-15-advanced-agents">Month 15: advanced agents</a><a style="margin-left:24px" href="#month-16-monitoring-serving-and-reliability">Month 16: monitoring, serving, and reliability</a><a style="margin-left:24px" href="#month-17-industrial-ai-and-optimization">Month 17: industrial AI and optimization</a><a style="margin-left:24px" href="#month-18-advanced-integration-project">Month 18: advanced integration project</a><a style="margin-left:12px" href="#phase-8-research-and-expert-track">Phase 8: research and expert track</a><a style="margin-left:24px" href="#research-systems-and-experimentation">Research, systems, and experimentation</a><a style="margin-left:24px" href="#quantization-and-frontier-llm-references">Quantization and frontier LLM references</a></aside>
+    </main>
+  </body>
+</html>

@@ -209,7 +209,7 @@
     </header>
     
     <main class="layout">
-      <article class="content"><h2 id="12-month-data-to-ai-engineering-self-internship">12-Month Data-to-AI Engineering Self-Internship</h2>
+      <article class="content"><h2 id="24-month-data-to-ai-engineering-self-internship">24-Month Data-to-AI Engineering Self-Internship</h2>
 <p><strong>Goal:</strong> Transition from academic Data Science to a full-stack AI/Machine Learning Engineer capable of handling everything from physical hardware (IoT) to cloud-deployed autonomous AI agents.</p>
 <p><strong>Mindset:</strong> Treat this like a 9-to-5 job. Dedicate 4–6 hours a day to coding, building, and debugging. You already know the math — now you are learning the <strong>tools</strong>.</p>
 <h3 id="the-industrial-engineer-advantage">The Industrial Engineer Advantage</h3>
@@ -265,14 +265,32 @@
 ├── phase-3-full-stack-web/          ← Month 5–6
 ├── phase-4-iot-hardware/            ← Month 7–8
 ├── phase-5-capstone/                ← Month 9
-└── phase-6-generative-ai/           ← Month 10–12 (NLP → LLMs → RAG → Agents)</code></pre>
+├── phase-6-generative-ai/           ← Month 10–12 (NLP → LLMs → RAG → Agents)
+├── phase-7-advanced-ai-systems/     ← Month 13–18 (Fine-tuning → Quantization → Reliability)
+└── phase-8-research-expert-track/   ← Month 19–24 (Research → Scale → Expert Portfolio)</code></pre>
 <p>Each <code>phase-X/month-Y/</code> folder contains:</p>
 <ul>
 <li><code>resources/</code> — Code files and guides to study <strong>before</strong> starting</li>
 <li><code>deliverable/</code> — Your finished work goes here</li>
 </ul>
-<h3 id="the-12-month-roadmap">The 12-Month Roadmap</h3>
+<h3 id="the-core-12-month-roadmap">The Core 12-Month Roadmap</h3>
 <table><thead><tr><th>Phase</th><th>Months</th><th>Focus</th><th>Deliverable</th></tr></thead><tbody><tr><td>1 – Software Engineering</td><td>1–2</td><td>Python OOP, Git, SQL, FastAPI</td><td>CLI tool + ML model in FastAPI</td></tr><tr><td>2 – Production ML (MLOps)</td><td>3–4</td><td>Docker, MLflow, Cloud, CI/CD</td><td>Dockerized model on cloud server</td></tr><tr><td>3 – Full-Stack Web</td><td>5–6</td><td>Django MVT, ORM, Celery/Redis</td><td>Web app with ML-powered dashboard</td></tr><tr><td>4 – IoT &amp; Hardware</td><td>7–8</td><td>Arduino/ESP32, C++, MQTT</td><td>Live sensor dashboard in Django</td></tr><tr><td>5 – Capstone</td><td>9</td><td>Tie everything together</td><td>Full IoT → ML → Cloud portfolio project</td></tr><tr><td>6 – Generative AI &amp; Agents</td><td>10–12</td><td>NLP, LLMs, RAG, Agentic AI</td><td>Production AI agent with memory &amp; tools</td></tr></tbody></table>
+<h3 id="ai-ml-roadmap-coverage">AI/ML Roadmap Coverage</h3>
+<p>The external <code>Comprehensive AI/ML Learning &amp; Research Roadmap</code> is now covered in two layers:</p>
+<ul>
+<li><strong>Months 1–12:</strong> the original engineering internship</li>
+<li><strong>Months 13–24:</strong> the advanced systems and research extension needed to cover quantization, reliability, evaluation, and expert-level work</li>
+</ul>
+<p>Use <a href="ROADMAP_COVERAGE.md">ROADMAP_COVERAGE.md</a> as the master crosswalk between the external roadmap and this repository. Use <a href="ROADMAP_SOURCES.md">ROADMAP_SOURCES.md</a> as the companion source map built from the provided comprehensive sources PDF.</p>
+<p>The following tracks now run across the full internship, not just one month:</p>
+<ul>
+<li>Math refresh: linear algebra, calculus, probability, statistics, information theory</li>
+<li>Paper reading and technical writing</li>
+<li>Evaluation discipline before and after every build</li>
+<li>Portfolio-quality documentation for every major deliverable</li>
+</ul>
+<h4 id="extension-phases-months-13-24">Extension Phases (Months 13–24)</h4>
+<table><thead><tr><th>Phase</th><th>Months</th><th>Focus</th><th>Deliverable</th></tr></thead><tbody><tr><td>7 – Advanced AI Systems</td><td>13–18</td><td>Fine-tuning, quantization, advanced agents, monitoring, reliability, industrial AI integration</td><td>Production-grade AI/ML systems with formal evaluation and observability</td></tr><tr><td>8 – Research &amp; Expert Track</td><td>19–24</td><td>Paper reproduction, novel architectures, large-scale systems, open-source contribution, expert portfolio</td><td>Research-grade artifact or public contribution plus expert portfolio</td></tr></tbody></table>
 <h3 id="phase-1-the-software-engineering-foundation">Phase 1 — The Software Engineering Foundation</h3>
 <blockquote><em>Stop writing scripts. Start writing software.</em></blockquote>
 <h4 id="month-1-advanced-python-amp-version-control">Month 1: Advanced Python &amp; Version Control</h4>
@@ -353,6 +371,34 @@
 </ol>
 <p><strong>Why all of Phase 1–5 matters here:</strong></p>
 <table><thead><tr><th>Skill from earlier</th><th>How it powers your agent</th></tr></thead><tbody><tr><td>FastAPI (Month 2)</td><td>Each agent tool is a FastAPI endpoint</td></tr><tr><td>Docker + Cloud (Month 3–4)</td><td>Agent runs as a containerized service</td></tr><tr><td>Django + Celery (Month 5–6)</td><td>Long agent runs are async background tasks</td></tr><tr><td>SQL + ORM (Month 2, 5)</td><td>RAG retrieval + agent memory storage</td></tr><tr><td>CI/CD (Month 4)</td><td>Auto-deploy updated agent on every push</td></tr><tr><td>IoT data (Month 7–8)</td><td>Agent monitors and reacts to live sensor data</td></tr></tbody></table>
+<h3 id="phase-7-advanced-ai-systems">Phase 7 — Advanced AI Systems</h3>
+<blockquote><em>Move from working AI applications to optimized and reliable AI systems.</em></blockquote>
+<h4 id="month-13-llm-fine-tuning-and-evaluation">Month 13: LLM Fine-Tuning and Evaluation</h4>
+<p><strong>Learn:</strong> LoRA/QLoRA, supervised fine-tuning, training dynamics, model evaluation <strong>Study:</strong> <code>phase-7-advanced-ai-systems/month-13-llm-finetuning-evaluation/resources/</code> <strong>Build:</strong> Fine-tune a small open-weight model and compare it against prompt-only baselines</p>
+<h4 id="month-14-quantization-and-efficient-inference">Month 14: Quantization and Efficient Inference</h4>
+<p><strong>Learn:</strong> INT8/INT4 tradeoffs, GPTQ/AWQ/GGUF concepts, local and server inference benchmarking <strong>Study:</strong> <code>phase-7-advanced-ai-systems/month-14-quantization-efficient-inference/resources/</code> <strong>Build:</strong> Benchmark one model across multiple inference configurations for memory, latency, throughput, and quality</p>
+<h4 id="month-15-advanced-agent-systems">Month 15: Advanced Agent Systems</h4>
+<p><strong>Learn:</strong> Agent evaluation, tracing, retries, fallback logic, memory, multi-agent collaboration <strong>Study:</strong> <code>phase-7-advanced-ai-systems/month-15-advanced-agent-systems/resources/</code> <strong>Build:</strong> A production-minded tool-using agent with observability and failure recovery</p>
+<h4 id="month-16-ml-system-design-and-reliability">Month 16: ML System Design and Reliability</h4>
+<p><strong>Learn:</strong> Drift detection, SLOs, error budgets, shadow deploys, canary rollouts, incident response <strong>Study:</strong> <code>phase-7-advanced-ai-systems/month-16-ml-system-design-reliability/resources/</code> <strong>Build:</strong> Add monitoring and reliability controls to one ML or AI system from earlier phases</p>
+<h4 id="month-17-industrial-ai-and-optimization">Month 17: Industrial AI and Optimization</h4>
+<p><strong>Learn:</strong> Digital twins, causal reasoning, graph-aware operations, advanced decision support <strong>Study:</strong> <code>phase-7-advanced-ai-systems/month-17-industrial-ai-optimization/resources/</code> <strong>Build:</strong> Extend an industrial project so it predicts, diagnoses, and recommends optimized action</p>
+<h4 id="month-18-advanced-integration-project">Month 18: Advanced Integration Project</h4>
+<p><strong>Learn:</strong> System integration across model adaptation, serving, evaluation, reliability, and industrial use cases <strong>Study:</strong> <code>phase-7-advanced-ai-systems/month-18-advanced-integration-project/resources/</code> <strong>Build:</strong> A production-grade integrated AI system that combines the Phase 7 competencies</p>
+<h3 id="phase-8-research-amp-expert-track">Phase 8 — Research &amp; Expert Track</h3>
+<blockquote><em>Turn strong engineering into expert-level judgment, public artifacts, and research discipline.</em></blockquote>
+<h4 id="month-19-research-methodology">Month 19: Research Methodology</h4>
+<p><strong>Learn:</strong> Paper reading, reproduction workflow, ablations, experiment rigor, research-style writing <strong>Study:</strong> <code>phase-8-research-expert-track/month-19-research-methodology/resources/</code> <strong>Build:</strong> Reproduce one meaningful paper result or benchmark</p>
+<h4 id="month-20-novel-architectures">Month 20: Novel Architectures</h4>
+<p><strong>Learn:</strong> Transformer variants, efficient architectures, multimodal design, architecture comparison <strong>Study:</strong> <code>phase-8-research-expert-track/month-20-novel-architectures/resources/</code> <strong>Build:</strong> Implement or adapt one non-trivial architecture idea and compare it to a baseline</p>
+<h4 id="month-21-large-scale-systems">Month 21: Large-Scale Systems</h4>
+<p><strong>Learn:</strong> Throughput, concurrency, serving patterns, orchestration, capacity planning <strong>Study:</strong> <code>phase-8-research-expert-track/month-21-large-scale-systems/resources/</code> <strong>Build:</strong> Design and test a scaled serving or pipeline architecture for one existing system</p>
+<h4 id="month-22-open-source-and-thought-leadership">Month 22: Open Source and Thought Leadership</h4>
+<p><strong>Learn:</strong> Public engineering writing, reusable artifacts, contribution workflow, technical communication <strong>Study:</strong> <code>phase-8-research-expert-track/month-22-open-source-thought-leadership/resources/</code> <strong>Build:</strong> Publish a reusable component, technical deep dive, or strong open-source contribution</p>
+<h4 id="month-23-research-contribution">Month 23: Research Contribution</h4>
+<p><strong>Learn:</strong> What makes a contribution novel, reproducible, and worth sharing <strong>Study:</strong> <code>phase-8-research-expert-track/month-23-research-contribution/resources/</code> <strong>Build:</strong> Produce a research-style artifact, benchmark suite, or serious systems contribution</p>
+<h4 id="month-24-expert-portfolio">Month 24: Expert Portfolio</h4>
+<p><strong>Learn:</strong> How to package systems, research, and industrial AI work into one coherent profile <strong>Study:</strong> <code>phase-8-research-expert-track/month-24-expert-portfolio/resources/</code> <strong>Build:</strong> Assemble a leadership-grade portfolio, resume narrative, and interview architecture stories</p>
 <h3 id="how-to-use-this-workspace">How to Use This Workspace</h3>
 <ol>
 <li><strong>Navigate to the current phase/month</strong> you are working on</li>
@@ -385,8 +431,8 @@
 <h4 id="3-keep-iot-simple-months-7-8">3. Keep IoT Simple (Months 7–8)</h4>
 <p>Hardware is messy. Wires get loose, sensors fail, and C++ is unforgiving. Your goal is <strong>not</strong> to become an electrical engineer. Your goal is to prove you can pipe live data from the physical world into your database.</p>
 <p><strong>Scope rule:</strong> One sensor (DHT11), one board (ESP32), one endpoint. Get that working first. Resist the urge to add more hardware until the basic pipeline is solid.</p>
-<p><em>Started: April 2026 | Phase 1–5 target: January 2027 | Phase 6 (Gen AI) target: April 2027</em></p></article>
-      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#12-month-data-to-ai-engineering-self-internship">12-Month Data-to-AI Engineering Self-Internship</a><a style="margin-left:12px" href="#the-industrial-engineer-advantage">The Industrial Engineer Advantage</a><a style="margin-left:24px" href="#superpower-1-optimization-beyond-prediction">Superpower 1 — Optimization (Beyond Prediction)</a><a style="margin-left:24px" href="#superpower-2-industry-4-0-amp-predictive-maintenance">Superpower 2 — Industry 4.0 &amp; Predictive Maintenance</a><a style="margin-left:24px" href="#superpower-3-the-ai-product-manager-amp-enterprise-architect-engineering-management-bridge">Superpower 3 — The AI Product Manager &amp; Enterprise Architect (Engineering Management Bridge)</a><a style="margin-left:12px" href="#workspace-structure">Workspace Structure</a><a style="margin-left:12px" href="#the-12-month-roadmap">The 12-Month Roadmap</a><a style="margin-left:12px" href="#phase-1-the-software-engineering-foundation">Phase 1 — The Software Engineering Foundation</a><a style="margin-left:24px" href="#month-1-advanced-python-amp-version-control">Month 1: Advanced Python &amp; Version Control</a><a style="margin-left:24px" href="#month-2-databases-amp-the-web-foundation">Month 2: Databases &amp; The Web Foundation</a><a style="margin-left:12px" href="#phase-2-production-machine-learning-mlops">Phase 2 — Production Machine Learning (MLOps)</a><a style="margin-left:24px" href="#month-3-containerization-amp-mlops-basics">Month 3: Containerization &amp; MLOps Basics</a><a style="margin-left:24px" href="#month-4-cloud-computing-amp-ci-cd">Month 4: Cloud Computing &amp; CI/CD</a><a style="margin-left:12px" href="#phase-3-the-full-stack-web-framework">Phase 3 — The Full-Stack Web Framework</a><a style="margin-left:24px" href="#month-5-django-fundamentals">Month 5: Django Fundamentals</a><a style="margin-left:24px" href="#month-6-integrating-ml-into-django">Month 6: Integrating ML into Django</a><a style="margin-left:12px" href="#phase-4-edge-computing-amp-the-physical-world">Phase 4 — Edge Computing &amp; The Physical World</a><a style="margin-left:24px" href="#month-7-microcontrollers-amp-sensors">Month 7: Microcontrollers &amp; Sensors</a><a style="margin-left:24px" href="#month-8-iot-data-streaming">Month 8: IoT Data Streaming</a><a style="margin-left:12px" href="#phase-5-the-masterpiece-amp-the-job-hunt">Phase 5 — The Masterpiece &amp; The Job Hunt</a><a style="margin-left:24px" href="#month-9-the-grand-capstone-cold-chain-logistics-warehouse">Month 9: The Grand Capstone — Cold-Chain Logistics Warehouse</a><a style="margin-left:12px" href="#phase-6-generative-ai-amp-agentic-systems">Phase 6 — Generative AI &amp; Agentic Systems</a><a style="margin-left:24px" href="#month-10-nlp-foundations-amp-llm-basics">Month 10: NLP Foundations &amp; LLM Basics</a><a style="margin-left:24px" href="#month-11-rag-retrieval-augmented-generation">Month 11: RAG — Retrieval-Augmented Generation</a></aside>
+<p><em>Started: April 2026 | Core engineering track target: April 2027 | Advanced systems target: October 2027 | Research/expert track target: April 2028</em></p></article>
+      <aside class="toc"><h2>On this page</h2><a style="margin-left:0px" href="#24-month-data-to-ai-engineering-self-internship">24-Month Data-to-AI Engineering Self-Internship</a><a style="margin-left:12px" href="#the-industrial-engineer-advantage">The Industrial Engineer Advantage</a><a style="margin-left:24px" href="#superpower-1-optimization-beyond-prediction">Superpower 1 — Optimization (Beyond Prediction)</a><a style="margin-left:24px" href="#superpower-2-industry-4-0-amp-predictive-maintenance">Superpower 2 — Industry 4.0 &amp; Predictive Maintenance</a><a style="margin-left:24px" href="#superpower-3-the-ai-product-manager-amp-enterprise-architect-engineering-management-bridge">Superpower 3 — The AI Product Manager &amp; Enterprise Architect (Engineering Management Bridge)</a><a style="margin-left:12px" href="#workspace-structure">Workspace Structure</a><a style="margin-left:12px" href="#the-core-12-month-roadmap">The Core 12-Month Roadmap</a><a style="margin-left:12px" href="#ai-ml-roadmap-coverage">AI/ML Roadmap Coverage</a><a style="margin-left:24px" href="#extension-phases-months-13-24">Extension Phases (Months 13–24)</a><a style="margin-left:12px" href="#phase-1-the-software-engineering-foundation">Phase 1 — The Software Engineering Foundation</a><a style="margin-left:24px" href="#month-1-advanced-python-amp-version-control">Month 1: Advanced Python &amp; Version Control</a><a style="margin-left:24px" href="#month-2-databases-amp-the-web-foundation">Month 2: Databases &amp; The Web Foundation</a><a style="margin-left:12px" href="#phase-2-production-machine-learning-mlops">Phase 2 — Production Machine Learning (MLOps)</a><a style="margin-left:24px" href="#month-3-containerization-amp-mlops-basics">Month 3: Containerization &amp; MLOps Basics</a><a style="margin-left:24px" href="#month-4-cloud-computing-amp-ci-cd">Month 4: Cloud Computing &amp; CI/CD</a><a style="margin-left:12px" href="#phase-3-the-full-stack-web-framework">Phase 3 — The Full-Stack Web Framework</a><a style="margin-left:24px" href="#month-5-django-fundamentals">Month 5: Django Fundamentals</a><a style="margin-left:24px" href="#month-6-integrating-ml-into-django">Month 6: Integrating ML into Django</a><a style="margin-left:12px" href="#phase-4-edge-computing-amp-the-physical-world">Phase 4 — Edge Computing &amp; The Physical World</a><a style="margin-left:24px" href="#month-7-microcontrollers-amp-sensors">Month 7: Microcontrollers &amp; Sensors</a><a style="margin-left:24px" href="#month-8-iot-data-streaming">Month 8: IoT Data Streaming</a><a style="margin-left:12px" href="#phase-5-the-masterpiece-amp-the-job-hunt">Phase 5 — The Masterpiece &amp; The Job Hunt</a><a style="margin-left:24px" href="#month-9-the-grand-capstone-cold-chain-logistics-warehouse">Month 9: The Grand Capstone — Cold-Chain Logistics Warehouse</a><a style="margin-left:12px" href="#phase-6-generative-ai-amp-agentic-systems">Phase 6 — Generative AI &amp; Agentic Systems</a></aside>
     </main>
   </body>
 </html>
