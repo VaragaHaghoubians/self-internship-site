@@ -4178,9 +4178,6 @@ function renderResources() {
         </div>
         <div class="source-link-actions">
           <a class="file-link" href="${localUrl}" target="_blank" rel="noreferrer">Open</a>
-          ${githubLink(path)
-            ? `<a class="file-link" href="${githubLink(path)}" target="_blank" rel="noreferrer">GitHub</a>`
-            : ""}
         </div>
       </article>
     `}).join("") || `<p>No resources match your search.</p>`;
