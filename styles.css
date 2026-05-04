@@ -335,27 +335,30 @@ input {
 }
 
 /* ── Filter: main roadmap rail ─────── */
-.month-rail.ft-active .month-button[data-fast-track="false"] {
-  opacity: 0.28;
-  filter: grayscale(0.7);
+/* Use :not() so this works even if data-fast-track is absent */
+.month-rail.ft-active .month-button:not([data-fast-track="true"]) {
+  opacity: 0.25 !important;
+  filter: grayscale(0.75) !important;
+  border-color: var(--line) !important;
+  box-shadow: none !important;
 }
 .month-rail.ft-active .month-button[data-fast-track="true"] {
-  border-color: #f59e0b;
-  box-shadow: 0 0 0 2px #f59e0b55;
+  outline: 2px solid #f59e0b !important;
+  box-shadow: 0 0 0 4px #f59e0b33 !important;
 }
 .month-rail.ft-active .month-button[data-fast-track="true"] .ft-badge {
-  display: inline;
+  display: inline !important;
 }
 
 /* ── Filter: extended roadmap cards ── */
-#extendedRoadmapContent.ft-active .ext-month-card[data-fast-track="false"] {
-  opacity: 0.22;
-  filter: grayscale(0.8);
-  pointer-events: none;
+#extendedRoadmapContent.ft-active .ext-month-card:not([data-fast-track="true"]) {
+  opacity: 0.2 !important;
+  filter: grayscale(0.85) !important;
+  pointer-events: none !important;
 }
 #extendedRoadmapContent.ft-active .ext-month-card[data-fast-track="true"] {
-  border-color: #f59e0b;
-  box-shadow: 0 0 0 3px #f59e0b44;
+  outline: 3px solid #f59e0b !important;
+  box-shadow: 0 0 0 6px #f59e0b33 !important;
 }
 
 .hero {
