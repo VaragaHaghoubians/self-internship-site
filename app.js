@@ -4644,6 +4644,48 @@ function bindTheme() {
   });
 }
 
+function bindNavMenu() {
+  const btn = document.getElementById("navMenuBtn");
+  const panel = document.getElementById("navPanel");
+  const overlay = document.getElementById("navOverlay");
+  if (!btn || !panel || !overlay) return;
+
+  function openMenu() {
+    panel.classList.add("is-open");
+    overlay.classList.add("is-open");
+    btn.setAttribute("aria-expanded", "true");
+    panel.setAttribute("aria-hidden", "false");
+  }
+
+  function closeMenu() {
+    panel.classList.remove("is-open");
+    overlay.classList.remove("is-open");
+    btn.setAttribute("aria-expanded", "false");
+    panel.setAttribute("aria-hidden", "true");
+  }
+
+  function toggleMenu() {
+    if (panel.classList.contains("is-open")) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  }
+
+  btn.addEventListener("click", toggleMenu);
+  overlay.addEventListener("click", closeMenu);
+
+  // Close menu when a nav link is clicked
+  panel.querySelectorAll(".nav-item").forEach((link) => {
+    link.addEventListener("click", closeMenu);
+  });
+
+  // Close on Escape key
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeMenu();
+  });
+}
+
 function init() {
   renderSuperpowers();
   renderMissionControl();
@@ -4670,6 +4712,7 @@ function init() {
   renderResources();
   bindSearch();
   bindTheme();
+  bindNavMenu();
   bindMissionControl();
   bindReference();
   bindPythonLessonLab();

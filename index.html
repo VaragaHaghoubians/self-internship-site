@@ -13,24 +13,88 @@
         <span class="brand-mark" aria-hidden="true">12</span>
         <span>Self-Internship</span>
       </a>
-      <nav class="nav-links" aria-label="Page sections">
-        <a href="#mission-control">Start</a>
-        <a href="#cloud-coding">Cloud</a>
-        <a href="#roadmap">Roadmap</a>
-        <a href="#python-lab">Python</a>
-        <a href="#skill-labs">Skills</a>
-        <a href="#code-lab">Submit</a>
-        <a href="#projects">Projects</a>
-        <a href="#resources">Files</a>
-        <a href="#library">Library</a>
-        <a href="#extended-roadmap">+12 Months</a>
-        <a href="#git-reminder">Git</a>
-        <a href="#reference">Help</a>
-      </nav>
-      <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle theme">
-        <span aria-hidden="true">T</span>
+
+      <!-- Menu toggle button (visible always) -->
+      <button class="nav-menu-btn" id="navMenuBtn" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navPanel">
+        <span class="nav-menu-label">Menu</span>
+        <span class="nav-menu-icon" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
       </button>
+
+      <div class="topbar-right">
+        <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+          <span aria-hidden="true">T</span>
+        </button>
+      </div>
     </header>
+
+    <!-- Full-width mega-menu panel -->
+    <div class="nav-panel" id="navPanel" aria-hidden="true">
+      <div class="nav-panel-inner">
+        <div class="nav-col">
+          <p class="nav-col-title">📋 Planning</p>
+          <a class="nav-item" href="#mission-control">
+            <strong>Mission Control</strong>
+            <span>Start checklist, daily goal, backup</span>
+          </a>
+          <a class="nav-item" href="#cloud-coding">
+            <strong>Cloud Coding</strong>
+            <span>GitHub Codespaces setup</span>
+          </a>
+          <a class="nav-item" href="#git-reminder">
+            <strong>Git Reminder</strong>
+            <span>Daily 4-command save habit</span>
+          </a>
+        </div>
+        <div class="nav-col">
+          <p class="nav-col-title">🗺️ Roadmap</p>
+          <a class="nav-item" href="#roadmap">
+            <strong>12-Month Roadmap</strong>
+            <span>Month plan, week tasks, deliverables</span>
+          </a>
+          <a class="nav-item" href="#extended-roadmap">
+            <strong>+12 Months (Advanced)</strong>
+            <span>Phase 7 &amp; 8 from your PDF roadmaps</span>
+          </a>
+          <a class="nav-item" href="#projects">
+            <strong>Projects</strong>
+            <span>7 portfolio projects with instructions</span>
+          </a>
+        </div>
+        <div class="nav-col">
+          <p class="nav-col-title">🧪 Practice</p>
+          <a class="nav-item" href="#python-lab">
+            <strong>Python Lab</strong>
+            <span>20 interactive lessons in browser</span>
+          </a>
+          <a class="nav-item" href="#skill-labs">
+            <strong>Skills Lab</strong>
+            <span>SQL, Docker, Django, ML lessons</span>
+          </a>
+          <a class="nav-item" href="#code-lab">
+            <strong>Submit &amp; Check</strong>
+            <span>Month challenge labs with auto-grading</span>
+          </a>
+        </div>
+        <div class="nav-col">
+          <p class="nav-col-title">📚 Resources</p>
+          <a class="nav-item" href="#library">
+            <strong>Learning Library</strong>
+            <span>Books, courses, papers, tools</span>
+          </a>
+          <a class="nav-item" href="#resources">
+            <strong>Files</strong>
+            <span>Open your local study materials</span>
+          </a>
+          <a class="nav-item" href="#reference">
+            <strong>Glossary &amp; Help</strong>
+            <span>Key terms and blocker fixes</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="nav-overlay" id="navOverlay"></div>
 
     <main id="top">
       <section class="hero" aria-labelledby="heroTitle">
