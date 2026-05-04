@@ -76,8 +76,7 @@ input {
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-left: auto;
+  gap: 10px;
 }
 
 /* ── Menu toggle button ── */
@@ -85,7 +84,6 @@ input {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: 20px;
   padding: 0 14px;
   height: 38px;
   border: 1.5px solid var(--line);
