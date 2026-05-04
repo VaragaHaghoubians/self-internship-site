@@ -78,6 +78,22 @@ const glossary = [
   ["OR-Tools", "Google library for operations research problems like routing, assignment, and scheduling."],
   ["PuLP", "Python library for linear programming optimization models."],
   ["RUL", "Remaining Useful Life. Predictive maintenance target estimating how long a machine has before failure."],
+  ["MCP", "Model Context Protocol. An open standard by Anthropic for connecting LLM agents to external tools, APIs, and data sources through a uniform interface."],
+  ["LangGraph", "A graph-based agent orchestration library built on LangChain. Agents are modeled as nodes in a state machine graph, with conditional edges deciding the next step."],
+  ["ReAct", "Reasoning + Acting. A prompting pattern where the LLM alternates between thinking (Reason) and doing (Act/tool call) in a loop until it reaches an answer."],
+  ["Chain of Thought", "A prompting technique where the model writes out intermediate reasoning steps before giving a final answer. Significantly improves performance on complex tasks."],
+  ["Test-time compute", "Letting a model 'think longer' at inference time (more tokens, more reasoning steps) to improve answer quality. Used by o1, o3, and DeepSeek-R1 style models."],
+  ["Computer-use agent", "An AI agent that controls a GUI by observing screenshots and taking mouse/keyboard actions, without needing an API."],
+  ["Voice agent", "An AI pipeline that listens to speech (ASR), processes with an LLM, and speaks back (TTS) in near real-time."],
+  ["DeepEval", "An open-source LLM evaluation framework. Write unit-test-style assertions for LLM outputs: correctness, faithfulness, hallucination, relevancy."],
+  ["RAGAS", "Retrieval-Augmented Generation Assessment. A framework that automatically evaluates RAG pipelines using LLM-as-judge for faithfulness and answer relevancy."],
+  ["PromptFoo", "An open-source CLI and library for comparing prompt versions, model outputs, and running adversarial tests at scale."],
+  ["Guardrails AI", "A Python library that validates LLM output structure and content: enforces schema, filters toxic content, and retries on validation failure."],
+  ["Digital twin", "A software simulation of a physical system (machine, factory, supply chain) that mirrors the real system and lets you test changes before applying them."],
+  ["A2A", "Agent-to-Agent protocol. An emerging standard (Google) for one AI agent to call another AI agent, analogous to how MCP connects agents to tools."],
+  ["Sandbox", "An isolated code execution environment where untrusted code runs safely. Used in code agents so the LLM-generated code cannot damage the host system."],
+  ["LoRA", "Low-Rank Adaptation. A fine-tuning method that adds small trainable matrices to a frozen model, reducing GPU memory and compute cost dramatically."],
+  ["vLLM", "A high-throughput LLM serving library using PagedAttention for efficient GPU memory management. Standard tool for production LLM API servers."],
 ];
 
 const blockers = [
@@ -91,6 +107,12 @@ const blockers = [
   ["ESP32 cannot connect WiFi", "Check SSID/password, 2.4 GHz network, serial monitor logs, and power cable quality."],
   ["ML metric is bad", "First verify data leakage, target definition, train/test split, missing values, and baseline performance."],
   ["LLM/RAG answer is wrong", "Inspect retrieved chunks before blaming the model. Bad retrieval usually causes bad generation."],
+  ["Agent loops infinitely", "Add max_iterations (e.g. 15) and a step counter. Log every tool call. Most infinite loops mean the agent cannot parse a tool result or keeps retrying a failing step."],
+  ["Tool call returns wrong format", "Validate tool output before returning it to the agent. Use Pydantic models for tool return types. The LLM will hallucinate if it gets unexpected JSON keys."],
+  ["Voice agent has high latency", "Measure each stage separately: ASR latency, LLM latency, TTS latency. Use streaming for TTS and LLM. Target under 800ms end-to-end for a good experience."],
+  ["Prompt injection in agent", "An untrusted input (web page, email, document) tells your agent to do something the user did not intend. Always sanitize inputs before passing to the agent and add a validation layer."],
+  ["Code agent breaks out of sandbox", "Never run agent-generated code on the host machine without a sandbox (E2B, Docker, Modal). Set CPU and memory limits. Block network access inside the sandbox."],
+  ["Fine-tuning makes model worse", "Most fine-tuning failures are data problems: too few examples, wrong format, or contaminated labels. Start with 100 clean, diverse examples before scaling."],
 ];
 
 const months = [
@@ -604,6 +626,161 @@ const extendedMonths = [
     ],
     tags: ["Portfolio", "Career", "Interview", "Leadership"],
   },
+  // ── Phase 9: Emerging AI 2025-2026 (Months 25-30) ──
+  {
+    id: 25,
+    phase: "Phase 9",
+    label: "Emerging AI 2025–2026",
+    title: "Agentic Frameworks Deep Dive",
+    focus: "LangGraph stateful agents, CrewAI, AutoGen, smolagents, MCP protocol",
+    why: "Month 12 introduced agents conceptually. This month masters the production frameworks that teams actually ship. LangGraph handles state machines for complex agent flows. MCP (Model Context Protocol) is the emerging open standard for connecting agents to any tool or data source.",
+    learn: [
+      "LangGraph: nodes, edges, state machines, conditional branching",
+      "CrewAI: role-based multi-agent crews with task delegation",
+      "Microsoft AutoGen: conversational multi-agent patterns",
+      "smolagents (HuggingFace): lightweight code-first agents",
+      "MCP (Model Context Protocol): open standard for agent tool connections",
+      "A2A (Agent-to-Agent) protocol basics for agent communication",
+    ],
+    build: "Build a production multi-agent system using LangGraph: an orchestrator agent that delegates to specialist sub-agents (SQL agent, web search agent, analysis agent). Connect external tools via MCP. Deploy with a FastAPI interface.",
+    resources: [
+      { label: "LangGraph (GitHub)", url: "https://github.com/langchain-ai/langgraph" },
+      { label: "CrewAI (GitHub)", url: "https://github.com/joaomdmoura/crewAI" },
+      { label: "AutoGen (Microsoft, GitHub)", url: "https://github.com/microsoft/autogen" },
+      { label: "smolagents (HuggingFace, GitHub)", url: "https://github.com/huggingface/smolagents" },
+      { label: "Model Context Protocol (official site)", url: "https://modelcontextprotocol.io" },
+    ],
+    tags: ["LangGraph", "CrewAI", "AutoGen", "MCP", "Multi-agent"],
+  },
+  {
+    id: 26,
+    phase: "Phase 9",
+    label: "Emerging AI 2025–2026",
+    title: "Reasoning Models & Structured Thinking",
+    focus: "Chain of Thought, Tree of Thoughts, test-time compute, DeepSeek-R1, extended thinking",
+    why: "Reasoning models (o1, o3, DeepSeek-R1, Claude extended thinking) spend more compute at inference time to think step-by-step before answering. They outperform standard models on complex planning, math, and multi-step decisions — exactly the kind of problems industrial engineers face.",
+    learn: [
+      "Chain-of-Thought (CoT) prompting and why it works",
+      "Tree of Thoughts (ToT): exploring multiple reasoning paths",
+      "Self-consistency: sample multiple CoT paths, pick majority answer",
+      "Test-time compute scaling: why thinking longer improves results",
+      "DeepSeek-R1 architecture and open-weights reasoning",
+      "Anthropic extended thinking API: when to use vs. standard mode",
+      "Routing: when to send queries to a reasoning model vs. a fast model",
+    ],
+    build: "Build a decision-support agent for a multi-constraint industrial scheduling problem. Compare standard GPT-4o vs. o1/o3 or DeepSeek-R1 on the same problem set. Benchmark quality and cost. Write a routing policy that selects the right model based on task complexity.",
+    resources: [
+      { label: "Chain-of-Thought paper (ArXiv)", url: "https://arxiv.org/abs/2201.11903" },
+      { label: "Tree of Thoughts (ArXiv)", url: "https://arxiv.org/abs/2305.10601" },
+      { label: "Self-Consistency paper (ArXiv)", url: "https://arxiv.org/abs/2203.11171" },
+      { label: "DeepSeek-R1 (GitHub)", url: "https://github.com/deepseek-ai/DeepSeek-R1" },
+      { label: "Anthropic extended thinking docs", url: "https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking" },
+    ],
+    tags: ["Reasoning", "CoT", "DeepSeek-R1", "Test-time compute", "Decision-making"],
+  },
+  {
+    id: 27,
+    phase: "Phase 9",
+    label: "Emerging AI 2025–2026",
+    title: "Voice & Multimodal Agents",
+    focus: "Real-time speech pipelines, vision LLMs, multimodal RAG, LiveKit, Whisper",
+    why: "Text-only AI misses most of how industrial environments communicate: voice alerts, camera inspection images, sensor dashboards. Multimodal agents that can see, hear, and speak are the next layer of industrial AI.",
+    learn: [
+      "Real-time ASR (automatic speech recognition) with Whisper and Deepgram",
+      "Text-to-speech with ElevenLabs or Kokoro TTS",
+      "Real-time voice agent pipeline: audio in → ASR → LLM → TTS → audio out",
+      "LiveKit for low-latency voice streaming infrastructure",
+      "Vision LLMs: GPT-4V, Claude Vision, LLaVA — image + text prompts",
+      "Multimodal RAG: index images + text together, retrieve by query",
+      "Latency budgeting: where each millisecond goes in a voice pipeline",
+    ],
+    build: "Build a voice-enabled industrial assistant: a factory worker speaks a question (e.g., 'What is the anomaly probability for machine 3?'), the system transcribes it, queries your Month 9 capstone database via the LLM, and speaks the answer back. Add a vision check that accepts a photo of a gauge and describes its reading.",
+    resources: [
+      { label: "OpenAI Whisper (GitHub)", url: "https://github.com/openai/whisper" },
+      { label: "Deepgram Python SDK (GitHub)", url: "https://github.com/deepgram/deepgram-python-sdk" },
+      { label: "ElevenLabs Python SDK (GitHub)", url: "https://github.com/elevenlabs/elevenlabs-python" },
+      { label: "LiveKit (GitHub)", url: "https://github.com/livekit/livekit" },
+      { label: "LLaVA multimodal (GitHub)", url: "https://github.com/haotian-liu/LLaVA" },
+    ],
+    tags: ["Voice agents", "Multimodal", "Whisper", "LiveKit", "Vision LLM"],
+  },
+  {
+    id: 28,
+    phase: "Phase 9",
+    label: "Emerging AI 2025–2026",
+    title: "Computer-Use & Code Agents",
+    focus: "GUI automation, code agents, sandboxed execution, OpenHands, E2B",
+    why: "Computer-use agents control real GUIs — clicking, typing, reading screens — without APIs. Code agents write, run, and debug code autonomously. These capabilities enable AI to automate entire software workflows, not just single API calls.",
+    learn: [
+      "Computer-use API (Anthropic): screenshot → action loops",
+      "GUI automation: observing screen state, deciding clicks, verifying outcomes",
+      "Code agent architecture: write code → execute in sandbox → read output → fix",
+      "Sandboxed code execution with E2B (secure cloud containers)",
+      "OpenHands (formerly OpenDevin): open-source software engineering agents",
+      "Safety: how to limit scope, prevent destructive actions, set guardrails",
+      "Agentic code review and refactoring pipelines",
+    ],
+    build: "Build a code agent that accepts a broken Python ML script, runs it in an E2B sandbox, reads the error, searches for a fix, edits the file, and reruns until the tests pass. Log each reasoning step. Add a hard limit of 10 iterations and a human-approval checkpoint before any file deletion.",
+    resources: [
+      { label: "Anthropic computer-use docs", url: "https://docs.anthropic.com/en/docs/build-with-claude/computer-use" },
+      { label: "OpenHands (GitHub)", url: "https://github.com/All-Hands-AI/OpenHands" },
+      { label: "E2B code interpreter (GitHub)", url: "https://github.com/e2b-dev/e2b" },
+      { label: "Modal (serverless sandboxes, GitHub)", url: "https://github.com/modal-labs/modal-client" },
+    ],
+    tags: ["Computer-use", "Code agents", "GUI automation", "OpenHands", "E2B"],
+  },
+  {
+    id: 29,
+    phase: "Phase 9",
+    label: "Emerging AI 2025–2026",
+    title: "Agent Evaluation & Safety",
+    focus: "DeepEval, RAGAS, PromptFoo, Guardrails AI, red-teaming, prompt injection defense",
+    why: "Agents that cannot be evaluated cannot be trusted in production. Evaluation frameworks measure whether your agent answers correctly, stays on task, and handles adversarial inputs safely. This is the skill most AI engineers skip and the one every hiring team asks about.",
+    learn: [
+      "LLM evaluation metrics: faithfulness, answer relevancy, context precision",
+      "RAGAS: automated RAG pipeline evaluation with LLM-as-judge",
+      "DeepEval: unit-test-style assertions for LLM outputs",
+      "PromptFoo: compare prompt versions and model outputs at scale",
+      "Guardrails AI: structured output validation and input/output filters",
+      "Red-teaming agents: prompt injection attacks, jailbreaks, goal hijacking",
+      "AgentBench: benchmark suite for evaluating agent task completion",
+    ],
+    build: "Build a complete eval suite for your Month 12 or Month 25 agent. Write 30 test cases with expected answers. Run with DeepEval and RAGAS. Use PromptFoo to compare two prompt versions. Add Guardrails AI output validation. Write a red-team report with 5 failure modes you found.",
+    resources: [
+      { label: "DeepEval (GitHub)", url: "https://github.com/confident-ai/deepeval" },
+      { label: "RAGAS (GitHub)", url: "https://github.com/explodinggradients/ragas" },
+      { label: "PromptFoo (GitHub)", url: "https://github.com/promptfoo/promptfoo" },
+      { label: "Guardrails AI (GitHub)", url: "https://github.com/guardrails-ai/guardrails" },
+      { label: "AgentBench (GitHub)", url: "https://github.com/THUDM/AgentBench" },
+    ],
+    tags: ["Evaluation", "DeepEval", "RAGAS", "Safety", "Red-teaming"],
+  },
+  {
+    id: 30,
+    phase: "Phase 9",
+    label: "Emerging AI 2025–2026",
+    title: "Industrial AI Agents (IE Superpower)",
+    focus: "Agentic AI for operations, supply chain agents, LLM + OR-Tools orchestration, digital twin integration",
+    why: "This is your unique market position: the combination of IE systems thinking + agentic AI almost nobody else has. An industrial AI agent monitors KPIs, detects anomalies, runs optimization, communicates findings by voice, and hands off to a human for approval — this is not a toy project, this is a product.",
+    learn: [
+      "Designing agent workflows for operational decisions: monitor → detect → diagnose → optimize → communicate",
+      "LLM + OR-Tools orchestration: agent decides when to trigger optimizer",
+      "Supply chain agents: demand forecasting, vendor negotiation drafts, reorder triggers",
+      "Scheduling agents: shift planning, machine assignment, constraint handling via LLM reasoning",
+      "Digital twin integration: SimPy simulation as an agent tool",
+      "Human-in-the-loop for high-stakes industrial decisions",
+      "Responsible deployment: audit logs, decision traceability, rollback",
+    ],
+    build: "Extend your Month 9 cold-chain capstone into an agentic system: a monitoring agent polls sensors every 10 minutes, a diagnosis agent analyzes anomalies and determines root cause, an optimization agent calls OR-Tools to replan inventory routing, and a communication agent sends a voice or text summary to the operator. Add human approval before any route change.",
+    resources: [
+      { label: "OR-Tools (Google, GitHub)", url: "https://github.com/google/or-tools" },
+      { label: "SimPy (discrete-event simulation, docs)", url: "https://simpy.readthedocs.io" },
+      { label: "DoWhy causal analysis (GitHub)", url: "https://github.com/py-why/dowhy" },
+      { label: "LangGraph for orchestration (GitHub)", url: "https://github.com/langchain-ai/langgraph" },
+      { label: "AutoGen for multi-agent ops (GitHub)", url: "https://github.com/microsoft/autogen" },
+    ],
+    tags: ["Industrial AI", "Operations", "OR-Tools", "Supply chain", "IE + AI"],
+  },
 ];
 
 // Continuous tracks that run alongside Phase 7 and Phase 8
@@ -643,6 +820,32 @@ const continuousTracks = [
       { label: "Hashnode (free blog)", url: "https://hashnode.com" },
       { label: "How to write a postmortem", url: "https://www.atlassian.com/incident-management/postmortem/templates" },
       { label: "Technical writing guide (Google)", url: "https://developers.google.com/tech-writing" },
+    ],
+  },
+  {
+    id: "agent-news",
+    icon: "🤖",
+    title: "Agent Frameworks Watch",
+    desc: "The agent ecosystem moves weekly. Follow changelogs, new releases, and benchmark results for LangGraph, CrewAI, AutoGen, smolagents, and MCP. Spend 30 minutes each week scanning what changed and why it matters.",
+    resources: [
+      { label: "LangChain blog (releases + tutorials)", url: "https://blog.langchain.dev" },
+      { label: "AutoGen releases (GitHub)", url: "https://github.com/microsoft/autogen/releases" },
+      { label: "MCP changelog (official site)", url: "https://modelcontextprotocol.io" },
+      { label: "AI news digest — The Rundown AI", url: "https://www.therundown.ai" },
+      { label: "smolagents changelog (GitHub)", url: "https://github.com/huggingface/smolagents/releases" },
+    ],
+  },
+  {
+    id: "ie-agents",
+    icon: "🏭",
+    title: "IE × Agents (Your Superpower)",
+    desc: "Every month, pick one real industrial problem (scheduling, routing, maintenance, quality) and sketch how an AI agent could solve it. This builds the pattern library that makes you different from every other AI engineer.",
+    resources: [
+      { label: "OR-Tools examples (Google, GitHub)", url: "https://github.com/google/or-tools/tree/stable/examples/python" },
+      { label: "SimPy examples (docs)", url: "https://simpy.readthedocs.io/en/latest/examples/" },
+      { label: "Industrial AI use cases (McKinsey)", url: "https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/the-top-trends-in-tech" },
+      { label: "Supply chain AI papers (ArXiv)", url: "https://arxiv.org/search/?searchtype=all&query=supply+chain+reinforcement+learning" },
+      { label: "INFORMS (operations research journals)", url: "https://www.informs.org/Publications/INFORMS-Journals" },
     ],
   },
 ];
@@ -707,12 +910,15 @@ function renderExtendedRoadmap() {
     </div>
   `;
 
+  const phase9 = extendedMonths.filter(m => m.phase === "Phase 9");
+
   section.innerHTML = `
     <div class="ext-intro">
-      <p>Your 12-month core roadmap covers software engineering, production ML, IoT, and generative AI. The 3 external AI/ML roadmaps you shared add <strong>12 more months</strong> of advanced topics that build on top of the core. Think of months 1-12 as your engineering foundation and months 13-24 as your path to senior/research-level work.</p>
+      <p>Your 12-month core roadmap covers software engineering, production ML, IoT, and generative AI. The extended roadmap adds <strong>18 more months</strong> of advanced and emerging topics. Phase 7–8 (from the 3 PDF roadmaps you shared) build research and senior engineering depth. Phase 9 covers the emerging 2025–2026 skills — agentic frameworks, reasoning models, voice/multimodal agents, and your IE superpower track — that are in demand right now.</p>
     </div>
-    ${phaseHtml(phase7, "Phase 7", "Advanced AI Systems", "Months 13–18 · LLM mastery, quantization, advanced agents, ML reliability, industrial AI")}
+    ${phaseHtml(phase7, "Phase 7", "Advanced AI Systems", "Months 13–18 · LLM fine-tuning, quantization, advanced agents, ML reliability, industrial AI")}
     ${phaseHtml(phase8, "Phase 8", "Research & Expert Track", "Months 19–24 · Research methodology, novel architectures, large-scale systems, open-source, expert portfolio")}
+    ${phaseHtml(phase9, "Phase 9", "Emerging AI 2025–2026", "Months 25–30 · Agentic frameworks (LangGraph/MCP), reasoning models, voice agents, computer-use, agent eval, IE × Agents superpower")}
     ${tracksHtml}
   `;
 }
