@@ -3351,18 +3351,10 @@ function normalizeGitHubRepoBase(value) {
 }
 
 function detectGitHubRepoBaseFromLocation() {
-  try {
-    const { hostname, pathname, origin } = window.location;
-    if (/github\.io$/i.test(hostname)) {
-      const owner = hostname.replace(/\.github\.io$/i, "");
-      const firstSegment = pathname.split("/").filter(Boolean)[0];
-      if (owner && firstSegment) return `https://github.com/${owner}/${firstSegment}`;
-    }
-    if (/github\.com$/i.test(hostname)) {
-      const parts = pathname.split("/").filter(Boolean);
-      if (parts.length >= 2) return `${origin}/${parts[0]}/${parts[1]}`;
-    }
-  } catch {}
+  // Auto-detection is disabled: this site is hosted at github.io/self-internship-site
+  // but the study content lives in a SEPARATE private repo (self-internship, not self-internship-site).
+  // Auto-detecting the wrong repo causes all GitHub links to 404.
+  // Users must set their private repo URL explicitly via Mission Control.
   return "";
 }
 
@@ -3631,7 +3623,7 @@ function renderSourceLinks(items, options = {}) {
       const github = githubLink(item.path);
       const githubHtml = github
         ? `<a class="file-link" href="${github}" target="_blank" rel="noreferrer">GitHub</a>`
-        : `<span class="muted-note">Add GitHub URL in Mission Control to enable GitHub links.</span>`;
+        : `<span class="muted-note">Set private repo URL in Mission Control ↑ to enable this link.</span>`;
       return `
         <div class="source-link-row ${compact ? "compact" : ""}">
           <div>
@@ -3873,10 +3865,8 @@ function renderMissionControl() {
   if (githubInput) githubInput.value = state.githubRepoBase;
   if (githubStatus) {
     githubStatus.textContent = manualRepo
-      ? `GitHub source links are active for ${manualRepo}.`
-      : autoRepo
-        ? `GitHub source links were detected automatically from this website: ${effectiveRepo}.`
-        : "Add your GitHub repository URL to unlock source links for months, weeks, projects, and files.";
+      ? `✅ GitHub source links active for: ${manualRepo}`
+      : "⚠️ Paste your private self-internship repo URL here (e.g. https://github.com/YourName/self-internship) to unlock all GitHub links. Without this, GitHub buttons show a 'not configured' message.";
   }
 
   renderEvidence();
