@@ -457,7 +457,7 @@ const extendedMonths = [
       { label: "SimPy (simulation)", url: "https://simpy.readthedocs.io" },
       { label: "DoWhy (causal)", url: "https://github.com/py-why/dowhy" },
       { label: "TensorFlow Lite", url: "https://www.tensorflow.org/lite/guide" },
-      { label: "EfficientML.ai", url: "https://efficientai.mit.edu" },
+      { label: "EfficientML.ai", url: "https://hanlab.mit.edu/courses/2024-fall-65940" },
     ],
     tags: ["Digital Twin", "Causal AI", "Edge AI", "Industrial IE"],
   },
@@ -505,7 +505,7 @@ const extendedMonths = [
     resources: [
       { label: "Papers With Code", url: "https://paperswithcode.com" },
       { label: "ArXiv.org", url: "https://arxiv.org/list/cs.LG/recent" },
-      { label: "Andrej Karpathy's paper reading guide", url: "https://twitter.com/karpathy/status/1444157007226306562" },
+      { label: "Andrej Karpathy's paper reading guide", url: "https://x.com/karpathy/status/1444157007226306562" },
       { label: "Semantic Scholar", url: "https://www.semanticscholar.org" },
     ],
     tags: ["Research", "Paper Reading", "Technical Writing", "Methodology"],
@@ -625,7 +625,7 @@ const extendedMonths = [
     resources: [
       { label: "ML interview guide", url: "https://github.com/khangich/machine-learning-interview" },
       { label: "System design for ML", url: "https://github.com/chiphuyen/machine-learning-systems-design" },
-      { label: "Senior engineer reading list", url: "https://github.com/yashbonde/awesome-ml-papers" },
+      { label: "Senior engineer reading list", url: "https://github.com/eugeneyan/applied-ml" },
       { label: "Grokking the ML Interview", url: "https://www.educative.io/courses/grokking-the-machine-learning-interview" },
     ],
     tags: ["Portfolio", "Career", "Interview", "Leadership"],
@@ -649,7 +649,7 @@ const extendedMonths = [
     build: "Build a production multi-agent system using LangGraph: an orchestrator agent that delegates to specialist sub-agents (SQL agent, web search agent, analysis agent). Connect external tools via MCP. Deploy with a FastAPI interface.",
     resources: [
       { label: "LangGraph (GitHub)", url: "https://github.com/langchain-ai/langgraph" },
-      { label: "CrewAI (GitHub)", url: "https://github.com/joaomdmoura/crewAI" },
+      { label: "CrewAI (GitHub)", url: "https://github.com/crewAIInc/crewAI" },
       { label: "AutoGen (Microsoft, GitHub)", url: "https://github.com/microsoft/autogen" },
       { label: "smolagents (HuggingFace, GitHub)", url: "https://github.com/huggingface/smolagents" },
       { label: "Model Context Protocol (official site)", url: "https://modelcontextprotocol.io" },
@@ -1025,7 +1025,7 @@ const monthGithubLinks = {
     { label: "langchain-ai/langgraph", url: "https://github.com/langchain-ai/langgraph", desc: "🟢 START HERE — open /examples/ and run the ReAct agent example. That is your Week 45 starting point for the agentic AI build." },
     { label: "microsoft/autogen", url: "https://github.com/microsoft/autogen", desc: "Microsoft multi-agent framework. Read /notebook/agentchat_two_users.ipynb to understand how multi-agent systems coordinate." },
     { label: "langchain-ai/langchain/tree/master/cookbook", url: "https://github.com/langchain-ai/langchain/tree/master/cookbook", desc: "LangChain cookbook — real agent examples with tools and memory. Read one notebook per day as your Week 46-47 daily practice." },
-    { label: "joaomdmoura/crewAI", url: "https://github.com/joaomdmoura/crewAI", desc: "CrewAI multi-role agents. Study how roles and tasks are orchestrated — useful reference for Week 47 guardrails and memory." },
+    { label: "joaomdmoura/crewAI", url: "https://github.com/crewAIInc/crewAI", desc: "CrewAI multi-role agents. Study how roles and tasks are orchestrated — useful reference for Week 47 guardrails and memory." },
     { label: "e2b-dev/awesome-ai-agents", url: "https://github.com/e2b-dev/awesome-ai-agents", desc: "Curated list of every major AI agent framework. Browse it in Week 45 to understand the landscape before choosing your tools." },
   ],
 };
@@ -1075,7 +1075,7 @@ const learningLibrary = [
       { type: "course", label: "fast.ai Practical Deep Learning", url: "https://course.fast.ai/", desc: "Top-down, code-first deep learning course. Start Lesson 1 in Month 10 — very practical, no PhD required." },
       { type: "course", label: "Stanford CS224N — NLP with Deep Learning", url: "https://web.stanford.edu/class/cs224n/", desc: "Stanford's NLP course (lecture videos on YouTube). Watch Lectures 1-4 in Month 10 for transformer theory." },
       { type: "course", label: "MLOps Zoomcamp — DataTalks.Club", url: "https://github.com/DataTalksClub/mlops-zoomcamp", desc: "Free MLOps course with code. 9 modules — do Module 1-2 in Month 3, Module 4-5 in Month 4. Best free MLOps course." },
-      { type: "course", label: "Full Stack LLM Bootcamp — FSDL", url: "https://fullstackdeeplearning.com/llm-bootcamp/", desc: "Free bootcamp covering LLM apps from scratch. Watch the lectures in Month 10-11 for practical LLM engineering." },
+      { type: "course", label: "Full Stack LLM Bootcamp — FSDL", url: "https://fullstackdeeplearning.com/llm-bootcamp/spring-2023/", desc: "Free bootcamp covering LLM apps from scratch. Watch the lectures in Month 10-11 for practical LLM engineering." },
     ],
   },
   {
@@ -1145,7 +1145,7 @@ const learningLibrary = [
       { type: "github", label: "luo-junyu/awesome-agent-papers", url: "https://github.com/luo-junyu/awesome-agent-papers", desc: "Month 12 — curated list of every important agent paper. Browse by category to find what to read next." },
       { type: "github", label: "e2b-dev/awesome-ai-agents", url: "https://github.com/e2b-dev/awesome-ai-agents", desc: "Month 12 — curated list of all AI agent frameworks. Use to compare LangGraph, AutoGen, CrewAI, and others." },
       { type: "github", label: "microsoft/autogen", url: "https://github.com/microsoft/autogen", desc: "Month 12 — Microsoft multi-agent framework. Read /notebook/ for multi-agent conversation examples." },
-      { type: "github", label: "crewaiinc/crewAI", url: "https://github.com/crewaiinc/crewAI", desc: "Month 12 — role-based multi-agent framework. Easier than AutoGen for structured agent workflows." },
+      { type: "github", label: "crewAIInc/crewAI", url: "https://github.com/crewAIInc/crewAI", desc: "Month 12 — role-based multi-agent framework. Easier than AutoGen for structured agent workflows." },
       { type: "github", label: "mlflow/mlflow", url: "https://github.com/mlflow/mlflow", desc: "Month 3 — experiment tracking. Clone and run /examples/sklearn_elasticnet_wine/ as your first tracking exercise." },
       { type: "github", label: "pydantic/pydantic-ai", url: "https://github.com/pydantic/pydantic-ai", desc: "Month 12 — new agent framework from the Pydantic team. Cleaner than LangChain for structured agent outputs." },
       { type: "github", label: "DataTalksClub/mlops-zoomcamp", url: "https://github.com/DataTalksClub/mlops-zoomcamp", desc: "Month 3-4 — free MLOps course with all code. Clone and run the notebooks for each module." },
