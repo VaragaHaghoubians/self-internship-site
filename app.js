@@ -976,64 +976,92 @@ const projects = [
     group: "foundations",
     title: "Telecom Customer Churn",
     role: "Data Scientist",
+    month: "Month 2",
     time: "8-12 hours",
     outcome: "EDA, hypothesis tests, churn classifier, feature importance, and business recommendations.",
     skills: ["pandas", "scipy", "classification", "business storytelling"],
     path: "projects/foundations/project-1-customer-churn/README.md",
+    instructions: "projects/foundations/project-1-customer-churn/INSTRUCTIONS.md",
+    prerequisites: "projects/foundations/project-1-customer-churn/PREREQUISITES.md",
+    code: "projects/foundations/project-1-customer-churn/customer_churn_analysis.py",
   },
   {
     group: "foundations",
     title: "Retail Sales Performance",
     role: "Data Analyst",
+    month: "Month 2",
     time: "6-9 hours",
     outcome: "Clean sales data, answer management questions, build KPI summaries and visual reports.",
     skills: ["groupby", "date parsing", "visualization", "managerial insights"],
     path: "projects/foundations/project-2-sales-analysis/README.md",
+    instructions: "projects/foundations/project-2-sales-analysis/INSTRUCTIONS.md",
+    prerequisites: "projects/foundations/project-2-sales-analysis/PREREQUISITES.md",
+    code: "projects/foundations/project-2-sales-analysis/sales_performance_analysis.py",
   },
   {
     group: "foundations",
     title: "House Price ML Pipeline",
     role: "ML Engineer",
+    month: "Month 3",
     time: "10-14 hours",
     outcome: "A reproducible scikit-learn pipeline with preprocessing, validation, model selection, and serialization.",
     skills: ["Pipeline", "ColumnTransformer", "cross-validation", "joblib"],
     path: "projects/foundations/project-3-house-price-pipeline/README.md",
+    instructions: "projects/foundations/project-3-house-price-pipeline/INSTRUCTIONS.md",
+    prerequisites: "projects/foundations/project-3-house-price-pipeline/PREREQUISITES.md",
+    code: "projects/foundations/project-3-house-price-pipeline/house_price_pipeline.py",
   },
   {
     group: "foundations",
     title: "News Classification NLP",
     role: "AI Engineer",
+    month: "Month 4",
     time: "12-18 hours",
     outcome: "Compare TF-IDF baseline with transformer fine-tuning on AG News classification.",
     skills: ["TF-IDF", "BERT", "Hugging Face", "model comparison"],
     path: "projects/foundations/project-4-news-classification/README.md",
+    instructions: "projects/foundations/project-4-news-classification/INSTRUCTIONS.md",
+    prerequisites: "projects/foundations/project-4-news-classification/PREREQUISITES.md",
+    code: "projects/foundations/project-4-news-classification/news_classification_nlp.py",
   },
   {
     group: "advanced",
     title: "Agentic Factory Digital Twin",
     role: "AI Systems Engineer",
+    month: "Month 9",
     time: "Advanced reference",
     outcome: "SimPy factory simulation, anomaly detection, and an LLM agent that reasons and acts.",
     skills: ["SimPy", "IsolationForest", "tool calling", "factory simulation"],
     path: "projects/advanced/project-5-factory-twin/PREREQUISITES.md",
+    instructions: null,
+    prerequisites: "projects/advanced/project-5-factory-twin/PREREQUISITES.md",
+    code: "projects/advanced/project-5-factory-twin/project1_factory_twin.py",
   },
   {
     group: "advanced",
     title: "Predictive Maintenance",
     role: "Senior ML Engineer",
+    month: "Month 9",
     time: "Capstone reference",
     outcome: "Remaining Useful Life model with window features, XGBoost, and diagnostic RAG notes.",
     skills: ["CMAPSS", "RUL", "rolling features", "XGBoost"],
     path: "projects/advanced/project-6-predictive-maintenance/PREREQUISITES.md",
+    instructions: null,
+    prerequisites: "projects/advanced/project-6-predictive-maintenance/PREREQUISITES.md",
+    code: "projects/advanced/project-6-predictive-maintenance/project2_predictive_maintenance.py",
   },
   {
     group: "advanced",
     title: "Generative Supply Chain Optimizer",
     role: "Operations Data Scientist",
+    month: "Month 9",
     time: "Strong IE demo",
     outcome: "NetworkX graph, demand forecast, PuLP optimizer, and LLM risk monitoring.",
     skills: ["NetworkX", "Prophet", "PuLP", "risk agent"],
     path: "projects/advanced/project-7-supply-chain/PREREQUISITES.md",
+    instructions: null,
+    prerequisites: "projects/advanced/project-7-supply-chain/PREREQUISITES.md",
+    code: "projects/advanced/project-7-supply-chain/project3_supply_chain.py",
   },
 ];
 
@@ -3832,16 +3860,27 @@ function renderProjectTabs() {
 function renderProjects() {
   document.getElementById("projectGrid").innerHTML = projects
     .filter((project) => project.group === state.projectGroup)
-    .map((project) => `
-      <article class="project reveal">
-        <p class="role">${project.role}</p>
-        <h3>${project.title}</h3>
-        <p>${project.outcome}</p>
-        <p><strong>Time:</strong> ${project.time}</p>
-        <ul>${project.skills.map((skill) => `<li>${skill}</li>`).join("")}</ul>
-        ${renderSourceLinks([{ label: `${project.title} source`, path: project.path }], { title: "Project source links", compact: true })}
-      </article>
-    `)
+    .map((project) => {
+      const docLinks = [
+        { label: "📋 README (overview)", path: project.path },
+        project.instructions ? { label: "📝 INSTRUCTIONS (step-by-step)", path: project.instructions } : null,
+        { label: "✅ PREREQUISITES (what to install)", path: project.prerequisites },
+        { label: "🐍 Starter code (.py)", path: project.code },
+      ].filter(Boolean);
+      return `
+        <article class="project reveal">
+          <div class="project-header-row">
+            <p class="role">${project.role}</p>
+            <span class="project-month-pill">${project.month}</span>
+          </div>
+          <h3>${project.title}</h3>
+          <p>${project.outcome}</p>
+          <p class="project-time"><strong>⏱ Time:</strong> ${project.time}</p>
+          <ul class="project-skills">${project.skills.map((skill) => `<li>${skill}</li>`).join("")}</ul>
+          ${renderSourceLinks(docLinks, { title: "Project files", compact: true })}
+        </article>
+      `;
+    })
     .join("");
 }
 
