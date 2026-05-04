@@ -271,6 +271,12 @@ input {
   cursor: pointer;
 }
 
+/* Theme toggle icons: light mode shows moon, dark mode shows sun */
+.theme-icon { display: none; pointer-events: none; }
+.theme-icon-moon { display: block; }
+[data-theme="dark"] .theme-icon-moon { display: none; }
+[data-theme="dark"] .theme-icon-sun  { display: block; }
+
 .hero {
   position: relative;
   min-height: calc(100svh - 64px);
