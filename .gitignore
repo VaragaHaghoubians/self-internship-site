@@ -1,0 +1,4 @@
+# Ignore generated docs for venv and package folders (noise, not useful)
+docs/emergency-path/.venv/
+docs/emergency-path/venv/
+docs/**/node_modules/
