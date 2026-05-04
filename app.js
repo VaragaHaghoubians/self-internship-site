@@ -115,6 +115,10 @@ const blockers = [
   ["Fine-tuning makes model worse", "Most fine-tuning failures are data problems: too few examples, wrong format, or contaminated labels. Start with 100 clean, diverse examples before scaling."],
 ];
 
+// Months that matter most if your focus is AI Agents + Industrial Engineering
+// Toggle the 🎯 filter button in each roadmap section to highlight these.
+const fastTrackIds = new Set([1, 2, 3, 9, 10, 11, 12, 15, 17, 19, 25, 26, 27, 28, 29, 30]);
+
 const months = [
   {
     id: 1,
@@ -867,8 +871,11 @@ function renderExtendedRoadmap() {
         </div>
       </div>
       <div class="ext-month-grid">
-        ${months.map(m => `
-          <div class="ext-month-card">
+        ${months.map(m => {
+          const isFt = fastTrackIds.has(m.id);
+          return `
+          <div class="ext-month-card${isFt ? ' is-fast-track' : ''}" data-fast-track="${isFt}">
+            ${isFt ? '<span class="ft-priority-badge">🎯 AI Agents Priority</span>' : ''}
             <div class="ext-month-top">
               <span class="ext-month-num">Month ${m.id}</span>
               <div class="ext-month-tags">${m.tags.map(t => `<span class="ext-tag">${t}</span>`).join("")}</div>
@@ -887,7 +894,7 @@ function renderExtendedRoadmap() {
               ${m.resources.map(r => `<a class="ext-res-link" href="${r.url}" target="_blank" rel="noreferrer">↗ ${r.label}</a>`).join("")}
             </div>
           </div>
-        `).join("")}
+        `;}).join("")}
       </div>
     </div>
   `;
@@ -915,12 +922,30 @@ function renderExtendedRoadmap() {
   section.innerHTML = `
     <div class="ext-intro">
       <p>Your 12-month core roadmap covers software engineering, production ML, IoT, and generative AI. The extended roadmap adds <strong>18 more months</strong> of advanced and emerging topics. Phase 7–8 (from the 3 PDF roadmaps you shared) build research and senior engineering depth. Phase 9 covers the emerging 2025–2026 skills — agentic frameworks, reasoning models, voice/multimodal agents, and your IE superpower track — that are in demand right now.</p>
+      <div class="ft-toggle-row">
+        <button class="ft-toggle" id="ftToggleExt" aria-pressed="false">
+          🎯 Show AI Agents Priority only
+        </button>
+        <span class="ft-toggle-hint">Highlights the months most critical for your AI Agents + IE focus. Nothing is deleted — toggle off to see all.</span>
+      </div>
     </div>
     ${phaseHtml(phase7, "Phase 7", "Advanced AI Systems", "Months 13–18 · LLM fine-tuning, quantization, advanced agents, ML reliability, industrial AI")}
     ${phaseHtml(phase8, "Phase 8", "Research & Expert Track", "Months 19–24 · Research methodology, novel architectures, large-scale systems, open-source, expert portfolio")}
     ${phaseHtml(phase9, "Phase 9", "Emerging AI 2025–2026", "Months 25–30 · Agentic frameworks (LangGraph/MCP), reasoning models, voice agents, computer-use, agent eval, IE × Agents superpower")}
     ${tracksHtml}
   `;
+
+  // bind the extended roadmap fast-track toggle
+  const extToggle = document.getElementById("ftToggleExt");
+  if (extToggle) {
+    extToggle.addEventListener("click", () => {
+      const extSection = document.getElementById("extendedRoadmapContent");
+      const active = extSection.classList.toggle("ft-active");
+      extToggle.classList.toggle("is-active", active);
+      extToggle.setAttribute("aria-pressed", active);
+      extToggle.textContent = active ? "✅ Showing Priority only — click to show all" : "🎯 Show AI Agents Priority only";
+    });
+  }
 }
 
 const monthGithubLinks = {
@@ -3681,10 +3706,11 @@ function renderMonths() {
     .map((month) => {
       const active = month.id === state.month ? "is-active" : "";
       const done = state.done.includes(month.id) ? "is-done" : "";
+      const ft = fastTrackIds.has(month.id);
       return `
-        <button class="month-button ${active} ${done}" type="button" role="tab" aria-selected="${month.id === state.month}" data-month="${month.id}">
+        <button class="month-button ${active} ${done}" type="button" role="tab" aria-selected="${month.id === state.month}" data-month="${month.id}" data-fast-track="${ft}">
           <span class="month-number">${month.id}</span>
-          <span><strong>${month.title}</strong><span>${month.phase}</span></span>
+          <span><strong>${month.title}</strong><span>${month.phase}${ft ? ' <em class="ft-badge">🎯 Priority</em>' : ''}</span></span>
           <span class="check-dot" aria-hidden="true">${state.done.includes(month.id) ? "OK" : ""}</span>
         </button>
       `;
@@ -4850,6 +4876,23 @@ function bindTheme() {
   });
 }
 
+function bindFastTrackToggle() {
+  // Main 12-month roadmap toggle
+  const mainToggle = document.getElementById("ftToggleMain");
+  const rail = document.getElementById("monthRail");
+  if (mainToggle && rail) {
+    mainToggle.addEventListener("click", () => {
+      const active = rail.classList.toggle("ft-active");
+      mainToggle.classList.toggle("is-active", active);
+      mainToggle.setAttribute("aria-pressed", active);
+      mainToggle.textContent = active
+        ? "✅ Showing Priority only — click to show all"
+        : "🎯 Show AI Agents Priority only";
+    });
+  }
+  // Extended roadmap toggle is bound inside renderExtendedRoadmap()
+}
+
 function bindNavMenu() {
   const btn = document.getElementById("navMenuBtn");
   const panel = document.getElementById("navPanel");
@@ -4919,6 +4962,7 @@ function init() {
   bindSearch();
   bindTheme();
   bindNavMenu();
+  bindFastTrackToggle();
   bindMissionControl();
   bindReference();
   bindPythonLessonLab();
