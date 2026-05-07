@@ -197,20 +197,96 @@
     </style>
   </head>
   <body>
+    <style>
+      .proj-grid { display: grid; gap: 16px; margin-top: 8px; }
+      .proj-card { padding: 20px; border: 1px solid var(--line); border-left: 3px solid #7c3aed; border-radius: 10px; background: var(--surface); }
+      .proj-card h3 { margin: 0 0 8px; font-size: 18px; }
+      .proj-card h3 a { color: var(--ink); }
+      .proj-card h3 a:hover { color: #7c3aed; }
+      .proj-card p { margin: 0 0 12px; font-size: 14px; color: var(--muted); }
+      .proj-links { display: flex; flex-wrap: wrap; gap: 7px; }
+      .plink { padding: 5px 11px; border-radius: 7px; font-size: 12px; font-weight: 600; text-decoration: none !important; }
+      .plink.pre { background: #ede9fe; color: #7c3aed; }
+      .plink.cod { background: #1e2b26; color: #5eead4; }
+      .meta-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; font-size: 12px; color: var(--muted); }
+      .role-badge { padding: 2px 8px; border-radius: 20px; border: 1px solid var(--line); }
+      .adv-note { padding: 14px 16px; border-radius: 8px; background: #ede9fe; border-left: 3px solid #7c3aed; margin-bottom: 24px; font-size: 14px; color: #4c1d95; }
+    </style>
+
     <nav class="reader-top">
-      <a href="../../../index.html">Back to website</a>
-      <a href="../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">← Back to website</a>
+      <a href="../index.html">All Projects</a>
       <a href="../../index.html">Docs index</a>
     </nav>
     <header class="hero">
-      <h1>advanced</h1>
-      <p>Clean index for this workspace folder.</p>
+      <h1>Advanced Projects</h1>
+      <p>Three capstone-level challenges without step-by-step instructions. Use prerequisites and starter code as your scaffold.</p>
       <div class="path">projects/advanced</div>
     </header>
-    
+
     <main class="layout">
-      <article class="content"><h2>Readable files</h2><p>Choose a file or folder. Markdown is rendered cleanly, and code files are shown in a focused reading view.</p><div class="dir-list"><a class="dir-item" href="project-5-factory-twin/index.html"><strong>project-5-factory-twin/</strong><span>projects/advanced/project-5-factory-twin</span></a><a class="dir-item" href="project-6-predictive-maintenance/index.html"><strong>project-6-predictive-maintenance/</strong><span>projects/advanced/project-6-predictive-maintenance</span></a><a class="dir-item" href="project-7-supply-chain/index.html"><strong>project-7-supply-chain/</strong><span>projects/advanced/project-7-supply-chain</span></a></div></article>
-      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+      <article class="content">
+        <h2>3 Capstone Challenges</h2>
+        <div class="adv-note">
+          ⚡ These are senior-level projects. No hand-holding — use the prerequisites to set up, then build the full system from the starter code scaffold. Demonstrate systems thinking, not just scripting.
+        </div>
+
+        <div class="proj-grid">
+
+          <div class="proj-card">
+            <div class="meta-row">
+              <span class="role-badge">AI Systems Engineer</span>
+              <span>📅 Month 9</span>
+              <span>Advanced reference</span>
+            </div>
+            <h3><a href="project-5-factory-twin/PREREQUISITES.md.html">5 · Agentic Factory Digital Twin</a></h3>
+            <p>SimPy factory simulation, anomaly detection, and an LLM agent that reasons and acts on sensor data.</p>
+            <div class="proj-links">
+              <a class="plink pre" href="project-5-factory-twin/PREREQUISITES.md.html">✅ Prerequisites</a>
+              <a class="plink cod" href="project-5-factory-twin/project1_factory_twin.py.html">⌨ Starter code</a>
+            </div>
+          </div>
+
+          <div class="proj-card">
+            <div class="meta-row">
+              <span class="role-badge">Senior ML Engineer</span>
+              <span>📅 Month 9</span>
+              <span>Capstone reference</span>
+            </div>
+            <h3><a href="project-6-predictive-maintenance/PREREQUISITES.md.html">6 · Predictive Maintenance</a></h3>
+            <p>Remaining Useful Life model with window features, XGBoost, and diagnostic RAG notes.</p>
+            <div class="proj-links">
+              <a class="plink pre" href="project-6-predictive-maintenance/PREREQUISITES.md.html">✅ Prerequisites</a>
+              <a class="plink cod" href="project-6-predictive-maintenance/project2_predictive_maintenance.py.html">⌨ Starter code</a>
+            </div>
+          </div>
+
+          <div class="proj-card">
+            <div class="meta-row">
+              <span class="role-badge">Operations Data Scientist</span>
+              <span>📅 Month 9</span>
+              <span>Strong IE demo</span>
+            </div>
+            <h3><a href="project-7-supply-chain/PREREQUISITES.md.html">7 · Generative Supply Chain Optimizer</a></h3>
+            <p>NetworkX graph, demand forecast, PuLP optimizer, and LLM risk monitoring.</p>
+            <div class="proj-links">
+              <a class="plink pre" href="project-7-supply-chain/PREREQUISITES.md.html">✅ Prerequisites</a>
+              <a class="plink cod" href="project-7-supply-chain/project3_supply_chain.py.html">⌨ Starter code</a>
+            </div>
+          </div>
+
+        </div>
+      </article>
+
+      <aside class="toc">
+        <h2>On this page</h2>
+        <a href="#">5 · Factory Digital Twin</a>
+        <a href="#">6 · Predictive Maintenance</a>
+        <a href="#">7 · Supply Chain Optimizer</a>
+        <hr style="margin:10px 0;border:none;border-top:1px solid var(--line)" />
+        <a href="../index.html">→ All 7 projects</a>
+        <a href="../foundations/index.html">→ Foundations projects</a>
+      </aside>
     </main>
   </body>
 </html>

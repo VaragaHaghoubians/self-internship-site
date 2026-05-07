@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>projects - Self-Internship Reader</title>
+    <title>Portfolio Projects — Self-Internship Reader</title>
     <style>
       :root {
         --bg: #f7f5ef;
@@ -14,6 +14,8 @@
         --accent: #0f766e;
         --accent-soft: #d8f1ea;
         --code: #101511;
+        --adv: #7c3aed;
+        --adv-soft: #ede9fe;
       }
       * { box-sizing: border-box; }
       body {
@@ -23,8 +25,10 @@
         background: var(--bg);
         line-height: 1.65;
       }
-      a { color: var(--accent); font-weight: 750; text-decoration: none; }
+      a { color: var(--accent); font-weight: 600; text-decoration: none; }
       a:hover { text-decoration: underline; }
+
+      /* ── Nav ── */
       .reader-top {
         position: sticky;
         top: 0;
@@ -39,84 +43,51 @@
         background: rgba(247, 245, 239, 0.92);
         backdrop-filter: blur(14px);
       }
-      .reader-top a { color: var(--ink); }
+      .reader-top a { color: var(--ink); font-weight: 600; }
+
+      /* ── Hero ── */
       .hero {
-        padding: 64px 5vw 38px;
+        padding: 64px 5vw 44px;
         color: white;
         background:
           linear-gradient(90deg, rgba(30, 43, 38, 0.98), rgba(30, 43, 38, 0.82)),
           radial-gradient(circle at 80% 20%, rgba(45, 212, 191, 0.35), transparent 34%),
           #1e2b26;
       }
-      .hero p { max-width: 940px; margin: 0; color: rgba(255, 255, 255, 0.76); }
-      .run-panel {
-        display: grid;
-        gap: 14px;
-        padding: 22px 5vw;
-        border-bottom: 1px solid var(--line);
-        background: var(--surface);
-      }
-      .run-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-      }
-      .run-button {
-        min-height: 42px;
-        padding: 0 14px;
-        border: 0;
-        border-radius: 8px;
-        color: #06231f;
-        background: #5eead4;
-        cursor: pointer;
-        font: inherit;
-        font-weight: 900;
-      }
-      .run-note {
-        margin: 0;
-        color: var(--muted);
-      }
-      .run-output {
-        display: none;
-        max-height: 420px;
-        overflow: auto;
-        margin: 0;
-      }
-      .run-output.is-visible { display: block; }
-      h1 {
+      .hero h1 {
         max-width: 980px;
         margin: 0 0 16px;
         font-size: clamp(38px, 6vw, 82px);
         line-height: 0.98;
         letter-spacing: 0;
       }
-      .path {
-        display: inline-block;
-        max-width: 100%;
-        margin-top: 18px;
-        padding: 8px 10px;
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        border-radius: 8px;
-        overflow-wrap: anywhere;
-        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-        font-size: 13px;
+      .hero p { max-width: 760px; margin: 0; color: rgba(255,255,255,0.76); font-size: 17px; }
+      .hero-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-top: 28px;
       }
+      .hero-stat {
+        padding: 10px 16px;
+        border: 1px solid rgba(255,255,255,0.18);
+        border-radius: 8px;
+        font-size: 13px;
+        color: rgba(255,255,255,0.82);
+      }
+      .hero-stat strong { display: block; font-size: 22px; color: #5eead4; line-height: 1.1; }
+
+      /* ── Layout ── */
       .layout {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 280px;
+        grid-template-columns: minmax(0, 1fr) 260px;
         gap: 36px;
         width: min(1320px, 100%);
         margin: 0 auto;
         padding: 44px 5vw 90px;
       }
-      .content {
-        min-width: 0;
-        padding: 32px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--surface);
-      }
+
+      /* ── TOC ── */
       .toc {
         position: sticky;
         top: 86px;
@@ -126,91 +97,402 @@
         border-radius: 8px;
         background: var(--surface);
       }
-      .toc h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; }
-      .toc a { display: block; margin: 8px 0; color: var(--muted); font-size: 14px; }
-      h2, h3, h4 { line-height: 1.16; letter-spacing: 0; }
-      h2 { margin-top: 42px; padding-top: 24px; border-top: 1px solid var(--line); font-size: clamp(28px, 3.8vw, 46px); }
-      h3 { margin-top: 32px; font-size: 26px; }
-      h4 { margin-top: 24px; font-size: 19px; }
-      p { margin: 0 0 18px; }
-      ul, ol { padding-left: 24px; }
-      li { margin: 6px 0; }
-      blockquote {
-        margin: 24px 0;
-        padding: 18px 20px;
-        border-left: 4px solid var(--accent);
-        background: var(--accent-soft);
+      .toc h2 { margin: 0 0 12px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+      .toc a { display: block; margin: 7px 0; color: var(--muted); font-size: 14px; font-weight: 500; }
+      .toc a:hover { color: var(--accent); }
+      .toc-divider { margin: 10px 0; border: none; border-top: 1px solid var(--line); }
+
+      /* ── Section heading ── */
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 24px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid var(--line);
       }
-      table {
-        width: 100%;
-        margin: 24px 0;
-        border-collapse: collapse;
-        overflow: hidden;
-        border: 1px solid var(--line);
-        border-radius: 8px;
+      .section-title h2 { margin: 0; font-size: clamp(22px, 3vw, 34px); line-height: 1.1; }
+      .section-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .badge-foundations { background: var(--accent-soft); color: var(--accent); }
+      .badge-advanced { background: var(--adv-soft); color: var(--adv); }
+
+      .section-desc {
+        margin: 0 0 28px;
+        color: var(--muted);
         font-size: 15px;
+        line-height: 1.6;
       }
-      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-      th { text-align: left; background: var(--accent-soft); }
-      tr:last-child td { border-bottom: 0; }
-      code {
-        padding: 2px 5px;
-        border-radius: 5px;
-        background: #ece7da;
-        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-        font-size: 0.92em;
+
+      /* ── Project cards ── */
+      .project-grid {
+        display: grid;
+        gap: 20px;
+        margin-bottom: 52px;
       }
-      pre {
-        overflow: auto;
-        margin: 24px 0;
-        padding: 18px;
-        border-radius: 8px;
-        color: #f5f1e8;
-        background: var(--code);
+      .project-card {
+        position: relative;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+        transition: box-shadow .15s;
+      }
+      .project-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,.07); }
+      .project-card.advanced { border-left: 3px solid var(--adv); }
+      .project-card.foundations { border-left: 3px solid var(--accent); }
+
+      .project-number {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 13px;
+        font-weight: 800;
+      }
+      .foundations .project-number { background: var(--accent-soft); color: var(--accent); }
+      .advanced .project-number { background: var(--adv-soft); color: var(--adv); }
+
+      .project-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
+        align-items: center;
+      }
+      .project-role {
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        border: 1px solid var(--line);
+        color: var(--muted);
+      }
+      .project-month {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .project-time {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .project-time::before { content: "⏱ "; }
+
+      .project-card h3 {
+        margin: 0 0 10px;
+        font-size: 20px;
+        line-height: 1.2;
+        padding-right: 48px;
+      }
+      .project-card h3 a { color: var(--ink); font-weight: 700; }
+      .project-card h3 a:hover { color: var(--accent); text-decoration: none; }
+
+      .project-outcome {
+        margin: 0 0 14px;
+        font-size: 15px;
+        color: var(--muted);
         line-height: 1.55;
       }
-      pre code { padding: 0; color: inherit; background: transparent; }
-      .dir-list {
-        display: grid;
-        gap: 10px;
-        margin-top: 20px;
+
+      .skill-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 18px;
       }
-      .dir-item {
-        display: grid;
-        gap: 4px;
-        padding: 14px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: #fffaf0;
-      }
-      .dir-item span {
-        color: var(--muted);
-        overflow-wrap: anywhere;
-        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      .skill-pill {
+        padding: 3px 9px;
+        border-radius: 6px;
+        background: #ece7da;
         font-size: 12px;
+        font-weight: 600;
+        color: #4a4a3a;
+        font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
       }
+
+      .project-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .proj-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        border-radius: 7px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: opacity .15s;
+      }
+      .proj-link:hover { opacity: .82; }
+      .proj-link.readme { background: var(--accent-soft); color: var(--accent); }
+      .proj-link.instructions { background: #fef3c7; color: #92400e; }
+      .proj-link.prereqs { background: #fee2e2; color: #991b1b; }
+      .proj-link.code { background: #1e2b26; color: #5eead4; }
+      .proj-link.adv-readme { background: var(--adv-soft); color: var(--adv); }
+
+      /* ── Divider between groups ── */
+      .group-divider {
+        margin: 0 0 44px;
+        border: none;
+        border-top: 1px solid var(--line);
+      }
+
+      /* ── Responsive ── */
       @media (max-width: 900px) {
         .layout { grid-template-columns: 1fr; }
         .toc { position: static; order: -1; }
-        .content { padding: 22px; }
       }
     </style>
   </head>
   <body>
     <nav class="reader-top">
-      <a href="../../index.html">Back to website</a>
-      <a href="../../index.html#python-lab">Python lab</a>
+      <a href="../../index.html">← Back to website</a>
+      <a href="../../index.html#projects">Projects section</a>
       <a href="../index.html">Docs index</a>
     </nav>
+
     <header class="hero">
-      <h1>projects</h1>
-      <p>Clean index for this workspace folder.</p>
-      <div class="path">projects</div>
+      <h1>Portfolio Projects</h1>
+      <p>Seven hands-on projects spanning data science, machine learning, NLP, and advanced AI systems. Build a real portfolio by completing these role-simulated challenges.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><strong>7</strong> total projects</div>
+        <div class="hero-stat"><strong>4</strong> foundations (guided)</div>
+        <div class="hero-stat"><strong>3</strong> advanced (capstone)</div>
+        <div class="hero-stat"><strong>56–73 hrs</strong> estimated total</div>
+      </div>
     </header>
-    
+
     <main class="layout">
-      <article class="content"><h2>Readable files</h2><p>Choose a file or folder. Markdown is rendered cleanly, and code files are shown in a focused reading view.</p><div class="dir-list"><a class="dir-item" href="advanced/index.html"><strong>advanced/</strong><span>projects/advanced</span></a><a class="dir-item" href="foundations/index.html"><strong>foundations/</strong><span>projects/foundations</span></a></div></article>
-      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+      <article>
+
+        <!-- ── FOUNDATIONS ── -->
+        <div id="foundations">
+          <div class="section-title">
+            <h2>Foundations Projects</h2>
+            <span class="section-badge badge-foundations">Guided</span>
+          </div>
+          <p class="section-desc">
+            Structured projects with full instructions, prerequisites, and starter code. Each one simulates a real role — completing them gives you four portfolio pieces you can explain in an interview.
+          </p>
+
+          <div class="project-grid">
+
+            <!-- Project 1 -->
+            <div class="project-card foundations" id="project-1">
+              <span class="project-number">1</span>
+              <div class="project-meta">
+                <span class="project-role">Data Scientist</span>
+                <span class="project-month">📅 Month 2</span>
+                <span class="project-time">8–12 hours</span>
+              </div>
+              <h3><a href="foundations/project-1-customer-churn/README.md.html">Telecom Customer Churn</a></h3>
+              <p class="project-outcome">EDA, hypothesis tests, churn classifier, feature importance, and business recommendations.</p>
+              <div class="skill-pills">
+                <span class="skill-pill">pandas</span>
+                <span class="skill-pill">scipy</span>
+                <span class="skill-pill">classification</span>
+                <span class="skill-pill">business storytelling</span>
+              </div>
+              <div class="project-links">
+                <a class="proj-link readme" href="foundations/project-1-customer-churn/README.md.html">📄 README</a>
+                <a class="proj-link instructions" href="foundations/project-1-customer-churn/INSTRUCTIONS.md.html">📋 Instructions</a>
+                <a class="proj-link prereqs" href="foundations/project-1-customer-churn/PREREQUISITES.md.html">✅ Prerequisites</a>
+                <a class="proj-link code" href="foundations/project-1-customer-churn/customer_churn_analysis.py.html">⌨ Starter code</a>
+              </div>
+            </div>
+
+            <!-- Project 2 -->
+            <div class="project-card foundations" id="project-2">
+              <span class="project-number">2</span>
+              <div class="project-meta">
+                <span class="project-role">Data Analyst</span>
+                <span class="project-month">📅 Month 2</span>
+                <span class="project-time">6–9 hours</span>
+              </div>
+              <h3><a href="foundations/project-2-sales-analysis/README.md.html">Retail Sales Performance</a></h3>
+              <p class="project-outcome">Clean sales data, answer management questions, build KPI summaries and visual reports.</p>
+              <div class="skill-pills">
+                <span class="skill-pill">groupby</span>
+                <span class="skill-pill">date parsing</span>
+                <span class="skill-pill">visualization</span>
+                <span class="skill-pill">managerial insights</span>
+              </div>
+              <div class="project-links">
+                <a class="proj-link readme" href="foundations/project-2-sales-analysis/README.md.html">📄 README</a>
+                <a class="proj-link instructions" href="foundations/project-2-sales-analysis/INSTRUCTIONS.md.html">📋 Instructions</a>
+                <a class="proj-link prereqs" href="foundations/project-2-sales-analysis/PREREQUISITES.md.html">✅ Prerequisites</a>
+                <a class="proj-link code" href="foundations/project-2-sales-analysis/sales_performance_analysis.py.html">⌨ Starter code</a>
+              </div>
+            </div>
+
+            <!-- Project 3 -->
+            <div class="project-card foundations" id="project-3">
+              <span class="project-number">3</span>
+              <div class="project-meta">
+                <span class="project-role">ML Engineer</span>
+                <span class="project-month">📅 Month 3</span>
+                <span class="project-time">10–14 hours</span>
+              </div>
+              <h3><a href="foundations/project-3-house-price-pipeline/README.md.html">House Price ML Pipeline</a></h3>
+              <p class="project-outcome">A reproducible scikit-learn pipeline with preprocessing, validation, model selection, and serialization.</p>
+              <div class="skill-pills">
+                <span class="skill-pill">Pipeline</span>
+                <span class="skill-pill">ColumnTransformer</span>
+                <span class="skill-pill">cross-validation</span>
+                <span class="skill-pill">joblib</span>
+              </div>
+              <div class="project-links">
+                <a class="proj-link readme" href="foundations/project-3-house-price-pipeline/README.md.html">📄 README</a>
+                <a class="proj-link instructions" href="foundations/project-3-house-price-pipeline/INSTRUCTIONS.md.html">📋 Instructions</a>
+                <a class="proj-link prereqs" href="foundations/project-3-house-price-pipeline/PREREQUISITES.md.html">✅ Prerequisites</a>
+                <a class="proj-link code" href="foundations/project-3-house-price-pipeline/house_price_pipeline.py.html">⌨ Starter code</a>
+              </div>
+            </div>
+
+            <!-- Project 4 -->
+            <div class="project-card foundations" id="project-4">
+              <span class="project-number">4</span>
+              <div class="project-meta">
+                <span class="project-role">AI Engineer</span>
+                <span class="project-month">📅 Month 4</span>
+                <span class="project-time">12–18 hours</span>
+              </div>
+              <h3><a href="foundations/project-4-news-classification/README.md.html">News Classification NLP</a></h3>
+              <p class="project-outcome">Compare TF-IDF baseline with transformer fine-tuning on AG News classification.</p>
+              <div class="skill-pills">
+                <span class="skill-pill">TF-IDF</span>
+                <span class="skill-pill">BERT</span>
+                <span class="skill-pill">Hugging Face</span>
+                <span class="skill-pill">model comparison</span>
+              </div>
+              <div class="project-links">
+                <a class="proj-link readme" href="foundations/project-4-news-classification/README.md.html">📄 README</a>
+                <a class="proj-link instructions" href="foundations/project-4-news-classification/INSTRUCTIONS.md.html">📋 Instructions</a>
+                <a class="proj-link prereqs" href="foundations/project-4-news-classification/PREREQUISITES.md.html">✅ Prerequisites</a>
+                <a class="proj-link code" href="foundations/project-4-news-classification/news_classification_nlp.py.html">⌨ Starter code</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <hr class="group-divider" />
+
+        <!-- ── ADVANCED ── -->
+        <div id="advanced">
+          <div class="section-title">
+            <h2>Advanced Projects</h2>
+            <span class="section-badge badge-advanced">Capstone</span>
+          </div>
+          <p class="section-desc">
+            Senior-level capstone challenges without step-by-step instructions. Use the prerequisites and starter code as your scaffold. These demonstrate systems thinking, not just scripting.
+          </p>
+
+          <div class="project-grid">
+
+            <!-- Project 5 -->
+            <div class="project-card advanced" id="project-5">
+              <span class="project-number">5</span>
+              <div class="project-meta">
+                <span class="project-role">AI Systems Engineer</span>
+                <span class="project-month">📅 Month 9</span>
+                <span class="project-time">Advanced reference</span>
+              </div>
+              <h3><a href="advanced/project-5-factory-twin/PREREQUISITES.md.html">Agentic Factory Digital Twin</a></h3>
+              <p class="project-outcome">SimPy factory simulation, anomaly detection, and an LLM agent that reasons and acts on sensor data.</p>
+              <div class="skill-pills">
+                <span class="skill-pill">SimPy</span>
+                <span class="skill-pill">IsolationForest</span>
+                <span class="skill-pill">tool calling</span>
+                <span class="skill-pill">factory simulation</span>
+              </div>
+              <div class="project-links">
+                <a class="proj-link adv-readme" href="advanced/project-5-factory-twin/PREREQUISITES.md.html">✅ Prerequisites</a>
+                <a class="proj-link code" href="advanced/project-5-factory-twin/project1_factory_twin.py.html">⌨ Starter code</a>
+              </div>
+            </div>
+
+            <!-- Project 6 -->
+            <div class="project-card advanced" id="project-6">
+              <span class="project-number">6</span>
+              <div class="project-meta">
+                <span class="project-role">Senior ML Engineer</span>
+                <span class="project-month">📅 Month 9</span>
+                <span class="project-time">Capstone reference</span>
+              </div>
+              <h3><a href="advanced/project-6-predictive-maintenance/PREREQUISITES.md.html">Predictive Maintenance</a></h3>
+              <p class="project-outcome">Remaining Useful Life model with window features, XGBoost, and diagnostic RAG notes.</p>
+              <div class="skill-pills">
+                <span class="skill-pill">CMAPSS</span>
+                <span class="skill-pill">RUL</span>
+                <span class="skill-pill">rolling features</span>
+                <span class="skill-pill">XGBoost</span>
+              </div>
+              <div class="project-links">
+                <a class="proj-link adv-readme" href="advanced/project-6-predictive-maintenance/PREREQUISITES.md.html">✅ Prerequisites</a>
+                <a class="proj-link code" href="advanced/project-6-predictive-maintenance/project2_predictive_maintenance.py.html">⌨ Starter code</a>
+              </div>
+            </div>
+
+            <!-- Project 7 -->
+            <div class="project-card advanced" id="project-7">
+              <span class="project-number">7</span>
+              <div class="project-meta">
+                <span class="project-role">Operations Data Scientist</span>
+                <span class="project-month">📅 Month 9</span>
+                <span class="project-time">Strong IE demo</span>
+              </div>
+              <h3><a href="advanced/project-7-supply-chain/PREREQUISITES.md.html">Generative Supply Chain Optimizer</a></h3>
+              <p class="project-outcome">NetworkX graph, demand forecast, PuLP optimizer, and LLM risk monitoring.</p>
+              <div class="skill-pills">
+                <span class="skill-pill">NetworkX</span>
+                <span class="skill-pill">Prophet</span>
+                <span class="skill-pill">PuLP</span>
+                <span class="skill-pill">risk agent</span>
+              </div>
+              <div class="project-links">
+                <a class="proj-link adv-readme" href="advanced/project-7-supply-chain/PREREQUISITES.md.html">✅ Prerequisites</a>
+                <a class="proj-link code" href="advanced/project-7-supply-chain/project3_supply_chain.py.html">⌨ Starter code</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </article>
+
+      <!-- ── Sidebar TOC ── -->
+      <aside class="toc">
+        <h2>On this page</h2>
+        <a href="#foundations">Foundations (4)</a>
+        <a href="#project-1">1 · Customer Churn</a>
+        <a href="#project-2">2 · Sales Performance</a>
+        <a href="#project-3">3 · House Price Pipeline</a>
+        <a href="#project-4">4 · News Classification</a>
+        <hr class="toc-divider" />
+        <a href="#advanced">Advanced (3)</a>
+        <a href="#project-5">5 · Factory Digital Twin</a>
+        <a href="#project-6">6 · Predictive Maintenance</a>
+        <a href="#project-7">7 · Supply Chain Optimizer</a>
+        <hr class="toc-divider" />
+        <a href="foundations/index.html">→ Foundations folder</a>
+        <a href="advanced/index.html">→ Advanced folder</a>
+      </aside>
     </main>
   </body>
 </html>

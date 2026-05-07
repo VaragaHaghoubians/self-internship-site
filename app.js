@@ -482,7 +482,7 @@ const extendedMonths = [
       { label: "System design primer", url: "https://github.com/donnemartin/system-design-primer" },
       { label: "Chip Huyen's ML Systems Design", url: "https://huyenchip.com/machine-learning-systems-design/toc.html" },
       { label: "Designing ML Systems (book)", url: "https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/" },
-      { label: "LLM patterns collection", url: "https://github.com/Trusted-AI/AIF360" },
+      { label: "AI Fairness 360 (IBM fairness toolkit)", url: "https://github.com/Trusted-AI/AIF360" },
     ],
     tags: ["System Design", "Integration", "Production AI", "Architecture"],
   },
@@ -855,6 +855,618 @@ const continuousTracks = [
   },
 ];
 
+// ─── Community 12-Month Path ─────────────────────────────────────────────────
+// Source: community-curated 12-month DS + Engineering roadmap with verified GitHub repos
+const communityPathMonths = [
+  {
+    id: "cp-1",
+    title: "Python + Git + Linux + SQL + MongoDB",
+    icon: "🐍",
+    focus: "Python fundamentals, NumPy, Pandas, Matplotlib, SQL basics, MongoDB, first ML steps",
+    cloneCommands: [
+      "git clone https://github.com/Asabeneh/30-Days-Of-Python",
+      "git clone https://github.com/jerry-git/learn-python3",
+      "git clone https://github.com/jlord/git-it-electron",
+      "git clone https://github.com/guipsamora/pandas_exercises",
+      "git clone https://github.com/WebDevSimplified/Learn-SQL",
+      "git clone https://github.com/s-shemmee/SQL-101",
+      "git clone https://github.com/mattdavis0351/mongodb-labs",
+      "git clone https://github.com/ageron/handson-ml3",
+    ],
+    project: "Titanic EDA + basic ML model — analyze, visualize, and predict survival",
+    weeks: [
+      {
+        title: "Python Fundamentals (Days 1–7)",
+        desc: "Variables, data types, strings, lists, tuples, dicts, sets, conditionals, loops, functions",
+        repos: [
+          { label: "Asabeneh/30-Days-Of-Python", url: "https://github.com/Asabeneh/30-Days-Of-Python", desc: "🟢 PRIMARY — 30-day Python challenge. Work through Day 1–11 this week. Read each day's .md file, run the exercises, then retype from scratch." },
+          { label: "jerry-git/learn-python3", url: "https://github.com/jerry-git/learn-python3", desc: "Beginner Jupyter notebooks with auto-tests. Do the OOP and classes notebooks — run the tests to check yourself." },
+          { label: "rameshovyas/30-Days-of-Python-Exercises", url: "https://github.com/rameshovyas/30-Days-of-Python-Exercises", desc: "Exercise solutions to check yourself — look only after attempting every problem." },
+        ],
+      },
+      {
+        title: "Python Intermediate + Git (Days 8–14)",
+        desc: "List comprehensions, file I/O, exceptions, OOP, modules, Git workflow",
+        repos: [
+          { label: "jlord/git-it-electron", url: "https://github.com/jlord/git-it-electron", desc: "🟢 START HERE for Git — interactive desktop app with guided challenges. Download, run it, and complete all challenges with real Git commands." },
+          { label: "Asabeneh/30-Days-Of-Python", url: "https://github.com/Asabeneh/30-Days-Of-Python", desc: "Continue from Day 12 (Modules) through Day 22 (OOP inheritance) — covers all Python intermediate topics for this week." },
+        ],
+      },
+      {
+        title: "NumPy + Pandas + Matplotlib + SQL (Days 15–21)",
+        desc: "Data manipulation, visualization, SQL basics — the data stack",
+        repos: [
+          { label: "ine-rmotr-curriculum/freecodecamp-intro-to-numpy", url: "https://github.com/ine-rmotr-curriculum/freecodecamp-intro-to-numpy", desc: "🟢 NumPy intro from FreeCodeCamp. Run every notebook cell, then delete and retype from scratch." },
+          { label: "ine-rmotr-curriculum/freecodecamp-intro-to-pandas", url: "https://github.com/ine-rmotr-curriculum/freecodecamp-intro-to-pandas", desc: "Pandas intro from FreeCodeCamp. Master groupby, merge, and null handling — core skills for every data project." },
+          { label: "guipsamora/pandas_exercises", url: "https://github.com/guipsamora/pandas_exercises", desc: "80+ pandas exercises with solutions. Do 5 per day and check the solution only after trying yourself." },
+          { label: "WebDevSimplified/Learn-SQL", url: "https://github.com/WebDevSimplified/Learn-SQL", desc: "SQL fundamentals with examples. Study SELECT, WHERE, GROUP BY, and JOIN this week." },
+          { label: "s-shemmee/SQL-101", url: "https://github.com/s-shemmee/SQL-101", desc: "SQL 101 beginner tutorials. Use as a second reference alongside Learn-SQL." },
+        ],
+      },
+      {
+        title: "ML Intro + MongoDB + Linux (Days 22–30)",
+        desc: "scikit-learn basics, MongoDB queries, Linux commands, month project",
+        repos: [
+          { label: "ageron/handson-ml3", url: "https://github.com/ageron/handson-ml3", desc: "🟢 Hands-On ML textbook notebooks. Open Chapter 2 (end-to-end ML project) and Chapter 3 (classification) — your ML foundations." },
+          { label: "mattdavis0351/mongodb-labs", url: "https://github.com/mattdavis0351/mongodb-labs", desc: "MongoDB query exercises. Open exercises/01_basic-mongo-queries.md and work through all exercises." },
+          { label: "tkarim45/Beginner-Data-Science-Projects", url: "https://github.com/tkarim45/Beginner-Data-Science-Projects", desc: "Beginner DS projects. Study project #1 (Titanic), delete all code, then redo it from scratch as your Month 1 project." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "cp-2",
+    title: "Java Core + OOP + Data Structures",
+    icon: "☕",
+    focus: "Java syntax, OOP principles, collections, algorithms, data structures",
+    cloneCommands: [
+      "git clone https://github.com/in28minutes/java-tutorial-for-beginners",
+      "git clone https://github.com/bobocode-projects/java-fundamentals-exercises",
+      "git clone https://github.com/TheAlgorithms/Java",
+      "git clone https://github.com/DiegoKrupitza/Simple-Java-Exercises-for-Beginners",
+    ],
+    project: "Bank account system CLI with OOP — create, deposit, withdraw, transfer, statements",
+    weeks: [
+      {
+        title: "Java Basics",
+        desc: "Setup JDK + IntelliJ, variables, types, operators, conditionals, loops, arrays",
+        repos: [
+          { label: "in28minutes/java-tutorial-for-beginners", url: "https://github.com/in28minutes/java-tutorial-for-beginners", desc: "🟢 START HERE — Java tutorial from in28minutes. Study the src/ folder section by section — all Java basics covered." },
+          { label: "DiegoKrupitza/Simple-Java-Exercises-for-Beginners", url: "https://github.com/DiegoKrupitza/Simple-Java-Exercises-for-Beginners", desc: "Simple Java exercises for beginners. Do 5 exercises per day to practice syntax and problem-solving." },
+          { label: "manjunath5496/Beginner-Java-Exercises", url: "https://github.com/manjunath5496/Beginner-Java-Exercises", desc: "Beginner Java exercises with arrays and loops. Use for Week 1 Days 6–7 to reinforce array handling." },
+        ],
+      },
+      {
+        title: "Java OOP",
+        desc: "Classes, objects, constructors, inheritance, interfaces, polymorphism, exceptions",
+        repos: [
+          { label: "in28minutes/java-a-course-for-beginners", url: "https://github.com/in28minutes/java-a-course-for-beginners", desc: "🟢 Java OOP course from in28minutes. Follow the course structure for all OOP concepts — classes through polymorphism." },
+          { label: "bobocode-projects/java-fundamentals-exercises", url: "https://github.com/bobocode-projects/java-fundamentals-exercises", desc: "Java fundamentals exercises from bobocode. Do the interfaces and abstract classes sections this week." },
+        ],
+      },
+      {
+        title: "Java Collections + Functional",
+        desc: "ArrayList, HashMap, Generics, Streams, Lambda expressions, File I/O, threads intro",
+        repos: [
+          { label: "bobocode-projects/java-fundamentals-exercises", url: "https://github.com/bobocode-projects/java-fundamentals-exercises", desc: "Do the generics, streams, and lambda exercises this week. Check your solutions against the provided answers." },
+        ],
+      },
+      {
+        title: "Java DSA + Project Week",
+        desc: "LinkedList, Stack, Queue, Tree, sorting algorithms, OOP capstone project",
+        repos: [
+          { label: "TheAlgorithms/Java", url: "https://github.com/TheAlgorithms/Java", desc: "🟢 Every Java algorithm implemented cleanly. Study DataStructures/ and Sorts/ — read, understand, then reimplement without looking." },
+          { label: "parthasarathy27/Java_beginner_practice", url: "https://github.com/parthasarathy27/Java_beginner_practice", desc: "Java beginner practice projects. Study the bank account example for your Month 2 project — then build your own from scratch." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "cp-3",
+    title: "Advanced Python + Design Patterns + APIs",
+    icon: "⚙️",
+    focus: "Advanced OOP, design patterns, Flask REST API development",
+    cloneCommands: [
+      "git clone https://github.com/hamedasgari20/Python-Django-FastAPI-advanced-topics",
+      "git clone https://github.com/KodeWorker/Python-Design-Patterns",
+      "git clone https://github.com/pallets/flask",
+    ],
+    project: "REST API for a Todo app with Flask + SQLite — full CRUD with endpoints and authentication",
+    weeks: [
+      {
+        title: "Advanced OOP",
+        desc: "Metaclasses, dunder methods, properties, descriptors, class decorators",
+        repos: [
+          { label: "hamedasgari20/Python-Django-FastAPI-advanced-topics", url: "https://github.com/hamedasgari20/Python-Django-FastAPI-advanced-topics", desc: "🟢 Advanced Python, Django, and FastAPI topics. Start with the Python advanced OOP section — metaclasses, descriptors, and advanced class patterns." },
+        ],
+      },
+      {
+        title: "Design Patterns",
+        desc: "Singleton, Factory, Observer, Decorator, Strategy, Command patterns",
+        repos: [
+          { label: "KodeWorker/Python-Design-Patterns", url: "https://github.com/KodeWorker/Python-Design-Patterns", desc: "🟢 Python design patterns with clean examples. Read each pattern, understand the use case, then implement it from scratch." },
+        ],
+      },
+      {
+        title: "Flask REST APIs",
+        desc: "Routes, templates, forms, REST endpoints, authentication, error handling",
+        repos: [
+          { label: "hamedasgari20/Python-Django-FastAPI-advanced-topics", url: "https://github.com/hamedasgari20/Python-Django-FastAPI-advanced-topics", desc: "Flask section — routes, blueprints, and REST APIs. Follow the examples and build alongside them." },
+          { label: "pallets/flask", url: "https://github.com/pallets/flask", desc: "Flask official source code. Browse /examples/ to see how real Flask apps are structured." },
+        ],
+      },
+      {
+        title: "Project Week",
+        desc: "Build a full CRUD REST API for a Todo app with Flask + SQLite",
+        repos: [
+          { label: "hamedasgari20/Python-Django-FastAPI-advanced-topics", url: "https://github.com/hamedasgari20/Python-Django-FastAPI-advanced-topics", desc: "Study the API examples, then build your own Todo API from scratch — do not copy any code." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "cp-4",
+    title: "Web Development: HTML/CSS/JS + React",
+    icon: "🌐",
+    focus: "HTML5, CSS3, JavaScript DOM, async/await, React components and hooks",
+    cloneCommands: [
+      "git clone https://github.com/bradtraversy/50projects50days",
+      "git clone https://github.com/ianshulx/React-projects-for-beginners",
+      "git clone https://github.com/ImranNawar/web_small_projects",
+    ],
+    project: "Personal portfolio website (HTML/CSS/JS) + React To-Do App with state management",
+    weeks: [
+      {
+        title: "HTML5 + CSS3",
+        desc: "Structure, semantic elements, styling, flexbox, grid, responsive design",
+        repos: [
+          { label: "bradtraversy/50projects50days", url: "https://github.com/bradtraversy/50projects50days", desc: "🟢 50 HTML/CSS/JS projects in 50 days. Do Projects 1–10 this week — build each from scratch without copying any code." },
+        ],
+      },
+      {
+        title: "JavaScript + DOM",
+        desc: "DOM manipulation, events, fetch API, async/await, LocalStorage",
+        repos: [
+          { label: "bradtraversy/50projects50days", url: "https://github.com/bradtraversy/50projects50days", desc: "Projects 11–25 this week. Focus on projects that use fetch, events, and async JavaScript." },
+          { label: "ImranNawar/web_small_projects", url: "https://github.com/ImranNawar/web_small_projects", desc: "Small web projects for practice. Use as extra exercises alongside the 50 days projects." },
+        ],
+      },
+      {
+        title: "React Basics",
+        desc: "Components, props, state, hooks (useState, useEffect), React Router",
+        repos: [
+          { label: "ianshulx/React-projects-for-beginners", url: "https://github.com/ianshulx/React-projects-for-beginners", desc: "🟢 React beginner projects. Study each project's component structure, then rebuild it from scratch." },
+        ],
+      },
+      {
+        title: "Project Week",
+        desc: "Build portfolio website + React To-Do App",
+        repos: [
+          { label: "bradtraversy/50projects50days", url: "https://github.com/bradtraversy/50projects50days", desc: "Study the most polished projects for portfolio inspiration — adapt them into your own style." },
+          { label: "ianshulx/React-projects-for-beginners", url: "https://github.com/ianshulx/React-projects-for-beginners", desc: "Study the To-Do project completely, delete everything, and rewrite it from scratch." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "cp-5",
+    title: "Advanced ML + Feature Engineering",
+    icon: "🧠",
+    focus: "Feature engineering, ensemble methods, XGBoost, unsupervised learning, full ML pipeline",
+    cloneCommands: [
+      "git clone https://github.com/ageron/handson-ml3",
+      "git clone https://github.com/dipanjanS/practical-machine-learning-with-python",
+    ],
+    project: "End-to-end ML pipeline: data → clean → feature engineer → train → evaluate → save model",
+    weeks: [
+      {
+        title: "Feature Engineering",
+        desc: "Encoding categorical features, scaling, feature selection, handling missing values",
+        repos: [
+          { label: "ageron/handson-ml3", url: "https://github.com/ageron/handson-ml3", desc: "🟢 Open Chapter 2 (end-to-end ML project) — this is the most complete feature engineering guide. Study every pipeline step." },
+        ],
+      },
+      {
+        title: "Ensemble Methods",
+        desc: "Random Forest, Gradient Boosting, XGBoost, stacking, blending",
+        repos: [
+          { label: "ageron/handson-ml3", url: "https://github.com/ageron/handson-ml3", desc: "Open Chapter 7 (ensemble learning and random forests) — understand bagging, boosting, and voting classifiers in depth." },
+        ],
+      },
+      {
+        title: "Unsupervised Learning",
+        desc: "K-Means, PCA, DBSCAN, anomaly detection, dimensionality reduction",
+        repos: [
+          { label: "ageron/handson-ml3", url: "https://github.com/ageron/handson-ml3", desc: "Open Chapter 9 (unsupervised learning) — implement K-Means and PCA on a real dataset from scratch." },
+        ],
+      },
+      {
+        title: "Project Week",
+        desc: "Full end-to-end ML pipeline with feature engineering",
+        repos: [
+          { label: "dipanjanS/practical-machine-learning-with-python", url: "https://github.com/dipanjanS/practical-machine-learning-with-python", desc: "🟢 Practical ML with Python textbook code. Study Chapters 3–5, then delete everything and rebuild with your own dataset." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "cp-6",
+    title: "Deep Learning: TensorFlow + PyTorch + CV",
+    icon: "🔥",
+    focus: "Neural networks, CNNs, transfer learning, computer vision, image classification",
+    cloneCommands: [
+      "git clone https://github.com/mrdbourke/tensorflow-deep-learning",
+      "git clone https://github.com/mrdbourke/pytorch-deep-learning",
+      "git clone https://github.com/udacity/deep-learning-v2-pytorch",
+    ],
+    project: "Dog vs Cat classifier with transfer learning (ResNet50) — real computer vision pipeline",
+    weeks: [
+      {
+        title: "TensorFlow + Keras",
+        desc: "Neural network basics, regression, classification, CNNs with Keras",
+        repos: [
+          { label: "mrdbourke/tensorflow-deep-learning", url: "https://github.com/mrdbourke/tensorflow-deep-learning", desc: "🟢 TF Zero to Mastery by Daniel Bourke. Do Notebooks 00–04 — the most practical free TF course available." },
+        ],
+      },
+      {
+        title: "PyTorch Basics",
+        desc: "Tensors, autograd, training loop, model saving and loading",
+        repos: [
+          { label: "mrdbourke/pytorch-deep-learning", url: "https://github.com/mrdbourke/pytorch-deep-learning", desc: "🟢 PyTorch Zero to Mastery by Daniel Bourke. Do Notebooks 00–03 — same high-quality practical style as the TF course." },
+        ],
+      },
+      {
+        title: "Computer Vision",
+        desc: "CNN architectures, transfer learning, image augmentation, classification",
+        repos: [
+          { label: "udacity/deep-learning-v2-pytorch", url: "https://github.com/udacity/deep-learning-v2-pytorch", desc: "Udacity Deep Learning with PyTorch. Open convolutional-neural-networks/ folder and run the CNN examples." },
+        ],
+      },
+      {
+        title: "Project Week",
+        desc: "Dog vs Cat classifier with ResNet50 transfer learning",
+        repos: [
+          { label: "mrdbourke/tensorflow-deep-learning", url: "https://github.com/mrdbourke/tensorflow-deep-learning", desc: "Open Notebook 04 (transfer learning part 1 feature extraction). Study it completely, then close it and reimplement yourself." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "cp-7",
+    title: "NLP + Transformers + Hugging Face",
+    icon: "💬",
+    focus: "Text preprocessing, RNNs/LSTMs, BERT, GPT basics, Hugging Face pipelines",
+    cloneCommands: [
+      "git clone https://github.com/jonkrohn/DLTFpT",
+      "git clone https://github.com/huggingface/transformers",
+    ],
+    project: "Sentiment analysis API — Hugging Face model + Flask endpoint + local deployment",
+    weeks: [
+      {
+        title: "Text Preprocessing + Embeddings",
+        desc: "Tokenization, TF-IDF, word2vec, GloVe, text cleaning pipeline",
+        repos: [
+          { label: "jonkrohn/DLTFpT", url: "https://github.com/jonkrohn/DLTFpT", desc: "🟢 Deep Learning with TF and PyTorch textbook code. Open the NLP notebooks for text preprocessing and embedding examples." },
+        ],
+      },
+      {
+        title: "RNNs + LSTMs",
+        desc: "Sequence modeling, language modeling, text generation, sentiment analysis",
+        repos: [
+          { label: "udacity/deep-learning-v2-pytorch", url: "https://github.com/udacity/deep-learning-v2-pytorch", desc: "Open recurrent-neural-networks/ folder — study the RNN and LSTM examples, then rebuild from scratch." },
+        ],
+      },
+      {
+        title: "Transformers + BERT + GPT",
+        desc: "Attention mechanism, BERT fine-tuning, GPT inference, Hugging Face pipelines",
+        repos: [
+          { label: "huggingface/transformers", url: "https://github.com/huggingface/transformers", desc: "🟢 HuggingFace Transformers official. Open examples/pytorch/ and run the text-classification example — then modify it for your own task." },
+        ],
+      },
+      {
+        title: "Project Week",
+        desc: "Sentiment analysis API combining Flask + Hugging Face model",
+        repos: [
+          { label: "huggingface/transformers", url: "https://github.com/huggingface/transformers", desc: "Use the pipeline() API to load a sentiment model, wrap it in Flask, and test it with curl." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "cp-8",
+    title: "Data Engineering: Airflow + Spark + Kafka",
+    icon: "⚡",
+    focus: "Pipeline orchestration, distributed computing, streaming data, end-to-end data platform",
+    cloneCommands: [
+      "git clone https://github.com/airscholar/e2e-data-engineering",
+      "git clone https://github.com/apache/airflow",
+    ],
+    project: "End-to-end pipeline: Kafka → Spark → Postgres → Dashboard",
+    weeks: [
+      {
+        title: "Apache Airflow",
+        desc: "DAGs, operators, sensors, scheduling, XCom, task dependencies",
+        repos: [
+          { label: "airscholar/e2e-data-engineering", url: "https://github.com/airscholar/e2e-data-engineering", desc: "🟢 End-to-end data engineering project. Study the architecture first, then run each component: Airflow DAG, Kafka, Spark, Postgres." },
+          { label: "apache/airflow", url: "https://github.com/apache/airflow", desc: "Apache Airflow official. Browse /airflow/example_dags/ to see real DAG patterns before writing your own." },
+        ],
+      },
+      {
+        title: "Apache Spark + PySpark",
+        desc: "RDDs, DataFrames, transformations, actions, Spark SQL, partitioning",
+        repos: [
+          { label: "airscholar/e2e-data-engineering", url: "https://github.com/airscholar/e2e-data-engineering", desc: "Study the PySpark section — how Spark reads from Kafka and writes to Postgres." },
+        ],
+      },
+      {
+        title: "Apache Kafka",
+        desc: "Producers, consumers, topics, partitions, consumer groups, streaming basics",
+        repos: [
+          { label: "airscholar/e2e-data-engineering", url: "https://github.com/airscholar/e2e-data-engineering", desc: "Study the Kafka producers and consumers. Follow the Docker Compose setup to run Kafka locally." },
+        ],
+      },
+      {
+        title: "Project Week",
+        desc: "Full pipeline: Kafka → Spark → Postgres → Dashboard",
+        repos: [
+          { label: "airscholar/e2e-data-engineering", url: "https://github.com/airscholar/e2e-data-engineering", desc: "🟢 Full reference project. Study every file, understand every connection, then rebuild it from scratch with different data." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "cp-9",
+    title: "MLOps + Docker + CI/CD",
+    icon: "🚀",
+    focus: "MLflow experiment tracking, DVC data versioning, Docker, Kubernetes basics, production ML",
+    cloneCommands: [
+      "git clone https://github.com/hdegen/MLOps-end-to-end",
+      "git clone https://github.com/AlexIoannides/kubernetes-mlops",
+    ],
+    project: "Package Month 5 ML model → Docker container → REST API → Kubernetes deployment",
+    weeks: [
+      {
+        title: "Docker for ML",
+        desc: "Images, containers, Dockerfile, docker-compose, multi-service apps",
+        repos: [
+          { label: "hdegen/MLOps-end-to-end", url: "https://github.com/hdegen/MLOps-end-to-end", desc: "🟢 MLOps end-to-end project. Start with the Docker section — Dockerfile for the ML service and docker-compose for the full stack." },
+        ],
+      },
+      {
+        title: "MLflow Tracking",
+        desc: "Experiments, runs, parameters, metrics, model registry, serving",
+        repos: [
+          { label: "hdegen/MLOps-end-to-end", url: "https://github.com/hdegen/MLOps-end-to-end", desc: "Study the MLflow tracking section. Log experiments, compare runs, and promote a model to the registry." },
+        ],
+      },
+      {
+        title: "DVC + Data Versioning",
+        desc: "Version datasets alongside code, pipelines, remote storage, reproducibility",
+        repos: [
+          { label: "hdegen/MLOps-end-to-end", url: "https://github.com/hdegen/MLOps-end-to-end", desc: "Study the DVC section — how to version datasets and define ML pipelines as DVC stages." },
+        ],
+      },
+      {
+        title: "Project Week",
+        desc: "Package ML model → Docker → REST API → Kubernetes",
+        repos: [
+          { label: "AlexIoannides/kubernetes-mlops", url: "https://github.com/AlexIoannides/kubernetes-mlops", desc: "🟢 Kubernetes MLOps tutorial. Study how ML models are deployed in Kubernetes — then do it with your own model." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "cp-10",
+    title: "System Design + Cloud Basics",
+    icon: "☁️",
+    focus: "Scalability, CAP theorem, databases at scale, AWS/GCP basics, system design interviews",
+    cloneCommands: [
+      "git clone https://github.com/donnemartin/system-design-primer",
+      "git clone https://github.com/ByteByteGoHq/system-design-101",
+    ],
+    project: "Design a URL shortener, chat system, or recommendation engine — full technical document",
+    weeks: [
+      {
+        title: "System Design Fundamentals",
+        desc: "Scalability, load balancing, CAP theorem, consistency vs. availability",
+        repos: [
+          { label: "donnemartin/system-design-primer", url: "https://github.com/donnemartin/system-design-primer", desc: "🟢 The #1 system design resource. Read the README top to bottom — the most comprehensive free guide available." },
+        ],
+      },
+      {
+        title: "Databases at Scale",
+        desc: "SQL vs NoSQL, sharding, replication, caching, CDN, message queues",
+        repos: [
+          { label: "ByteByteGoHq/system-design-101", url: "https://github.com/ByteByteGoHq/system-design-101", desc: "🟢 System Design 101 from ByteByteGo. Visual explanations of database scaling, caching, and API design patterns." },
+        ],
+      },
+      {
+        title: "Cloud Basics (AWS/GCP)",
+        desc: "EC2, S3, RDS, Lambda, IAM, auto-scaling, free tier exploration",
+        repos: [
+          { label: "miztiik/AWS-Demos", url: "https://github.com/miztiik/AWS-Demos", desc: "AWS demos and tutorials. Pick 3–5 demos that match your use case and deploy them on your free-tier account." },
+        ],
+      },
+      {
+        title: "System Design Practice",
+        desc: "Design URL shortener, chat system, recommendation engine from scratch",
+        repos: [
+          { label: "donnemartin/system-design-primer", url: "https://github.com/donnemartin/system-design-primer", desc: "Study the URL shortener and Twitter design — design your own before reading the solution." },
+          { label: "ByteByteGoHq/system-design-101", url: "https://github.com/ByteByteGoHq/system-design-101", desc: "Use the visual diagrams to explain your design — great for interview prep and portfolio documentation." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "cp-11",
+    title: "DSA + Interview Prep + LeetCode",
+    icon: "💻",
+    focus: "Arrays, trees, graphs, dynamic programming, recursion, mock interviews, LeetCode patterns",
+    cloneCommands: [
+      "git clone https://github.com/TheAlgorithms/Python",
+      "git clone https://github.com/jwasham/coding-interview-university",
+      "git clone https://github.com/thepranaygupta/Data-Structures-and-Algorithms",
+    ],
+    project: "Solve 2 LeetCode problems per day + one system design practice per week",
+    weeks: [
+      {
+        title: "Arrays, Strings, Hashmaps",
+        desc: "Two-pointer, sliding window, prefix sums, hash table patterns",
+        repos: [
+          { label: "TheAlgorithms/Python", url: "https://github.com/TheAlgorithms/Python", desc: "🟢 Every algorithm in Python. Study sorts/, data_structures/, and graphs/ — read, understand, retype without looking." },
+          { label: "jwasham/coding-interview-university", url: "https://github.com/jwasham/coding-interview-university", desc: "Complete coding interview university by John Washam — the most thorough free CS interview guide. Follow the study plan." },
+        ],
+      },
+      {
+        title: "Trees + Graphs",
+        desc: "Binary trees, BST, BFS, DFS, topological sort, shortest path",
+        repos: [
+          { label: "jwasham/coding-interview-university", url: "https://github.com/jwasham/coding-interview-university", desc: "Study the Trees and Graphs sections. Implement BFS and DFS from scratch before touching LeetCode." },
+        ],
+      },
+      {
+        title: "DP + Recursion + Backtracking",
+        desc: "Memoization, tabulation, classic DP patterns, recursive tree problems",
+        repos: [
+          { label: "thepranaygupta/Data-Structures-and-Algorithms", url: "https://github.com/thepranaygupta/Data-Structures-and-Algorithms", desc: "🟢 Complete DSA implementations in Python. Study the dynamic programming folder and implement each pattern yourself." },
+        ],
+      },
+      {
+        title: "Mock Interviews + System Design",
+        desc: "2 LeetCode problems per day + system design practice",
+        repos: [
+          { label: "donnemartin/system-design-primer", url: "https://github.com/donnemartin/system-design-primer", desc: "Use for system design interview practice. Explain designs out loud as if in an interview." },
+          { label: "TheAlgorithms/Python", url: "https://github.com/TheAlgorithms/Python", desc: "Check your LeetCode solutions against these implementations — learn alternative approaches." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "cp-12",
+    title: "Capstone Projects + Portfolio + Job Applications",
+    icon: "🏆",
+    focus: "Integrate all 11 months into 3 capstone projects, polish GitHub profile, apply to jobs",
+    cloneCommands: [],
+    project: "3 capstone projects: Full ML Web App + Data Pipeline + NLP App, plus polished GitHub",
+    weeks: [
+      {
+        title: "Full ML Web App",
+        desc: "Train model → Flask API → React frontend → Docker → deploy on AWS",
+        repos: [
+          { label: "mrdbourke/tensorflow-deep-learning", url: "https://github.com/mrdbourke/tensorflow-deep-learning", desc: "Use your best DL model from Month 6 as the core of this app." },
+          { label: "donnemartin/system-design-primer", url: "https://github.com/donnemartin/system-design-primer", desc: "Design the architecture before building — draw the diagram and document it in your README." },
+        ],
+      },
+      {
+        title: "Data Pipeline Capstone",
+        desc: "Real data ingestion → Airflow DAG → Spark → Postgres → dashboard",
+        repos: [
+          { label: "airscholar/e2e-data-engineering", url: "https://github.com/airscholar/e2e-data-engineering", desc: "Use this as your pipeline architecture reference — then build a completely original version with different data." },
+        ],
+      },
+      {
+        title: "NLP Application Capstone",
+        desc: "Upload text → sentiment + summary → Hugging Face → FastAPI → deployment",
+        repos: [
+          { label: "huggingface/transformers", url: "https://github.com/huggingface/transformers", desc: "Combine Month 7 NLP skills with Month 3 API skills — build a text analysis API with multiple endpoints." },
+        ],
+      },
+      {
+        title: "Portfolio + Job Applications",
+        desc: "Polish GitHub profile, write READMEs, update LinkedIn, apply to data roles",
+        repos: [
+          { label: "nilbuild/developer-roadmap", url: "https://github.com/nilbuild/developer-roadmap", desc: "Developer roadmap — use to identify remaining skill gaps and plan what to learn after this program." },
+          { label: "ossu/computer-science", url: "https://github.com/ossu/computer-science", desc: "OSSU full CS curriculum — reference for skills you want to deepen after the 12-month program." },
+          { label: "jwasham/coding-interview-university", url: "https://github.com/jwasham/coding-interview-university", desc: "Final interview prep — work through the coding and system design questions in the last 2 weeks before applying." },
+        ],
+      },
+    ],
+  },
+];
+
+function renderCommunityPath() {
+  const section = document.getElementById("communityPathContent");
+  if (!section) return;
+
+  section.innerHTML = `
+    <div class="cp-rules">
+      <div class="cp-rule-card">
+        <span class="cp-rule-num">1</span>
+        <p><strong>Type the code — never copy-paste.</strong> Typing forces your brain to process every line. You will make mistakes and fix them — that is where learning happens.</p>
+      </div>
+      <div class="cp-rule-card">
+        <span class="cp-rule-num">2</span>
+        <p><strong>Push to your own GitHub daily.</strong> Your 12-month commit history is your resume. Employers can see the streak — every day counts.</p>
+      </div>
+      <div class="cp-rule-card">
+        <span class="cp-rule-num">3</span>
+        <p><strong>When stuck, look at the solution — understand it, close it, rewrite from scratch.</strong> Never copy-paste the solution. Understanding then reproducing is what builds real skill.</p>
+      </div>
+    </div>
+    <div class="cp-overview">
+      <h3 class="cp-overview-title">12-Month Overview</h3>
+      <div class="cp-overview-grid">
+        ${communityPathMonths.map((m, idx) => `
+          <a class="cp-overview-pill" href="#cp-detail-${m.id}">
+            <span class="cp-pill-num">M${idx + 1}</span>
+            <span class="cp-pill-icon">${m.icon}</span>
+            <span>${m.title.split(":")[0].split("+")[0].trim()}</span>
+          </a>
+        `).join("")}
+      </div>
+    </div>
+    <div class="cp-months-list">
+      ${communityPathMonths.map((m, idx) => `
+        <div class="cp-month-card" id="cp-detail-${m.id}">
+          <div class="cp-month-header">
+            <div class="cp-month-num-badge">Month ${idx + 1}</div>
+            <span class="cp-icon" aria-hidden="true">${m.icon}</span>
+            <div class="cp-month-title-block">
+              <h3 class="cp-month-title">${m.title}</h3>
+              <p class="cp-focus">${m.focus}</p>
+            </div>
+          </div>
+
+          ${m.cloneCommands.length ? `
+            <details class="cp-clone-block">
+              <summary>📥 Clone all repos for this month</summary>
+              <pre class="cp-clone-pre">${m.cloneCommands.map(c => c).join("\n")}</pre>
+            </details>
+          ` : ""}
+
+          <div class="cp-weeks">
+            ${m.weeks.map((w, wi) => `
+              <details class="cp-week" ${wi === 0 ? "open" : ""}>
+                <summary class="cp-week-summary">
+                  <span class="cp-week-num-badge">W${wi + 1}</span>
+                  <strong>${w.title}</strong>
+                  <span class="cp-week-desc">${w.desc}</span>
+                </summary>
+                <div class="cp-week-repos">
+                  ${w.repos.map(r => `
+                    <a class="cp-repo-card" href="${r.url}" target="_blank" rel="noreferrer">
+                      <span class="cp-repo-icon">⭐</span>
+                      <div class="cp-repo-info">
+                        <strong>${r.label}</strong>
+                        <p>${r.desc}</p>
+                      </div>
+                    </a>
+                  `).join("")}
+                </div>
+              </details>
+            `).join("")}
+          </div>
+
+          <div class="cp-project-box">
+            <span class="cp-project-label">📦 Monthly Project</span>
+            <p>${m.project}</p>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
 function renderExtendedRoadmap() {
   const section = document.getElementById("extendedRoadmapContent");
   if (!section) return;
@@ -953,20 +1565,26 @@ const monthGithubLinks = {
   1: [
     { label: "trekhleb/learn-python", url: "https://github.com/trekhleb/learn-python", desc: "🟢 START HERE — 30 Python topic scripts. Clone the repo, open each .py file, read it line by line, then re-type it yourself from scratch." },
     { label: "jerry-git/learn-python3", url: "https://github.com/jerry-git/learn-python3", desc: "Jupyter notebooks with exercises and auto-tests. Do the OOP and classes notebooks in Week 1 — run the tests to check yourself." },
+    { label: "Asabeneh/30-Days-Of-Python", url: "https://github.com/Asabeneh/30-Days-Of-Python", desc: "30-day Python challenge — beginner to advanced. Clone it and work through Day 1–11 in your first week: variables, lists, loops, functions." },
+    { label: "jlord/git-it-electron", url: "https://github.com/jlord/git-it-electron", desc: "Interactive Git desktop app — completes real Git challenges on your machine. Download and run it in Week 2 to learn git add, commit, push, branch." },
+    { label: "guipsamora/pandas_exercises", url: "https://github.com/guipsamora/pandas_exercises", desc: "80+ pandas exercises with solutions. Clone it in Week 3 and do 5 exercises per day — check the solution only after trying yourself." },
     { label: "TheAlgorithms/Python", url: "https://github.com/TheAlgorithms/Python", desc: "Reference — every algorithm in clean Python. When you write a class this month, search here to see how pros write the same thing." },
     { label: "satwikkansal/wtfpython", url: "https://github.com/satwikkansal/wtfpython", desc: "Python surprises and gotchas explained with examples. Read 2-3 entries per day — it builds real understanding fast." },
     { label: "realpython/python-guide", url: "https://github.com/realpython/python-guide", desc: "The Hitchhiker's Guide to Python. Read the 'Writing Great Python Code' and 'Virtual Environments' chapters this month." },
   ],
   2: [
     { label: "XD-DENG/SQL-exercise", url: "https://github.com/XD-DENG/SQL-exercise", desc: "🟢 START HERE for SQL — real practice questions with answers. Do all exercises in the /SQL_exercise_01 through /04 folders in Weeks 5-6." },
+    { label: "WebDevSimplified/Learn-SQL", url: "https://github.com/WebDevSimplified/Learn-SQL", desc: "SQL fundamentals by Web Dev Simplified. Clone and work through every .sql file — clear beginner-friendly explanations of SELECT, JOIN, GROUP BY." },
+    { label: "s-shemmee/SQL-101", url: "https://github.com/s-shemmee/SQL-101", desc: "SQL 101 beginner tutorials with examples. Use as a second reference alongside the other SQL repos to reinforce each concept." },
     { label: "tiangolo/fastapi", url: "https://github.com/tiangolo/fastapi", desc: "FastAPI official repo. Open the /docs/en/docs/tutorial/ folder and follow every page as a step-by-step guide in Weeks 7-8." },
     { label: "tiangolo/full-stack-fastapi-template", url: "https://github.com/tiangolo/full-stack-fastapi-template", desc: "Clone this and explore the folder structure. This is how a real production FastAPI project looks — study it before building yours." },
     { label: "pydantic/pydantic", url: "https://github.com/pydantic/pydantic", desc: "Data validation used inside FastAPI. Read the README examples and practice defining models with type hints." },
-    { label: "bald-coder/sql-practice-problems", url: "https://github.com/smpetersgithub/AdvancedSQLPuzzles", desc: "Advanced SQL puzzles with window functions and CTEs — do these in Week 6 after the basics." },
+    { label: "smpetersgithub/AdvancedSQLPuzzles", url: "https://github.com/smpetersgithub/AdvancedSQLPuzzles", desc: "Advanced SQL puzzles with window functions and CTEs — do these in Week 6 after the basics." },
   ],
   3: [
     { label: "DataTalksClub/mlops-zoomcamp", url: "https://github.com/DataTalksClub/mlops-zoomcamp", desc: "🟢 START HERE — free MLOps course. Do Module 1 (intro) in Week 9 and Module 2 (experiment tracking with MLflow) in Week 11." },
     { label: "mlflow/mlflow", url: "https://github.com/mlflow/mlflow", desc: "MLflow official. Open /examples/sklearn_elasticnet_wine/ and run it — that is your first experiment tracking exercise." },
+    { label: "hdegen/MLOps-end-to-end", url: "https://github.com/hdegen/MLOps-end-to-end", desc: "End-to-end MLOps project with Docker, MLflow, and DVC. Study the Dockerfile and docker-compose first — then the MLflow tracking section." },
     { label: "docker/awesome-compose", url: "https://github.com/docker/awesome-compose", desc: "Real Docker Compose examples. Clone and run the /flask/ or /fastapi/ example to understand multi-service apps before writing your own." },
     { label: "GokuMohandas/Made-With-ML", url: "https://github.com/GokuMohandas/Made-With-ML", desc: "Full ML engineering course on GitHub. Read the MLOps and reproducibility sections as a reference for how production teams work." },
   ],
@@ -974,7 +1592,7 @@ const monthGithubLinks = {
     { label: "actions/starter-workflows", url: "https://github.com/actions/starter-workflows", desc: "🟢 START HERE — official GitHub Actions templates. Copy /ci/python-package.yml into your repo and edit it for Week 15." },
     { label: "bregman-arie/devops-exercises", url: "https://github.com/bregman-arie/devops-exercises", desc: "500+ DevOps questions with answers. Study the Linux, CI/CD, and Cloud sections — treat it like a daily quiz while you set up servers." },
     { label: "open-guides/og-aws", url: "https://github.com/open-guides/og-aws", desc: "Practical AWS guide written by engineers. Read the EC2 and IAM sections before launching your first cloud server in Week 14." },
-    { label: "bregman-arie/linux-exercises", url: "https://github.com/bregman-arie/linux-exercises", desc: "Linux command exercises. Do 5 exercises per day during the SSH and server setup week to build terminal fluency fast." },
+    { label: "learnbyexample/cli-computing", url: "https://github.com/learnbyexample/cli-computing", desc: "Linux command line and shell scripting guide with exercises. Work through the chapters during the SSH and server setup week to build terminal fluency fast." },
   ],
   5: [
     { label: "wsvincent/djangox", url: "https://github.com/wsvincent/djangox", desc: "🟢 START HERE — production Django starter with auth. Clone it, run it, and read every file before building your own project." },
@@ -985,6 +1603,7 @@ const monthGithubLinks = {
   ],
   6: [
     { label: "ageron/handson-ml3", url: "https://github.com/ageron/handson-ml3", desc: "🟢 START HERE — Hands-On ML textbook notebooks. Do Chapter 3 (classification) and Chapter 6 (decision trees) as your ML theory base." },
+    { label: "dipanjanS/practical-machine-learning-with-python", url: "https://github.com/dipanjanS/practical-machine-learning-with-python", desc: "Practical ML with Python textbook code. Study Chapters 3–5 for feature engineering, ensemble methods, and model evaluation — then redo exercises with your own dataset." },
     { label: "scikit-learn/scikit-learn", url: "https://github.com/scikit-learn/scikit-learn", desc: "scikit-learn official. Open /examples/classification/ and run a classifier — then integrate that exact pattern into your Django view." },
     { label: "celery/celery", url: "https://github.com/celery/celery", desc: "Celery background tasks. Read /docs/getting-started/first-steps-with-celery.rst and build the example — then swap in your ML task." },
     { label: "plotly/plotly.py", url: "https://github.com/plotly/plotly.py", desc: "Interactive charts. Open /doc/python/bar-charts.md and /line-charts.md — recreate each example, then plug in your ML results." },
@@ -1011,6 +1630,8 @@ const monthGithubLinks = {
   10: [
     { label: "huggingface/transformers", url: "https://github.com/huggingface/transformers", desc: "🟢 START HERE — open /examples/pytorch/text-classification/ and run the AG News example. That is your Week 38 task done." },
     { label: "huggingface/datasets", url: "https://github.com/huggingface/datasets", desc: "Load any NLP dataset in one line. Read the quickstart in the README — use it to load AG News for the classifier in Week 37." },
+    { label: "mrdbourke/tensorflow-deep-learning", url: "https://github.com/mrdbourke/tensorflow-deep-learning", desc: "TF Deep Learning Zero to Mastery — for DL foundations before NLP. Open Notebook 00 (TF fundamentals) if you skipped deep learning basics." },
+    { label: "jonkrohn/DLTFpT", url: "https://github.com/jonkrohn/DLTFpT", desc: "Deep Learning with TensorFlow and PyTorch textbook notebooks. Open the NLP section for text preprocessing, word embeddings, and sequence models." },
     { label: "karpathy/nanoGPT", url: "https://github.com/karpathy/nanoGPT", desc: "Small GPT from scratch by Karpathy. Read model.py to understand how transformers actually work — the best 1-hour learning investment." },
     { label: "openai/openai-python", url: "https://github.com/openai/openai-python", desc: "OpenAI Python SDK. Open /examples/ and run the basic chat completion — then build it into your FastAPI /ask endpoint." },
     { label: "anthropics/anthropic-sdk-python", url: "https://github.com/anthropics/anthropic-sdk-python", desc: "Claude SDK — alternative to OpenAI. Read /examples/ to see how to call Claude from Python for structured LLM outputs." },
@@ -1025,8 +1646,8 @@ const monthGithubLinks = {
   12: [
     { label: "langchain-ai/langgraph", url: "https://github.com/langchain-ai/langgraph", desc: "🟢 START HERE — open /examples/ and run the ReAct agent example. That is your Week 45 starting point for the agentic AI build." },
     { label: "microsoft/autogen", url: "https://github.com/microsoft/autogen", desc: "Microsoft multi-agent framework. Read /notebook/agentchat_two_users.ipynb to understand how multi-agent systems coordinate." },
-    { label: "langchain-ai/langchain/tree/master/cookbook", url: "https://python.langchain.com/docs/tutorials/", desc: "LangChain cookbook — real agent examples with tools and memory. Read one notebook per day as your Week 46-47 daily practice." },
-    { label: "joaomdmoura/crewAI", url: "https://github.com/crewAIInc/crewAI", desc: "CrewAI multi-role agents. Study how roles and tasks are orchestrated — useful reference for Week 47 guardrails and memory." },
+    { label: "LangChain Tutorials (Official Docs)", url: "https://python.langchain.com/docs/tutorials/", desc: "LangChain official tutorials — real agent examples with tools and memory. Read one tutorial per day as your Week 46-47 daily practice." },
+    { label: "crewAIInc/crewAI", url: "https://github.com/crewAIInc/crewAI", desc: "CrewAI multi-role agents. Study how roles and tasks are orchestrated — useful reference for Week 47 guardrails and memory." },
     { label: "e2b-dev/awesome-ai-agents", url: "https://github.com/e2b-dev/awesome-ai-agents", desc: "Curated list of every major AI agent framework. Browse it in Week 45 to understand the landscape before choosing your tools." },
   ],
 };
@@ -1057,7 +1678,7 @@ const learningLibrary = [
       { type: "book", label: "Designing Machine Learning Systems — Chip Huyen", url: "https://huyenchip.com/books/", desc: "Production ML bible. Read Chapter 1-4 in Month 3 (Docker/MLOps), Chapter 7-9 in Month 4 (deployment)." },
       { type: "book", label: "Hands-On Large Language Models — Alammar & Grootendorst", url: "https://www.llm-book.com/", desc: "The best practical LLM book. Read alongside Month 10-11 — covers embeddings, RAG, and fine-tuning with code." },
       { type: "book", label: "Build a Large Language Model from Scratch — Raschka", url: "https://www.manning.com/books/build-a-large-language-model-from-scratch", desc: "Build GPT step by step. Read in Month 10 — the best way to understand how LLMs actually work." },
-      { type: "book", label: "Reinforcement Learning: An Introduction — Sutton & Barto", url: "https://incompleteideas.net/book/RLbook2020.pdf", desc: "Free PDF — RL theory. Read Chapters 1-3 in Month 12 to understand the ReAct agent loop theoretically." },
+      { type: "book", label: "Reinforcement Learning: An Introduction — Sutton & Barto", url: "http://incompleteideas.net/book/RLbook2020.pdf", desc: "Free PDF — RL theory. Read Chapters 1-3 in Month 12 to understand the ReAct agent loop theoretically." },
       { type: "book", label: "Probabilistic ML: Advanced Topics — Kevin Murphy", url: "https://probml.github.io/pml-book/book2.html", desc: "Advanced reference. Browse the Gaussian Processes and Bayesian chapters when you need theory for Month 6 ML work." },
     ],
   },
@@ -3868,8 +4489,8 @@ function renderMissionControl() {
   if (githubBranchInput) githubBranchInput.value = state.githubBranch || "main";
   if (githubStatus) {
     githubStatus.textContent = manualRepo
-      ? `✅ GitHub links active: ${manualRepo} (branch: ${state.githubBranch || "main"})`
-      : "⚠️ Paste your private repo URL (e.g. https://github.com/YourName/self-internship) and set the branch name (main or master), then click Save GitHub URL.";
+      ? `✅ GitHub links active — branch: ${state.githubBranch || "main"}. Click the sample link below to verify your repo is correct.`
+      : "⚠️ No private study repo set. Create a repo on GitHub (e.g. self-internship), paste the URL above, and click Save. GitHub buttons throughout the site will then open your files directly.";
   }
 
   renderEvidence();
@@ -3929,9 +4550,28 @@ function bindMissionControl() {
   const githubInput = document.getElementById("githubRepoBase");
   const githubBranchInput = document.getElementById("githubBranch");
   const saveGithubButton = document.getElementById("saveGithubRepoBase");
+  const clearGithubButton = document.getElementById("clearGithubRepoBase");
   const githubStatus = document.getElementById("githubRepoStatus");
+  const githubPreview = document.getElementById("githubLinkPreview");
+  const githubPreviewAnchor = document.getElementById("githubLinkPreviewAnchor");
+
   // Restore saved values into inputs
   if (githubBranchInput) githubBranchInput.value = state.githubBranch || "main";
+
+  const updateGithubPreview = () => {
+    if (!githubPreview || !githubPreviewAnchor) return;
+    const repo = normalizeGitHubRepoBase(githubInput?.value || state.githubRepoBase);
+    const branch = (githubBranchInput?.value || state.githubBranch || "main").trim() || "main";
+    if (repo) {
+      const sampleUrl = `${repo}/tree/${branch}/knowledge-base/`;
+      githubPreviewAnchor.href = sampleUrl;
+      githubPreviewAnchor.textContent = sampleUrl;
+      githubPreview.style.display = "block";
+    } else {
+      githubPreview.style.display = "none";
+    }
+  };
+
   const saveGithubRepo = () => {
     state.githubRepoBase = normalizeGitHubRepoBase(githubInput?.value || "");
     state.githubBranch = (githubBranchInput?.value || "main").trim() || "main";
@@ -3940,17 +4580,39 @@ function bindMissionControl() {
     if (githubBranchInput) githubBranchInput.value = state.githubBranch;
     if (githubStatus) {
       githubStatus.textContent = state.githubRepoBase
-        ? `✅ GitHub links active: ${state.githubRepoBase} (branch: ${state.githubBranch})`
-        : "GitHub repository URL cleared. Add it again to enable GitHub links.";
+        ? `✅ Saved! GitHub buttons now point to: ${state.githubRepoBase} (branch: ${state.githubBranch}). Click the sample link below to verify your repo exists.`
+        : "URL cleared. GitHub buttons are disabled until you add a repo URL.";
     }
+    updateGithubPreview();
     renderMonthDetail();
     renderProjects();
     renderFolders();
     renderResources();
   };
+
+  const clearGithubRepo = () => {
+    if (githubInput) githubInput.value = "";
+    if (githubBranchInput) githubBranchInput.value = "main";
+    state.githubRepoBase = "";
+    state.githubBranch = "main";
+    saveMissionState();
+    if (githubStatus) githubStatus.textContent = "URL cleared. Paste your private study repo URL and click Save to re-enable GitHub buttons.";
+    if (githubPreview) githubPreview.style.display = "none";
+    renderMonthDetail();
+    renderProjects();
+    renderFolders();
+    renderResources();
+  };
+
+  githubInput?.addEventListener("input", updateGithubPreview);
+  githubBranchInput?.addEventListener("input", updateGithubPreview);
   githubInput?.addEventListener("change", saveGithubRepo);
   githubBranchInput?.addEventListener("change", saveGithubRepo);
   saveGithubButton?.addEventListener("click", saveGithubRepo);
+  clearGithubButton?.addEventListener("click", clearGithubRepo);
+
+  // Show preview on load if URL is already set
+  updateGithubPreview();
 
   document.getElementById("exportProgress")?.addEventListener("click", exportProgress);
   document.getElementById("importProgress")?.addEventListener("change", importProgress);
@@ -4937,6 +5599,7 @@ function init() {
   renderMissionControl();
   renderLearningLibrary();
   renderExtendedRoadmap();
+  renderCommunityPath();
   renderReference();
   renderMonths();
   renderMonthDetail();
