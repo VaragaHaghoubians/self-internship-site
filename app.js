@@ -798,7 +798,7 @@ const continuousTracks = [
     resources: [
       { label: "3Blue1Brown (Linear Algebra)", url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab" },
       { label: "3Blue1Brown (Calculus)", url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr" },
-      { label: "Probability for ML (cheatsheet)", url: "https://stanford.edu/~shervine/teaching/cs-229/cheatsheet-probabilities" },
+      { label: "Probability for ML (cheatsheet)", url: "https://stanford.edu/~shervine/teaching/cs-229/refresher-probabilities-statistics" },
       { label: "Mathematics for ML (free book)", url: "https://mml-book.github.io" },
       { label: "StatQuest (YouTube)", url: "https://www.youtube.com/@statquest" },
     ],
@@ -1025,7 +1025,7 @@ const monthGithubLinks = {
   12: [
     { label: "langchain-ai/langgraph", url: "https://github.com/langchain-ai/langgraph", desc: "🟢 START HERE — open /examples/ and run the ReAct agent example. That is your Week 45 starting point for the agentic AI build." },
     { label: "microsoft/autogen", url: "https://github.com/microsoft/autogen", desc: "Microsoft multi-agent framework. Read /notebook/agentchat_two_users.ipynb to understand how multi-agent systems coordinate." },
-    { label: "langchain-ai/langchain/tree/master/cookbook", url: "https://github.com/langchain-ai/langchain/tree/master/cookbook", desc: "LangChain cookbook — real agent examples with tools and memory. Read one notebook per day as your Week 46-47 daily practice." },
+    { label: "langchain-ai/langchain/tree/master/cookbook", url: "https://python.langchain.com/docs/tutorials/", desc: "LangChain cookbook — real agent examples with tools and memory. Read one notebook per day as your Week 46-47 daily practice." },
     { label: "joaomdmoura/crewAI", url: "https://github.com/crewAIInc/crewAI", desc: "CrewAI multi-role agents. Study how roles and tasks are orchestrated — useful reference for Week 47 guardrails and memory." },
     { label: "e2b-dev/awesome-ai-agents", url: "https://github.com/e2b-dev/awesome-ai-agents", desc: "Curated list of every major AI agent framework. Browse it in Week 45 to understand the landscape before choosing your tools." },
   ],
@@ -1057,8 +1057,8 @@ const learningLibrary = [
       { type: "book", label: "Designing Machine Learning Systems — Chip Huyen", url: "https://huyenchip.com/books/", desc: "Production ML bible. Read Chapter 1-4 in Month 3 (Docker/MLOps), Chapter 7-9 in Month 4 (deployment)." },
       { type: "book", label: "Hands-On Large Language Models — Alammar & Grootendorst", url: "https://www.llm-book.com/", desc: "The best practical LLM book. Read alongside Month 10-11 — covers embeddings, RAG, and fine-tuning with code." },
       { type: "book", label: "Build a Large Language Model from Scratch — Raschka", url: "https://www.manning.com/books/build-a-large-language-model-from-scratch", desc: "Build GPT step by step. Read in Month 10 — the best way to understand how LLMs actually work." },
-      { type: "book", label: "Reinforcement Learning: An Introduction — Sutton & Barto", url: "http://incompleteideas.net/book/the-book-2nd.html", desc: "Free PDF — RL theory. Read Chapters 1-3 in Month 12 to understand the ReAct agent loop theoretically." },
-      { type: "book", label: "Probabilistic ML: Advanced Topics — Kevin Murphy", url: "https://probml.github.io/book2", desc: "Advanced reference. Browse the Gaussian Processes and Bayesian chapters when you need theory for Month 6 ML work." },
+      { type: "book", label: "Reinforcement Learning: An Introduction — Sutton & Barto", url: "https://incompleteideas.net/book/RLbook2020.pdf", desc: "Free PDF — RL theory. Read Chapters 1-3 in Month 12 to understand the ReAct agent loop theoretically." },
+      { type: "book", label: "Probabilistic ML: Advanced Topics — Kevin Murphy", url: "https://probml.github.io/pml-book/book2.html", desc: "Advanced reference. Browse the Gaussian Processes and Bayesian chapters when you need theory for Month 6 ML work." },
     ],
   },
   {
