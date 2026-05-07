@@ -20,6 +20,7 @@ const state = {
   evidence: JSON.parse(localStorage.getItem("portfolioEvidence") || "[]"),
   glossaryQuery: "",
   githubRepoBase: localStorage.getItem("githubRepoBase") || "",
+  githubBranch: localStorage.getItem("githubBranch") || "main",
 };
 
 const superpowers = [
@@ -3236,6 +3237,7 @@ function saveMissionState() {
   localStorage.setItem("setupChecklistDone", JSON.stringify(state.setupDone));
   localStorage.setItem("portfolioEvidence", JSON.stringify(state.evidence));
   localStorage.setItem("githubRepoBase", state.githubRepoBase);
+  localStorage.setItem("githubBranch", state.githubBranch);
 }
 
 function saveLabState() {
@@ -3378,8 +3380,9 @@ function isLikelyFilePath(path) {
 function githubLink(path) {
   const repo = getEffectiveGitHubRepoBase();
   if (!repo || !path) return "";
+  const branch = (state.githubBranch || "main").trim() || "main";
   const mode = isLikelyFilePath(path) ? "blob" : "tree";
-  return `${repo}/${mode}/main/${encodeGitHubPath(path)}`;
+  return `${repo}/${mode}/${branch}/${encodeGitHubPath(path)}`;
 }
 
 function monthSourceCatalog(month) {
@@ -3858,15 +3861,15 @@ function renderMissionControl() {
   }
 
   const githubInput = document.getElementById("githubRepoBase");
+  const githubBranchInput = document.getElementById("githubBranch");
   const githubStatus = document.getElementById("githubRepoStatus");
   const manualRepo = normalizeGitHubRepoBase(state.githubRepoBase);
-  const autoRepo = detectGitHubRepoBaseFromLocation();
-  const effectiveRepo = getEffectiveGitHubRepoBase();
   if (githubInput) githubInput.value = state.githubRepoBase;
+  if (githubBranchInput) githubBranchInput.value = state.githubBranch || "main";
   if (githubStatus) {
     githubStatus.textContent = manualRepo
-      ? `✅ GitHub source links active for: ${manualRepo}`
-      : "⚠️ Paste your private self-internship repo URL here (e.g. https://github.com/YourName/self-internship) to unlock all GitHub links. Without this, GitHub buttons show a 'not configured' message.";
+      ? `✅ GitHub links active: ${manualRepo} (branch: ${state.githubBranch || "main"})`
+      : "⚠️ Paste your private repo URL (e.g. https://github.com/YourName/self-internship) and set the branch name (main or master), then click Save GitHub URL.";
   }
 
   renderEvidence();
@@ -3924,18 +3927,21 @@ function bindMissionControl() {
   });
 
   const githubInput = document.getElementById("githubRepoBase");
+  const githubBranchInput = document.getElementById("githubBranch");
   const saveGithubButton = document.getElementById("saveGithubRepoBase");
   const githubStatus = document.getElementById("githubRepoStatus");
+  // Restore saved values into inputs
+  if (githubBranchInput) githubBranchInput.value = state.githubBranch || "main";
   const saveGithubRepo = () => {
     state.githubRepoBase = normalizeGitHubRepoBase(githubInput?.value || "");
+    state.githubBranch = (githubBranchInput?.value || "main").trim() || "main";
     saveMissionState();
     if (githubInput) githubInput.value = state.githubRepoBase;
+    if (githubBranchInput) githubBranchInput.value = state.githubBranch;
     if (githubStatus) {
       githubStatus.textContent = state.githubRepoBase
-        ? `Saved GitHub repository URL: ${state.githubRepoBase}`
-        : detectGitHubRepoBaseFromLocation()
-          ? `Manual GitHub repository URL cleared. Auto-detected repo is active: ${getEffectiveGitHubRepoBase()}`
-          : "GitHub repository URL cleared. Add it again to enable GitHub links.";
+        ? `✅ GitHub links active: ${state.githubRepoBase} (branch: ${state.githubBranch})`
+        : "GitHub repository URL cleared. Add it again to enable GitHub links.";
     }
     renderMonthDetail();
     renderProjects();
@@ -3943,6 +3949,7 @@ function bindMissionControl() {
     renderResources();
   };
   githubInput?.addEventListener("change", saveGithubRepo);
+  githubBranchInput?.addEventListener("change", saveGithubRepo);
   saveGithubButton?.addEventListener("click", saveGithubRepo);
 
   document.getElementById("exportProgress")?.addEventListener("click", exportProgress);
