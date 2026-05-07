@@ -2352,3 +2352,394 @@ details p {
 .ext-track-links a:hover {
   text-decoration: underline;
 }
+
+/* ─── Community Path ────────────────────────────────────────────────────── */
+.community-path-section { background: var(--surface); }
+
+/* Rules */
+.cp-rules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 36px;
+}
+.cp-rule-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.cp-rule-num {
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cp-rule-card h4 { margin: 0 0 4px; font-size: 15px; }
+.cp-rule-card p  { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+/* Overview grid */
+.cp-overview { margin-bottom: 40px; }
+.cp-overview-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 14px;
+  color: var(--fg);
+}
+.cp-overview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.cp-overview-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px 6px 10px;
+  text-decoration: none;
+  color: var(--fg);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.15s, border-color 0.15s;
+}
+.cp-overview-pill:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.cp-pill-num {
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+.cp-overview-pill:hover .cp-pill-num { background: rgba(255,255,255,0.25); }
+.cp-pill-icon { font-size: 16px; }
+
+/* Month cards */
+.cp-months-list { display: flex; flex-direction: column; gap: 28px; }
+.cp-month-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  scroll-margin-top: 80px;
+}
+.cp-month-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.cp-month-num-badge {
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+.cp-icon { font-size: 28px; }
+.cp-month-title-block { flex: 1; min-width: 0; }
+.cp-month-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--fg);
+}
+.cp-focus {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Clone block */
+.cp-clone-block {
+  border-bottom: 1px solid var(--border);
+}
+.cp-clone-block summary {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.cp-clone-block summary::-webkit-details-marker { display: none; }
+.cp-clone-block summary::before { content: "▶ "; font-size: 11px; }
+.cp-clone-block[open] summary::before { content: "▼ "; }
+.cp-clone-pre {
+  margin: 0;
+  padding: 12px 20px 16px;
+  background: var(--surface);
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--fg);
+  border-top: 1px solid var(--border);
+}
+
+/* Weeks */
+.cp-weeks { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+.cp-week {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.cp-week-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--surface);
+  user-select: none;
+}
+.cp-week-summary::-webkit-details-marker { display: none; }
+.cp-week-num-badge {
+  background: var(--border);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.cp-week[open] .cp-week-num-badge { background: var(--accent); color: #fff; }
+.cp-week-desc {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+  margin-left: auto;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40%;
+}
+
+/* Repo cards inside weeks */
+.cp-week-repos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+  padding: 12px 14px 14px;
+  background: var(--card);
+}
+.cp-repo-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  text-decoration: none;
+  color: var(--fg);
+  transition: border-color 0.15s, background 0.15s;
+}
+.cp-repo-card:hover {
+  border-color: var(--accent);
+  background: var(--card);
+}
+.cp-repo-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+.cp-repo-info { min-width: 0; }
+.cp-repo-info strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+.cp-repo-info span {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Project box */
+.cp-project-box {
+  margin: 0 20px 18px;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-left: 4px solid var(--accent);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.cp-project-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin: 0 0 6px;
+}
+.cp-project-box p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--fg);
+  line-height: 1.55;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .cp-month-header { flex-wrap: wrap; }
+  .cp-week-desc { display: none; }
+  .cp-week-repos { grid-template-columns: 1fr; }
+  .cp-overview-pill { font-size: 12px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MOBILE COMPATIBILITY — comprehensive phone fixes
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Nav mega-menu: must be scrollable on phones ── */
+.nav-panel {
+  max-height: calc(100svh - 64px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── 2. Nav panel columns: 4→2 at 700px (already done) → 1 at 480px ── */
+@media (max-width: 480px) {
+  .nav-panel-inner {
+    grid-template-columns: 1fr;
+    padding: 16px 18px 24px;
+  }
+  .nav-col {
+    padding: 0 0 14px;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-col:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+/* ── 3. Tablet (≤980px) tweaks ── */
+@media (max-width: 980px) {
+  /* Month rail: 2 columns (already set), but reset to 1 on small screens */
+  .lab-list,
+  .python-lesson-list,
+  .skill-lesson-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: 320px;
+  }
+}
+
+/* ── 4. Phone (≤700px) layout fixes ── */
+@media (max-width: 700px) {
+  /* Topbar brand: shrink text if needed */
+  .brand { font-size: 14px; }
+
+  /* Hero: tighter vertical rhythm */
+  .hero { padding-top: 48px; padding-bottom: 32px; }
+
+  /* Superpowers / Loop / Folder / Project grids: already 1fr at 980px */
+
+  /* Source link buttons: full-width on phone */
+  .source-link-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .source-link-actions .file-link,
+  .source-link-actions .mark-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Lab actions row: stack buttons */
+  .lab-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .lab-actions .mark-button,
+  .lab-actions .file-link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Code editors: shorter on small screens */
+  #codeEditor, #labOutput,
+  #pythonLessonEditor, #pythonLessonOutput,
+  #skillLessonEditor, #skillLessonOutput {
+    min-height: 200px;
+  }
+
+  /* Mission grid: already 1fr at 980px, but also ensure panel padding */
+  .mission-panel { padding: 16px; }
+
+  /* Reference shell: already 1fr at 980px */
+
+  /* Community path: tighten */
+  .cp-month-card { border-radius: 10px; }
+  .cp-clone-pre { font-size: 11px; padding: 10px 12px; }
+  .cp-project-box { margin: 0 10px 14px; }
+
+  /* Extended roadmap track: prevent overflow */
+  .ext-track-card { min-width: 0; }
+}
+
+/* ── 5. Small phone (≤400px) fine-tuning ── */
+@media (max-width: 400px) {
+  /* Hero h1 readable at 375px/320px */
+  h1 { font-size: 34px !important; line-height: 1.05; }
+
+  /* Reduce horizontal padding further */
+  .hero, .section-pad { padding-left: 12px; padding-right: 12px; }
+
+  /* Month detail: tighter */
+  .month-detail { padding: 14px; }
+
+  /* Lab workspaces */
+  .lab-workspace,
+  .python-lesson-workspace,
+  .skill-lesson-workspace { padding: 12px; }
+
+  /* Nav menu button: shrink padding */
+  .nav-menu-btn { padding: 0 10px; font-size: 12px; }
+
+  /* Topbar: reduce height */
+  .topbar { min-height: 52px; }
+
+  /* Community path overview pills: 2-col grid */
+  .cp-overview-grid { gap: 6px; }
+  .cp-overview-pill { padding: 6px 10px; font-size: 11px; }
+
+  /* Folder/power/project cards: tighter padding */
+  .power, .loop-grid > div, .folder, .project { padding: 16px; }
+}

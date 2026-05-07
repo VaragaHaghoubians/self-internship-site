@@ -197,20 +197,118 @@
     </style>
   </head>
   <body>
+    <style>
+      .proj-grid { display: grid; gap: 16px; margin-top: 8px; }
+      .proj-card { padding: 20px; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 10px; background: var(--surface); }
+      .proj-card h3 { margin: 0 0 8px; font-size: 18px; }
+      .proj-card h3 a { color: var(--ink); }
+      .proj-card h3 a:hover { color: var(--accent); }
+      .proj-card p { margin: 0 0 12px; font-size: 14px; color: var(--muted); }
+      .proj-links { display: flex; flex-wrap: wrap; gap: 7px; }
+      .plink { padding: 5px 11px; border-radius: 7px; font-size: 12px; font-weight: 600; text-decoration: none !important; }
+      .plink.rm { background: var(--accent-soft); color: var(--accent); }
+      .plink.ins { background: #fef3c7; color: #92400e; }
+      .plink.pre { background: #fee2e2; color: #991b1b; }
+      .plink.cod { background: #1e2b26; color: #5eead4; }
+      .meta-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; font-size: 12px; color: var(--muted); }
+      .role-badge { padding: 2px 8px; border-radius: 20px; border: 1px solid var(--line); }
+    </style>
+
     <nav class="reader-top">
-      <a href="../../../index.html">Back to website</a>
-      <a href="../../../index.html#python-lab">Python lab</a>
+      <a href="../../../index.html">← Back to website</a>
+      <a href="../index.html">All Projects</a>
       <a href="../../index.html">Docs index</a>
     </nav>
     <header class="hero">
-      <h1>foundations</h1>
-      <p>Clean index for this workspace folder.</p>
+      <h1>Foundations Projects</h1>
+      <p>Four guided projects with full instructions, prerequisites, and starter code. Each simulates a real job role.</p>
       <div class="path">projects/foundations</div>
     </header>
-    
+
     <main class="layout">
-      <article class="content"><h2>Readable files</h2><p>Choose a file or folder. Markdown is rendered cleanly, and code files are shown in a focused reading view.</p><div class="dir-list"><a class="dir-item" href="project-1-customer-churn/index.html"><strong>project-1-customer-churn/</strong><span>projects/foundations/project-1-customer-churn</span></a><a class="dir-item" href="project-2-sales-analysis/index.html"><strong>project-2-sales-analysis/</strong><span>projects/foundations/project-2-sales-analysis</span></a><a class="dir-item" href="project-3-house-price-pipeline/index.html"><strong>project-3-house-price-pipeline/</strong><span>projects/foundations/project-3-house-price-pipeline</span></a><a class="dir-item" href="project-4-news-classification/index.html"><strong>project-4-news-classification/</strong><span>projects/foundations/project-4-news-classification</span></a></div></article>
-      <aside class="toc"><h2>On this page</h2><p>No headings found.</p></aside>
+      <article class="content">
+        <h2>4 Guided Projects</h2>
+        <p>These projects are fully scaffolded — start with the README, review prerequisites, then work through the starter code.</p>
+
+        <div class="proj-grid">
+
+          <div class="proj-card">
+            <div class="meta-row">
+              <span class="role-badge">Data Scientist</span>
+              <span>📅 Month 2</span>
+              <span>⏱ 8–12 hours</span>
+            </div>
+            <h3><a href="project-1-customer-churn/README.md.html">1 · Telecom Customer Churn</a></h3>
+            <p>EDA, hypothesis tests, churn classifier, feature importance, and business recommendations.</p>
+            <div class="proj-links">
+              <a class="plink rm" href="project-1-customer-churn/README.md.html">📄 README</a>
+              <a class="plink ins" href="project-1-customer-churn/INSTRUCTIONS.md.html">📋 Instructions</a>
+              <a class="plink pre" href="project-1-customer-churn/PREREQUISITES.md.html">✅ Prerequisites</a>
+              <a class="plink cod" href="project-1-customer-churn/customer_churn_analysis.py.html">⌨ Starter code</a>
+            </div>
+          </div>
+
+          <div class="proj-card">
+            <div class="meta-row">
+              <span class="role-badge">Data Analyst</span>
+              <span>📅 Month 2</span>
+              <span>⏱ 6–9 hours</span>
+            </div>
+            <h3><a href="project-2-sales-analysis/README.md.html">2 · Retail Sales Performance</a></h3>
+            <p>Clean sales data, answer management questions, build KPI summaries and visual reports.</p>
+            <div class="proj-links">
+              <a class="plink rm" href="project-2-sales-analysis/README.md.html">📄 README</a>
+              <a class="plink ins" href="project-2-sales-analysis/INSTRUCTIONS.md.html">📋 Instructions</a>
+              <a class="plink pre" href="project-2-sales-analysis/PREREQUISITES.md.html">✅ Prerequisites</a>
+              <a class="plink cod" href="project-2-sales-analysis/sales_performance_analysis.py.html">⌨ Starter code</a>
+            </div>
+          </div>
+
+          <div class="proj-card">
+            <div class="meta-row">
+              <span class="role-badge">ML Engineer</span>
+              <span>📅 Month 3</span>
+              <span>⏱ 10–14 hours</span>
+            </div>
+            <h3><a href="project-3-house-price-pipeline/README.md.html">3 · House Price ML Pipeline</a></h3>
+            <p>A reproducible scikit-learn pipeline with preprocessing, validation, model selection, and serialization.</p>
+            <div class="proj-links">
+              <a class="plink rm" href="project-3-house-price-pipeline/README.md.html">📄 README</a>
+              <a class="plink ins" href="project-3-house-price-pipeline/INSTRUCTIONS.md.html">📋 Instructions</a>
+              <a class="plink pre" href="project-3-house-price-pipeline/PREREQUISITES.md.html">✅ Prerequisites</a>
+              <a class="plink cod" href="project-3-house-price-pipeline/house_price_pipeline.py.html">⌨ Starter code</a>
+            </div>
+          </div>
+
+          <div class="proj-card">
+            <div class="meta-row">
+              <span class="role-badge">AI Engineer</span>
+              <span>📅 Month 4</span>
+              <span>⏱ 12–18 hours</span>
+            </div>
+            <h3><a href="project-4-news-classification/README.md.html">4 · News Classification NLP</a></h3>
+            <p>Compare TF-IDF baseline with transformer fine-tuning on AG News classification.</p>
+            <div class="proj-links">
+              <a class="plink rm" href="project-4-news-classification/README.md.html">📄 README</a>
+              <a class="plink ins" href="project-4-news-classification/INSTRUCTIONS.md.html">📋 Instructions</a>
+              <a class="plink pre" href="project-4-news-classification/PREREQUISITES.md.html">✅ Prerequisites</a>
+              <a class="plink cod" href="project-4-news-classification/news_classification_nlp.py.html">⌨ Starter code</a>
+            </div>
+          </div>
+
+        </div>
+      </article>
+
+      <aside class="toc">
+        <h2>On this page</h2>
+        <a href="#">1 · Customer Churn</a>
+        <a href="#">2 · Sales Performance</a>
+        <a href="#">3 · House Price Pipeline</a>
+        <a href="#">4 · News Classification</a>
+        <hr style="margin:10px 0;border:none;border-top:1px solid var(--line)" />
+        <a href="../index.html">→ All 7 projects</a>
+        <a href="../advanced/index.html">→ Advanced projects</a>
+      </aside>
     </main>
   </body>
 </html>

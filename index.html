@@ -70,6 +70,10 @@
             <strong>+18 Months (Advanced &amp; Emerging)</strong>
             <span>Phase 7–8 from PDF roadmaps + Phase 9 emerging 2025–2026 skills</span>
           </a>
+          <a class="nav-item" href="#community-path">
+            <strong>Community 12-Month Path</strong>
+            <span>GitHub repos, week plans, projects — curated community reference</span>
+          </a>
           <a class="nav-item" href="#projects">
             <strong>Projects</strong>
             <span>7 portfolio projects with instructions</span>
@@ -95,6 +99,10 @@
           <a class="nav-item" href="#library">
             <strong>Learning Library</strong>
             <span>Books, courses, papers, tools</span>
+          </a>
+          <a class="nav-item" href="#workspace">
+            <strong>Folder Map</strong>
+            <span>What every folder is for</span>
           </a>
           <a class="nav-item" href="#resources">
             <strong>Files</strong>
@@ -203,18 +211,27 @@
               <h3>GitHub sources</h3>
               <span>repo links</span>
             </div>
+            <p class="muted-note" style="margin-bottom:10px;line-height:1.55">
+              📁 This is your <strong>private study repo</strong> — a separate GitHub repo (not this website) where you save your work, notes, and code as you study.
+              Create it on GitHub, name it <code>self-internship</code>, then paste the URL below.
+              The <strong>GitHub</strong> buttons on month cards, projects, and folder links will then open the exact file in your repo.
+            </p>
             <label class="field">
-              <span>GitHub repository URL</span>
+              <span>Private study repo URL</span>
               <input id="githubRepoBase" type="url" placeholder="https://github.com/your-name/self-internship" />
             </label>
             <label class="field">
-              <span>Default branch name <small style="font-weight:400;color:var(--muted)">(usually <code>main</code> or <code>master</code>)</small></span>
+              <span>Branch name <small style="font-weight:400;color:var(--muted)">(usually <code>main</code> or <code>master</code>)</small></span>
               <input id="githubBranch" type="text" placeholder="main" style="max-width:160px" />
             </label>
             <div class="lab-actions">
               <button class="mark-button" id="saveGithubRepoBase" type="button">Save GitHub URL</button>
+              <button class="file-link as-button" id="clearGithubRepoBase" type="button" style="background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px">Clear URL</button>
             </div>
-            <pre class="mini-output" id="githubRepoStatus">Add your GitHub repository URL to unlock source links for months, weeks, projects, and files.</pre>
+            <pre class="mini-output" id="githubRepoStatus">Add your private study repo URL above to enable GitHub buttons throughout the site.</pre>
+            <div id="githubLinkPreview" style="display:none;margin-top:8px;font-size:12px;color:var(--muted);word-break:break-all">
+              📎 Sample link: <a id="githubLinkPreviewAnchor" href="#" target="_blank" rel="noreferrer" style="color:var(--accent)"></a>
+            </div>
           </article>
           <article class="mission-panel">
             <div class="panel-heading">
@@ -682,6 +699,18 @@
           </p>
         </div>
         <div id="extendedRoadmapContent"></div>
+      </section>
+
+      <section id="community-path" class="section-pad community-path-section" aria-labelledby="communityPathTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Community Reference Path</p>
+          <h2 id="communityPathTitle">12-Month Community Data Science + Engineering Path</h2>
+          <p>
+            A community-curated 12-month path covering Python, Java, web dev, ML, deep learning, NLP, data engineering, MLOps, system design, DSA, and portfolio building.
+            Each month includes verified GitHub repos to clone and study. Use this alongside your main roadmap for additional practice and different perspectives.
+          </p>
+        </div>
+        <div id="communityPathContent"></div>
       </section>
 
       <section id="reference" class="section-pad reference-section" aria-labelledby="referenceTitle">
