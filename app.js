@@ -5501,8 +5501,11 @@ function renderResources() {
   });
 
   document.getElementById("resourceList").innerHTML = filtered
-    .map(([title, note, tag, path]) => {
-      const localUrl = link(path);
+    .map(([title, note, tag, path, precomputedUrl]) => {
+      // Use pre-computed URL: github resources already have a full https:// URL stored
+      // as the 5th element; workspace resources have their docs/ path pre-computed.
+      // Falling back to link(path) would wrongly produce "docs/https://..." for github entries.
+      const localUrl = precomputedUrl || link(path);
       return `
       <article class="resource-item">
         <div>
