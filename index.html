@@ -46,76 +46,82 @@
     <div class="nav-panel" id="navPanel" aria-hidden="true">
       <div class="nav-panel-inner">
         <div class="nav-col">
-          <p class="nav-col-title">📋 Planning</p>
+          <p class="nav-col-title">🎯 Start Here</p>
           <a class="nav-item" href="#mission-control">
             <strong>Mission Control</strong>
-            <span>Start checklist, daily goal, backup</span>
+            <span>Setup checklist — do this first, once</span>
           </a>
-          <a class="nav-item" href="#cloud-coding">
-            <strong>Cloud Coding</strong>
-            <span>GitHub Codespaces setup</span>
-          </a>
-          <a class="nav-item" href="#git-reminder">
-            <strong>Git Reminder</strong>
-            <span>Daily 4-command save habit</span>
-          </a>
-        </div>
-        <div class="nav-col">
-          <p class="nav-col-title">🗺️ Roadmap</p>
           <a class="nav-item" href="#roadmap">
-            <strong>12-Month Roadmap</strong>
-            <span>Month plan, week tasks, deliverables</span>
-          </a>
-          <a class="nav-item" href="#extended-roadmap">
-            <strong>+18 Months (Advanced &amp; Emerging)</strong>
-            <span>Phase 7–8 from PDF roadmaps + Phase 9 emerging 2025–2026 skills</span>
-          </a>
-          <a class="nav-item" href="#community-path">
-            <strong>Community 12-Month Path</strong>
-            <span>GitHub repos, week plans, projects — curated community reference</span>
+            <strong>My Current Month</strong>
+            <span>Weekly tasks, skills to learn, deliverable</span>
           </a>
           <a class="nav-item" href="#projects">
             <strong>Projects</strong>
-            <span>7 portfolio projects with instructions</span>
+            <span>7 portfolio projects — build these as you go</span>
+          </a>
+          <hr style="border:none;border-top:1px solid var(--line);margin:8px 0" />
+          <a class="nav-item" href="#extended-roadmap" style="opacity:0.6">
+            <strong>Advanced Roadmap (+18 months)</strong>
+            <span>Phase 7–9 — unlock after Month 12</span>
+          </a>
+          <a class="nav-item" href="#community-path" style="opacity:0.6">
+            <strong>Community Path</strong>
+            <span>GitHub repos, curated reference</span>
           </a>
         </div>
         <div class="nav-col">
           <p class="nav-col-title">🧪 Practice</p>
           <a class="nav-item" href="#python-lab">
             <strong>Python Lab</strong>
-            <span>20 interactive lessons in browser</span>
+            <span>20 interactive lessons — run code in browser</span>
           </a>
           <a class="nav-item" href="#skill-labs">
             <strong>Skills Lab</strong>
-            <span>SQL, Docker, Django, ML lessons</span>
+            <span>SQL, Docker, Django, ML — do these by month</span>
           </a>
           <a class="nav-item" href="#code-lab">
             <strong>Submit &amp; Check</strong>
             <span>Month challenge labs with auto-grading</span>
           </a>
+          <hr style="border:none;border-top:1px solid var(--line);margin:8px 0" />
+          <a class="nav-item" href="#cloud-coding" style="opacity:0.6">
+            <strong>Cloud Coding Setup</strong>
+            <span>GitHub Codespaces — optional cloud IDE</span>
+          </a>
+          <a class="nav-item" href="#git-reminder" style="opacity:0.6">
+            <strong>Git Reminder</strong>
+            <span>Daily 4-command save habit</span>
+          </a>
         </div>
         <div class="nav-col">
-          <p class="nav-col-title">📚 Resources</p>
+          <p class="nav-col-title">📚 Reference</p>
           <a class="nav-item" href="#library">
             <strong>Learning Library</strong>
-            <span>Books, courses, papers, tools</span>
-          </a>
-          <a class="nav-item" href="#workspace">
-            <strong>Folder Map</strong>
-            <span>What every folder is for</span>
+            <span>Books, courses, papers, tools — browse anytime</span>
           </a>
           <a class="nav-item" href="#resources">
-            <strong>Files</strong>
-            <span>Open your local study materials</span>
+            <strong>Files &amp; Study Materials</strong>
+            <span>Open your workspace files and guides</span>
           </a>
           <a class="nav-item" href="#reference">
             <strong>Glossary &amp; Help</strong>
-            <span>Key terms and blocker fixes</span>
+            <span>Key terms, blocker fixes, definitions</span>
+          </a>
+          <a class="nav-item" href="#workspace">
+            <strong>Folder Map</strong>
+            <span>What every folder in the workspace is for</span>
           </a>
         </div>
       </div>
     </div>
     <div class="nav-overlay" id="navOverlay"></div>
+
+    <!-- Focus strip: always-visible "you are here" bar -->
+    <div class="focus-strip" id="focusStrip" aria-label="Current month progress">
+      <span class="focus-strip-month">📍 Current focus: <strong id="focusMonthLabel">Month 1: Advanced Python and Version Control</strong></span>
+      <span class="focus-strip-progress" id="focusPct">0 / 12 months done</span>
+      <a class="focus-strip-link" href="#roadmap" id="focusJumpBtn">→ Go to my month</a>
+    </div>
 
     <main id="top">
       <section class="hero" aria-labelledby="heroTitle">
