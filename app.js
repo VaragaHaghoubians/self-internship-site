@@ -4347,10 +4347,11 @@ function renderMonths() {
     .map((month) => {
       const active = month.id === state.month ? "is-active" : "";
       const done = state.done.includes(month.id) ? "is-done" : "";
+      const locked = !isMonthUnlocked(month.id) ? "is-locked" : "";
       const ft = fastTrackIds.has(month.id);
       return `
-        <button class="month-button ${active} ${done}" type="button" role="tab" aria-selected="${month.id === state.month}" data-month="${month.id}" data-fast-track="${ft}">
-          <span class="month-number">${month.id}</span>
+        <button class="month-button ${active} ${done} ${locked}" type="button" role="tab" aria-selected="${month.id === state.month}" data-month="${month.id}" data-fast-track="${ft}">
+          <span class="month-number">${locked ? "🔒" : month.id}</span>
           <span><strong>${month.title}</strong><span>${month.phase}${ft ? ' <em class="ft-badge">🎯 Priority</em>' : ''}</span></span>
           <span class="check-dot" aria-hidden="true">${state.done.includes(month.id) ? "OK" : ""}</span>
         </button>
@@ -4370,6 +4371,32 @@ function renderMonths() {
 
 function renderMonthDetail() {
   const month = months.find((item) => item.id === state.month);
+
+  // ── Progressive unlock gate ──────────────────────────────────────────────
+  if (!isMonthUnlocked(month.id)) {
+    const prevMonth = months.find(m => m.id === month.id - 1);
+    document.getElementById("monthDetail").innerHTML = `
+      <div class="locked-month-detail">
+        <div class="lock-glyph">🔒</div>
+        <h3>${month.phase} — ${month.title}</h3>
+        <p class="lock-note">
+          Complete <strong>Month ${month.id - 1}${prevMonth ? ": " + prevMonth.title : ""}</strong> first.
+          Scroll to it in the list on the left, work through it, then click
+          <em>"Mark month complete"</em> at the bottom to unlock this one.
+        </p>
+        <button class="goto-prev-btn" data-goto="${month.id - 1}">← Go to Month ${month.id - 1}</button>
+      </div>
+    `;
+    document.querySelector(".goto-prev-btn").addEventListener("click", (e) => {
+      state.month = Number(e.currentTarget.dataset.goto);
+      saveProgress();
+      renderMonths();
+      renderMonthDetail();
+    });
+    return;
+  }
+  // ── End unlock gate ──────────────────────────────────────────────────────
+
   const done = state.done.includes(month.id);
   const monthSourcesHtml = renderSourceLinks(monthSourceCatalog(month), { title: "Month source links" });
   const weeksHtml = month.weeks ? `
@@ -4444,14 +4471,27 @@ function renderMonthDetail() {
 
   document.getElementById("markMonth").addEventListener("click", () => {
     if (state.done.includes(month.id)) {
+      // Un-marking: just remove from done list
       state.done = state.done.filter((id) => id !== month.id);
     } else {
+      // Marking complete: add to done, then auto-advance to next month
       state.done = [...state.done, month.id].sort((a, b) => a - b);
+      const nextId = month.id + 1;
+      const nextMonth = months.find(m => m.id === nextId);
+      if (nextMonth) {
+        state.month = nextId;
+        // Brief visual flash on the newly unlocked button after re-render
+        setTimeout(() => {
+          const btn = document.querySelector(`.month-button[data-month="${nextId}"]`);
+          if (btn) { btn.classList.add("just-unlocked"); setTimeout(() => btn.classList.remove("just-unlocked"), 800); }
+        }, 50);
+      }
     }
     saveProgress();
     renderMonths();
     renderMonthDetail();
     updateCompletedCount();
+    updateFocusStrip();
   });
 }
 
@@ -4468,6 +4508,34 @@ function updateCompletedCount() {
   if (barLabel) barLabel.textContent = `${count} / ${total} months complete — ${pct}%`;
   if (barWrap) {
     barWrap.title = `${pct}% of the 12-month roadmap marked complete`;
+  }
+}
+
+// ── Progressive unlock helpers ─────────────────────────────────────────────
+function isMonthUnlocked(monthId) {
+  if (monthId === 1) return true;
+  return state.done.includes(monthId - 1);
+}
+
+function currentActiveMonthId() {
+  for (const m of months) {
+    if (!state.done.includes(m.id)) return m.id;
+  }
+  return months[months.length - 1].id;
+}
+
+function updateFocusStrip() {
+  const activeId = currentActiveMonthId();
+  const activeMonth = months.find(m => m.id === activeId);
+  const label = document.getElementById("focusMonthLabel");
+  const pct = document.getElementById("focusPct");
+  if (label && activeMonth) {
+    label.textContent = `Month ${activeId}: ${activeMonth.title}`;
+  }
+  if (pct) {
+    const count = state.done.length;
+    const total = months.length;
+    pct.textContent = `${count} / ${total} months done`;
   }
 }
 
@@ -5656,6 +5724,7 @@ function init() {
   bindPythonLessonLab();
   bindSkillLessonLab();
   bindLabEditor();
+  updateFocusStrip();
 }
 
 init();

@@ -2743,3 +2743,114 @@ details p {
   /* Folder/power/project cards: tighter padding */
   .power, .loop-grid > div, .folder, .project { padding: 16px; }
 }
+
+/* ═══════════════════════════════════════════════════
+   FOCUS STRIP  (sticky "you are here" bar)
+═══════════════════════════════════════════════════ */
+.focus-strip {
+  position: sticky;
+  top: 60px;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 5vw;
+  background: var(--accent);
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+}
+.focus-strip-month {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.focus-strip-month strong { font-weight: 800; }
+.focus-strip-progress {
+  opacity: 0.78;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.focus-strip-link {
+  color: white;
+  font-weight: 700;
+  background: rgba(255,255,255,0.18);
+  padding: 5px 12px;
+  border-radius: 6px;
+  text-decoration: none !important;
+  white-space: nowrap;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+}
+.focus-strip-link:hover { background: rgba(255,255,255,0.28); }
+@media (max-width: 700px) {
+  .focus-strip { top: 52px; flex-wrap: wrap; gap: 8px; }
+  .focus-strip-progress { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════
+   PROGRESSIVE UNLOCK  (locked month states)
+═══════════════════════════════════════════════════ */
+.month-button.is-locked {
+  opacity: 0.32;
+  cursor: default;
+  filter: grayscale(0.5);
+}
+.month-button.is-locked:hover {
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+.month-button.is-locked .month-number {
+  font-size: 14px;
+  letter-spacing: 0;
+}
+/* Locked detail panel */
+.locked-month-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 60px 24px 48px;
+  gap: 16px;
+}
+.locked-month-detail .lock-glyph {
+  font-size: 54px;
+  line-height: 1;
+}
+.locked-month-detail h3 {
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.2;
+}
+.locked-month-detail .lock-note {
+  color: var(--muted);
+  font-size: 15px;
+  max-width: 360px;
+  margin: 0;
+  line-height: 1.5;
+}
+.locked-month-detail .goto-prev-btn {
+  margin-top: 8px;
+  padding: 11px 24px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font: inherit;
+  font-size: 15px;
+  transition: opacity 0.15s;
+}
+.locked-month-detail .goto-prev-btn:hover { opacity: 0.85; }
+/* "Month unlocked" celebration flash */
+@keyframes unlock-flash {
+  0%   { background: var(--accent-soft); }
+  50%  { background: #b2f0e8; }
+  100% { background: var(--accent-soft); }
+}
+.month-button.just-unlocked { animation: unlock-flash 0.7s ease; }
