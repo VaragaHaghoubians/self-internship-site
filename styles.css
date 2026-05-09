@@ -153,7 +153,7 @@ input {
 
 .nav-panel-inner {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0;
   max-width: 1200px;
   margin: 0 auto;
@@ -638,10 +638,10 @@ h1 {
 
 .month-rail {
   position: sticky;
-  top: 84px;
+  top: 104px;
   display: grid;
   gap: 8px;
-  max-height: calc(100svh - 104px);
+  max-height: calc(100svh - 124px);
   overflow: auto;
 }
 
@@ -961,10 +961,10 @@ h1 {
 .python-lesson-list,
 .skill-lesson-list {
   position: sticky;
-  top: 84px;
+  top: 104px;
   display: grid;
   gap: 8px;
-  max-height: calc(100svh - 104px);
+  max-height: calc(100svh - 124px);
   overflow: auto;
 }
 
@@ -1685,35 +1685,72 @@ details p {
     display: none;
   }
 
+  /* Single-column nav on phones */
   .nav-panel-inner {
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    grid-template-columns: 1fr;
+    padding: 16px 18px 20px;
+    gap: 0;
   }
 
   .nav-col {
-    padding: 0 12px;
+    padding: 12px 0;
     border-right: none;
     border-bottom: 1px solid var(--line);
-    padding-bottom: 16px;
   }
 
   .nav-col:last-child {
     border-bottom: none;
   }
 
+  .nav-col-title {
+    margin-bottom: 8px;
+  }
+
+  /* Reduce hero and section-pad side padding */
   .hero,
   .section-pad {
     padding-left: 18px;
     padding-right: 18px;
   }
 
+  /* Reduce hero height and section vertical breathing room */
   .hero {
     min-height: auto;
-    padding-top: 62px;
+    padding-top: 44px;
+    padding-bottom: 36px;
   }
 
+  /* Reduce section vertical padding (was 86px — too spacious on phone) */
+  .section-pad {
+    padding-top: 52px;
+    padding-bottom: 52px;
+  }
+
+  /* Smaller h1 on phones */
   h1 {
-    font-size: 48px;
+    font-size: 38px;
+    line-height: 1.04;
+  }
+
+  /* Section heading h2 */
+  .section-heading h2 {
+    font-size: 28px;
+  }
+
+  /* Hero stats: horizontal 3-column strip instead of vertical stack */
+  .hero-panel {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .panel-number {
+    font-size: 28px;
+  }
+
+  .panel-label {
+    font-size: 11px;
   }
 
   .month-rail {
@@ -2854,3 +2891,128 @@ details p {
   100% { background: var(--accent-soft); }
 }
 .month-button.just-unlocked { animation: unlock-flash 0.7s ease; }
+
+/* ═══════════════════════════════════════════════════
+   COMPREHENSIVE PHONE FIXES — written last so they
+   override any earlier rules of same specificity.
+═══════════════════════════════════════════════════ */
+
+/* ── Phone (≤ 700px) ───────────────────────────── */
+@media (max-width: 700px) {
+
+  /* 1. Section vertical padding: 86px → 52px */
+  .section-pad {
+    padding-top: 52px !important;
+    padding-bottom: 52px !important;
+  }
+
+  /* 2. Heading sizes */
+  h1 { font-size: 36px !important; line-height: 1.05; }
+  .section-heading h2 { font-size: 26px; }
+
+  /* 3. Hero: compact, no giant min-height */
+  .hero {
+    min-height: auto !important;
+    padding-top: 40px !important;
+    padding-bottom: 32px !important;
+    gap: 20px;
+  }
+  .lead { font-size: 15px; }
+
+  /* 4. Hero stats: 3-column horizontal strip */
+  .hero-panel {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+  .panel-number { font-size: 26px; }
+  .panel-label  { font-size: 11px; }
+
+  /* 5. Month rail: cap height so detail panel is visible without scrolling */
+  .month-rail {
+    max-height: 300px !important;
+    overflow-y: auto !important;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px;
+    background: var(--surface);
+  }
+
+  /* 6. Month detail: remove minimum height */
+  .month-detail { min-height: 0 !important; }
+
+  /* 7. Month-columns (learn + study links): already 1fr via 980px rule */
+  .month-columns { gap: 16px; }
+
+  /* 8. Nav: single column */
+  .nav-panel-inner {
+    grid-template-columns: 1fr !important;
+    padding: 14px 16px 18px !important;
+  }
+  .nav-col {
+    padding: 10px 0 !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--line) !important;
+  }
+  .nav-col:last-child { border-bottom: none !important; }
+
+  /* 9. Extended roadmap card min-width: force 1-col on narrow phones */
+  .ext-month-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 10. Lib-grid cards: 1 column */
+  .lib-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 11. Hero actions: stack buttons full-width */
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .primary-action, .secondary-action {
+    text-align: center;
+    width: 100%;
+  }
+
+  /* 12. Focus strip: tighter on phone */
+  .focus-strip {
+    top: 52px; /* matches smaller topbar on some phones */
+    padding: 7px 16px;
+    font-size: 12px;
+  }
+
+  /* 13. Weeks grid already 1fr via existing rule */
+
+  /* 14. Mission control panels: reduce padding */
+  .mission-panel { padding: 14px; }
+
+  /* 15. GitHub link cards on phone */
+  .github-link-card { padding: 12px 14px; gap: 10px; }
+
+  /* 16. Reduce section heading bottom margin */
+  .section-heading { margin-bottom: 22px; }
+}
+
+/* ── Very small phone (≤ 430px) ─────────────────── */
+@media (max-width: 430px) {
+  h1 { font-size: 30px !important; line-height: 1.06; }
+  .hero { padding-left: 14px !important; padding-right: 14px !important; }
+  .section-pad { padding-left: 14px !important; padding-right: 14px !important; }
+  .panel-number { font-size: 22px; }
+  .topbar { min-height: 52px; }
+  .focus-strip { top: 52px; font-size: 11px; }
+  .month-rail { max-height: 260px !important; }
+  .month-button { min-height: 56px; }
+  .month-number { width: 36px; height: 36px; }
+}
+
+/* ── Landscape phone ─────────────────────────────── */
+@media (max-height: 500px) and (max-width: 900px) {
+  .hero { min-height: auto !important; padding-top: 32px; padding-bottom: 24px; }
+  .month-rail { max-height: 200px !important; }
+  .focus-strip { display: none; } /* hide strip in landscape to save vertical space */
+}
