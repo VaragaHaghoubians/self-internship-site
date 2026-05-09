@@ -21,6 +21,9 @@ const state = {
   glossaryQuery: "",
   githubRepoBase: localStorage.getItem("githubRepoBase") || "",
   githubBranch: localStorage.getItem("githubBranch") || "main",
+  applications: JSON.parse(localStorage.getItem("careerApplications") || "[]"),
+  interviewPracticed: JSON.parse(localStorage.getItem("interviewPracticed") || "{}"),
+  applyChecks: JSON.parse(localStorage.getItem("applyChecks") || "{}"),
 };
 
 const superpowers = [
@@ -5715,6 +5718,7 @@ function init() {
   updateSkillLessonCount();
   renderResourceChips();
   renderResources();
+  renderCareerHub();
   bindSearch();
   bindTheme();
   bindNavMenu();
@@ -5725,6 +5729,531 @@ function init() {
   bindSkillLessonLab();
   bindLabEditor();
   updateFocusStrip();
+}
+
+
+// ─── Career Hub Data ─────────────────────────────────────────────────────────
+
+const interviewQuestions = {
+  behavioral: [
+    { id:"b1", q:"Tell me about yourself.", tip:"30-second summary: background → master's → self-internship → what you built → why this role.", answer:"I have a background in industrial engineering and recently completed a master's in data science. I've been running a structured 12-month self-internship building ML pipelines, a full-stack dashboard, and an AI agent. I'm looking for an internship where I can apply those skills to real data problems." },
+    { id:"b2", q:"Tell me about a project where you solved a hard problem.", tip:"STAR: Situation → Task → Action → Result. Use a specific project with real numbers.", answer:"In my predictive maintenance project I needed to detect anomalies in temperature sensor data with <5% false positives. I built an Isolation Forest model, tuned it with cross-validation, and deployed it as a FastAPI endpoint. False positive rate dropped to 2.8%." },
+    { id:"b3", q:"Describe a time you failed and what you learned.", tip:"Be honest. Focus 70% on what you learned and changed afterward.", answer:"I underestimated how long Docker setup would take in Month 3 — spent 2 weeks debugging instead of 1. I learned to always containerize from day one. I now start every project with a working Dockerfile before writing application code." },
+    { id:"b4", q:"Why do you want to work here specifically?", tip:"Research the company. Mention one specific project, blog post, or product and connect it to something you built.", answer:"Customize per company. Find one specific initiative and connect it to a project in your portfolio." },
+    { id:"b5", q:"Where do you see yourself in 3 years?", tip:"Be honest about the learning goal. Companies hire interns who want to grow.", answer:"I want to be an ML Engineer or AI Systems Engineer working on production systems. This internship is my way of proving I can contribute immediately in a team environment." },
+    { id:"b6", q:"How do you handle tight deadlines with incomplete data?", tip:"Mention: scoping down, communicating early, delivering a simpler version on time.", answer:"I scope down to what's achievable, communicate the tradeoff to stakeholders early, and deliver a working baseline on time. I'd rather ship a working logistic regression on time than a broken neural net late." },
+  ],
+  sql: [
+    { id:"s1", q:"Find the top 3 customers by total revenue in the last 30 days.", tip:"Use SUM(), GROUP BY, ORDER BY DESC, LIMIT, and a WHERE clause on the date column.", answer:"SELECT customer_id, SUM(revenue) AS total_revenue\nFROM orders\nWHERE order_date >= CURRENT_DATE - INTERVAL '30 days'\nGROUP BY customer_id\nORDER BY total_revenue DESC\nLIMIT 3;" },
+    { id:"s2", q:"Calculate a 7-day rolling average of daily sales.", tip:"Use AVG() OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW).", answer:"SELECT date,\n  SUM(sales) AS daily_sales,\n  AVG(SUM(sales)) OVER (\n    ORDER BY date\n    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW\n  ) AS rolling_7d_avg\nFROM sales\nGROUP BY date\nORDER BY date;" },
+    { id:"s3", q:"Find users who placed their second order within 7 days of their first.", tip:"Use ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY order_date), then filter on date difference.", answer:"WITH ranked AS (\n  SELECT user_id, order_date,\n    ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY order_date) AS rn\n  FROM orders\n)\nSELECT r1.user_id\nFROM ranked r1\nJOIN ranked r2 ON r1.user_id = r2.user_id AND r2.rn = 2\nWHERE r1.rn = 1 AND r2.order_date - r1.order_date <= 7;" },
+    { id:"s4", q:"Show month-over-month growth rate of signups.", tip:"Use LAG() to get previous month's count, then (current - previous) / previous * 100.", answer:"WITH monthly AS (\n  SELECT DATE_TRUNC('month', signup_date) AS month, COUNT(*) AS signups\n  FROM users GROUP BY 1\n)\nSELECT month, signups,\n  LAG(signups) OVER (ORDER BY month) AS prev_month,\n  ROUND(100.0 * (signups - LAG(signups) OVER (ORDER BY month))\n    / NULLIF(LAG(signups) OVER (ORDER BY month), 0), 1) AS pct_growth\nFROM monthly;" },
+    { id:"s5", q:"Find products that were never purchased.", tip:"LEFT JOIN orders ON product_id, then WHERE orders.product_id IS NULL.", answer:"SELECT p.product_id, p.name\nFROM products p\nLEFT JOIN orders o ON p.product_id = o.product_id\nWHERE o.product_id IS NULL;" },
+    { id:"s6", q:"Detect and remove duplicate rows, keeping only one.", tip:"Use ROW_NUMBER() OVER (PARTITION BY all_key_columns ORDER BY id), then DELETE WHERE rn > 1.", answer:"WITH dupes AS (\n  SELECT id,\n    ROW_NUMBER() OVER (PARTITION BY email, name ORDER BY id) AS rn\n  FROM users\n)\nDELETE FROM users WHERE id IN (SELECT id FROM dupes WHERE rn > 1);" },
+  ],
+  stats: [
+    { id:"st1", q:"What is a p-value and how do you interpret it?", tip:"Never say 'probability the null hypothesis is true'. Say: probability of data this extreme IF the null is true.", answer:"A p-value is the probability of observing a result as extreme as your data (or more) assuming the null hypothesis is true. If p < 0.05 we reject the null at 5% significance. It does NOT tell you the probability that your hypothesis is correct." },
+    { id:"st2", q:"How would you design an A/B test for a new feature?", tip:"Cover: randomization unit, metric choice, sample size calculation, duration, and analysis method.", answer:"1) Define the metric (e.g., conversion rate). 2) Choose randomization unit (user-level). 3) Run power analysis: 80% power, α=0.05, MDE=5%. 4) Run for full weeks to avoid weekday bias. 5) Analyze with two-proportion z-test. 6) Check for novelty effects and segment results." },
+    { id:"st3", q:"What is the difference between Type I and Type II error?", tip:"Type I = false positive. Type II = false negative. There is a tradeoff between them.", answer:"Type I error (α): rejecting the null when it is true — a false positive. Type II error (β): failing to reject the null when it is false — a false negative. Statistical power = 1 - β. Lowering α reduces false positives but increases false negatives." },
+    { id:"st4", q:"Explain the Central Limit Theorem and why it matters.", tip:"CLT lets you use normal-based tests even when the underlying data is not normal.", answer:"The CLT states that the sampling distribution of the mean approaches normal as sample size grows, regardless of the original distribution. This is why t-tests work even on non-normal data — as long as n ≥ 30." },
+    { id:"st5", q:"What is the difference between correlation and causation?", tip:"Always mention confounders. Ice cream sales and drowning — both caused by summer heat.", answer:"Correlation measures linear relationship. Causation means one variable directly causes another. Ice cream sales and drowning deaths are correlated — both are caused by summer. To establish causation, use randomized experiments (A/B tests) or causal inference methods (DoWhy, propensity scoring)." },
+    { id:"st6", q:"When would you use the median instead of the mean?", tip:"Outliers pull the mean but not the median. Income data is the canonical example.", answer:"Use the median when data is skewed or has outliers. Median household income is more representative than mean income because a few billionaires don't distort it." },
+  ],
+  ml: [
+    { id:"ml1", q:"Explain the bias-variance tradeoff.", tip:"High bias = underfitting. High variance = overfitting. Goal is the sweet spot in between.", answer:"Bias is error from wrong model assumptions (too simple). Variance is sensitivity to training data noise (too complex). To reduce bias: add complexity or features. To reduce variance: regularize, add data, use ensembles. Cross-validation helps find the balance." },
+    { id:"ml2", q:"How do you handle imbalanced classes?", tip:"Cover: class weights, SMOTE, threshold tuning, and why accuracy is misleading here.", answer:"1) class_weight='balanced' in sklearn. 2) Oversample minority with SMOTE. 3) Undersample majority. 4) Lower decision threshold. 5) Use precision-recall AUC, not accuracy — accuracy is misleading on imbalanced data." },
+    { id:"ml3", q:"When would you choose logistic regression over a random forest?", tip:"Start simple. Logistic regression is interpretable and often surprisingly competitive.", answer:"Start with logistic regression: fast, interpretable, works well when the relationship is roughly linear. Use random forest when you expect nonlinear interactions and interpretability is less critical. Always compare both — logistic regression often beats complex models on small clean datasets." },
+    { id:"ml4", q:"What is cross-validation and why do you use it?", tip:"Prevents overfitting to a single train/test split. k-fold = k different test sets → more reliable estimate.", answer:"k-fold CV splits data into k folds, trains on k-1, tests on the held-out fold, repeats k times. Gives a more reliable generalization estimate than a single split — especially important when your dataset is small." },
+    { id:"ml5", q:"Explain precision and recall. When do you optimize for each?", tip:"Precision = avoid false alarms. Recall = catch everything. The right choice depends on what failure costs more.", answer:"Precision = TP / (TP + FP). Recall = TP / (TP + FN). Optimize precision when false positives are costly (spam filter). Optimize recall when false negatives are costly (cancer screening)." },
+    { id:"ml6", q:"How do you prevent overfitting?", tip:"Four main approaches: more data, regularization, simpler model, early stopping.", answer:"1) More training data. 2) Regularization (L1, L2, dropout). 3) Simpler model. 4) Early stopping. 5) Cross-validation to detect it. 6) Feature selection. 7) Ensembles like bagging reduce variance." },
+  ],
+  coding: [
+    { id:"c1", q:"What coding patterns are most tested for DS/ML internships?", tip:"Focus on Medium LeetCode. DS interviews rarely test advanced algorithms.", answer:"Most DS internship coding rounds test: 1) Array/string manipulation (sliding window, two pointers). 2) Hash maps for counting/grouping. 3) Sorting + searching. 4) SQL (1-2 questions). 5) Stats in code. Aim for 50 Medium problems total, not 500." },
+    { id:"c2", q:"How do you approach a new coding problem in an interview?", tip:"Talk out loud. Clarify before coding. Brute force first, then optimize.", answer:"1) Restate in your own words. 2) Ask 2-3 clarifying questions (edge cases, input size). 3) State brute force + complexity. 4) Think aloud about optimization. 5) Code solution. 6) Test with examples including edge cases. 7) State time and space complexity." },
+    { id:"c3", q:"Write a function to find duplicate values in a list.", tip:"Use Counter for O(n) solution. Avoid nested loops (O(n²)).", answer:"from collections import Counter\n\ndef find_duplicates(lst):\n    counts = Counter(lst)\n    return [item for item, count in counts.items() if count > 1]\n\n# O(n) time, O(n) space" },
+    { id:"c4", q:"How would you process a 10GB CSV that doesn't fit in memory?", tip:"Chunking with pandas, Dask, or Spark. Never load everything at once.", answer:"# Option 1: pandas chunking\nfor chunk in pd.read_csv('large.csv', chunksize=100_000):\n    process(chunk)\n\n# Option 2: Dask (lazy, parallel)\nimport dask.dataframe as dd\ndf = dd.read_csv('large.csv')\nresult = df.groupby('col').sum().compute()\n\n# Option 3: PySpark for truly massive files" },
+    { id:"c5", q:"Return the k most frequent elements in a list.", tip:"Counter + most_common(k) is O(n log k). Clean and idiomatic Python.", answer:"from collections import Counter\n\ndef top_k_frequent(nums, k):\n    return [item for item, _ in Counter(nums).most_common(k)]\n\n# Counter.most_common(k) uses a heap: O(n log k)" },
+  ],
+};
+
+const applyMilestones = [
+  {
+    month: 2,
+    roles: ["Data Analyst", "Research Analyst", "Business Intelligence Analyst"],
+    companies: "Startups, consulting firms, retail analytics, healthcare analytics",
+    skills: ["Python with Pandas, NumPy, Matplotlib, Seaborn", "SQL — GROUP BY, JOINs, window functions", "Hypothesis testing & A/B testing basics", "Git & GitHub with public repos and READMEs", "Documented EDA project with visualizations"],
+    resume: ["Python proficiency (Pandas/NumPy/Matplotlib)", "GitHub: EDA project with clear README", "SQL skills — list specific functions used", "A/B testing design and hypothesis testing", "Frame as: 'Self-directed data science project'"],
+    red_flags: ["No public GitHub repos with real projects", "Resume lists tools without projects to prove them", "Can't explain what a p-value means or what SQL JOIN does"],
+  },
+  {
+    month: 4,
+    roles: ["Junior Data Scientist", "ML Intern", "AI/ML Research Intern"],
+    companies: "Tech companies, ML teams at mid-size companies, university research labs",
+    skills: ["scikit-learn pipeline: preprocessing → model → evaluation", "Model evaluation: precision, recall, AUC, confusion matrix", "FastAPI endpoint serving a trained model", "Docker (containerized ML environment)", "Feature engineering and selection", "2+ ML projects with documented metrics"],
+    resume: ["ML project with real metrics: 'Achieved 87% AUC on customer churn'", "FastAPI endpoint serving a trained model", "Docker container for reproducible environment", "2 portfolio repos with clean READMEs", "Business problem framing — not just tool names"],
+    red_flags: ["Only reporting accuracy with no other metrics", "Model trained but never deployed even locally", "Can't explain bias-variance tradeoff"],
+  },
+  {
+    month: 6,
+    roles: ["ML Engineer Intern", "Data Engineer Intern", "Backend Python Intern"],
+    companies: "Tech companies with ML products, MLOps teams, data platform teams",
+    skills: ["Django + PostgreSQL full-stack web app", "Celery background task pipeline", "CI/CD basics (GitHub Actions)", "MLflow or equivalent experiment tracking", "Production-style code: tests, logging, error handling", "System design awareness for ML pipelines"],
+    resume: ["Django app with auth, database models, and API endpoints", "Background job pipeline (Celery + Redis)", "3+ portfolio projects — demonstrable or deployed", "Mention production concerns: logging, error handling, tests", "Link to live demo or recorded demo video"],
+    red_flags: ["Only Jupyter notebooks, no deployed or served apps", "No tests at all — can't describe how you'd test an endpoint", "Never thought about what happens when the model fails in production"],
+  },
+  {
+    month: 9,
+    roles: ["Operations Data Scientist", "AI Systems Engineer", "Industrial AI Intern"],
+    companies: "Manufacturing, logistics, supply chain, aerospace, energy companies",
+    skills: ["End-to-end capstone project with quantified results", "IoT data pipeline from sensor to dashboard", "Optimization with OR-Tools or PuLP", "Business value narrative: cost saved, risk reduced", "Stakeholder-ready visualizations", "Full technical documentation"],
+    resume: ["Capstone: business problem → approach → quantified result", "IoT pipeline from sensor to storage to dashboard", "Optimization model: what you optimized and the result", "GitHub repo with full documentation", "Frame your IE background as competitive differentiator"],
+    red_flags: ["Can't explain what business problem your capstone solves", "No quantified results — 'I built a model' is not enough", "Portfolio looks like coursework, not independent work"],
+  },
+  {
+    month: 12,
+    roles: ["LLM Engineer Intern", "MLOps Engineer", "AI Systems Engineer", "GenAI Intern"],
+    companies: "AI-first companies, LLM product teams, enterprise AI teams",
+    skills: ["RAG pipeline: chunking, embedding, retrieval, reranking", "LLM API integration (OpenAI, Anthropic, or open-weights)", "AI agent with tool use and memory", "Prompt evaluation and quality measurement", "Vector database (Chroma, Pinecone, or Weaviate)", "Agent safety and guardrails basics"],
+    resume: ["RAG system: describe retrieval quality vs. baseline", "AI agent: tools used, what it automates, evaluation score", "Prompt evaluation: how you measured output quality", "Link to working demo with clear setup instructions", "Show you understand LLM limitations: hallucination, context limits"],
+    red_flags: ["Used the ChatGPT API but can't explain how RAG works", "Agent has no memory, no error handling, no evaluation", "Can't explain when NOT to use an LLM"],
+  },
+];
+
+const jobSearchTimeline = [
+  {
+    season: "Summer Internships (June–August)",
+    icon: "☀️",
+    urgency: "high",
+    apply: "September – November",
+    deadline: "Most positions close by December. Big tech closes October–November.",
+    platforms: ["LinkedIn", "Handshake (university job board)", "Company career pages directly", "Indeed", "Glassdoor"],
+    tips: ["Apply to 50–100 roles — not 5, not 500.", "Prioritize company career pages over job boards — apply directly.", "Personalize the first 2 sentences of your cover letter per company.", "Follow up by email after 2 weeks if no response.", "Message the recruiter on LinkedIn after applying."],
+  },
+  {
+    season: "Fall Internships (September–December)",
+    icon: "🍂",
+    urgency: "medium",
+    apply: "June – August",
+    deadline: "Rolling — some companies hire fall interns year-round.",
+    platforms: ["LinkedIn", "AngelList / Wellfound (startups)", "Handshake", "Company career pages"],
+    tips: ["Less competitive than summer — good for your first internship.", "Startups hire fall interns more readily than big tech.", "State your availability window clearly: e.g. Sept 1 – Dec 15."],
+  },
+  {
+    season: "Spring Internships (January–April)",
+    icon: "🌱",
+    urgency: "low",
+    apply: "October – December",
+    deadline: "Rolling. Less common but growing.",
+    platforms: ["LinkedIn", "Handshake", "Company career pages"],
+    tips: ["Least common season — focus here if summer applications were unsuccessful.", "Research labs and startups are the best bet for spring terms."],
+  },
+  {
+    season: "Year-Round / Rolling",
+    icon: "🔄",
+    urgency: "ongoing",
+    apply: "Always open",
+    deadline: "No deadline — first come, first hired.",
+    platforms: ["Y Combinator job board (ycombinator.com/jobs)", "AngelList / Wellfound", "Remote-first job boards", "LinkedIn — filter: Internship + Remote"],
+    tips: ["Startups with <100 employees often hire rolling year-round.", "Remote internships open your market globally — don't limit to your city.", "YC-backed startups: fast-moving, real responsibilities, great resume signal."],
+  },
+];
+
+const resumeGuide = [
+  { month:1, add:["Python proficiency (Pandas, NumPy, Matplotlib, Seaborn)", "Git / GitHub — daily commit habit established", "Self-directed EDA project on a real dataset"], avoid:"Don't list 'Python' without a GitHub project to prove it." },
+  { month:2, add:["Statistical analysis and hypothesis testing", "A/B test design (power analysis, significance testing)", "SQL: GROUP BY, JOINs, window functions", "EDA project with documented findings and charts"], avoid:"Don't call it 'academic work' — frame as a self-initiated data project." },
+  { month:3, add:["scikit-learn pipeline: preprocessing → model → evaluation", "Model evaluation metrics: AUC, F1, confusion matrix, recall", "Predictive modeling project with quantified outcome", "Docker containerized development environment"], avoid:"Don't report accuracy alone — always add precision, recall, and AUC." },
+  { month:4, add:["FastAPI REST endpoint serving a trained model", "MLflow experiment tracking", "2nd ML project in a different domain", "Bullet: 'Built FastAPI endpoint serving predictions at Xms P99 latency'"], avoid:"Don't say 'used FastAPI' — say what you served and how it performed." },
+  { month:5, add:["Django web application with PostgreSQL database", "Authentication system", "REST API with documented endpoints", "Production patterns: logging, error handling, input validation"], avoid:"Must solve a real problem — even a simple one. 'Tutorial project' is a red flag." },
+  { month:6, add:["Celery + Redis background job pipeline", "CI/CD pipeline (GitHub Actions)", "Full-stack project with live demo or recorded video", "3+ portfolio projects complete — list all with links"], avoid:"Don't hide your IE background. Frame it: 'Optimized [process] using ML, reducing [metric] by X%'." },
+  { month:7, add:["IoT data pipeline: sensor → API → storage → dashboard", "Time-series anomaly detection on live sensor data", "Hardware + software integration (ESP32 / DHT11)"], avoid:"Keep hardware boring. The value is the data pipeline, not the sensor count." },
+  { month:8, add:["Real-time streaming (Redis pub/sub or MQTT)", "Monitoring and alerting system", "Advanced dashboard with live data (Grafana or custom)", "Performance metrics for your pipeline"], avoid:"Don't list 'Django' in multiple bullets — consolidate into one strong statement." },
+  { month:9, add:["Capstone: cold-chain or equivalent end-to-end system", "OR-Tools/PuLP optimization with quantified result (e.g. '18% cost reduction')", "Business value narrative: cost saved, risk reduced, efficiency gained", "Full documentation, demo video, and public GitHub repo"], avoid:"The capstone is your strongest bullet. Lead with business outcome, not tech stack." },
+  { month:10, add:["LLM API integration (OpenAI, Anthropic, or Hugging Face)", "NLP pipeline (tokenization, embeddings, classification)", "Prompt engineering techniques and results"], avoid:"Don't just say 'used ChatGPT API' — explain what you built on top of it." },
+  { month:11, add:["RAG pipeline: chunking, embedding, retrieval, reranking", "Vector database (Chroma, Pinecone, or Weaviate)", "Retrieval quality measurement: recall@k, MRR", "Document Q&A system with evaluation results"], avoid:"Describe the quality improvement from RAG vs. no RAG — recruiters want numbers." },
+  { month:12, add:["AI agent with tool use, memory, and error handling", "Agent evaluation suite: 20+ test cases with pass rate", "Prompt safety / guardrails implementation", "7 portfolio projects complete — ready for senior internship or junior roles"], avoid:"'I built an AI agent' is not enough. Describe what it automates and how you measured quality." },
+];
+
+const linkedinChecklist = [
+  { section:"Headline", text:"Don't write just 'Student'. Write: 'Data Science MS | Building ML pipelines, AI agents, and full-stack dashboards | Seeking 2026 internship'" },
+  { section:"About / Summary", text:"3–4 sentences: background → what you're building → what you're looking for. Include keywords: Python, scikit-learn, SQL, FastAPI, Docker, LLM." },
+  { section:"Experience — Self-Internship", text:"Add your self-internship as a position: Title = 'Data Science Self-Internship', Company = 'Self-directed'. Dates = start month to present. Add 3–5 bullet points with outcomes." },
+  { section:"Education", text:"Add your master's degree with GPA (if ≥3.5), relevant courses, and thesis/capstone if applicable." },
+  { section:"Projects", text:"Add your top 3 portfolio projects with links to GitHub. Use action verbs: Built, Deployed, Reduced, Automated, Improved." },
+  { section:"Skills (add 25)", text:"Prioritize: Python, SQL, Machine Learning, Docker, FastAPI, pandas, NumPy, scikit-learn, PyTorch/TensorFlow, LangChain, LLMs, Git, Linux, Django, REST APIs." },
+  { section:"Open to Work", text:"Turn on 'Open to Work' for Internship roles. Add job titles: Data Scientist, ML Engineer, Data Analyst, AI Engineer, Data Science Intern." },
+  { section:"Connections — weekly habit", text:"Connect with 5 new people per week: professors, alumni, data scientists at target companies, speakers from podcasts or conference talks you've watched." },
+];
+
+const networkingGuide = [
+  {
+    title:"Cold message template (LinkedIn DM)",
+    content:`Hi [Name], I'm a data science master's student building AI and ML systems through a structured self-internship. I've been following [Company]'s work on [specific project/blog post] and would love to ask 2–3 questions about your experience on the team in a 15-min chat — no pressure if you're busy. Thanks, [Your Name]`,
+    tip:"Keep it under 80 words. Mention ONE specific thing about them or their company. Generic messages get ignored.",
+  },
+  {
+    title:"After applying — recruiter follow-up email",
+    content:`Subject: Following up — [Role] application\n\nHi [Recruiter Name], I applied for the [Role] position on [Date]. I'm very interested because [1 specific reason]. I have experience in [2 skills from the JD] and my portfolio: [GitHub link]. Thank you for your time.`,
+    tip:"Send 5–7 business days after applying if no response. Send once — don't chase.",
+  },
+  {
+    title:"Informational interview request",
+    content:`Hi [Name], I admire your work at [Company]. I'm a master's student specializing in [area] and exploring roles at AI/ML companies. Would you be open to a 15-minute call? I have specific questions ready and won't take more of your time than that.`,
+    tip:"30–40% response rate if personalized. Follow up once after a week, then let it go.",
+  },
+  {
+    title:"Career fair 30-second pitch",
+    content:`Hi, I'm [Name], an industrial engineering and data science grad student. I've been building ML pipelines, AI agents, and a full-stack industrial dashboard for the past [X] months. I'm looking for a [specific role] internship. Do you have openings on the [specific] team?`,
+    tip:"Bring 10 physical resumes. Have your GitHub open on your phone ready to show projects.",
+  },
+  {
+    title:"How many applications to send",
+    content:`Week 1–2: Research 50 target companies (big tech + mid-size + startups).\nWeek 3–4: Apply to 25 roles.\nMonth 2: Apply to 25 more. Track all in your Application Tracker.\n\nExpected rate: 5–10% callback. 50 applications → 3–5 phone screens → 1–2 offers.\nAfter 100 applications, stop applying and focus entirely on interview prep.`,
+    tip:"Quality > quantity up to ~100 applications. Customize the first paragraph of each cover letter.",
+  },
+];
+
+// ─── Career Hub Render ────────────────────────────────────────────────────────
+
+let careerActiveTab = localStorage.getItem("careerActiveTab") || "applications";
+
+function renderCareerHub() {
+  const tabsEl = document.getElementById("careerHubTabs");
+  const contentEl = document.getElementById("careerHubContent");
+  if (!tabsEl || !contentEl) return;
+
+  const tabs = [
+    { id:"applications", label:"📋 Applications" },
+    { id:"interview",    label:"🎤 Interview Prep" },
+    { id:"apply-ready",  label:"✅ Ready to Apply?" },
+    { id:"timeline",     label:"📅 When to Apply" },
+    { id:"resume",       label:"📄 Resume Guide" },
+    { id:"linkedin",     label:"🔗 LinkedIn & Network" },
+  ];
+
+  tabsEl.innerHTML = tabs.map(t =>
+    `<button class="career-tab ${t.id === careerActiveTab ? "is-active" : ""}" data-tab="${t.id}">${t.label}</button>`
+  ).join("");
+
+  renderCareerTabContent(contentEl);
+
+  tabsEl.querySelectorAll(".career-tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      careerActiveTab = btn.dataset.tab;
+      localStorage.setItem("careerActiveTab", careerActiveTab);
+      tabsEl.querySelectorAll(".career-tab").forEach(b => b.classList.toggle("is-active", b.dataset.tab === careerActiveTab));
+      renderCareerTabContent(contentEl);
+    });
+  });
+}
+
+function renderCareerTabContent(contentEl) {
+  if (!contentEl) return;
+  switch (careerActiveTab) {
+    case "applications": contentEl.innerHTML = renderApplicationTrackerHTML(); bindApplicationTracker(contentEl); break;
+    case "interview":    contentEl.innerHTML = renderInterviewPrepHTML();     bindInterviewPrep(contentEl);     break;
+    case "apply-ready":  contentEl.innerHTML = renderApplyReadyHTML();        bindApplyReady(contentEl);        break;
+    case "timeline":     contentEl.innerHTML = renderJobTimelineHTML();       break;
+    case "resume":       contentEl.innerHTML = renderResumeGuideHTML();       break;
+    case "linkedin":     contentEl.innerHTML = renderLinkedInGuideHTML();     bindApplyReady(contentEl);        break;
+  }
+}
+
+// ── Application Tracker ───────────────────────────────────────────────────────
+
+function statusClass(s) {
+  return { "Saved":"st-saved","Applied":"st-applied","Phone Screen":"st-phone","Technical":"st-tech","Final Round":"st-final","Offer":"st-offer","Rejected":"st-rejected" }[s] || "";
+}
+
+function renderApplicationTrackerHTML() {
+  const apps = state.applications || [];
+  const total = apps.length;
+  const applied = apps.filter(a => a.status !== "Saved").length;
+  const active  = apps.filter(a => ["Phone Screen","Technical","Final Round"].includes(a.status)).length;
+  const offers  = apps.filter(a => a.status === "Offer").length;
+  const statusOptions = ["Saved","Applied","Phone Screen","Technical","Final Round","Offer","Rejected"];
+
+  return `
+<div class="app-tracker">
+  <div class="app-form-card">
+    <h3>Add Application</h3>
+    <div class="app-form">
+      <input id="appCompany"  type="text"  placeholder="Company name" />
+      <input id="appRole"     type="text"  placeholder="Role (e.g. Data Science Intern)" />
+      <input id="appDate"     type="date"  value="${new Date().toISOString().slice(0,10)}" />
+      <select id="appStatus">${statusOptions.map(s=>`<option>${s}</option>`).join("")}</select>
+      <input id="appNotes"    type="text"  placeholder="Notes (optional)" style="grid-column:1/-1" />
+      <button class="mark-button" id="addAppBtn" style="grid-column:1/-1">+ Add application</button>
+    </div>
+  </div>
+  <div class="app-stats-row">
+    <div class="app-stat"><span class="app-stat-num">${total}</span><span>Tracked</span></div>
+    <div class="app-stat"><span class="app-stat-num">${applied}</span><span>Applied</span></div>
+    <div class="app-stat"><span class="app-stat-num">${active}</span><span>In progress</span></div>
+    <div class="app-stat"><span class="app-stat-num ${offers>0?"st-offer":""}">${offers}</span><span>Offers 🎉</span></div>
+  </div>
+  <div class="app-table-wrap">
+    ${apps.length === 0
+      ? `<p class="muted-note" style="text-align:center;padding:32px">No applications yet — add your first one above.</p>`
+      : `<table class="app-table">
+          <thead><tr><th>Company</th><th>Role</th><th>Date</th><th>Status</th><th>Notes</th><th>Update</th><th></th></tr></thead>
+          <tbody>
+            ${apps.map(app=>`
+              <tr>
+                <td><strong>${app.company}</strong></td>
+                <td>${app.role}</td>
+                <td>${app.dateApplied||"—"}</td>
+                <td><span class="app-status-pill ${statusClass(app.status)}">${app.status}</span></td>
+                <td class="app-notes-cell">${app.notes||"—"}</td>
+                <td>
+                  <select class="app-status-sel" data-id="${app.id}">
+                    ${statusOptions.map(s=>`<option ${s===app.status?"selected":""}>${s}</option>`).join("")}
+                  </select>
+                </td>
+                <td><button class="app-del-btn" data-id="${app.id}" title="Remove">✕</button></td>
+              </tr>`).join("")}
+          </tbody>
+        </table>`
+    }
+  </div>
+</div>`;
+}
+
+function bindApplicationTracker(contentEl) {
+  const el = contentEl || document.getElementById("careerHubContent");
+  el.querySelector("#addAppBtn")?.addEventListener("click", () => {
+    const company = el.querySelector("#appCompany").value.trim();
+    const role    = el.querySelector("#appRole").value.trim();
+    if (!company || !role) { alert("Please enter a company name and role."); return; }
+    state.applications = state.applications || [];
+    state.applications.unshift({
+      id: `app-${Date.now()}`,
+      company, role,
+      dateApplied: el.querySelector("#appDate").value,
+      status:      el.querySelector("#appStatus").value,
+      notes:       el.querySelector("#appNotes").value.trim(),
+    });
+    localStorage.setItem("careerApplications", JSON.stringify(state.applications));
+    el.innerHTML = renderApplicationTrackerHTML();
+    bindApplicationTracker(el);
+  });
+  el.querySelectorAll(".app-del-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.applications = state.applications.filter(a => a.id !== btn.dataset.id);
+      localStorage.setItem("careerApplications", JSON.stringify(state.applications));
+      el.innerHTML = renderApplicationTrackerHTML();
+      bindApplicationTracker(el);
+    });
+  });
+  el.querySelectorAll(".app-status-sel").forEach(sel => {
+    sel.addEventListener("change", () => {
+      const app = state.applications.find(a => a.id === sel.dataset.id);
+      if (app) {
+        app.status = sel.value;
+        localStorage.setItem("careerApplications", JSON.stringify(state.applications));
+        el.innerHTML = renderApplicationTrackerHTML();
+        bindApplicationTracker(el);
+      }
+    });
+  });
+}
+
+// ── Interview Prep ────────────────────────────────────────────────────────────
+
+function renderInterviewPrepHTML() {
+  const activeTrack = localStorage.getItem("interviewTrack") || "behavioral";
+  const practiced   = state.interviewPracticed || {};
+  const tracks = [
+    { id:"behavioral", label:"💬 Behavioral" },
+    { id:"sql",        label:"🗄️ SQL" },
+    { id:"stats",      label:"📊 Stats & A/B" },
+    { id:"ml",         label:"🤖 ML Concepts" },
+    { id:"coding",     label:"💻 Coding" },
+  ];
+  const qs = interviewQuestions[activeTrack] || [];
+  const done = qs.filter(q => practiced[q.id]).length;
+
+  return `
+<div class="interview-prep">
+  <div class="interview-tracks" id="interviewTracks">
+    ${tracks.map(t=>`<button class="interview-track-btn ${t.id===activeTrack?"is-active":""}" data-track="${t.id}">${t.label}</button>`).join("")}
+  </div>
+  <div class="interview-progress">Practiced: <strong>${done} / ${qs.length}</strong> in this category</div>
+  <div class="interview-questions" id="interviewQuestions">
+    ${qs.map(q => {
+      const isDone = !!practiced[q.id];
+      return `
+<details class="interview-q ${isDone?"is-practiced":""}" data-qid="${q.id}">
+  <summary>
+    <span class="q-num">${isDone?"✅":"○"}</span>
+    <span class="q-text">${q.q}</span>
+  </summary>
+  <div class="q-body">
+    <p class="q-tip"><strong>💡 Tip:</strong> ${q.tip}</p>
+    <pre class="q-answer">${q.answer}</pre>
+    <button class="mark-button practice-btn" data-qid="${q.id}">${isDone?"Unmark":"Mark as practiced ✅"}</button>
+  </div>
+</details>`;
+    }).join("")}
+  </div>
+</div>`;
+}
+
+function bindInterviewPrep(contentEl) {
+  const el = contentEl || document.getElementById("careerHubContent");
+  el.querySelector("#interviewTracks")?.querySelectorAll(".interview-track-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      localStorage.setItem("interviewTrack", btn.dataset.track);
+      el.innerHTML = renderInterviewPrepHTML();
+      bindInterviewPrep(el);
+    });
+  });
+  el.querySelectorAll(".practice-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      state.interviewPracticed = state.interviewPracticed || {};
+      const id = btn.dataset.qid;
+      state.interviewPracticed[id] ? delete state.interviewPracticed[id] : (state.interviewPracticed[id] = true);
+      localStorage.setItem("interviewPracticed", JSON.stringify(state.interviewPracticed));
+      el.innerHTML = renderInterviewPrepHTML();
+      bindInterviewPrep(el);
+    });
+  });
+}
+
+// ── Ready to Apply ────────────────────────────────────────────────────────────
+
+function renderApplyReadyHTML() {
+  const checks = state.applyChecks || {};
+  return `
+<div class="apply-ready">
+  <p class="muted-note" style="margin-bottom:20px">Check off skills and resume bullets as you complete them. Progress is saved automatically.</p>
+  ${applyMilestones.map(m => {
+    const totalItems = m.skills.length + m.resume.length;
+    const doneItems  = [...m.skills.map((_,i)=>`m${m.month}-skill-${i}`), ...m.resume.map((_,i)=>`m${m.month}-resume-${i}`)].filter(k=>checks[k]).length;
+    const pct = Math.round(100*doneItems/totalItems);
+    return `
+<details class="apply-milestone" ${m.month <= 3 ? "open" : ""}>
+  <summary>
+    <div class="milestone-summary-left">
+      <span class="milestone-month-badge">After Month ${m.month}</span>
+      <span class="milestone-roles-text">${m.roles.join(" · ")}</span>
+    </div>
+    <div class="milestone-pct">${pct}%</div>
+  </summary>
+  <div class="milestone-body">
+    <div class="milestone-cols">
+      <div class="milestone-col">
+        <h4>✅ Skills needed</h4>
+        <ul class="check-list">
+          ${m.skills.map((s,i)=>{const k=`m${m.month}-skill-${i}`;return`<li><label><input type="checkbox" class="apply-check" data-key="${k}" ${checks[k]?"checked":""}> ${s}</label></li>`;}).join("")}
+        </ul>
+      </div>
+      <div class="milestone-col">
+        <h4>📄 Resume bullets to add</h4>
+        <ul class="check-list">
+          ${m.resume.map((r,i)=>{const k=`m${m.month}-resume-${i}`;return`<li><label><input type="checkbox" class="apply-check" data-key="${k}" ${checks[k]?"checked":""}> ${r}</label></li>`;}).join("")}
+        </ul>
+      </div>
+    </div>
+    <div class="milestone-footer">
+      <div class="milestone-red-flags">
+        <h4>🚩 Red flags to avoid</h4>
+        <ul>${m.red_flags.map(r=>`<li>${r}</li>`).join("")}</ul>
+      </div>
+      <div class="milestone-companies"><strong>Target companies:</strong> ${m.companies}</div>
+    </div>
+  </div>
+</details>`; }).join("")}
+</div>`;
+}
+
+function bindApplyReady(contentEl) {
+  const el = contentEl || document.getElementById("careerHubContent");
+  el.querySelectorAll(".apply-check").forEach(cb => {
+    cb.addEventListener("change", () => {
+      state.applyChecks = state.applyChecks || {};
+      cb.checked ? (state.applyChecks[cb.dataset.key] = true) : delete state.applyChecks[cb.dataset.key];
+      localStorage.setItem("applyChecks", JSON.stringify(state.applyChecks));
+    });
+  });
+}
+
+// ── Job Search Timeline ───────────────────────────────────────────────────────
+
+function renderJobTimelineHTML() {
+  return `
+<div class="job-timeline">
+  ${jobSearchTimeline.map(item=>`
+<div class="timeline-card tl-${item.urgency}">
+  <div class="timeline-card-header">
+    <span class="tl-icon">${item.icon}</span>
+    <div>
+      <h3>${item.season}</h3>
+      <p class="tl-window">📅 Apply window: <strong>${item.apply}</strong> — ${item.deadline}</p>
+    </div>
+  </div>
+  <div class="tl-body">
+    <div class="tl-platforms">
+      <strong>Where to apply:</strong>
+      <div class="tl-tags">${item.platforms.map(p=>`<span class="tl-tag">${p}</span>`).join("")}</div>
+    </div>
+    <ul class="tl-tips">${item.tips.map(t=>`<li>${t}</li>`).join("")}</ul>
+  </div>
+</div>`).join("")}
+</div>`;
+}
+
+// ── Resume Guide ──────────────────────────────────────────────────────────────
+
+function renderResumeGuideHTML() {
+  return `
+<div class="resume-guide">
+  <div class="resume-intro-box">
+    <strong>Add one bullet to your resume each month.</strong> Don't wait until Month 12. Use action verbs + metrics. "Built X that achieved Y."
+  </div>
+  <div class="resume-month-grid">
+    ${resumeGuide.map(m=>`
+<div class="resume-month-card">
+  <div class="resume-month-label">Month ${m.month}</div>
+  <ul class="resume-add-list">${m.add.map(a=>`<li>${a}</li>`).join("")}</ul>
+  <div class="resume-avoid-box">⚠️ ${m.avoid}</div>
+</div>`).join("")}
+  </div>
+</div>`;
+}
+
+// ── LinkedIn & Networking ─────────────────────────────────────────────────────
+
+function renderLinkedInGuideHTML() {
+  const checks = state.applyChecks || {};
+  return `
+<div class="linkedin-guide">
+  <div class="linkedin-checklist-section">
+    <h3>LinkedIn Profile Checklist</h3>
+    <p class="muted-note" style="margin-bottom:16px">Check off each section as you complete it.</p>
+    ${linkedinChecklist.map((item,i)=>{
+      const k = `linkedin-${i}`;
+      return `
+<label class="linkedin-item ${checks[k]?"is-done":""}">
+  <input type="checkbox" class="apply-check" data-key="${k}" ${checks[k]?"checked":""}>
+  <div class="linkedin-item-text">
+    <strong>${item.section}</strong>
+    <p>${item.text}</p>
+  </div>
+</label>`;}).join("")}
+  </div>
+  <div class="networking-section">
+    <h3>Networking Templates &amp; Strategy</h3>
+    ${networkingGuide.map(item=>`
+<details class="networking-item">
+  <summary>${item.title}</summary>
+  <div class="networking-body">
+    <pre class="networking-template">${item.content}</pre>
+    <p class="networking-tip">💡 <em>${item.tip}</em></p>
+  </div>
+</details>`).join("")}
+  </div>
+</div>`;
 }
 
 init();
