@@ -3473,6 +3473,33 @@ INSERT INTO sales VALUES
           ["Output includes North", /North/, "output"],
         ],
       },
+      {
+        id: "sql-debug-01",
+        title: "🐛 Debug: Fix the broken SQL",
+        mode: "sql",
+        explain: "SQL errors fall into two types: syntax errors (database cannot parse the query) and logic errors (query runs but gives wrong results). Both happen daily in real data work. Reading the error message and tracing which clause is wrong is a core skill. Fix the two bugs below.",
+        goals: ["Identify the missing keyword causing the syntax error", "Identify the wrong column name causing the logic error", "Make the query return Alice with total 800"],
+        starter: `-- Debug: Two bugs in this query. Fix both.
+-- Expected: Alice | 800
+
+SELECT customers.name, SUM(orders.amount) AS total
+FROM orders
+JOIN customers customers.id = orders.customer_id
+WHERE orders.status = 'shipped'
+GROUP BY custome.name
+ORDER BY total DESC;`,
+        setup: `CREATE TABLE customers (id INTEGER, name TEXT);
+CREATE TABLE orders (id INTEGER, customer_id INTEGER, amount INTEGER, status TEXT);
+INSERT INTO customers VALUES (1,'Alice'),(2,'Bob');
+INSERT INTO orders VALUES (101,1,500,'shipped'),(102,2,700,'pending'),(103,1,300,'shipped');`,
+        expected: "Should return Alice | 800 after both bugs are fixed.",
+        checks: [
+          ["Bug 1 fixed: JOIN has ON keyword", /join\s+customers\s+on/i],
+          ["Bug 2 fixed: GROUP BY uses customers.name not custome.name", /group\s+by\s+customers\.name/i],
+          ["Output includes Alice", /Alice/, "output"],
+          ["Output includes 800", /800/, "output"],
+        ],
+      },
     ],
   },
   {
@@ -3534,6 +3561,27 @@ cd python-practice`,
           ["Uses ls", /\bls\b/],
           ["Uses mkdir", /\bmkdir\b/],
           ["Uses cd", /\bcd\b/],
+        ],
+      },
+      {
+        id: "git-debug-01",
+        title: "🐛 Debug: Fix the broken Git workflow",
+        mode: "text",
+        explain: "Git errors stop your whole team when they happen on a real project. The two most common beginner mistakes are: committing without adding files first (nothing staged), and pushing to the wrong remote branch. Read the broken workflow below and fix both mistakes.",
+        goals: ["Fix Bug 1: stage the file before committing", "Fix Bug 2: push to origin main, not just main", "Write the corrected 4-step workflow"],
+        starter: `# Bug 1: commit without staging — nothing will be saved
+git commit -m "Add data cleaner"
+
+# Bug 2: push to wrong target — this is not a valid git push command
+git push main
+
+# After the push, check the log:
+git log --oneline`,
+        expected: "Correct workflow: git add → git commit -m → git push origin main → git log.",
+        checks: [
+          ["Bug 1 fixed: git add before commit", /git\s+add[\s\S]*git\s+commit/],
+          ["Bug 2 fixed: git push origin main", /git\s+push\s+origin\s+main/],
+          ["Includes git log", /git\s+log/],
         ],
       },
     ],
@@ -3923,6 +3971,43 @@ print("TESTS PASSED: cross-validation complete")`,
           ["Builds test set", /X_test\s*=/],
           ["Appends scores", /scores\.append/],
           ["Prints mean", /Mean|mean/i, "output"],
+        ],
+      },
+      {
+        id: "ml-debug-01",
+        title: "🐛 Debug: Fix the ML pipeline",
+        mode: "python",
+        explain: "ML code breaks in predictable ways: fitting on test data instead of train data (data leakage), wrong input shapes, and confusing predict with predict_proba. These mistakes are very common and very expensive — a model that accidentally sees test data during training looks perfect in evaluation but fails completely on real data. Find and fix the two bugs below.",
+        goals: ["Fix the data leakage: scaler should fit on X_train only, not X_test", "Fix the evaluation: use X_test_scaled not X_train_scaled for predictions", "Make the accuracy print a number between 0 and 1"],
+        starter: `# Debug: Fix the 2 ML pipeline bugs below.
+# Bug clues are in the comments.
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+X_train = [[1,2],[2,3],[3,4],[4,5],[5,6]]
+X_test  = [[6,7],[7,8]]
+y_train = [0,0,1,1,1]
+y_test  = [1,1]
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled  = scaler.fit_transform(X_test)   # Bug 1: should use transform, not fit_transform
+
+model = LogisticRegression()
+model.fit(X_train_scaled, y_train)
+
+preds = model.predict(X_train_scaled)            # Bug 2: should predict on X_test_scaled
+accuracy = sum(p == y for p, y in zip(preds, y_test)) / len(y_test)
+print(f"Accuracy: {accuracy:.2f}")
+`,
+        expected: "After fixing both bugs, prints an accuracy between 0.0 and 1.0.",
+        tests: `assert 0.0 <= accuracy <= 1.0, f"Accuracy {accuracy} out of range"
+print("TESTS PASSED: ML pipeline bugs fixed")`,
+        checks: [
+          ["Bug 1 fixed: X_test uses transform not fit_transform", /X_test_scaled\s*=\s*scaler\.transform\s*\(\s*X_test\s*\)/],
+          ["Bug 2 fixed: predict uses X_test_scaled", /model\.predict\s*\(\s*X_test_scaled\s*\)/],
+          ["Accuracy in valid range", /Accuracy:\s*[01]\.\d+/, "output"],
         ],
       },
     ],
@@ -5401,6 +5486,31 @@ function renderSkillLesson() {
   document.getElementById("skillSourceLink").href = link(track.source);
   renderSkillLessonChecks(saved?.results || []);
   updateSkillLessonCount();
+  renderSkillFeynmanCheck(lesson.id, saved?.passed);
+}
+
+function renderSkillFeynmanCheck(lessonId, passed) {
+  const feynmanEl = document.getElementById("skillFeynmanCheck");
+  const savedAnswerEl = document.getElementById("skillFeynmanSavedAnswer");
+  const answerTextarea = document.getElementById("skillFeynmanAnswer");
+  const statusEl = document.getElementById("skillFeynmanStatus");
+  if (!feynmanEl) return;
+  const savedExplanation = localStorage.getItem(`feynman-${lessonId}`);
+  if (passed) {
+    feynmanEl.hidden = false;
+    if (savedExplanation) {
+      answerTextarea.value = savedExplanation;
+      savedAnswerEl.hidden = false;
+      savedAnswerEl.innerHTML = `<strong>✅ Saved explanation:</strong> <em>${savedExplanation}</em>`;
+      if (statusEl) statusEl.textContent = "Explanation saved.";
+    } else {
+      answerTextarea.value = "";
+      savedAnswerEl.hidden = true;
+      if (statusEl) statusEl.textContent = "";
+    }
+  } else {
+    feynmanEl.hidden = true;
+  }
 }
 
 function renderSkillLessonChecks(results) {
@@ -5442,10 +5552,58 @@ function bindSkillLessonLab() {
     editor.value = lesson.starter;
     localStorage.setItem(getSkillDraftKey(lesson.id), lesson.starter);
     localStorage.removeItem(getSkillOutputKey(lesson.id));
+    localStorage.removeItem(`scratch-${lesson.id}`);
     state.skillLessonOutput = "";
     document.getElementById("skillLessonOutput").textContent = "Starter restored.";
     renderSkillLessonChecks(getSavedSkillSubmission(lesson.id)?.results || []);
+    const scratchBtn = document.getElementById("scratchSkillLesson");
+    if (scratchBtn) { scratchBtn.textContent = "🧠 Write from Scratch"; scratchBtn.classList.remove("scratch-active"); }
   });
+
+  const skillScratchBtn = document.getElementById("scratchSkillLesson");
+  if (skillScratchBtn) {
+    const lesson = getSkillLesson();
+    if (localStorage.getItem(`scratch-${lesson.id}`)) { skillScratchBtn.textContent = "📄 Show Starter Hint"; skillScratchBtn.classList.add("scratch-active"); }
+    skillScratchBtn.addEventListener("click", () => {
+      const lesson = getSkillLesson();
+      const inScratch = localStorage.getItem(`scratch-${lesson.id}`);
+      if (!inScratch) {
+        editor.value = `-- ${lesson.title}\n-- Write this from memory. Goal: ${lesson.goals ? lesson.goals[0] : "complete the lesson"}\n\n`;
+        if (lesson.mode === "python") editor.value = `# ${lesson.title}\n# Write this from memory. Goal: ${lesson.goals ? lesson.goals[0] : "complete the lesson"}\n\n`;
+        localStorage.setItem(getSkillDraftKey(lesson.id), editor.value);
+        localStorage.setItem(`scratch-${lesson.id}`, "1");
+        skillScratchBtn.textContent = "📄 Show Starter Hint";
+        skillScratchBtn.classList.add("scratch-active");
+        document.getElementById("skillLessonOutput").textContent = "Scratch mode — editor cleared. Write from memory. Click 'Show Starter Hint' to peek.";
+      } else {
+        editor.value = lesson.starter;
+        localStorage.setItem(getSkillDraftKey(lesson.id), lesson.starter);
+        localStorage.removeItem(`scratch-${lesson.id}`);
+        skillScratchBtn.textContent = "🧠 Write from Scratch";
+        skillScratchBtn.classList.remove("scratch-active");
+        document.getElementById("skillLessonOutput").textContent = "Starter restored as hint. Try again from scratch after reading it.";
+      }
+    });
+  }
+
+  const saveSkillFeynmanBtn = document.getElementById("saveSkillFeynman");
+  if (saveSkillFeynmanBtn) {
+    saveSkillFeynmanBtn.addEventListener("click", () => {
+      const lesson = getSkillLesson();
+      const answer = (document.getElementById("skillFeynmanAnswer").value || "").trim();
+      if (!answer) {
+        const statusEl = document.getElementById("skillFeynmanStatus");
+        if (statusEl) statusEl.textContent = "Write at least one sentence before saving.";
+        return;
+      }
+      localStorage.setItem(`feynman-${lesson.id}`, answer);
+      const savedAnswerEl = document.getElementById("skillFeynmanSavedAnswer");
+      if (savedAnswerEl) { savedAnswerEl.hidden = false; savedAnswerEl.innerHTML = `<strong>✅ Saved explanation:</strong> <em>${answer}</em>`; }
+      const statusEl = document.getElementById("skillFeynmanStatus");
+      if (statusEl) statusEl.textContent = "Explanation saved. Great job thinking it through!";
+    });
+  }
+
   document.getElementById("nextSkillLesson").addEventListener("click", () => {
     const track = getSkillTrack();
     const index = track.lessons.findIndex((lesson) => lesson.id === state.skillLessonId);
@@ -5562,8 +5720,9 @@ _skill_output = _stdout.getvalue()
     renderSkillLessonList();
     updateSkillLessonCount();
     document.getElementById("skillLessonStatus").textContent = passed
-      ? "Skill lesson submitted and saved."
+      ? "Skill lesson submitted and saved. Fill in the Feynman Check below to lock in the understanding."
       : "Skill lesson saved, but it needs fixes.";
+    renderSkillFeynmanCheck(lesson.id, passed);
   }
 }
 

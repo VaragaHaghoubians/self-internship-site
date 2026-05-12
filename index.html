@@ -493,6 +493,7 @@
           <span>3. Run or review</span>
           <span>4. Submit</span>
           <span>5. Check</span>
+          <span>6. Explain</span>
         </div>
         <div class="skill-lab">
           <aside class="skill-lesson-list" id="skillLessonList" aria-label="Skill lessons"></aside>
@@ -517,8 +518,21 @@
               <button class="mark-button" id="runSkillLesson" type="button">Run lesson</button>
               <button class="mark-button" id="submitSkillLesson" type="button">Submit lesson</button>
               <button class="file-link as-button" id="resetSkillLesson" type="button">Reset starter</button>
+              <button class="file-link as-button scratch-btn" id="scratchSkillLesson" type="button">🧠 Write from Scratch</button>
               <button class="file-link as-button" id="nextSkillLesson" type="button">Next lesson</button>
               <a class="file-link" id="skillSourceLink" href="docs/README.md.html">Open source guide</a>
+            </div>
+            <div class="feynman-check" id="skillFeynmanCheck" hidden>
+              <div class="feynman-header">
+                <h4>🧠 Feynman Check — Explain it back</h4>
+                <p>You passed the checks. Now prove you actually understand it. Explain what you just learned in 2–3 sentences, as if teaching a friend who has never seen this tool. No jargon allowed. If you cannot explain it simply, re-read the lesson.</p>
+              </div>
+              <textarea id="skillFeynmanAnswer" rows="4" placeholder="Explain the concept in plain words. What does it do? Why would you use it? When would it break?"></textarea>
+              <div class="feynman-actions">
+                <button class="mark-button" id="saveSkillFeynman" type="button">Save explanation</button>
+                <span id="skillFeynmanStatus" class="muted-note"></span>
+              </div>
+              <div id="skillFeynmanSavedAnswer" class="feynman-saved" hidden></div>
             </div>
           </article>
         </div>
