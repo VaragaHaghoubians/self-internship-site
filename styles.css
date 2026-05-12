@@ -3256,3 +3256,68 @@ details p {
   .reality-2026-grid { grid-template-columns: 1fr !important; }
   .emerging-grid { grid-template-columns: 1fr !important; }
 }
+
+/* ── Beginner tip banner ── */
+.beginner-tip {
+  background: #f0faf0;
+  border: 1.5px solid #4caf50;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  color: #1a3a1a;
+}
+[data-theme="dark"] .beginner-tip {
+  background: #0e2410;
+  border-color: #4caf50;
+  color: #c8f0c8;
+}
+
+/* ── Write from Scratch button ── */
+.scratch-btn { color: var(--accent) !important; border-color: var(--accent) !important; }
+.scratch-btn.scratch-active { background: var(--accent) !important; color: #fff !important; }
+
+/* ── Feynman Check section ── */
+.feynman-check {
+  margin-top: 28px;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  padding: 20px 22px;
+  background: var(--surface);
+}
+.feynman-header h4 { margin: 0 0 6px; font-size: 15px; }
+.feynman-header p { margin: 0 0 14px; font-size: 13px; color: var(--muted); line-height: 1.55; }
+.feynman-check textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  resize: vertical;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+.feynman-check textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+.feynman-actions { display: flex; align-items: center; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+.feynman-saved {
+  margin-top: 12px;
+  background: #f0faf0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1a3a1a;
+}
+[data-theme="dark"] .feynman-saved { background: #0e2410; color: #c8f0c8; }
+[data-theme="dark"] .feynman-check { background: var(--surface); border-color: var(--accent); }
+
+/* ── Debug lesson tag ── */
+.python-lesson[data-lesson^="py-2"] .pill-debug,
+.python-lesson[data-lesson="py-21"] small::before,
+.python-lesson[data-lesson="py-22"] small::before,
+.python-lesson[data-lesson="py-23"] small::before { content: "🐛 "; }
