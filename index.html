@@ -47,6 +47,10 @@
       <div class="nav-panel-inner">
         <div class="nav-col">
           <p class="nav-col-title">🎯 Start Here</p>
+          <a class="nav-item" href="#guided-path" style="background:color-mix(in srgb,var(--accent) 8%,transparent);border-radius:8px">
+            <strong>🗺️ Your Guided Path ← START HERE</strong>
+            <span>Step-by-step for your current month — buttons take you right there</span>
+          </a>
           <a class="nav-item" href="#mission-control">
             <strong>Mission Control</strong>
             <span>Setup checklist — do this first, once</span>
@@ -122,7 +126,7 @@
 
     <!-- Focus strip: always-visible "you are here" bar -->
     <div class="focus-strip" id="focusStrip" aria-label="Current month progress">
-      <span class="focus-strip-month">📍 Current focus: <strong id="focusMonthLabel">Month 1: Advanced Python and Version Control</strong></span>
+      <span class="focus-strip-month">📍 Current focus: <strong id="focusMonthLabel">Month 1: Python Foundations &amp; Version Control</strong></span>
       <span class="focus-strip-progress" id="focusPct">0 / 12 months done</span>
       <a class="focus-strip-link" href="#roadmap" id="focusJumpBtn">→ Go to my month</a>
     </div>
@@ -162,6 +166,15 @@
             <span class="panel-label">portfolio projects</span>
           </div>
         </aside>
+      </section>
+
+      <section id="guided-path" class="section-pad guided-path-section" aria-labelledby="guidedPathTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Your learning GPS</p>
+          <h2 id="guidedPathTitle">Start here. Follow the steps. One month at a time.</h2>
+          <p>The site has many sections. You do not need to explore them all. Just follow the numbered steps below for your current month — the buttons take you directly to the right place.</p>
+        </div>
+        <div id="guidedPathContent"></div>
       </section>
 
       <section id="mission-control" class="section-pad mission-section" aria-labelledby="missionTitle">

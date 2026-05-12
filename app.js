@@ -6104,6 +6104,265 @@ function bindNavMenu() {
   });
 }
 
+// ─── Guided Path ─────────────────────────────────────────────────────────────
+
+// Per-month step definitions.
+// Each step: { icon, label, detail, href, track?, lessonId?, labId?, badge? }
+const monthGuide = [
+  { // Month 1 — Python Foundations
+    id: 1,
+    intro: "Month 1 is 100% Python + Git. You do not need SQL, Docker, or anything else yet. Complete these steps in order.",
+    steps: [
+      { icon:"⚙️", label:"One-time setup",          detail:"Install Python 3.11, VS Code, and Git. Do this first, once only.", href:"#mission-control", badge:"Once" },
+      { icon:"📖", label:"Read Month 1 overview",    detail:"Open the Roadmap, select Month 1. Read the focus, the 4-week plan, and the deliverable.", href:"#roadmap" },
+      { icon:"🐍", label:"Python Lessons 1–10",      detail:"Print, variables, strings, numbers, lists, if/else, loops, functions, dicts, mini cleaner.", href:"#python-lab", lessonId:"py-01" },
+      { icon:"🐍", label:"Python Lessons 11–20",     detail:"List comprehensions, tuples/sets, error handling, file I/O, classes, inheritance, lambda, CSV, decorators, generators.", href:"#python-lab", lessonId:"py-11" },
+      { icon:"🐛", label:"Debug Lessons 21–23",      detail:"Fix real errors: NameError/SyntaxError, logic bugs, TypeError/IndexError. These teach you how to read Python error messages.", href:"#python-lab", lessonId:"py-21", badge:"Debug" },
+      { icon:"🛠️", label:"Git Lab — 3 lessons",       detail:"git-01: stage/commit/push workflow. git-02: feature branches. git-debug-01: fix broken Git commands.", href:"#skill-labs", track:"git", lessonId:"git-01" },
+      { icon:"💻", label:"Build: CSV Cleaner",       detail:"Write a Python CLI tool that cleans a messy CSV using argparse and classes. Push it to GitHub with a README.", href:"#code-lab", labId:"month-01" },
+      { icon:"✅", label:"Mark Month 1 done",        detail:"Click 'Mark done' on Month 1 in the Roadmap. This unlocks Month 2.", href:"#roadmap", badge:"Unlock" },
+    ]
+  },
+  { // Month 2 — Databases & Web
+    id: 2,
+    intro: "Month 2 adds SQL and your first API. No new Python lessons — but you will use Python in every lab.",
+    steps: [
+      { icon:"📖", label:"Read Month 2 overview",    detail:"Open the Roadmap, select Month 2. Read the SQL + FastAPI focus.", href:"#roadmap" },
+      { icon:"🗄️", label:"SQL Lessons 1–6 + Debug",  detail:"SELECT, GROUP BY, JOINs, CTEs, window functions, HAVING/subqueries, then fix a broken JOIN.", href:"#skill-labs", track:"sql", lessonId:"sql-01" },
+      { icon:"⚡", label:"FastAPI Lab",               detail:"fastapi-01: Build your first HTTP endpoint and wrap a simple prediction in an API.", href:"#skill-labs", track:"fastapi", lessonId:"fastapi-01" },
+      { icon:"💻", label:"Build: ML REST API",       detail:"FastAPI endpoint that serves a scikit-learn model. Tested with curl.", href:"#code-lab", labId:"month-02" },
+      { icon:"✅", label:"Mark Month 2 done",        detail:"Unlocks Month 3.", href:"#roadmap", badge:"Unlock" },
+    ]
+  },
+  { // Month 3 — Docker & Deployment
+    id: 3,
+    intro: "Month 3 is about packaging your app so it runs anywhere, not just on your laptop.",
+    steps: [
+      { icon:"📖", label:"Read Month 3 overview",    detail:"Focus: Docker, containers, reproducible environments, CI basics.", href:"#roadmap" },
+      { icon:"🐳", label:"Docker Lab — 2 lessons",   detail:"docker-01: Write a Dockerfile. docker-02: docker-compose multi-service setup.", href:"#skill-labs", track:"docker", lessonId:"docker-01" },
+      { icon:"💻", label:"Build: Containerized App", detail:"Wrap your Month 2 FastAPI model in Docker. It must start with docker-compose up.", href:"#code-lab", labId:"month-03" },
+      { icon:"✅", label:"Mark Month 3 done",        detail:"Unlocks Month 4.", href:"#roadmap", badge:"Unlock" },
+    ]
+  },
+  { // Month 4 — Django Full-Stack
+    id: 4,
+    intro: "Month 4 builds a full web app with a database, views, forms, and a real front end.",
+    steps: [
+      { icon:"📖", label:"Read Month 4 overview",    detail:"Focus: Django MVT, ORM, admin, forms, Postgres.", href:"#roadmap" },
+      { icon:"🌐", label:"Django Lab — 3 lessons",   detail:"django-01: project & models. django-02: views & URLs. django-03: forms & authentication.", href:"#skill-labs", track:"django", lessonId:"django-01" },
+      { icon:"💻", label:"Build: Data Dashboard",    detail:"Django app with Postgres, user login, and a chart showing your ML model results.", href:"#code-lab", labId:"month-04" },
+      { icon:"✅", label:"Mark Month 4 done",        detail:"Unlocks Month 5.", href:"#roadmap", badge:"Unlock" },
+    ]
+  },
+  { // Month 5 — ML Foundations
+    id: 5,
+    intro: "Month 5 is where the math degree starts to pay off. You will train, evaluate, and interpret real ML models.",
+    steps: [
+      { icon:"📖", label:"Read Month 5 overview",    detail:"Focus: Regression, classification, scikit-learn pipelines, feature engineering.", href:"#roadmap" },
+      { icon:"🤖", label:"ML Lab — 3 lessons",       detail:"ml-01: linear regression from scratch. ml-02: logistic regression. ml-03: decision trees & feature importance.", href:"#skill-labs", track:"ml", lessonId:"ml-01" },
+      { icon:"💻", label:"Build: Prediction Model",  detail:"Train a model on a real dataset, tune it, evaluate with cross-validation, deploy as FastAPI.", href:"#code-lab", labId:"month-05" },
+      { icon:"✅", label:"Mark Month 5 done",        detail:"Unlocks Month 6.", href:"#roadmap", badge:"Unlock" },
+    ]
+  },
+  { // Month 6 — ML Engineering
+    id: 6,
+    intro: "Month 6 goes deeper: ensemble models, cross-validation, debugging ML pipelines.",
+    steps: [
+      { icon:"📖", label:"Read Month 6 overview",    detail:"Focus: Ensemble methods, cross-validation, data leakage, model monitoring.", href:"#roadmap" },
+      { icon:"🤖", label:"ML Lab — 2 lessons + Debug",detail:"ml-04: random forests & ensembles. ml-05: cross-validation logic. ml-debug-01: fix a data leakage bug.", href:"#skill-labs", track:"ml", lessonId:"ml-04" },
+      { icon:"💻", label:"Build: Production ML",     detail:"MLflow tracking, cross-validated model, monitored FastAPI endpoint, Dockerized.", href:"#code-lab", labId:"month-06" },
+      { icon:"✅", label:"Mark Month 6 done",        detail:"Unlocks Month 7.", href:"#roadmap", badge:"Unlock" },
+    ]
+  },
+  { // Month 7 — IoT & Sensor Systems
+    id: 7,
+    intro: "Month 7 is hardware + software. You will send real sensor data to your backend.",
+    steps: [
+      { icon:"📖", label:"Read Month 7 overview",    detail:"Focus: ESP32, MQTT, DHT11, real-time data pipeline.", href:"#roadmap" },
+      { icon:"📡", label:"IoT Lab — 2 lessons",      detail:"iot-01: ESP32 sensor loop. iot-02: MQTT publisher.", href:"#skill-labs", track:"iot", lessonId:"iot-01" },
+      { icon:"💻", label:"Build: Sensor Pipeline",   detail:"ESP32 → MQTT → Python subscriber → anomaly detector → alert.", href:"#code-lab", labId:"month-07" },
+      { icon:"✅", label:"Mark Month 7 done",        detail:"Unlocks Month 8.", href:"#roadmap", badge:"Unlock" },
+    ]
+  },
+  { // Month 8 — AI Agents & RAG
+    id: 8,
+    intro: "Month 8 is LLMs, vector search, and your first AI agent that uses tools and makes decisions.",
+    steps: [
+      { icon:"📖", label:"Read Month 8 overview",    detail:"Focus: RAG architecture, vector databases, LangChain agents, OpenAI API.", href:"#roadmap" },
+      { icon:"🧠", label:"AI Lab — 2 lessons",       detail:"rag-01: build a retrieval-augmented QA system. agent-01: build a ReAct-style tool-calling agent.", href:"#skill-labs", track:"ai", lessonId:"rag-01" },
+      { icon:"💻", label:"Build: AI Q&A Agent",      detail:"RAG system over your own documents, deployed as FastAPI, with evaluation metrics.", href:"#code-lab", labId:"month-08" },
+      { icon:"✅", label:"Mark Month 8 done",        detail:"Unlocks Month 9.", href:"#roadmap", badge:"Unlock" },
+    ]
+  },
+  { // Month 9 — Background Jobs & Celery
+    id: 9,
+    intro: "Month 9 makes your app production-ready: background jobs, task queues, async pipelines.",
+    steps: [
+      { icon:"📖", label:"Read Month 9 overview",    detail:"Focus: Celery, Redis, async Django, scheduled tasks.", href:"#roadmap" },
+      { icon:"🌐", label:"Django Lab — 2 more lessons",detail:"django-04: Celery + Redis task queue. django-05: scheduled background jobs.", href:"#skill-labs", track:"django", lessonId:"django-04" },
+      { icon:"💻", label:"Build: Async ML Platform", detail:"Django + Celery + Redis: submit ML jobs, process in background, return results to dashboard.", href:"#code-lab", labId:"month-09" },
+      { icon:"✅", label:"Mark Month 9 done",        detail:"Unlocks Month 10.", href:"#roadmap", badge:"Unlock" },
+    ]
+  },
+  { // Month 10 — Optimization
+    id: 10,
+    intro: "Month 10 is applied math — operations research and linear programming for real business problems.",
+    steps: [
+      { icon:"📖", label:"Read Month 10 overview",   detail:"Focus: OR-Tools, PuLP, routing, assignment, scheduling optimisation.", href:"#roadmap" },
+      { icon:"📐", label:"Study the optimization guide", detail:"Open Learning Library → search 'OR-Tools' or 'PuLP' for reference materials.", href:"#library" },
+      { icon:"💻", label:"Build: Optimization App",  detail:"Vehicle routing or inventory optimization tool, integrated with your Django dashboard.", href:"#code-lab", labId:"month-10" },
+      { icon:"✅", label:"Mark Month 10 done",       detail:"Unlocks Month 11.", href:"#roadmap", badge:"Unlock" },
+    ]
+  },
+  { // Month 11 — Predictive Maintenance
+    id: 11,
+    intro: "Month 11 combines everything: IoT data + ML + REST API + real-time anomaly detection.",
+    steps: [
+      { icon:"📖", label:"Read Month 11 overview",   detail:"Focus: NASA CMAPSS dataset, RUL prediction, anomaly detection, cold-chain monitoring.", href:"#roadmap" },
+      { icon:"🔧", label:"Review IoT + ML labs",     detail:"Revisit iot-01, iot-02 and ml-01 through ml-debug-01 as needed.", href:"#skill-labs", track:"iot", lessonId:"iot-01" },
+      { icon:"💻", label:"Build: Predictive Maintenance", detail:"Full pipeline: sensor data → feature engineering → RUL model → FastAPI alert endpoint.", href:"#code-lab", labId:"month-11" },
+      { icon:"✅", label:"Mark Month 11 done",       detail:"Unlocks Month 12 — your capstone.", href:"#roadmap", badge:"Unlock" },
+    ]
+  },
+  { // Month 12 — Capstone
+    id: 12,
+    intro: "Month 12 is your capstone. Everything you built across 11 months comes together into one production system.",
+    steps: [
+      { icon:"📖", label:"Read Month 12 overview",   detail:"Focus: Multi-service system, documented ROI, GitHub Pages portfolio, job applications.", href:"#roadmap" },
+      { icon:"💼", label:"Open Career Hub",          detail:"Start applying — use Application Tracker, Resume Guide, and Interview Prep.", href:"#career-hub" },
+      { icon:"💻", label:"Build: Multi-Skill Capstone", detail:"Deployed AI product: IoT + Django + ML + Agents + optimization. Documented ROI.", href:"#code-lab", labId:"month-12" },
+      { icon:"✅", label:"Mark Month 12 done",       detail:"Internship complete. Portfolio ready.", href:"#roadmap", badge:"Done!" },
+    ]
+  },
+];
+
+function renderGuidedPath() {
+  const el = document.getElementById("guidedPathContent");
+  if (!el) return;
+
+  const currentMonth = state.month;
+  const guide = monthGuide.find(g => g.id === currentMonth) || monthGuide[0];
+
+  // Site-map flow strip
+  const flowSteps = [
+    { icon:"📖", label:"Roadmap", sub:"Read the month", href:"#roadmap" },
+    { icon:"🐍", label:"Python Lab", sub:"Do Python lessons", href:"#python-lab" },
+    { icon:"🛠️", label:"Skill Labs", sub:"SQL / Git / Docker / ML…", href:"#skill-labs" },
+    { icon:"💻", label:"Code Lab", sub:"Build & submit project", href:"#code-lab" },
+    { icon:"✅", label:"Mark Done", sub:"Unlock next month", href:"#roadmap" },
+  ];
+
+  const flowHTML = `
+    <div class="gp-sitemap">
+      <p class="gp-sitemap-label">How the site works — same pattern every month:</p>
+      <div class="gp-flow">
+        ${flowSteps.map((s, i) => `
+          <a class="gp-flow-step" href="${s.href}">
+            <span class="gp-flow-icon">${s.icon}</span>
+            <strong>${s.label}</strong>
+            <small>${s.sub}</small>
+          </a>
+          ${i < flowSteps.length - 1 ? '<span class="gp-flow-arrow" aria-hidden="true">→</span>' : ""}
+        `).join("")}
+      </div>
+    </div>
+  `;
+
+  // Current month steps
+  const stepCards = guide.steps.map((step, i) => {
+    const badgeHTML = step.badge ? `<span class="gp-badge">${step.badge}</span>` : "";
+    return `
+      <div class="gp-step">
+        <div class="gp-step-num">${i + 1}</div>
+        <div class="gp-step-body">
+          <div class="gp-step-title">${step.icon} ${step.label} ${badgeHTML}</div>
+          <div class="gp-step-detail">${step.detail}</div>
+        </div>
+        <button class="gp-go-btn" type="button"
+          data-href="${step.href}"
+          ${step.track    ? `data-track="${step.track}"` : ""}
+          ${step.lessonId ? `data-lesson="${step.lessonId}"` : ""}
+          ${step.labId    ? `data-lab="${step.labId}"` : ""}
+        >Go there →</button>
+      </div>
+    `;
+  }).join("");
+
+  // Month progress bar
+  const donePct = Math.round((state.done.length / 12) * 100);
+  const monthDots = Array.from({length: 12}, (_, i) => {
+    const m = i + 1;
+    const done = state.done.includes(m);
+    const current = m === currentMonth;
+    return `<span class="gp-dot ${done ? "gp-dot-done" : current ? "gp-dot-current" : "gp-dot-future"}" title="Month ${m}">${m}</span>`;
+  }).join("");
+
+  el.innerHTML = `
+    ${flowHTML}
+    <div class="gp-month-header">
+      <div class="gp-month-title">
+        <span class="gp-month-badge">Month ${currentMonth} of 12</span>
+        <h3>${(monthGuide.find(g=>g.id===currentMonth)||monthGuide[0]).intro.split(".")[0]}</h3>
+        <p class="gp-month-intro">${guide.intro}</p>
+      </div>
+      <div class="gp-progress">
+        <div class="gp-dots">${monthDots}</div>
+        <div class="gp-bar-wrap"><div class="gp-bar" style="width:${donePct}%"></div></div>
+        <small>${state.done.length} of 12 months complete</small>
+      </div>
+    </div>
+    <div class="gp-steps">${stepCards}</div>
+    ${currentMonth < 12 ? `<p class="gp-note">After finishing all steps above, click <strong>Mark Month ${currentMonth} done</strong> (step ${guide.steps.length}) to unlock Month ${currentMonth + 1}.</p>` : ""}
+  `;
+
+  // Bind "Go there" buttons
+  el.querySelectorAll(".gp-go-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const href    = btn.dataset.href;
+      const track   = btn.dataset.track;
+      const lessonId = btn.dataset.lesson;
+      const labId   = btn.dataset.lab;
+
+      // Navigate skill track if specified
+      if (track) {
+        state.skillTrack = track;
+        if (lessonId) {
+          state.skillLessonId = lessonId;
+          saveSkillLessonState();
+        } else {
+          const t = skillTracks.find(t => t.id === track);
+          if (t) { state.skillLessonId = t.lessons[0].id; saveSkillLessonState(); }
+        }
+        renderSkillTrackTabs();
+        renderSkillLessonList();
+        renderSkillLesson();
+      }
+
+      // Navigate Python lesson if specified (no track = python lab)
+      if (lessonId && lessonId.startsWith("py-")) {
+        state.pythonLessonId = lessonId;
+        savePythonLessonState();
+        renderPythonLessonList();
+        renderPythonLesson();
+      }
+
+      // Navigate code lab if specified
+      if (labId) {
+        state.labId = labId;
+        localStorage.setItem("selectedLab", labId);
+        renderLabList();
+        renderLabWorkspace();
+      }
+
+      // Scroll to section
+      if (href) {
+        const target = document.querySelector(href);
+        if (target) target.scrollIntoView({ behavior:"smooth", block:"start" });
+      }
+    });
+  });
+}
+
 function init() {
   renderSuperpowers();
   renderMissionControl();
@@ -6129,6 +6388,7 @@ function init() {
   updateSkillLessonCount();
   renderResourceChips();
   renderResources();
+  renderGuidedPath();
   renderReality2026();
   renderCareerHub();
   bindSearch();
