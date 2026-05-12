@@ -4691,9 +4691,10 @@ function renderMonthDetail() {
       </section>
       <section>
         <h4>Study first</h4>
+        <p class="muted-note" style="font-size:13px;margin:0 0 8px">These are workspace folder paths. Open them in your local VS Code or clone the repo to read them. The GitHub repos listed below are the best online equivalents.</p>
         <ul>
-          <li><a href="${link(month.study)}">${month.study}</a></li>
-          ${month.references.map((item) => `<li><a href="${link(item)}">${item}</a></li>`).join("")}
+          <li><code>${month.study}</code></li>
+          ${month.references.map((item) => `<li><code>${item}</code></li>`).join("")}
         </ul>
       </section>
     </div>
@@ -6108,10 +6109,24 @@ function bindNavMenu() {
 
 // Per-month step definitions.
 // Each step: { icon, label, detail, href, track?, lessonId?, labId?, badge? }
+// Each resource: { type:"github"|"book"|"paper"|"course", label, url, required:bool, note }
 const monthGuide = [
   { // Month 1 — Python Foundations
     id: 1,
     intro: "Month 1 is 100% Python + Git. You do not need SQL, Docker, or anything else yet. Complete these steps in order.",
+    resources: [
+      { type:"github",  label:"trekhleb/learn-python",                url:"https://github.com/trekhleb/learn-python",                required:true,  note:"Clone it. Re-type every .py file from scratch — do not copy-paste." },
+      { type:"github",  label:"Asabeneh/30-Days-Of-Python",           url:"https://github.com/Asabeneh/30-Days-Of-Python",           required:true,  note:"Work through Days 1–15 in your first two weeks." },
+      { type:"github",  label:"jlord/git-it-electron",                url:"https://github.com/jlord/git-it-electron",                required:true,  note:"Download and complete all Git challenges — creates real commits on GitHub." },
+      { type:"github",  label:"guipsamora/pandas_exercises",          url:"https://github.com/guipsamora/pandas_exercises",          required:true,  note:"5 exercises per day in Weeks 3–4. Try before checking solutions." },
+      { type:"github",  label:"jakevdp/PythonDataScienceHandbook",    url:"https://github.com/jakevdp/PythonDataScienceHandbook",    required:true,  note:"Read Chapter 3 (Pandas) and Chapter 4 (Matplotlib) — the best free EDA reference." },
+      { type:"github",  label:"jerry-git/learn-python3",              url:"https://github.com/jerry-git/learn-python3",              required:false, note:"Optional — Jupyter notebooks with auto-tests. Good for OOP practice." },
+      { type:"github",  label:"rougier/numpy-100",                    url:"https://github.com/rougier/numpy-100",                    required:false, note:"Optional — 100 NumPy exercises. Do 10/day if you have spare time in Weeks 3–4." },
+      { type:"github",  label:"satwikkansal/wtfpython",               url:"https://github.com/satwikkansal/wtfpython",               required:false, note:"Optional — Python surprises and gotchas. Read 2–3 entries per day." },
+      { type:"github",  label:"TheAlgorithms/Python",                 url:"https://github.com/TheAlgorithms/Python",                 required:false, note:"Optional — reference for how pros write Python. Look up any class you write." },
+      { type:"book",    label:"Python Data Science Handbook (free online)", url:"https://jakevdp.github.io/PythonDataScienceHandbook/",required:true, note:"Chapters 3 (Pandas) and 4 (Matplotlib). Same as the GitHub repo above but easier to read." },
+      { type:"book",    label:"Mathematics for Machine Learning (free PDF)", url:"https://mml-book.github.io/book/mml-book.pdf",    required:false, note:"Optional — read Linear Algebra chapter now, Probability later in Month 5." },
+    ],
     steps: [
       { icon:"⚙️", label:"One-time setup",          detail:"Install Python 3.11, VS Code, and Git. Do this first, once only.", href:"#mission-control", badge:"Once" },
       { icon:"📖", label:"Read Month 1 overview",    detail:"Open the Roadmap, select Month 1. Read the focus, the 4-week plan, and the deliverable.", href:"#roadmap" },
@@ -6126,6 +6141,15 @@ const monthGuide = [
   { // Month 2 — Databases & Web
     id: 2,
     intro: "Month 2 adds SQL and your first API. No new Python lessons — but you will use Python in every lab.",
+    resources: [
+      { type:"github",  label:"XD-DENG/SQL-exercise",                 url:"https://github.com/XD-DENG/SQL-exercise",                 required:true,  note:"Do all exercises in folders 01–04. The single best SQL practice repo." },
+      { type:"github",  label:"tiangolo/fastapi",                     url:"https://github.com/tiangolo/fastapi",                     required:true,  note:"Read the full official tutorial at fastapi.tiangolo.com/tutorial/ — every page." },
+      { type:"github",  label:"smpetersgithub/AdvancedSQLPuzzles",    url:"https://github.com/smpetersgithub/AdvancedSQLPuzzles",    required:true,  note:"Window functions and CTE puzzles. Do after finishing XD-DENG exercises." },
+      { type:"book",    label:"Think Stats 2 — Allen Downey (free)",  url:"https://allendowney.github.io/ThinkStats/",               required:true,  note:"Read Chapters 1–7 in Weeks 5–6. Statistics for programmers, not mathematicians." },
+      { type:"github",  label:"AllenDowney/ThinkStats2",              url:"https://github.com/AllenDowney/ThinkStats2",              required:true,  note:"Run the notebooks alongside the book. This is your stats foundation." },
+      { type:"github",  label:"tiangolo/full-stack-fastapi-template",url:"https://github.com/tiangolo/full-stack-fastapi-template", required:false, note:"Optional — study the folder structure to see how a real FastAPI project is organised." },
+      { type:"course",  label:"StatQuest (p-value, t-test, regression videos)", url:"https://www.youtube.com/@statquest",           required:false, note:"Optional — watch the p-value, t-test, and logistic regression videos on YouTube." },
+    ],
     steps: [
       { icon:"📖", label:"Read Month 2 overview",    detail:"Open the Roadmap, select Month 2. Read the SQL + FastAPI focus.", href:"#roadmap" },
       { icon:"🗄️", label:"SQL Lessons 1–6 + Debug",  detail:"SELECT, GROUP BY, JOINs, CTEs, window functions, HAVING/subqueries, then fix a broken JOIN.", href:"#skill-labs", track:"sql", lessonId:"sql-01" },
@@ -6137,6 +6161,13 @@ const monthGuide = [
   { // Month 3 — Docker & Deployment
     id: 3,
     intro: "Month 3 is about packaging your app so it runs anywhere, not just on your laptop.",
+    resources: [
+      { type:"github",  label:"docker/awesome-compose",               url:"https://github.com/docker/awesome-compose",               required:true,  note:"Clone the fastapi/ or flask/ example and run it. Study the docker-compose.yml." },
+      { type:"github",  label:"DataTalksClub/mlops-zoomcamp",         url:"https://github.com/DataTalksClub/mlops-zoomcamp",         required:true,  note:"Free MLOps course. Do Module 1 (intro) and Module 2 (MLflow). The best free resource." },
+      { type:"github",  label:"mlflow/mlflow",                        url:"https://github.com/mlflow/mlflow",                        required:true,  note:"Run /examples/sklearn_elasticnet_wine/ — your first experiment tracking exercise." },
+      { type:"github",  label:"GokuMohandas/Made-With-ML",            url:"https://github.com/GokuMohandas/Made-With-ML",            required:false, note:"Optional — full ML engineering course. Read MLOps and reproducibility sections." },
+      { type:"github",  label:"hdegen/MLOps-end-to-end",              url:"https://github.com/hdegen/MLOps-end-to-end",              required:false, note:"Optional — end-to-end MLOps project. Study the Dockerfile and MLflow sections." },
+    ],
     steps: [
       { icon:"📖", label:"Read Month 3 overview",    detail:"Focus: Docker, containers, reproducible environments, CI basics.", href:"#roadmap" },
       { icon:"🐳", label:"Docker Lab — 2 lessons",   detail:"docker-01: Write a Dockerfile. docker-02: docker-compose multi-service setup.", href:"#skill-labs", track:"docker", lessonId:"docker-01" },
@@ -6147,6 +6178,14 @@ const monthGuide = [
   { // Month 4 — Django Full-Stack
     id: 4,
     intro: "Month 4 builds a full web app with a database, views, forms, and a real front end.",
+    resources: [
+      { type:"github",  label:"wsvincent/djangox",                    url:"https://github.com/wsvincent/djangox",                    required:true,  note:"Clone it, run it, read every file. This is your production Django starting template." },
+      { type:"github",  label:"wsvincent/awesome-django",             url:"https://github.com/wsvincent/awesome-django",             required:true,  note:"Curated Django packages. Use it to find a package for anything you need this month." },
+      { type:"book",    label:"Django for Beginners — William Vincent (free chapters)", url:"https://djangoforbeginners.com/",      required:true,  note:"Read the free chapters online. The clearest Django tutorial for beginners." },
+      { type:"github",  label:"cookiecutter/cookiecutter-django",     url:"https://github.com/cookiecutter/cookiecutter-django",     required:false, note:"Optional — study the folder layout of a large real Django project." },
+      { type:"github",  label:"encode/django-rest-framework",         url:"https://github.com/encode/django-rest-framework",         required:false, note:"Optional — add a REST API layer. Read /examples/ for ModelViewSet patterns." },
+      { type:"github",  label:"bregman-arie/devops-exercises",        url:"https://github.com/bregman-arie/devops-exercises",        required:false, note:"Optional — 500+ DevOps questions with answers. Study the Linux and CI/CD sections." },
+    ],
     steps: [
       { icon:"📖", label:"Read Month 4 overview",    detail:"Focus: Django MVT, ORM, admin, forms, Postgres.", href:"#roadmap" },
       { icon:"🌐", label:"Django Lab — 3 lessons",   detail:"django-01: project & models. django-02: views & URLs. django-03: forms & authentication.", href:"#skill-labs", track:"django", lessonId:"django-01" },
@@ -6157,6 +6196,14 @@ const monthGuide = [
   { // Month 5 — ML Foundations
     id: 5,
     intro: "Month 5 is where the math degree starts to pay off. You will train, evaluate, and interpret real ML models.",
+    resources: [
+      { type:"github",  label:"ageron/handson-ml3",                   url:"https://github.com/ageron/handson-ml3",                   required:true,  note:"Hands-On ML textbook notebooks. Do Chapter 3 (classification) and Chapter 4 (training models)." },
+      { type:"book",    label:"Hands-On Machine Learning 3rd Ed — Aurélien Géron", url:"https://www.oreilly.com/library/view/hands-on-machine-learning/9781098125967/", required:true, note:"The best practical ML book. Use the free GitHub notebooks if you can't buy the book." },
+      { type:"github",  label:"scikit-learn/scikit-learn",            url:"https://github.com/scikit-learn/scikit-learn",            required:true,  note:"Run /examples/classification/plot_classifier_comparison.py — your first multi-model comparison." },
+      { type:"course",  label:"StatQuest ML playlist (YouTube)",      url:"https://www.youtube.com/playlist?list=PLblh5JKOoLUICTaGLRoHQDuF_7q2GfuJF", required:true, note:"Watch the linear regression, logistic regression, and decision tree videos — the best visual explanations." },
+      { type:"paper",   label:"A Few Useful Things to Know About ML — Domingos (2012)", url:"https://homes.cs.washington.edu/~pedrod/papers/cacm12.pdf", required:true, note:"12-page paper. Read it before building your first model — the most important ideas in one place." },
+      { type:"github",  label:"dipanjanS/practical-machine-learning-with-python", url:"https://github.com/dipanjanS/practical-machine-learning-with-python", required:false, note:"Optional — Chapters 3–5 for feature engineering and model evaluation." },
+    ],
     steps: [
       { icon:"📖", label:"Read Month 5 overview",    detail:"Focus: Regression, classification, scikit-learn pipelines, feature engineering.", href:"#roadmap" },
       { icon:"🤖", label:"ML Lab — 3 lessons",       detail:"ml-01: linear regression from scratch. ml-02: logistic regression. ml-03: decision trees & feature importance.", href:"#skill-labs", track:"ml", lessonId:"ml-01" },
@@ -6167,6 +6214,13 @@ const monthGuide = [
   { // Month 6 — ML Engineering
     id: 6,
     intro: "Month 6 goes deeper: ensemble models, cross-validation, debugging ML pipelines.",
+    resources: [
+      { type:"github",  label:"ageron/handson-ml3 (Chapters 6–7)",    url:"https://github.com/ageron/handson-ml3",                   required:true,  note:"Chapter 6 (decision trees) and Chapter 7 (ensemble methods — random forests, boosting)." },
+      { type:"github",  label:"celery/celery",                        url:"https://github.com/celery/celery",                        required:true,  note:"Read the getting-started guide. Build the simple example, then swap in your ML inference task." },
+      { type:"github",  label:"plotly/plotly.py",                     url:"https://github.com/plotly/plotly.py",                     required:true,  note:"Read the bar-charts and line-charts docs. Recreate each chart with your ML results." },
+      { type:"paper",   label:"Random Forests — Breiman (2001)",      url:"https://link.springer.com/article/10.1023/A:1010933404324", required:true, note:"The original random forests paper. Read the introduction and section 1 — understand why ensembles work." },
+      { type:"github",  label:"joke2k/django-environ",                url:"https://github.com/joke2k/django-environ",                required:false, note:"Optional — load .env secrets in Django. Add it so API keys never reach GitHub." },
+    ],
     steps: [
       { icon:"📖", label:"Read Month 6 overview",    detail:"Focus: Ensemble methods, cross-validation, data leakage, model monitoring.", href:"#roadmap" },
       { icon:"🤖", label:"ML Lab — 2 lessons + Debug",detail:"ml-04: random forests & ensembles. ml-05: cross-validation logic. ml-debug-01: fix a data leakage bug.", href:"#skill-labs", track:"ml", lessonId:"ml-04" },
@@ -6177,6 +6231,13 @@ const monthGuide = [
   { // Month 7 — IoT & Sensor Systems
     id: 7,
     intro: "Month 7 is hardware + software. You will send real sensor data to your backend.",
+    resources: [
+      { type:"github",  label:"espressif/arduino-esp32",              url:"https://github.com/espressif/arduino-esp32",              required:true,  note:"Official ESP32 Arduino core. Browse /libraries/WiFi/examples/ — these are your firmware base." },
+      { type:"github",  label:"adafruit/DHT-sensor-library",          url:"https://github.com/adafruit/DHT-sensor-library",          required:true,  note:"Open DHTtester.ino and upload it to your ESP32. This is your Week 1 exercise for IoT." },
+      { type:"github",  label:"eclipse/paho.mqtt.python",             url:"https://github.com/eclipse/paho.mqtt.python",             required:true,  note:"MQTT Python client. Run /examples/subscribe.py on your laptop to receive messages from ESP32." },
+      { type:"github",  label:"micropython/micropython",              url:"https://github.com/micropython/micropython",              required:false, note:"Optional — write Python on ESP32 instead of C++. Read /ports/esp32/README.md." },
+      { type:"github",  label:"hobbyquaker/awesome-mqtt",             url:"https://github.com/hobbyquaker/awesome-mqtt",             required:false, note:"Optional — curated MQTT tools. Browse to pick the right broker and client for your pipeline." },
+    ],
     steps: [
       { icon:"📖", label:"Read Month 7 overview",    detail:"Focus: ESP32, MQTT, DHT11, real-time data pipeline.", href:"#roadmap" },
       { icon:"📡", label:"IoT Lab — 2 lessons",      detail:"iot-01: ESP32 sensor loop. iot-02: MQTT publisher.", href:"#skill-labs", track:"iot", lessonId:"iot-01" },
@@ -6187,6 +6248,16 @@ const monthGuide = [
   { // Month 8 — AI Agents & RAG
     id: 8,
     intro: "Month 8 is LLMs, vector search, and your first AI agent that uses tools and makes decisions.",
+    resources: [
+      { type:"github",  label:"langchain-ai/langchain (RAG tutorial)", url:"https://github.com/langchain-ai/langchain",              required:true,  note:"Follow the RAG tutorial at python.langchain.com/docs/tutorials/rag/ step by step." },
+      { type:"github",  label:"chroma-core/chroma",                   url:"https://github.com/chroma-core/chroma",                   required:true,  note:"ChromaDB vector database. Run the README quickstart before integrating with LangChain." },
+      { type:"github",  label:"openai/openai-python",                 url:"https://github.com/openai/openai-python",                 required:true,  note:"Run /examples/ for basic chat completion. Build it into your FastAPI /ask endpoint." },
+      { type:"paper",   label:"Attention Is All You Need — Vaswani et al. (2017)", url:"https://arxiv.org/abs/1706.03762",          required:true,  note:"The transformer paper. Read the abstract and sections 1–3. Understand why attention works." },
+      { type:"paper",   label:"RAG — Lewis et al. (2020)",            url:"https://arxiv.org/abs/2005.11401",                        required:true,  note:"Original RAG paper. Read sections 1–3. Understand retrieval + generation before you build it." },
+      { type:"github",  label:"karpathy/nanoGPT",                     url:"https://github.com/karpathy/nanoGPT",                     required:false, note:"Optional — read model.py to understand how transformers actually work from scratch." },
+      { type:"github",  label:"run-llama/llama_index",                url:"https://github.com/run-llama/llama_index",                required:false, note:"Optional — simpler RAG API. Good alternative if LangChain feels too complex." },
+      { type:"github",  label:"anthropics/anthropic-sdk-python",      url:"https://github.com/anthropics/anthropic-sdk-python",      required:false, note:"Optional — Claude SDK as an alternative to OpenAI. Read /examples/ for structured outputs." },
+    ],
     steps: [
       { icon:"📖", label:"Read Month 8 overview",    detail:"Focus: RAG architecture, vector databases, LangChain agents, OpenAI API.", href:"#roadmap" },
       { icon:"🧠", label:"AI Lab — 2 lessons",       detail:"rag-01: build a retrieval-augmented QA system. agent-01: build a ReAct-style tool-calling agent.", href:"#skill-labs", track:"ai", lessonId:"rag-01" },
@@ -6197,6 +6268,13 @@ const monthGuide = [
   { // Month 9 — Background Jobs & Celery
     id: 9,
     intro: "Month 9 makes your app production-ready: background jobs, task queues, async pipelines.",
+    resources: [
+      { type:"github",  label:"celery/celery (advanced patterns)",    url:"https://github.com/celery/celery",                        required:true,  note:"Read /docs/userguide/tasks.rst — chaining, routing, retries, and error handling." },
+      { type:"github",  label:"eclipse/mosquitto",                   url:"https://github.com/eclipse/mosquitto",                    required:true,  note:"MQTT broker. Install and run locally, test with mosquitto_pub from terminal." },
+      { type:"github",  label:"DataTalksClub/mlops-zoomcamp (Module 3+)", url:"https://github.com/DataTalksClub/mlops-zoomcamp",   required:true,  note:"Modules 3–4: orchestration and model deployment. These align directly with this month's build." },
+      { type:"github",  label:"plotly/dash",                         url:"https://github.com/plotly/dash",                          required:false, note:"Optional — build interactive dashboards. Read /docs/tutorial/ if you want richer charts." },
+      { type:"paper",   label:"Kafka: a Distributed Messaging System — Kreps et al.", url:"https://www.microsoft.com/en-us/research/wp-content/uploads/2017/09/Kafka.pdf", required:false, note:"Optional — understand streaming architectures before designing your pipeline." },
+    ],
     steps: [
       { icon:"📖", label:"Read Month 9 overview",    detail:"Focus: Celery, Redis, async Django, scheduled tasks.", href:"#roadmap" },
       { icon:"🌐", label:"Django Lab — 2 more lessons",detail:"django-04: Celery + Redis task queue. django-05: scheduled background jobs.", href:"#skill-labs", track:"django", lessonId:"django-04" },
@@ -6207,6 +6285,13 @@ const monthGuide = [
   { // Month 10 — Optimization
     id: 10,
     intro: "Month 10 is applied math — operations research and linear programming for real business problems.",
+    resources: [
+      { type:"github",  label:"google/or-tools",                      url:"https://github.com/google/or-tools",                      required:true,  note:"Run /ortools/linear_solver/samples/simple_lp_program.py — your first LP. Then try the vehicle routing example." },
+      { type:"github",  label:"coin-or/pulp",                        url:"https://github.com/coin-or/pulp",                         required:true,  note:"Open /examples/transportation_problem.py — this is the exact pattern for your inventory optimizer." },
+      { type:"book",    label:"Introduction to Operations Research — Hillier & Lieberman", url:"https://www.mheducation.com/highered/product/introduction-operations-research-hillier-lieberman/M9781259872990.html", required:true, note:"Chapters 1–3 on LP fundamentals. Your stochastics background makes this fast to read." },
+      { type:"paper",   label:"Traveling Salesman Problem survey — Applegate et al.", url:"https://www.math.uwaterloo.ca/tsp/", required:false, note:"Optional — deep dive into combinatorial optimization. Good background for the routing project." },
+      { type:"github",  label:"uqfoundation/pathos",                  url:"https://github.com/uqfoundation/pathos",                  required:false, note:"Optional — parallel processing in Python. Use if your Celery tasks process many sensor records." },
+    ],
     steps: [
       { icon:"📖", label:"Read Month 10 overview",   detail:"Focus: OR-Tools, PuLP, routing, assignment, scheduling optimisation.", href:"#roadmap" },
       { icon:"📐", label:"Study the optimization guide", detail:"Open Learning Library → search 'OR-Tools' or 'PuLP' for reference materials.", href:"#library" },
@@ -6217,6 +6302,13 @@ const monthGuide = [
   { // Month 11 — Predictive Maintenance
     id: 11,
     intro: "Month 11 combines everything: IoT data + ML + REST API + real-time anomaly detection.",
+    resources: [
+      { type:"github",  label:"imartinez/privateGPT",                 url:"https://github.com/imartinez/privateGPT",                 required:true,  note:"Full local RAG system. Read the source code as a complete architecture reference." },
+      { type:"github",  label:"pgvector/pgvector",                    url:"https://github.com/pgvector/pgvector",                    required:true,  note:"PostgreSQL vector extension. Use to move embeddings from ChromaDB into your Django database." },
+      { type:"paper",   label:"NASA C-MAPSS Turbofan Dataset — Saxena et al.", url:"https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/", required:true, note:"Download the dataset and read the paper. This is the dataset your RUL model is trained on." },
+      { type:"paper",   label:"Isolation Forest — Liu et al. (2008)", url:"https://cs.nju.edu.cn/zhouzh/zhouzh.files/publication/icdm08b.pdf", required:true, note:"The anomaly detection algorithm you will use. Read sections 1–4 before implementing." },
+      { type:"github",  label:"scikit-learn (IsolationForest examples)", url:"https://scikit-learn.org/stable/modules/outlier_detection.html", required:false, note:"Optional — read the outlier detection user guide and run the IsolationForest examples." },
+    ],
     steps: [
       { icon:"📖", label:"Read Month 11 overview",   detail:"Focus: NASA CMAPSS dataset, RUL prediction, anomaly detection, cold-chain monitoring.", href:"#roadmap" },
       { icon:"🔧", label:"Review IoT + ML labs",     detail:"Revisit iot-01, iot-02 and ml-01 through ml-debug-01 as needed.", href:"#skill-labs", track:"iot", lessonId:"iot-01" },
@@ -6227,6 +6319,15 @@ const monthGuide = [
   { // Month 12 — Capstone
     id: 12,
     intro: "Month 12 is your capstone. Everything you built across 11 months comes together into one production system.",
+    resources: [
+      { type:"github",  label:"langchain-ai/langgraph",               url:"https://github.com/langchain-ai/langgraph",               required:true,  note:"Run /examples/ReAct agent. This is your Week 1 starting point for the agentic AI build." },
+      { type:"github",  label:"e2b-dev/awesome-ai-agents",            url:"https://github.com/e2b-dev/awesome-ai-agents",            required:true,  note:"Curated list of every major agent framework. Browse it before choosing your tools." },
+      { type:"paper",   label:"ReAct: Synergizing Reasoning and Acting — Yao et al. (2022)", url:"https://arxiv.org/abs/2210.03629", required:true, note:"The paper behind the ReAct pattern your agent uses. Read sections 1–3." },
+      { type:"paper",   label:"Toolformer — Schick et al. (2023)",    url:"https://arxiv.org/abs/2302.04761",                        required:true,  note:"How LLMs learn to use tools. Read sections 1–2 before building your tool-calling agent." },
+      { type:"github",  label:"microsoft/autogen",                    url:"https://github.com/microsoft/autogen",                    required:false, note:"Optional — read /notebook/agentchat_two_users.ipynb for multi-agent coordination patterns." },
+      { type:"github",  label:"crewAIInc/crewAI",                    url:"https://github.com/crewAIInc/crewAI",                    required:false, note:"Optional — multi-role agent framework. Study how roles and tasks are orchestrated." },
+      { type:"paper",   label:"Chain-of-Thought Prompting — Wei et al. (2022)", url:"https://arxiv.org/abs/2201.11903",              required:false, note:"Optional — understand how to make your agent reason step by step before acting." },
+    ],
     steps: [
       { icon:"📖", label:"Read Month 12 overview",   detail:"Focus: Multi-service system, documented ROI, GitHub Pages portfolio, job applications.", href:"#roadmap" },
       { icon:"💼", label:"Open Career Hub",          detail:"Start applying — use Application Tracker, Resume Guide, and Interview Prep.", href:"#career-hub" },
@@ -6299,6 +6400,10 @@ function renderGuidedPath() {
       <small class="muted-note">${state.done.length} of 12 months complete — you are on Month ${currentMonth}</small>
     </div>`;
 
+  // helper: read/write resource checkbox state
+  function gpResKey(monthId, i) { return `gp-res-${monthId}-${i}`; }
+  function gpResChecked(monthId, i) { return localStorage.getItem(gpResKey(monthId, i)) === "1"; }
+
   // ── Build one accordion panel per month ──────────────────────────────────
   const accordionHTML = monthGuide.map(guide => {
     const isDone    = state.done.includes(guide.id);
@@ -6307,9 +6412,14 @@ function renderGuidedPath() {
     const title     = monthData ? monthData.title : `Month ${guide.id}`;
     const phase     = monthData ? monthData.phase : "";
 
-    let statusIcon  = isDone ? "✅" : isCurrent ? "▶️" : "🔒";
-    let statusLabel = isDone ? "Done" : isCurrent ? "Current" : "Upcoming";
-    let statusCls   = isDone ? "gp-status-done" : isCurrent ? "gp-status-current" : "gp-status-future";
+    // resource progress
+    const required  = (guide.resources || []).filter(r => r.required);
+    const reqDone   = required.filter((_, i) => gpResChecked(guide.id, (guide.resources||[]).findIndex(r=>r===_))).length;
+    const resProgress = required.length ? `${reqDone}/${required.length} required` : "";
+
+    const statusIcon  = isDone ? "✅" : isCurrent ? "▶️" : "⬜";
+    const statusLabel = isDone ? "Done" : isCurrent ? "Current" : "Upcoming";
+    const statusCls   = isDone ? "gp-status-done" : isCurrent ? "gp-status-current" : "gp-status-future";
 
     const stepCards = guide.steps.map((step, i) => {
       const badgeHTML = step.badge ? `<span class="gp-badge">${step.badge}</span>` : "";
@@ -6329,6 +6439,35 @@ function renderGuidedPath() {
         </div>`;
     }).join("");
 
+    // resource type icon
+    const typeIcon = { github:"⭐", book:"📖", paper:"📄", course:"🎬" };
+
+    const resourceRows = (guide.resources || []).map((res, i) => {
+      const checked  = gpResChecked(guide.id, i);
+      const reqBadge = res.required
+        ? `<span class="gp-res-badge gp-res-required">Required</span>`
+        : `<span class="gp-res-badge gp-res-optional">Optional</span>`;
+      return `
+        <label class="gp-res-row ${checked ? "gp-res-checked" : ""} ${!res.required ? "gp-res-opt-row" : ""}">
+          <input type="checkbox" class="gp-res-cb" data-month="${guide.id}" data-idx="${i}" ${checked ? "checked" : ""}>
+          <span class="gp-res-type">${typeIcon[res.type] || "📌"}</span>
+          <div class="gp-res-body">
+            <a class="gp-res-label" href="${res.url}" target="_blank" rel="noreferrer">${res.label}</a>
+            ${reqBadge}
+            <span class="gp-res-note">${res.note}</span>
+          </div>
+        </label>`;
+    }).join("");
+
+    const resourcesSection = guide.resources?.length ? `
+      <div class="gp-resources">
+        <h4 class="gp-res-heading">📚 Resources for Month ${guide.id}
+          ${resProgress ? `<span class="gp-res-progress">${resProgress} read</span>` : ""}
+        </h4>
+        <p class="gp-res-sub">Tick each resource as you finish it. <strong>Required</strong> items count toward your month. <strong>Optional</strong> items are extras.</p>
+        <div class="gp-res-list">${resourceRows}</div>
+      </div>` : "";
+
     return `
       <details class="gp-month-panel ${isCurrent ? "gp-panel-current" : ""} ${isDone ? "gp-panel-done" : ""}" ${isCurrent ? "open" : ""} data-month="${guide.id}">
         <summary class="gp-month-summary">
@@ -6336,7 +6475,7 @@ function renderGuidedPath() {
             <span class="gp-month-num">${guide.id}</span>
             <div class="gp-summary-text">
               <strong>${title}</strong>
-              <small>${phase} · ${guide.steps.length} steps · ${guide.intro.split(".")[0]}</small>
+              <small>${phase} · ${guide.steps.length} steps${resProgress ? ` · ${resProgress} read` : ""}</small>
             </div>
           </div>
           <span class="gp-status-pill ${statusCls}">${statusIcon} ${statusLabel}</span>
@@ -6344,6 +6483,7 @@ function renderGuidedPath() {
         <div class="gp-panel-body">
           <p class="gp-month-intro">${guide.intro}</p>
           <div class="gp-steps">${stepCards}</div>
+          ${resourcesSection}
         </div>
       </details>`;
   }).join("");
@@ -6353,6 +6493,34 @@ function renderGuidedPath() {
   // Bind all "Go there" buttons
   el.querySelectorAll(".gp-go-btn").forEach(btn => {
     btn.addEventListener("click", () => gpNavigate(btn));
+  });
+
+  // Bind resource checkboxes — save state and re-render summary line
+  el.querySelectorAll(".gp-res-cb").forEach(cb => {
+    cb.addEventListener("change", () => {
+      const monthId = Number(cb.dataset.month);
+      const idx     = Number(cb.dataset.idx);
+      localStorage.setItem(gpResKey(monthId, idx), cb.checked ? "1" : "0");
+      // update row style immediately
+      cb.closest(".gp-res-row").classList.toggle("gp-res-checked", cb.checked);
+      // update the summary small text
+      const guide    = monthGuide.find(g => g.id === monthId);
+      const required = (guide.resources || []).filter(r => r.required);
+      const reqDone  = required.filter((_, i) => {
+        const ri = (guide.resources||[]).findIndex(r=>r===_);
+        return localStorage.getItem(gpResKey(monthId, ri)) === "1";
+      }).length;
+      const panel    = el.querySelector(`details[data-month="${monthId}"]`);
+      if (panel) {
+        const small = panel.querySelector(".gp-summary-text small");
+        if (small) {
+          const base = small.textContent.replace(/·\s*\d+\/\d+ required read/, "").trimEnd();
+          if (required.length) small.textContent = `${base} · ${reqDone}/${required.length} required read`;
+        }
+        const heading = panel.querySelector(".gp-res-heading .gp-res-progress");
+        if (heading) heading.textContent = `${reqDone}/${required.length} required read`;
+      }
+    });
   });
 }
 
