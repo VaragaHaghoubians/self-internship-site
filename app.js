@@ -6236,130 +6236,123 @@ const monthGuide = [
   },
 ];
 
+function gpNavigate(btn) {
+  const href     = btn.dataset.href;
+  const track    = btn.dataset.track;
+  const lessonId = btn.dataset.lesson;
+  const labId    = btn.dataset.lab;
+
+  if (track) {
+    state.skillTrack = track;
+    if (lessonId) { state.skillLessonId = lessonId; saveSkillLessonState(); }
+    else { const t = skillTracks.find(t => t.id === track); if (t) { state.skillLessonId = t.lessons[0].id; saveSkillLessonState(); } }
+    renderSkillTrackTabs(); renderSkillLessonList(); renderSkillLesson();
+  }
+  if (lessonId && lessonId.startsWith("py-")) {
+    state.pythonLessonId = lessonId; savePythonLessonState(); renderPythonLessonList(); renderPythonLesson();
+  }
+  if (labId) {
+    state.labId = labId; localStorage.setItem("selectedLab", labId); renderLabList(); renderLabWorkspace();
+  }
+  if (href) { const t = document.querySelector(href); if (t) t.scrollIntoView({ behavior:"smooth", block:"start" }); }
+}
+
 function renderGuidedPath() {
   const el = document.getElementById("guidedPathContent");
   if (!el) return;
 
   const currentMonth = state.month;
-  const guide = monthGuide.find(g => g.id === currentMonth) || monthGuide[0];
 
-  // Site-map flow strip
+  // ── Site-map flow strip ──────────────────────────────────────────────────
   const flowSteps = [
-    { icon:"📖", label:"Roadmap", sub:"Read the month", href:"#roadmap" },
-    { icon:"🐍", label:"Python Lab", sub:"Do Python lessons", href:"#python-lab" },
+    { icon:"📖", label:"Roadmap",    sub:"Read the month",           href:"#roadmap" },
+    { icon:"🐍", label:"Python Lab", sub:"Lessons (Month 1 only)",   href:"#python-lab" },
     { icon:"🛠️", label:"Skill Labs", sub:"SQL / Git / Docker / ML…", href:"#skill-labs" },
-    { icon:"💻", label:"Code Lab", sub:"Build & submit project", href:"#code-lab" },
-    { icon:"✅", label:"Mark Done", sub:"Unlock next month", href:"#roadmap" },
+    { icon:"💻", label:"Code Lab",   sub:"Build & submit project",   href:"#code-lab" },
+    { icon:"✅", label:"Mark Done",  sub:"Unlock next month",        href:"#roadmap" },
   ];
-
   const flowHTML = `
     <div class="gp-sitemap">
-      <p class="gp-sitemap-label">How the site works — same pattern every month:</p>
+      <p class="gp-sitemap-label">Same 5-step pattern every single month:</p>
       <div class="gp-flow">
         ${flowSteps.map((s, i) => `
           <a class="gp-flow-step" href="${s.href}">
             <span class="gp-flow-icon">${s.icon}</span>
             <strong>${s.label}</strong>
             <small>${s.sub}</small>
-          </a>
-          ${i < flowSteps.length - 1 ? '<span class="gp-flow-arrow" aria-hidden="true">→</span>' : ""}
+          </a>${i < flowSteps.length - 1 ? '<span class="gp-flow-arrow">→</span>' : ""}
         `).join("")}
       </div>
-    </div>
-  `;
+    </div>`;
 
-  // Current month steps
-  const stepCards = guide.steps.map((step, i) => {
-    const badgeHTML = step.badge ? `<span class="gp-badge">${step.badge}</span>` : "";
-    return `
-      <div class="gp-step">
-        <div class="gp-step-num">${i + 1}</div>
-        <div class="gp-step-body">
-          <div class="gp-step-title">${step.icon} ${step.label} ${badgeHTML}</div>
-          <div class="gp-step-detail">${step.detail}</div>
-        </div>
-        <button class="gp-go-btn" type="button"
-          data-href="${step.href}"
-          ${step.track    ? `data-track="${step.track}"` : ""}
-          ${step.lessonId ? `data-lesson="${step.lessonId}"` : ""}
-          ${step.labId    ? `data-lab="${step.labId}"` : ""}
-        >Go there →</button>
-      </div>
-    `;
-  }).join("");
-
-  // Month progress bar
+  // ── Progress bar & dots ──────────────────────────────────────────────────
   const donePct = Math.round((state.done.length / 12) * 100);
-  const monthDots = Array.from({length: 12}, (_, i) => {
+  const dots = Array.from({length:12}, (_, i) => {
     const m = i + 1;
-    const done = state.done.includes(m);
-    const current = m === currentMonth;
-    return `<span class="gp-dot ${done ? "gp-dot-done" : current ? "gp-dot-current" : "gp-dot-future"}" title="Month ${m}">${m}</span>`;
+    const cls = state.done.includes(m) ? "gp-dot-done" : m === currentMonth ? "gp-dot-current" : "gp-dot-future";
+    return `<span class="gp-dot ${cls}" title="Month ${m}">${m}</span>`;
+  }).join("");
+  const progressHTML = `
+    <div class="gp-progress-bar-section">
+      <div class="gp-dots">${dots}</div>
+      <div class="gp-bar-wrap"><div class="gp-bar" style="width:${donePct}%"></div></div>
+      <small class="muted-note">${state.done.length} of 12 months complete — you are on Month ${currentMonth}</small>
+    </div>`;
+
+  // ── Build one accordion panel per month ──────────────────────────────────
+  const accordionHTML = monthGuide.map(guide => {
+    const isDone    = state.done.includes(guide.id);
+    const isCurrent = guide.id === currentMonth;
+    const monthData = months.find(m => m.id === guide.id);
+    const title     = monthData ? monthData.title : `Month ${guide.id}`;
+    const phase     = monthData ? monthData.phase : "";
+
+    let statusIcon  = isDone ? "✅" : isCurrent ? "▶️" : "🔒";
+    let statusLabel = isDone ? "Done" : isCurrent ? "Current" : "Upcoming";
+    let statusCls   = isDone ? "gp-status-done" : isCurrent ? "gp-status-current" : "gp-status-future";
+
+    const stepCards = guide.steps.map((step, i) => {
+      const badgeHTML = step.badge ? `<span class="gp-badge">${step.badge}</span>` : "";
+      return `
+        <div class="gp-step">
+          <div class="gp-step-num">${i + 1}</div>
+          <div class="gp-step-body">
+            <div class="gp-step-title">${step.icon} ${step.label} ${badgeHTML}</div>
+            <div class="gp-step-detail">${step.detail}</div>
+          </div>
+          <button class="gp-go-btn" type="button"
+            data-href="${step.href}"
+            ${step.track    ? `data-track="${step.track}"` : ""}
+            ${step.lessonId ? `data-lesson="${step.lessonId}"` : ""}
+            ${step.labId    ? `data-lab="${step.labId}"` : ""}
+          >Go there →</button>
+        </div>`;
+    }).join("");
+
+    return `
+      <details class="gp-month-panel ${isCurrent ? "gp-panel-current" : ""} ${isDone ? "gp-panel-done" : ""}" ${isCurrent ? "open" : ""} data-month="${guide.id}">
+        <summary class="gp-month-summary">
+          <div class="gp-summary-left">
+            <span class="gp-month-num">${guide.id}</span>
+            <div class="gp-summary-text">
+              <strong>${title}</strong>
+              <small>${phase} · ${guide.steps.length} steps · ${guide.intro.split(".")[0]}</small>
+            </div>
+          </div>
+          <span class="gp-status-pill ${statusCls}">${statusIcon} ${statusLabel}</span>
+        </summary>
+        <div class="gp-panel-body">
+          <p class="gp-month-intro">${guide.intro}</p>
+          <div class="gp-steps">${stepCards}</div>
+        </div>
+      </details>`;
   }).join("");
 
-  el.innerHTML = `
-    ${flowHTML}
-    <div class="gp-month-header">
-      <div class="gp-month-title">
-        <span class="gp-month-badge">Month ${currentMonth} of 12</span>
-        <h3>${(monthGuide.find(g=>g.id===currentMonth)||monthGuide[0]).intro.split(".")[0]}</h3>
-        <p class="gp-month-intro">${guide.intro}</p>
-      </div>
-      <div class="gp-progress">
-        <div class="gp-dots">${monthDots}</div>
-        <div class="gp-bar-wrap"><div class="gp-bar" style="width:${donePct}%"></div></div>
-        <small>${state.done.length} of 12 months complete</small>
-      </div>
-    </div>
-    <div class="gp-steps">${stepCards}</div>
-    ${currentMonth < 12 ? `<p class="gp-note">After finishing all steps above, click <strong>Mark Month ${currentMonth} done</strong> (step ${guide.steps.length}) to unlock Month ${currentMonth + 1}.</p>` : ""}
-  `;
+  el.innerHTML = `${flowHTML}${progressHTML}<div class="gp-accordion">${accordionHTML}</div>`;
 
-  // Bind "Go there" buttons
+  // Bind all "Go there" buttons
   el.querySelectorAll(".gp-go-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const href    = btn.dataset.href;
-      const track   = btn.dataset.track;
-      const lessonId = btn.dataset.lesson;
-      const labId   = btn.dataset.lab;
-
-      // Navigate skill track if specified
-      if (track) {
-        state.skillTrack = track;
-        if (lessonId) {
-          state.skillLessonId = lessonId;
-          saveSkillLessonState();
-        } else {
-          const t = skillTracks.find(t => t.id === track);
-          if (t) { state.skillLessonId = t.lessons[0].id; saveSkillLessonState(); }
-        }
-        renderSkillTrackTabs();
-        renderSkillLessonList();
-        renderSkillLesson();
-      }
-
-      // Navigate Python lesson if specified (no track = python lab)
-      if (lessonId && lessonId.startsWith("py-")) {
-        state.pythonLessonId = lessonId;
-        savePythonLessonState();
-        renderPythonLessonList();
-        renderPythonLesson();
-      }
-
-      // Navigate code lab if specified
-      if (labId) {
-        state.labId = labId;
-        localStorage.setItem("selectedLab", labId);
-        renderLabList();
-        renderLabWorkspace();
-      }
-
-      // Scroll to section
-      if (href) {
-        const target = document.querySelector(href);
-        if (target) target.scrollIntoView({ behavior:"smooth", block:"start" });
-      }
-    });
+    btn.addEventListener("click", () => gpNavigate(btn));
   });
 }
 
