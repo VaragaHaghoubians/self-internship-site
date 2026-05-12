@@ -137,9 +137,9 @@ const months = [
   {
     id: 1,
     phase: "Phase 1",
-    title: "Advanced Python and Version Control",
+    title: "Python Foundations & Version Control",
     focus: "Python OOP, virtual environments, Git, clean READMEs",
-    beginner: "This month changes how you think about code. A beginner writes one script that only works once. An engineer creates a small tool with functions, classes, setup instructions, and version history.",
+    beginner: "This month is for complete beginners. You will write your first real Python programs, understand how to organise code with functions and classes, and learn to save your work with Git. Everything is explained step by step — there is no assumed knowledge.",
     learn: ["Classes, methods, __init__, inheritance", "venv or conda environments", "Git branches, merges, conflict resolution", "README files that explain setup and usage", "Pandas and NumPy: loading, filtering, groupby, and reshaping DataFrames — the daily tools of every data role", "Matplotlib and Seaborn: distributions, scatter plots, and correlation heatmaps for exploratory data analysis (EDA)"],
     build: "A Python CLI tool that cleans a messy CSV from terminal commands.",
     study: "phase-1-software-engineering/month-01-python-oop-git/resources/",
@@ -3214,6 +3214,102 @@ print("TESTS PASSED: generators complete")`,
       ["Output includes index", /index/, "output"],
     ],
   },
+  {
+    id: "py-21",
+    day: "Debug 1",
+    title: "Fix the NameError and SyntaxError",
+    explain: "Reading error messages is one of the most important skills in Python. A NameError means you used a variable before defining it. A SyntaxError means Python cannot read your line at all — usually a missing colon, bracket, or quote. Read the error carefully, find the line number, and fix it.",
+    goals: ["Find and fix the NameError", "Find and fix the SyntaxError", "Make all three print lines run", "Read the full error message — it tells you the line number"],
+    starter: `# Debug 1: Fix the bugs below.
+# There are exactly 2 bugs. Read each error message carefully.
+# Hint: check variable names and missing punctuation.
+
+city = "Amsterdam"
+country = "Netherlands"
+
+print(f"{city} is in {contry}")   # Bug 1: NameError
+
+def greet(name)                    # Bug 2: SyntaxError
+    print(f"Hello, {name}!")
+
+greet("Ana")
+`,
+    expected: "Output should show the city line and Hello Ana without errors.",
+    tests: `assert "Amsterdam" in _lesson_output
+assert "Netherlands" in _lesson_output
+assert "Hello" in _lesson_output
+print("TESTS PASSED: debugging complete")`,
+    checks: [
+      ["NameError fixed: uses country not contry", /f["'].*\{country\}/],
+      ["SyntaxError fixed: def greet has colon", /def\s+greet\s*\([^)]*\)\s*:/],
+      ["Output shows Amsterdam", /Amsterdam/, "output"],
+      ["Output shows Hello", /Hello/, "output"],
+    ],
+  },
+  {
+    id: "py-22",
+    day: "Debug 2",
+    title: "Fix the logic errors",
+    explain: "Logic errors are the hardest bugs: the code runs without crashing, but the output is wrong. You have to think carefully about what the code is doing versus what you intended. These errors never show a red error message — you must test with real values and think.",
+    goals: ["Find and fix the off-by-one error in the loop", "Find and fix the wrong comparison operator", "Make both assertions pass"],
+    starter: `# Debug 2: No crashes — but the output is wrong.
+# Fix the two logic errors.
+
+# Bug 1: Should print numbers 1 through 5 (inclusive)
+for i in range(1, 5):       # Why does this miss 5?
+    print(i)
+
+# Bug 2: Should print "passed" when score >= 60
+score = 60
+if score > 60:              # Why does score=60 fail?
+    print("passed")
+else:
+    print("failed")
+`,
+    expected: "Loop should print 1 2 3 4 5. Score 60 should print passed.",
+    tests: `output_lines = [l.strip() for l in _lesson_output.splitlines() if l.strip()]
+assert "5" in output_lines, "Loop should include 5"
+assert "passed" in _lesson_output, "Score 60 should print passed"
+print("TESTS PASSED: logic errors fixed")`,
+    checks: [
+      ["Loop uses range(1, 6) to include 5", /range\s*\(\s*1\s*,\s*6\s*\)/],
+      ["Comparison uses >= not >", /score\s*>=\s*60/],
+      ["Output includes 5", /\b5\b/, "output"],
+      ["Output includes passed", /passed/, "output"],
+    ],
+  },
+  {
+    id: "py-23",
+    day: "Debug 3",
+    title: "Fix the TypeError and IndexError",
+    explain: "A TypeError means you tried to do something with the wrong type — like adding a string and an int. An IndexError means you tried to access a list position that does not exist. Both of these happen constantly in real data work. Learn to read the traceback: it shows you exactly which line crashed and why.",
+    goals: ["Fix the TypeError by converting types correctly", "Fix the IndexError by using a valid index", "Make all three assertions pass"],
+    starter: `# Debug 3: Fix the TypeError and IndexError.
+# Read the full traceback when you run — it shows the line and reason.
+
+age = "25"           # This is a string, not a number!
+years_left = 65 - age   # Bug 1: TypeError — can't subtract str from int
+
+scores = [88, 92, 79]
+last = scores[3]         # Bug 2: IndexError — list has indices 0, 1, 2 only
+
+total = sum(scores)
+print(f"Age: {age}, Years left: {years_left}")
+print(f"Last score: {last}")
+print(f"Total: {total}")
+`,
+    expected: "Output shows age, years left, the last score (79), and total.",
+    tests: `assert years_left == 40, f"Expected 40, got {years_left}"
+assert last == 79, f"Expected 79 (index 2), got {last}"
+assert total == 259
+print("TESTS PASSED: TypeError and IndexError fixed")`,
+    checks: [
+      ["TypeError fixed: int(age) used", /int\s*\(\s*age\s*\)/],
+      ["IndexError fixed: uses index 2", /scores\s*\[\s*2\s*\]/],
+      ["Output shows Years left: 40", /Years left:\s*40/, "output"],
+      ["Output shows Last score: 79", /Last score:\s*79/, "output"],
+    ],
+  },
 ];
 
 const skillTracks = [
@@ -5007,6 +5103,33 @@ function renderPythonLesson() {
     : output || "Run the lesson to see output.";
   renderPythonLessonChecks(saved?.results || []);
   updatePythonLessonCount();
+  renderFeynmanCheck(lesson.id, saved?.passed);
+}
+
+function renderFeynmanCheck(lessonId, passed) {
+  const feynmanEl = document.getElementById("feynmanCheck");
+  const savedAnswerEl = document.getElementById("feynmanSavedAnswer");
+  const answerTextarea = document.getElementById("feynmanAnswer");
+  const statusEl = document.getElementById("feynmanStatus");
+  if (!feynmanEl) return;
+
+  const savedExplanation = localStorage.getItem(`feynman-${lessonId}`);
+
+  if (passed) {
+    feynmanEl.hidden = false;
+    if (savedExplanation) {
+      answerTextarea.value = savedExplanation;
+      savedAnswerEl.hidden = false;
+      savedAnswerEl.innerHTML = `<strong>✅ Saved explanation:</strong> <em>${savedExplanation}</em>`;
+      if (statusEl) statusEl.textContent = "Explanation saved.";
+    } else {
+      answerTextarea.value = "";
+      savedAnswerEl.hidden = true;
+      if (statusEl) statusEl.textContent = "";
+    }
+  } else {
+    feynmanEl.hidden = true;
+  }
 }
 
 function renderPythonLessonChecks(results) {
@@ -5053,10 +5176,62 @@ function bindPythonLessonLab() {
     editor.value = lesson.starter;
     localStorage.setItem(getPythonDraftKey(lesson.id), lesson.starter);
     localStorage.removeItem(getPythonOutputKey(lesson.id));
+    localStorage.removeItem(`scratch-${lesson.id}`);
     state.pythonLessonOutput = "";
     document.getElementById("pythonLessonOutput").textContent = "Starter restored.";
     renderPythonLessonChecks(getSavedPythonSubmission(lesson.id)?.results || []);
+    const scratchBtn = document.getElementById("scratchPythonLesson");
+    if (scratchBtn) { scratchBtn.textContent = "🧠 Write from Scratch"; scratchBtn.classList.remove("scratch-active"); }
   });
+
+  const scratchBtn = document.getElementById("scratchPythonLesson");
+  if (scratchBtn) {
+    const lesson = getPythonLesson();
+    const inScratch = localStorage.getItem(`scratch-${lesson.id}`);
+    if (inScratch) { scratchBtn.textContent = "📄 Show Starter Hint"; scratchBtn.classList.add("scratch-active"); }
+    scratchBtn.addEventListener("click", () => {
+      const lesson = getPythonLesson();
+      const inScratch = localStorage.getItem(`scratch-${lesson.id}`);
+      if (!inScratch) {
+        // Enter scratch mode: clear editor
+        editor.value = `# ${lesson.title}\n# Write this lesson from memory.\n# Goal: ${lesson.goals[0]}\n\n`;
+        localStorage.setItem(getPythonDraftKey(lesson.id), editor.value);
+        localStorage.setItem(`scratch-${lesson.id}`, "1");
+        scratchBtn.textContent = "📄 Show Starter Hint";
+        scratchBtn.classList.add("scratch-active");
+        document.getElementById("pythonLessonOutput").textContent = "Scratch mode — editor cleared. Write the code from memory. Click 'Show Starter Hint' to peek at the original.";
+      } else {
+        // Show hint mode: restore starter temporarily
+        editor.value = lesson.starter;
+        localStorage.setItem(getPythonDraftKey(lesson.id), lesson.starter);
+        localStorage.removeItem(`scratch-${lesson.id}`);
+        scratchBtn.textContent = "🧠 Write from Scratch";
+        scratchBtn.classList.remove("scratch-active");
+        document.getElementById("pythonLessonOutput").textContent = "Starter restored as a hint. Try again from scratch after reading it.";
+      }
+    });
+  }
+
+  const saveFeynmanBtn = document.getElementById("saveFeynman");
+  if (saveFeynmanBtn) {
+    saveFeynmanBtn.addEventListener("click", () => {
+      const lesson = getPythonLesson();
+      const answer = (document.getElementById("feynmanAnswer").value || "").trim();
+      if (!answer) {
+        const statusEl = document.getElementById("feynmanStatus");
+        if (statusEl) statusEl.textContent = "Write at least one sentence before saving.";
+        return;
+      }
+      localStorage.setItem(`feynman-${lesson.id}`, answer);
+      const savedAnswerEl = document.getElementById("feynmanSavedAnswer");
+      if (savedAnswerEl) {
+        savedAnswerEl.hidden = false;
+        savedAnswerEl.innerHTML = `<strong>✅ Saved explanation:</strong> <em>${answer}</em>`;
+      }
+      const statusEl = document.getElementById("feynmanStatus");
+      if (statusEl) statusEl.textContent = "Explanation saved. Great job thinking it through!";
+    });
+  }
 
   document.getElementById("nextPythonLesson").addEventListener("click", () => {
     const index = pythonLessons.findIndex((lesson) => lesson.id === state.pythonLessonId);
@@ -5138,8 +5313,9 @@ _python_lesson_output = _stdout.getvalue()
     renderPythonLessonList();
     updatePythonLessonCount();
     document.getElementById("pythonLessonStatus").textContent = passed
-      ? "Lesson submitted and saved. You can move to the next lesson."
+      ? "Lesson submitted and saved. Fill in the Feynman Check below, then move to the next lesson."
       : "Lesson saved, but it needs fixes before completion.";
+    renderFeynmanCheck(lesson.id, passed);
   }
 }
 

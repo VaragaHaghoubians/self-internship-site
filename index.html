@@ -425,6 +425,10 @@
           <span>3. Run</span>
           <span>4. Submit</span>
           <span>5. Check</span>
+          <span>6. Explain</span>
+        </div>
+        <div class="beginner-tip" id="beginnerTip">
+          <strong>🌱 Complete beginner?</strong> Start at Lesson 1 and do not skip ahead. Read the explanation first, then edit the code to make it your own — do not just press Run on the starter. After submitting, use the <strong>Explain It Back</strong> box to describe what you learned in plain English. If you cannot explain it, you have not learned it yet.
         </div>
         <div class="python-lab">
           <aside class="python-lesson-list" id="pythonLessonList" aria-label="Python lessons"></aside>
@@ -449,8 +453,21 @@
               <button class="mark-button" id="runPythonLesson" type="button">Run lesson</button>
               <button class="mark-button" id="submitPythonLesson" type="button">Submit lesson</button>
               <button class="file-link as-button" id="resetPythonLesson" type="button">Reset starter</button>
+              <button class="file-link as-button scratch-btn" id="scratchPythonLesson" type="button">🧠 Write from Scratch</button>
               <button class="file-link as-button" id="nextPythonLesson" type="button">Next lesson</button>
               <a class="file-link" href="docs/knowledge-base/zero-to-hero-guides/python/python_zero_to_hero.py.html">Open full Python guide</a>
+            </div>
+            <div class="feynman-check" id="feynmanCheck" hidden>
+              <div class="feynman-header">
+                <h4>🧠 Feynman Check — Explain it back</h4>
+                <p>You passed the checks. Now prove you actually understand it. Explain what you just learned in 2–3 sentences, as if teaching a friend who has never coded. No jargon, no code. If you struggle to write this, go back and re-read the lesson.</p>
+              </div>
+              <textarea id="feynmanAnswer" rows="4" placeholder="For example: 'A variable is like a labelled box. You put a value in the box and give it a name, so you can use that value again later...'"></textarea>
+              <div class="feynman-actions">
+                <button class="mark-button" id="saveFeynman" type="button">Save explanation</button>
+                <span id="feynmanStatus" class="muted-note"></span>
+              </div>
+              <div id="feynmanSavedAnswer" class="feynman-saved" hidden></div>
             </div>
           </article>
         </div>
