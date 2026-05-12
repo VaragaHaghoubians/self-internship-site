@@ -3257,6 +3257,151 @@ details p {
   .emerging-grid { grid-template-columns: 1fr !important; }
 }
 
+/* ══ Guided Path ═══════════════════════════════════════════════════════════ */
+
+.guided-path-section { background: var(--surface); }
+
+/* Site-map flow */
+.gp-sitemap { margin-bottom: 32px; }
+.gp-sitemap-label { font-size: 13px; color: var(--muted); margin: 0 0 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.gp-flow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 16px 20px;
+  border: 1.5px solid var(--line);
+}
+.gp-flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  text-decoration: none;
+  color: var(--ink);
+  text-align: center;
+  min-width: 90px;
+  transition: border-color .15s, background .15s;
+}
+.gp-flow-step:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.gp-flow-icon { font-size: 22px; }
+.gp-flow-step strong { font-size: 12px; }
+.gp-flow-step small { font-size: 11px; color: var(--muted); }
+.gp-flow-arrow { font-size: 18px; color: var(--muted); flex-shrink: 0; }
+
+/* Month header */
+.gp-month-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 24px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+  border: 1.5px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+  border-radius: 14px;
+  padding: 22px 24px;
+}
+.gp-month-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+}
+.gp-month-title h3 { margin: 0 0 8px; font-size: 18px; }
+.gp-month-intro { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.55; }
+
+/* Progress */
+.gp-progress { display: flex; flex-direction: column; gap: 6px; min-width: 200px; }
+.gp-dots { display: flex; gap: 4px; flex-wrap: wrap; }
+.gp-dot {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  cursor: default;
+}
+.gp-dot-done    { background: var(--accent);  color: #fff; }
+.gp-dot-current { background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent); border: 2px solid var(--accent); }
+.gp-dot-future  { background: var(--bg); color: var(--muted); border: 1.5px solid var(--line); }
+.gp-bar-wrap { height: 6px; background: var(--bg); border-radius: 999px; overflow: hidden; border: 1px solid var(--line); }
+.gp-bar { height: 100%; background: var(--accent); border-radius: 999px; transition: width .4s; }
+.gp-progress small { font-size: 11px; color: var(--muted); }
+
+/* Step cards */
+.gp-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.gp-step {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: border-color .15s;
+}
+.gp-step:hover { border-color: var(--accent); }
+.gp-step-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.gp-step-title { font-size: 14px; font-weight: 700; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.gp-step-detail { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.gp-badge { background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .05em; }
+
+.gp-go-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity .15s;
+}
+.gp-go-btn:hover { opacity: .85; }
+
+.gp-note {
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .gp-flow { gap: 4px; padding: 12px; }
+  .gp-flow-step { min-width: 70px; padding: 8px 10px; }
+  .gp-flow-arrow { display: none; }
+  .gp-month-header { grid-template-columns: 1fr; }
+  .gp-step { grid-template-columns: 32px 1fr; }
+  .gp-go-btn { grid-column: 1 / -1; width: 100%; text-align: center; }
+}
+
 /* ── Beginner tip banner ── */
 .beginner-tip {
   background: #f0faf0;
