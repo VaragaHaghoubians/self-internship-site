@@ -3150,3 +3150,109 @@ details p {
   .career-tab { font-size:11px !important; padding:6px 10px !important; }
   .app-form { grid-template-columns:1fr !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   2026 JOB MARKET REALITY SECTION
+   ═══════════════════════════════════════════════════════════════════ */
+
+.reality-2026-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+.r26-card {
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.r26-warning  { background: #fff7ed; border-color: #fed7aa; }
+.r26-opportunity { background: #f0fdf4; border-color: #bbf7d0; }
+.r26-insight  { background: #eff6ff; border-color: #bfdbfe; }
+.r26-action   { background: var(--accent-soft); border-color: var(--accent); }
+
+[data-theme="dark"] .r26-warning    { background: #2c1a0e; border-color: #9a3412; }
+[data-theme="dark"] .r26-opportunity{ background: #0f2818; border-color: #166534; }
+[data-theme="dark"] .r26-insight    { background: #0f1f3d; border-color: #1e40af; }
+[data-theme="dark"] .r26-action     { background: #06231f; border-color: var(--accent); }
+
+.r26-card-header { display: flex; align-items: center; gap: 12px; }
+.r26-icon { font-size: 24px; flex-shrink: 0; }
+.r26-card-header h3 { margin: 0; font-size: 16px; }
+.r26-points { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 7px; }
+.r26-points li { font-size: 14px; line-height: 1.6; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   AI-NATIVE PROJECT STEPS
+   ═══════════════════════════════════════════════════════════════════ */
+
+.project-steps {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.project-steps li { font-size: 13px; line-height: 1.55; color: var(--muted); }
+.project-steps li strong { color: var(--ink); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   EMERGING ROLES 2026
+   ═══════════════════════════════════════════════════════════════════ */
+
+.emerging-roles { display: flex; flex-direction: column; gap: 24px; }
+.emerging-intro {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 14px;
+}
+.emerging-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+.emerging-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.emerging-card:hover { border-color: var(--accent); box-shadow: 0 4px 20px rgba(15,118,110,.1); }
+
+.emerging-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.emerging-card-header h3 { margin: 0 0 6px; font-size: 17px; }
+.emerging-badge { display: inline-block; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
+.emerging-demand { font-size: 15px; flex-shrink: 0; }
+
+.emerging-desc { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.55; }
+
+.emerging-skills { display: flex; flex-wrap: wrap; gap: 6px; }
+.emerging-skill-tag { background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 12px; }
+
+.emerging-meta { display: flex; flex-direction: column; gap: 4px; }
+.emerging-meta-item { font-size: 13px; }
+
+.emerging-position-box {
+  background: var(--bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .reality-2026-grid { grid-template-columns: 1fr !important; }
+  .emerging-grid { grid-template-columns: 1fr !important; }
+}

@@ -42,6 +42,16 @@ const superpowers = [
     text: "Turn models into dashboards, alerts, workflows, and business decisions that managers can use.",
     bullets: ["Django and PostgreSQL platform", "Celery background jobs", "ROI and financial risk panels"],
   },
+  {
+    title: "Multi-Skill Builder",
+    text: "In 2026, single-skill specialists are the most exposed to automation. The most valuable people combine data + engineering + AI + business thinking into one profile.",
+    bullets: ["Python + SQL + Docker + Django + IoT + LLMs + Agents — all 12 months", "Every project frames outcomes in cost, risk, or efficiency — not just code", "Automation-first: background jobs, CI/CD, and agents remove manual work"],
+  },
+  {
+    title: "AI-Native Problem Solver",
+    text: "AI is raising the minimum standard for every role. Knowing how to use AI to learn faster, review AI output critically, and build on top of AI is now a baseline skill.",
+    bullets: ["Use AI as a co-developer — prompt, evaluate, improve, ship", "Evaluate AI outputs: hallucination, bias, cost, and safety awareness", "Build AI products with product thinking: user, value, metric, iteration"],
+  },
 ];
 
 const startChecklistItems = [
@@ -1943,6 +1953,70 @@ const projects = [
     instructions: null,
     prerequisites: "projects/advanced/project-7-supply-chain/PREREQUISITES.md",
     code: "projects/advanced/project-7-supply-chain/project3_supply_chain.py",
+  },
+  // ── AI-Native Projects (2026 market positioning) ──
+  {
+    group: "ai-native",
+    title: "AI Automation Workflow",
+    role: "Automation Engineer / AI Workflow Designer",
+    month: "Month 6–7",
+    time: "12–18 hours",
+    outcome: "An end-to-end automation pipeline: trigger → data transform → AI decision → action → notification. Zero manual steps in the critical path.",
+    skills: ["Celery + Redis", "LLM API (structured output)", "webhook triggers", "FastAPI", "business logic encoding"],
+    path: "projects/foundations/project-1-customer-churn/README.md",
+    instructions: null,
+    prerequisites: "projects/foundations/project-1-customer-churn/PREREQUISITES.md",
+    code: "projects/foundations/project-1-customer-churn/customer_churn_analysis.py",
+    description: [
+      "Choose a real repetitive workflow (e.g. daily report generation, data quality check, alert routing, or document summarisation).",
+      "Build a trigger (scheduled Celery task or webhook) that starts the pipeline automatically.",
+      "Add an AI step: call an LLM with structured output (JSON) to make a classification, summarise text, or flag an anomaly.",
+      "Connect the output to an action: send a Slack message, write to a database, or update a dashboard.",
+      "Document the before/after: how many minutes per day does this save? What was done manually before?",
+      "Bonus: add an approval step where the AI flags something for human review before acting.",
+    ],
+  },
+  {
+    group: "ai-native",
+    title: "AI Business Analyst Tool",
+    role: "AI Product Engineer / Data + AI Engineer",
+    month: "Month 4–6",
+    time: "10–14 hours",
+    outcome: "A FastAPI or Django tool that accepts raw business data (CSV or text), runs statistical analysis, and returns AI-written insights with cited numbers.",
+    skills: ["pandas", "scipy.stats", "LLM API", "FastAPI", "structured prompts", "product thinking"],
+    path: "projects/foundations/project-2-sales-analysis/README.md",
+    instructions: null,
+    prerequisites: "projects/foundations/project-2-sales-analysis/PREREQUISITES.md",
+    code: "projects/foundations/project-2-sales-analysis/sales_performance_analysis.py",
+    description: [
+      "Upload a CSV of business data (sales, operations, HR — anything real or realistic).",
+      "Run statistical analysis: trends, outliers, correlations, period-over-period change.",
+      "Build a prompt that gives the LLM the actual numbers and asks for: (1) key insight, (2) possible cause, (3) recommended action.",
+      "Return structured output: JSON with insight, confidence, and supporting data points.",
+      "Build a minimal frontend (1 HTML page) to show results clearly — no data science background needed to read it.",
+      "Write a 1-page product brief: the problem you solved, who uses it, and how you would measure whether it works.",
+    ],
+  },
+  {
+    group: "ai-native",
+    title: "Multi-Skill AI Portfolio Capstone",
+    role: "AI Product Engineer — strongest portfolio item",
+    month: "Month 12",
+    time: "20–30 hours",
+    outcome: "A deployed AI product combining data + ML + API + agent + real business value. Something another person can use, with documented ROI.",
+    skills: ["Django or FastAPI", "scikit-learn or LLM", "AI agent with tools", "CI/CD", "deployment", "ROI calculation"],
+    path: "projects/advanced/project-5-factory-twin/PREREQUISITES.md",
+    instructions: null,
+    prerequisites: "projects/advanced/project-5-factory-twin/PREREQUISITES.md",
+    code: "projects/advanced/project-5-factory-twin/project1_factory_twin.py",
+    description: [
+      "Pick a real problem from your IE or DS background that no existing free tool fully solves.",
+      "Build a full product: data ingestion → processing → ML or LLM layer → API → simple UI.",
+      "Add an AI agent that can answer questions about the data, flag anomalies, or recommend actions.",
+      "Deploy it publicly (Render, Railway, or Hugging Face Spaces — all free tier).",
+      "Write the ROI case: what does this replace, how long did it take manually before, and what is the measurable improvement?",
+      "This is the project you show in every interview. It proves you are multi-skill, product-aware, and business-focused — not just a coder.",
+    ],
   },
 ];
 
@@ -4831,6 +4905,7 @@ function renderProjectTabs() {
   const tabs = [
     ["foundations", "Foundations"],
     ["advanced", "Advanced"],
+    ["ai-native", "🤖 AI-Native 2026"],
   ];
   document.getElementById("projectTabs").innerHTML = tabs
     .map(([id, label]) => `<button class="tab-button ${state.projectGroup === id ? "is-active" : ""}" type="button" data-group="${id}">${label}</button>`)
@@ -4864,6 +4939,7 @@ function renderProjects() {
           <p>${project.outcome}</p>
           <p class="project-time"><strong>⏱ Time:</strong> ${project.time}</p>
           <ul class="project-skills">${project.skills.map((skill) => `<li>${skill}</li>`).join("")}</ul>
+          ${project.description ? `<ol class="project-steps">${project.description.map(s=>`<li>${s}</li>`).join("")}</ol>` : ""}
           ${renderSourceLinks(docLinks, { title: "Project files", compact: true })}
         </article>
       `;
@@ -5718,6 +5794,7 @@ function init() {
   updateSkillLessonCount();
   renderResourceChips();
   renderResources();
+  renderReality2026();
   renderCareerHub();
   bindSearch();
   bindTheme();
@@ -5731,6 +5808,135 @@ function init() {
   updateFocusStrip();
 }
 
+
+// ─── 2026 Job Market Data ────────────────────────────────────────────────────
+
+const reality2026 = [
+  {
+    icon: "⚠️",
+    type: "warning",
+    title: "What is actually happening",
+    points: [
+      "Repetitive, predictable, entry-level tasks are being automated — not entire jobs, but the routine parts.",
+      "Roles most exposed: junior frontend/backend devs doing only basic tasks, data entry, basic content writing, document review, screening-only recruiters.",
+      "The pattern: if your job can be described as 'follow these instructions every day', AI can do a large portion of it.",
+      "This is not happening overnight. But the pressure is real and growing in 2025–2026.",
+    ],
+  },
+  {
+    icon: "📈",
+    type: "opportunity",
+    title: "The skills that will matter more",
+    points: [
+      "AI Engineering — building with LLMs, RAG, agents, and evaluation frameworks.",
+      "Automation — connecting systems, removing manual steps, building reliable pipelines.",
+      "System Design — understanding how parts fit together, not just writing individual functions.",
+      "Product Thinking — knowing who uses the thing you build and what value it creates.",
+      "Business Awareness — framing technical work in cost, risk, time, and revenue terms.",
+      "Multi-skill profile — combining data + engineering + AI + business in one person.",
+    ],
+  },
+  {
+    icon: "🎯",
+    type: "insight",
+    title: "The real insight",
+    points: [
+      "Being junior used to mean learning one tool and doing simple tasks. That is no longer enough.",
+      "Now, even junior people need to use AI to learn faster, review AI-generated output critically, improve it, and create real value.",
+      "AI can write code, but it still needs people who define the problem, design the solution, evaluate the output, and connect tools to real business decisions.",
+      "The future is harder for passive, single-skill workers — and much more promising for multi-skilled, AI-native, problem-oriented people.",
+    ],
+  },
+  {
+    icon: "🚀",
+    type: "action",
+    title: "How this internship positions you",
+    points: [
+      "Month 1–4: You build the boring fundamentals that AI tools actually need humans to understand — SQL, statistics, A/B testing, ML evaluation.",
+      "Month 5–8: You build full-stack production systems — not demos, real deployed apps with background jobs, CI/CD, and monitoring.",
+      "Month 9–12: You build AI agents, RAG systems, and end-to-end industrial AI — the exact emerging roles hiring in 2025–2026.",
+      "Throughout: every project is framed by business value. You will never just build code. You will always answer: what problem does this solve and what does it cost without it?",
+    ],
+  },
+];
+
+const emergingRoles2026 = [
+  {
+    title: "AI Engineer",
+    demand: 5,
+    badge: "Most in demand 2025–2026",
+    description: "Builds AI-powered applications using LLM APIs, RAG pipelines, agents, and evaluation frameworks.",
+    skills: ["LangChain / LangGraph", "RAG pipeline", "prompt engineering", "LLM API", "agent evaluation", "vector databases"],
+    roadmapPath: "Months 10–12 → Phase 9",
+    salary: "$95k–$160k (US)",
+    howToPosition: "Build a RAG system + AI agent in Months 11–12, deploy them publicly, and write clearly about what they do and how you measured quality.",
+  },
+  {
+    title: "Automation Engineer",
+    demand: 5,
+    badge: "Growing fast",
+    description: "Designs and builds automated workflows that replace repetitive manual processes. Uses Python, APIs, AI, and workflow tools to connect systems.",
+    skills: ["Python automation", "API integration", "Celery / Airflow", "LLM for structured extraction", "CI/CD"],
+    roadmapPath: "Months 4–6 — Celery, CI/CD, background tasks",
+    salary: "$85k–$140k",
+    howToPosition: "Build an end-to-end automation that replaces a real manual process. Show the before/after: time saved, error rate reduced, human steps removed.",
+  },
+  {
+    title: "AI Workflow Designer",
+    demand: 4,
+    badge: "New role — rising",
+    description: "Maps business processes, identifies automation opportunities, and designs AI-powered solutions. Combines business analysis with technical implementation.",
+    skills: ["Process mapping", "LLM integration", "business analysis", "prompt engineering", "stakeholder comms"],
+    roadmapPath: "Months 9–12 — capstone + agent system + IE background",
+    salary: "$80k–$130k",
+    howToPosition: "Your IE background is a superpower here. Document a real industrial process, build a prototype, and quantify the value in hours saved or errors prevented.",
+  },
+  {
+    title: "Data + AI Engineer",
+    demand: 5,
+    badge: "Most complete skillset",
+    description: "Combines data engineering (pipelines, SQL, cloud) with AI (ML models, LLMs, embeddings) to build production-grade data products.",
+    skills: ["SQL + Python", "dbt or Spark", "MLflow", "LLM APIs", "cloud (AWS/GCP)", "vector databases"],
+    roadmapPath: "Months 1–4 (data foundation) + Months 10–12 (AI layer) = full stack",
+    salary: "$100k–$165k",
+    howToPosition: "Show a project that has a real data pipeline AND an AI reasoning layer on top of it. That combination is rare and very in demand.",
+  },
+  {
+    title: "AI Product Engineer",
+    demand: 4,
+    badge: "High-leverage role",
+    description: "Builds AI products from idea to deployed MVP — combines engineering with product thinking, user understanding, and iteration.",
+    skills: ["Python / FastAPI / Django", "LLM API", "product thinking", "user stories", "metrics", "deployment"],
+    roadmapPath: "Months 5–6 (full-stack) + Months 10–12 (AI) = complete AI product builder",
+    salary: "$95k–$155k",
+    howToPosition: "Build a small AI product that solves a real problem. Write a 1-page product brief: the user, the problem, the solution, and how you measure success.",
+  },
+  {
+    title: "MLOps / AI Platform Engineer",
+    demand: 4,
+    badge: "Infrastructure for AI",
+    description: "Builds and maintains the infrastructure that ML models and AI systems run on. CI/CD, model registries, monitoring, and deployment automation.",
+    skills: ["Docker + Kubernetes", "MLflow", "CI/CD (GitHub Actions)", "Evidently AI", "cloud platforms"],
+    roadmapPath: "Months 3–4 (Docker, CI/CD) + Month 4 (cloud) + Month 12 (agent monitoring)",
+    salary: "$100k–$160k",
+    howToPosition: "Show your full CI/CD + Docker + monitoring stack running together. A working deployment pipeline with monitoring beats any certificate.",
+  },
+];
+
+function renderReality2026() {
+  const grid = document.getElementById("reality2026Grid");
+  if (!grid) return;
+  grid.innerHTML = reality2026.map(card => `
+<div class="r26-card r26-${card.type}">
+  <div class="r26-card-header">
+    <span class="r26-icon">${card.icon}</span>
+    <h3>${card.title}</h3>
+  </div>
+  <ul class="r26-points">
+    ${card.points.map(p => `<li>${p}</li>`).join("")}
+  </ul>
+</div>`).join("");
+}
 
 // ─── Career Hub Data ─────────────────────────────────────────────────────────
 
@@ -5928,6 +6134,7 @@ function renderCareerHub() {
     { id:"timeline",     label:"📅 When to Apply" },
     { id:"resume",       label:"📄 Resume Guide" },
     { id:"linkedin",     label:"🔗 LinkedIn & Network" },
+    { id:"emerging",     label:"🤖 Emerging Roles 2026" },
   ];
 
   tabsEl.innerHTML = tabs.map(t =>
@@ -5955,6 +6162,7 @@ function renderCareerTabContent(contentEl) {
     case "timeline":     contentEl.innerHTML = renderJobTimelineHTML();       break;
     case "resume":       contentEl.innerHTML = renderResumeGuideHTML();       break;
     case "linkedin":     contentEl.innerHTML = renderLinkedInGuideHTML();     bindApplyReady(contentEl);        break;
+    case "emerging":     contentEl.innerHTML = renderEmergingRolesHTML();     break;
   }
 }
 
@@ -6217,6 +6425,40 @@ function renderResumeGuideHTML() {
   <div class="resume-month-label">Month ${m.month}</div>
   <ul class="resume-add-list">${m.add.map(a=>`<li>${a}</li>`).join("")}</ul>
   <div class="resume-avoid-box">⚠️ ${m.avoid}</div>
+</div>`).join("")}
+  </div>
+</div>`;
+}
+
+// ── Emerging Roles 2026 ───────────────────────────────────────────────────────
+
+function renderEmergingRolesHTML() {
+  return `
+<div class="emerging-roles">
+  <div class="emerging-intro">
+    <p><strong>These roles are rising fast in 2025–2026.</strong> Your 12-month roadmap directly builds the skills for every one of them. Pick the ones that match your interests and use them as your job search target titles.</p>
+  </div>
+  <div class="emerging-grid">
+    ${emergingRoles2026.map(role => `
+<div class="emerging-card">
+  <div class="emerging-card-header">
+    <div>
+      <h3>${role.title}</h3>
+      <span class="emerging-badge">${role.badge}</span>
+    </div>
+    <div class="emerging-demand" title="Demand level">${"⭐".repeat(role.demand)}</div>
+  </div>
+  <p class="emerging-desc">${role.description}</p>
+  <div class="emerging-skills">
+    ${role.skills.map(s => `<span class="emerging-skill-tag">${s}</span>`).join("")}
+  </div>
+  <div class="emerging-meta">
+    <div class="emerging-meta-item"><strong>📍 Roadmap path:</strong> ${role.roadmapPath}</div>
+    <div class="emerging-meta-item"><strong>💰 Salary range:</strong> ${role.salary}</div>
+  </div>
+  <div class="emerging-position-box">
+    <strong>How to position yourself:</strong> ${role.howToPosition}
+  </div>
 </div>`).join("")}
   </div>
 </div>`;
