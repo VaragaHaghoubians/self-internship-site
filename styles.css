@@ -3406,6 +3406,47 @@ details p {
 }
 .gp-go-btn:hover { opacity: .85; }
 
+/* ── Resource checklist ── */
+.gp-resources { margin-top: 24px; border-top: 1.5px solid var(--line); padding-top: 18px; }
+.gp-res-heading {
+  font-size: 14px; margin: 0 0 6px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.gp-res-progress {
+  font-size: 11px; font-weight: 700; padding: 2px 9px;
+  background: color-mix(in srgb,var(--accent) 15%,transparent);
+  color: var(--accent); border-radius: 999px;
+}
+.gp-res-sub { font-size: 12px; color: var(--muted); margin: 0 0 12px; line-height: 1.5; }
+.gp-res-list { display: flex; flex-direction: column; gap: 6px; }
+
+.gp-res-row {
+  display: grid;
+  grid-template-columns: 18px 22px 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--line);
+  cursor: pointer;
+  background: var(--surface);
+  transition: border-color .12s, background .12s;
+}
+.gp-res-row:hover { border-color: var(--accent); }
+.gp-res-checked { background: color-mix(in srgb,var(--accent) 6%,var(--surface)); border-color: var(--accent); }
+.gp-res-opt-row { opacity: .8; }
+.gp-res-opt-row.gp-res-checked { opacity: 1; }
+.gp-res-row input[type="checkbox"] { margin-top: 2px; accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; }
+.gp-res-type { font-size: 15px; }
+.gp-res-body { display: flex; flex-direction: column; gap: 3px; }
+.gp-res-label { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; word-break: break-word; }
+.gp-res-label:hover { text-decoration: underline; }
+.gp-res-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; width: fit-content; }
+.gp-res-required { background: #fff3cd; color: #856404; }
+[data-theme="dark"] .gp-res-required { background: #3a2a00; color: #ffc107; }
+.gp-res-optional  { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+.gp-res-note { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
 .gp-note {
   font-size: 13px;
   color: var(--muted);
