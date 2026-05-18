@@ -4343,7 +4343,7 @@ print("Review complete. Make sure you can explain each concept without notes.")`
       {
         id: "llm-01",
         title: "Prompt anatomy & structured output",
-        mode: "text",
+        mode: "python",
         explain: "Every LLM call has three parts: a system prompt (behaviour rules), a user message (the question), and the model's response. Structured output forces the model to reply in a schema (JSON, Pydantic) you can parse reliably. This is the foundation of every production AI feature.",
         goals: ["Write a system prompt that constrains the model to a specific role and output format", "Write a user message for a classification task", "Define the JSON output schema the model should follow", "Add a temperature comment and explain what low temperature does"],
         starter: `# Prompt Engineering: anatomy of a production LLM call
@@ -4389,7 +4389,7 @@ print("Expected output category: shipping")`,
       {
         id: "llm-02",
         title: "Function calling / tool use",
-        mode: "text",
+        mode: "python",
         explain: "Function calling lets the LLM trigger real actions: query a database, call an API, run code. The model returns a JSON object you parse and execute — it does NOT call the function directly. This pattern is what turns a chatbot into an AI agent.",
         goals: ["Define a tool schema with name, description, and parameters", "Show how the model's response triggers the function call", "Write the handler that executes the tool and returns the result", "Explain why the model cannot call functions itself"],
         starter: `# LLM Function Calling / Tool Use pattern
@@ -4442,6 +4442,79 @@ print("Result sent back to LLM for final natural language answer.")`,
           ["Parses model response", /json\.loads|arguments/i],
           ["Prints tool result", /Tool result|tool_result/, "output"],
           ["Sends result back", /back to LLM|sent back/, "output"],
+        ],
+      },
+      {
+        id: "llm-03",
+        title: "Write a professional agent system prompt",
+        mode: "python",
+        explain: "Real production AI agents are controlled by a structured system prompt — a set of explicit rules the agent must always follow. This lesson teaches you to write one using the same pattern as professional agent frameworks: Modes, Scope, Safety, and Response Format. A vague system prompt causes unpredictable agents. A precise one produces reliable ones.",
+        goals: [
+          "Define at least 2 agent operating modes (e.g. Analysis Mode, Implementation Mode)",
+          "Write 3 scope rules: what the agent MUST do",
+          "Write 3 safety rules: what the agent must NEVER do",
+          "Specify the response format the agent must follow",
+          "Print the token count and a summary of what your prompt enforces",
+        ],
+        starter: `# Professional Agent System Prompt — write your own below.
+# Study the pattern: Modes → Scope → Safety → Response Format.
+# A good system prompt makes agent behaviour predictable and auditable.
+
+AGENT_SYSTEM_PROMPT = """
+You are a SQL data analyst assistant for a business intelligence team.
+
+MODES
+- Analysis Mode: when the user asks questions about data, only read and explain. Never modify data.
+- Query Mode: when the user asks to build a query, write SQL only. Do not execute it.
+
+SCOPE RULES
+1. Only write SELECT statements. Never write INSERT, UPDATE, DELETE, or DROP.
+2. Always include a brief comment above each query explaining what it does.
+3. If the question is ambiguous, ask one clarifying question before writing any SQL.
+
+SAFETY RULES
+1. Never expose column names that contain 'password', 'token', 'secret', or 'key'.
+2. Never write a query that touches more than 3 tables without explicit user confirmation.
+3. If asked to do anything outside your scope, respond: "That is outside my scope. I can help with read-only SQL analysis."
+
+RESPONSE FORMAT
+Always structure your response as:
+1. Mode: [Analysis Mode / Query Mode]
+2. Reasoning: one sentence explaining your approach.
+3. Output: the SQL query or explanation.
+4. Risks: any risks or assumptions the user should know.
+"""
+
+# Count rules and estimate tokens (1 token ≈ 4 characters for English)
+lines  = [l.strip() for l in AGENT_SYSTEM_PROMPT.strip().splitlines() if l.strip()]
+tokens = len(AGENT_SYSTEM_PROMPT) // 4
+
+scope_rules  = [l for l in lines if l[0].isdigit() and "SCOPE" not in l and "SAFETY" not in l and "FORMAT" not in l]
+safety_rules = [l for l in lines if l[0].isdigit() and any(kw in AGENT_SYSTEM_PROMPT[AGENT_SYSTEM_PROMPT.find(l)-50:AGENT_SYSTEM_PROMPT.find(l)] for kw in ["SAFETY"])]
+
+print(f"System prompt length : {len(AGENT_SYSTEM_PROMPT)} characters (~{tokens} tokens)")
+print(f"Lines in prompt      : {len(lines)}")
+print(f"Prompt enforces:")
+print("  - Explicit operating modes (agent knows WHEN to do what)")
+print("  - Scope rules (agent knows WHAT it can do)")
+print("  - Safety rules (agent knows what it must NEVER do)")
+print("  - Response format (agent output is predictable and parseable)")
+print()
+print("Key insight: A system prompt is not a description — it is a CONTRACT.")
+print("Every rule must be testable. If you cannot test a rule, remove it.")`,
+        expected: "System prompt defined with modes, scope rules, safety rules, and response format. Token count printed.",
+        tests: `assert len(AGENT_SYSTEM_PROMPT) > 200, "System prompt is too short — add real rules"
+assert "MODES" in AGENT_SYSTEM_PROMPT or "Mode" in AGENT_SYSTEM_PROMPT, "Define agent modes"
+assert "NEVER" in AGENT_SYSTEM_PROMPT or "never" in AGENT_SYSTEM_PROMPT, "Add safety rules with NEVER"
+assert "FORMAT" in AGENT_SYSTEM_PROMPT or "format" in AGENT_SYSTEM_PROMPT.lower(), "Specify response format"
+print("TESTS PASSED: professional system prompt structure complete")`,
+        checks: [
+          ["Defines AGENT_SYSTEM_PROMPT", /AGENT_SYSTEM_PROMPT\s*=/],
+          ["Includes operating modes", /MODES|Mode.*:/i],
+          ["Includes safety/never rules", /NEVER|never|SAFETY/],
+          ["Includes response format", /FORMAT|format|RESPONSE/i],
+          ["Prints token count", /token|character/i, "output"],
+          ["Prints insight about contracts", /CONTRACT|contract|testable/i, "output"],
         ],
       },
     ],
@@ -6112,8 +6185,9 @@ function bindSkillLessonLab() {
       const lesson = getSkillLesson();
       const inScratch = localStorage.getItem(`scratch-${lesson.id}`);
       if (!inScratch) {
-        editor.value = `-- ${lesson.title}\n-- Write this from memory. Goal: ${lesson.goals ? lesson.goals[0] : "complete the lesson"}\n\n`;
-        if (lesson.mode === "python") editor.value = `# ${lesson.title}\n# Write this from memory. Goal: ${lesson.goals ? lesson.goals[0] : "complete the lesson"}\n\n`;
+        // Use SQL comment prefix only for SQL lessons; Python or text lessons use #
+        const scratchPrefix = lesson.mode === "sql" ? "--" : "#";
+        editor.value = `${scratchPrefix} ${lesson.title}\n${scratchPrefix} Write this from memory. Goal: ${lesson.goals ? lesson.goals[0] : "complete the lesson"}\n\n`;
         localStorage.setItem(getSkillDraftKey(lesson.id), editor.value);
         localStorage.setItem(`scratch-${lesson.id}`, "1");
         skillScratchBtn.textContent = "📄 Show Starter Hint";
@@ -6425,14 +6499,16 @@ function submitCurrentLab() {
 async function ensurePyodide() {
   if (window.pyodide) return window.pyodide;
   if (!pyodideReady) {
-    document.getElementById("pythonStatus").textContent = "Python runner: loading Pyodide from CDN";
+    const statusEl = document.getElementById("pythonStatus");
+    if (statusEl) statusEl.textContent = "Python runner: loading Pyodide from CDN";
     pyodideReady = new Promise((resolve, reject) => {
       const script = document.createElement("script");
       script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
       script.onload = async () => {
         try {
           window.pyodide = await loadPyodide();
-          document.getElementById("pythonStatus").textContent = "Python runner: ready";
+          const statusEl2 = document.getElementById("pythonStatus");
+          if (statusEl2) statusEl2.textContent = "Python runner: ready";
           resolve(window.pyodide);
         } catch (error) {
           reject(error);
@@ -6808,10 +6884,12 @@ const monthGuide = [
       { type:"github",  label:"run-llama/llama_index",                url:"https://github.com/run-llama/llama_index",                required:false, note:"Optional — simpler RAG API. Good alternative if LangChain feels too complex." },
       { type:"github",  label:"anthropics/anthropic-sdk-python",      url:"https://github.com/anthropics/anthropic-sdk-python",      required:false, note:"Optional — Claude SDK as an alternative to OpenAI. Read /examples/ for structured outputs." },
       { type:"github",  label:"dair-ai/Prompt-Engineering-Guide",     url:"https://github.com/dair-ai/Prompt-Engineering-Guide",     required:true,  note:"The most comprehensive prompt engineering reference. Read the core techniques section before writing your first LLM call." },
+      { type:"github",  label:"f/awesome-chatgpt-prompts",            url:"https://github.com/f/awesome-chatgpt-prompts",            required:false, note:"Optional — curated collection of real system prompts. Study their structure before writing llm-03." },
+      { type:"paper",   label:"Constitutional AI — Bai et al. (2022)",url:"https://arxiv.org/abs/2212.08073",                        required:false, note:"Optional — how Anthropic trains Claude with rules. Understand how model-level safety and prompt-level rules differ." },
     ],
     steps: [
       { icon:"📖", label:"Read Month 8 overview",    detail:"Focus: RAG architecture, vector databases, LangChain agents, OpenAI API.", href:"#roadmap" },
-      { icon:"💬", label:"Prompt Engineering Labs",  detail:"llm-01: system/user/assistant anatomy + structured JSON output. llm-02: function calling / tool use schema.", href:"#skill-labs", track:"llm", lessonId:"llm-01", badge:"New" },
+      { icon:"💬", label:"Prompt Engineering Labs",  detail:"llm-01: system/user/assistant + structured JSON output (runnable). llm-02: function calling schema (runnable). llm-03: write a professional agent system prompt with modes, safety rules, and response format.", href:"#skill-labs", track:"llm", lessonId:"llm-01", badge:"New" },
       { icon:"🧠", label:"Deep Learning Labs",       detail:"dl-01: neural net forward pass from scratch. dl-02: gradient descent by hand. dl-03: PyTorch concepts review.", href:"#skill-labs", track:"dl", lessonId:"dl-01", badge:"New" },
       { icon:"🔍", label:"RAG & Agent Labs",         detail:"rag-01: build a retrieval-augmented QA system. agent-01: build a ReAct-style tool-calling agent.", href:"#skill-labs", track:"ai", lessonId:"rag-01" },
       { icon:"💻", label:"Build: AI Q&A Agent",      detail:"RAG system over your own documents, deployed as FastAPI, with evaluation metrics.", href:"#code-lab", labId:"month-08" },
