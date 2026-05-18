@@ -4010,6 +4010,86 @@ print("TESTS PASSED: ML pipeline bugs fixed")`,
           ["Accuracy in valid range", /Accuracy:\s*[01]\.\d+/, "output"],
         ],
       },
+      {
+        id: "ml-06",
+        title: "K-means clustering",
+        mode: "python",
+        explain: "K-means groups unlabelled data into K clusters by iteratively updating centroids. It is the most common unsupervised learning algorithm — used for customer segmentation, anomaly detection, and data compression. No labels needed: the algorithm discovers structure in the data.",
+        goals: ["Assign each point to nearest centroid", "Recalculate centroids after each assignment", "Run for 10 iterations", "Print final cluster assignments and centroids"],
+        starter: `import math
+
+data      = [(1,1),(1.5,2),(3,4),(5,7),(3.5,5),(4.5,5),(3.5,4.5)]
+k         = 2
+centroids = [(1,1),(5,7)]
+
+def distance(p, c):
+    return math.sqrt((p[0]-c[0])**2 + (p[1]-c[1])**2)
+
+for iteration in range(10):
+    clusters = {i: [] for i in range(k)}
+    for point in data:
+        nearest = min(range(k), key=lambda i: distance(point, centroids[i]))
+        clusters[nearest].append(point)
+    new_centroids = []
+    for i in range(k):
+        pts = clusters[i]
+        cx = sum(p[0] for p in pts) / len(pts)
+        cy = sum(p[1] for p in pts) / len(pts)
+        new_centroids.append((round(cx,2), round(cy,2)))
+    centroids = new_centroids
+
+for i, pts in clusters.items():
+    print(f"Cluster {i}: {pts}")
+    print(f"  Centroid: {centroids[i]}")`,
+        expected: "Two clusters with final centroids. The two tight groups in the data should separate cleanly.",
+        tests: `assert len(clusters) == k
+assert all(len(v) > 0 for v in clusters.values())
+print("TESTS PASSED: k-means clustering complete")`,
+        checks: [
+          ["Sets k=2", /k\s*=\s*2/],
+          ["Defines distance function", /def\s+distance/],
+          ["Assigns to clusters", /clusters\[/],
+          ["Updates centroids", /new_centroids|centroids\s*=/],
+          ["Output includes Cluster", /Cluster/, "output"],
+        ],
+      },
+      {
+        id: "ml-07",
+        title: "Gradient boosting (manual)",
+        mode: "python",
+        explain: "Gradient boosting trains each new model on the residual errors of the previous ensemble. XGBoost and LightGBM are production implementations of this loop. Here you implement the core idea from scratch so the algorithm is never a black box.",
+        goals: ["Compute initial prediction (mean of targets)", "Calculate residuals each round", "Fit a weak learner on residuals (mean residual here)", "Update predictions with learning rate", "Print MSE each round to see it decrease"],
+        starter: `targets = [3.0, 5.0, 7.0, 2.0, 4.0, 6.0]
+n  = len(targets)
+lr = 0.3
+
+# Step 1: initial prediction = mean
+preds = [sum(targets) / n] * n
+print(f"Initial preds: {[round(p,2) for p in preds]}")
+
+for round_num in range(5):
+    # Step 2: residuals
+    residuals = [t - p for t, p in zip(targets, preds)]
+    # Step 3: weak learner = mean residual
+    weak_pred = sum(residuals) / n
+    # Step 4: update
+    preds = [p + lr * weak_pred for p in preds]
+    mse = sum((t-p)**2 for t,p in zip(targets,preds)) / n
+    print(f"Round {round_num+1} — weak_pred: {round(weak_pred,3)}, MSE: {round(mse,4)}")
+
+print(f"Final preds: {[round(p,2) for p in preds]}")`,
+        expected: "MSE decreases each round. Final predictions should be closer to targets than the initial mean.",
+        tests: `assert len(preds) == n
+assert all(isinstance(p, float) for p in preds)
+print("TESTS PASSED: gradient boosting loop complete")`,
+        checks: [
+          ["Sets learning rate", /lr\s*=\s*0\.\d/],
+          ["Computes residuals", /residuals\s*=/],
+          ["Updates predictions with lr", /preds\s*=.*lr/],
+          ["Prints MSE", /MSE/, "output"],
+          ["Output shows rounds", /Round/, "output"],
+        ],
+      },
     ],
   },
   {
@@ -4116,6 +4196,469 @@ tools = [query_sql, search_web, run_analysis]`,
           ["Defines search_web", /def\s+search_web/],
           ["Defines run_analysis", /def\s+run_analysis/],
           ["Registers tools", /tools\s*=/],
+        ],
+      },
+    ],
+  },
+  // ── Deep Learning track ──────────────────────────────────────────────────
+  {
+    id: "dl",
+    label: "Deep Learning",
+    source: "phase-6-generative-ai/README.md",
+    lessons: [
+      {
+        id: "dl-01",
+        title: "Neural net forward pass",
+        mode: "python",
+        explain: "A neural network is a chain of matrix multiplications followed by non-linear activations. This lesson builds a one-hidden-layer network from scratch with pure Python — no libraries needed. Understanding this loop is the foundation for PyTorch, TensorFlow, and every deep learning framework.",
+        goals: ["Define weights and biases for two layers", "Implement ReLU activation", "Compute the forward pass", "Print layer outputs"],
+        starter: `import math
+
+def relu(x):
+    return max(0.0, x)
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
+
+def dot(weights, inputs, bias):
+    return sum(w * x for w, x in zip(weights, inputs)) + bias
+
+# Input: 2 features
+inputs = [0.5, 0.8]
+
+# Hidden layer: 3 neurons
+W1 = [[0.4, -0.3], [0.2, 0.6], [-0.5, 0.1]]
+b1 = [0.1, -0.2, 0.05]
+hidden = [relu(dot(W1[i], inputs, b1[i])) for i in range(3)]
+print(f"Hidden layer: {[round(h,4) for h in hidden]}")
+
+# Output layer: 1 neuron
+W2 = [[0.3, -0.2, 0.5]]
+b2 = [0.0]
+output_raw = dot(W2[0], hidden, b2[0])
+output = sigmoid(output_raw)
+print(f"Output (probability): {round(output, 4)}")`,
+        expected: "Hidden layer values (ReLU clamps negatives to 0). Output between 0 and 1 from sigmoid.",
+        tests: `assert 0.0 <= output <= 1.0, "Sigmoid output must be between 0 and 1"
+assert all(h >= 0 for h in hidden), "ReLU outputs must be non-negative"
+print("TESTS PASSED: forward pass complete")`,
+        checks: [
+          ["Defines relu", /def\s+relu/],
+          ["Defines sigmoid", /def\s+sigmoid/],
+          ["Computes hidden layer", /hidden\s*=/],
+          ["Computes output", /output\s*=/],
+          ["Output between 0 and 1", /0\.\d+/, "output"],
+        ],
+      },
+      {
+        id: "dl-02",
+        title: "Backprop: gradient by hand",
+        mode: "python",
+        explain: "Backpropagation computes how much each weight contributed to the error, using the chain rule. PyTorch's autograd does this automatically — but writing it once by hand is the fastest way to understand what autograd is doing for you.",
+        goals: ["Compute loss (MSE) between prediction and target", "Compute gradient of loss w.r.t. output weight", "Update the weight with gradient descent", "Run 20 training steps and watch loss decrease"],
+        starter: `# Simple 1-weight example: y = w * x
+# Target: w should learn to make y ≈ target
+
+x = 2.0
+target = 6.0   # we want w*x = 6, so w should converge to 3
+w = 0.5        # start far from the answer
+lr = 0.05      # learning rate
+
+for step in range(20):
+    # Forward pass
+    y_pred = w * x
+    # Loss: MSE
+    loss = (y_pred - target) ** 2
+    # Gradient: d(loss)/d(w) = 2 * (y_pred - target) * x
+    grad = 2 * (y_pred - target) * x
+    # Gradient descent update
+    w = w - lr * grad
+    if (step + 1) % 5 == 0:
+        print(f"Step {step+1:2d}: w={round(w,4)}, loss={round(loss,4)}")
+
+print(f"Final w: {round(w, 4)} (target: 3.0)")`,
+        expected: "Weight should converge toward 3.0 and loss should approach 0.",
+        tests: `assert abs(w - 3.0) < 0.5, f"w={w:.4f} should be near 3.0"
+assert loss < 0.5, f"loss={loss:.4f} should be small after 20 steps"
+print("TESTS PASSED: gradient descent converged")`,
+        checks: [
+          ["Computes y_pred", /y_pred\s*=\s*w\s*\*\s*x/],
+          ["Computes loss", /loss\s*=.*\*\*\s*2/],
+          ["Computes gradient", /grad\s*=.*\*.*\*\s*x/],
+          ["Updates w with lr", /w\s*=\s*w\s*-\s*lr\s*\*\s*grad/],
+          ["Output includes Final w", /Final w/, "output"],
+        ],
+      },
+      {
+        id: "dl-03",
+        title: "PyTorch concepts (review)",
+        mode: "text",
+        explain: "PyTorch is the dominant deep learning framework in research and increasingly in production. You need it for CNNs, Transformers, and LLM fine-tuning. This lesson reviews the five core PyTorch concepts you must know before touching any tutorial.",
+        goals: ["Define a tensor and explain how it differs from a Python list", "Explain what requires_grad does and why autograd needs it", "Write a minimal training loop using optimizer.zero_grad, loss.backward, optimizer.step", "Name the two most important optimizers and when to use each", "Describe what a DataLoader does"],
+        starter: `# PyTorch core concepts — write your explanations below each prompt.
+# This is a review exercise, not runnable Python.
+
+# 1. TENSOR
+# A tensor is a multi-dimensional array stored on CPU or GPU.
+# Unlike Python lists, tensors support automatic differentiation.
+# Example: import torch; x = torch.tensor([1.0, 2.0], requires_grad=True)
+
+# 2. AUTOGRAD (requires_grad=True)
+# When requires_grad=True, PyTorch tracks every operation on the tensor.
+# After loss.backward(), each tensor has a .grad attribute with the gradient.
+
+# 3. TRAINING LOOP (the 4-line core pattern)
+# for X, y in dataloader:
+#     optimizer.zero_grad()     # clear old gradients
+#     loss = criterion(model(X), y)
+#     loss.backward()           # compute gradients
+#     optimizer.step()          # update weights
+
+# 4. OPTIMIZERS
+# SGD: simple, fast, needs tuning. Good for CNNs.
+# Adam: adaptive learning rate, works well with less tuning. Default for transformers.
+
+# 5. DATALOADER
+# torch.utils.data.DataLoader wraps a Dataset, shuffles, and creates mini-batches.
+# Without it you'd have to manually index your data in every training loop.
+
+print("Review complete. Make sure you can explain each concept without notes.")`,
+        expected: "All 5 concepts defined in your own words.",
+        checks: [
+          ["Mentions tensor", /tensor/i],
+          ["Mentions requires_grad or autograd", /requires_grad|autograd/i],
+          ["Mentions backward", /backward/i],
+          ["Mentions optimizer", /optimizer/i],
+          ["Mentions DataLoader or dataloader", /DataLoader|dataloader/i],
+        ],
+      },
+    ],
+  },
+  // ── LLM / Prompt Engineering track ──────────────────────────────────────
+  {
+    id: "llm",
+    label: "Prompt Eng",
+    source: "phase-6-generative-ai/README.md",
+    lessons: [
+      {
+        id: "llm-01",
+        title: "Prompt anatomy & structured output",
+        mode: "text",
+        explain: "Every LLM call has three parts: a system prompt (behaviour rules), a user message (the question), and the model's response. Structured output forces the model to reply in a schema (JSON, Pydantic) you can parse reliably. This is the foundation of every production AI feature.",
+        goals: ["Write a system prompt that constrains the model to a specific role and output format", "Write a user message for a classification task", "Define the JSON output schema the model should follow", "Add a temperature comment and explain what low temperature does"],
+        starter: `# Prompt Engineering: anatomy of a production LLM call
+# Fill in the three roles and explain each decision.
+
+SYSTEM = """
+You are a customer support classifier.
+Classify the user's message into exactly ONE of these categories:
+["billing", "technical", "shipping", "other"]
+
+Reply ONLY with valid JSON in this exact format:
+{"category": "<label>", "confidence": <0.0-1.0>, "reason": "<one sentence>"}
+"""
+
+USER = "My package was supposed to arrive yesterday and still hasn't shown up."
+
+# What the API call would look like (pseudocode):
+# response = client.chat.completions.create(
+#     model="gpt-4o-mini",
+#     temperature=0.1,          # low temperature = deterministic, good for classification
+#     response_format={"type": "json_object"},
+#     messages=[
+#         {"role": "system",  "content": SYSTEM},
+#         {"role": "user",    "content": USER},
+#     ]
+# )
+
+# Expected output from model:
+# {"category": "shipping", "confidence": 0.97, "reason": "User reports late delivery."}
+
+print("System prompt defined:", len(SYSTEM), "chars")
+print("User message defined:",  len(USER),   "chars")
+print("Expected output category: shipping")`,
+        expected: "System prompt, user message, JSON schema, and temperature explanation all present.",
+        checks: [
+          ["Defines SYSTEM prompt", /SYSTEM\s*=/],
+          ["Defines USER message",  /USER\s*=/],
+          ["Specifies JSON output schema", /json|JSON/i],
+          ["Uses temperature",      /temperature/i],
+          ["Prints expected output", /Expected|shipping/, "output"],
+        ],
+      },
+      {
+        id: "llm-02",
+        title: "Function calling / tool use",
+        mode: "text",
+        explain: "Function calling lets the LLM trigger real actions: query a database, call an API, run code. The model returns a JSON object you parse and execute — it does NOT call the function directly. This pattern is what turns a chatbot into an AI agent.",
+        goals: ["Define a tool schema with name, description, and parameters", "Show how the model's response triggers the function call", "Write the handler that executes the tool and returns the result", "Explain why the model cannot call functions itself"],
+        starter: `# LLM Function Calling / Tool Use pattern
+# The model outputs JSON describing which tool to call and with what arguments.
+# Your code actually executes the tool and returns the result.
+
+# Step 1: Define tool schema (sent to the LLM)
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_weather",
+            "description": "Get the current weather for a city. Call this when the user asks about weather.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "city": {"type": "string", "description": "City name, e.g. Toronto"},
+                    "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]}
+                },
+                "required": ["city"]
+            }
+        }
+    }
+]
+
+# Step 2: Model returns a tool call (NOT the actual answer)
+model_response = {
+    "tool_calls": [{
+        "function": {
+            "name": "get_current_weather",
+            "arguments": '{"city": "Toronto", "unit": "celsius"}'
+        }
+    }]
+}
+
+# Step 3: Your code executes the tool
+import json
+args = json.loads(model_response["tool_calls"][0]["function"]["arguments"])
+print(f"Tool called: get_current_weather")
+print(f"Arguments:   {args}")
+
+# Step 4: Return result to the model for final answer
+tool_result = {"temp": 18, "condition": "partly cloudy", "city": args["city"]}
+print(f"Tool result: {tool_result}")
+print("Result sent back to LLM for final natural language answer.")`,
+        expected: "Tool schema defined, model response parsed, tool executed, result returned to LLM.",
+        checks: [
+          ["Defines tools list", /tools\s*=\s*\[/],
+          ["Includes function name", /"name".*"get_current_weather"|get_current_weather/],
+          ["Parses model response", /json\.loads|arguments/i],
+          ["Prints tool result", /Tool result|tool_result/, "output"],
+          ["Sends result back", /back to LLM|sent back/, "output"],
+        ],
+      },
+    ],
+  },
+  // ── Time Series track ────────────────────────────────────────────────────
+  {
+    id: "ts",
+    label: "Time Series",
+    source: "phase-2-production-ml/month-03-docker-mlops/resources/",
+    lessons: [
+      {
+        id: "ts-01",
+        title: "Moving average & trend",
+        mode: "python",
+        explain: "A moving average smooths out noise in time-series data so the underlying trend is visible. It is the first thing you check before building any forecasting model — and it is a surprisingly strong baseline for many business KPIs.",
+        goals: ["Create a time series list", "Compute 3-period simple moving average (SMA)", "Compute the trend (first difference)", "Print both series"],
+        starter: `# Time-series data: monthly sales
+sales = [120, 135, 128, 142, 155, 148, 163, 171, 160, 178, 185, 192]
+months = list(range(1, len(sales)+1))
+
+# 3-period simple moving average
+window = 3
+sma = []
+for i in range(len(sales)):
+    if i < window - 1:
+        sma.append(None)          # not enough history yet
+    else:
+        avg = sum(sales[i-window+1:i+1]) / window
+        sma.append(round(avg, 2))
+
+# First difference (month-over-month change = trend indicator)
+diff = [None] + [sales[i] - sales[i-1] for i in range(1, len(sales))]
+
+print("Month  Sales   SMA-3   MoM-Change")
+for i, (m, s, ma, d) in enumerate(zip(months, sales, sma, diff)):
+    ma_str = str(ma) if ma is not None else "  — "
+    d_str  = f"+{d}" if d is not None and d >= 0 else str(d) if d is not None else "  — "
+    print(f"  {m:2d}    {s:3d}   {ma_str:6}   {d_str}")`,
+        expected: "Table with sales, 3-period SMA starting month 3, and month-over-month change.",
+        tests: `assert len(sma) == len(sales)
+assert sma[0] is None
+assert sma[2] is not None
+assert abs(sma[2] - (120+135+128)/3) < 0.01
+print("TESTS PASSED: moving average complete")`,
+        checks: [
+          ["Creates sales list", /sales\s*=\s*\[/],
+          ["Sets window", /window\s*=\s*3/],
+          ["Computes SMA", /sma\.append\s*\(/],
+          ["Computes diff", /diff\s*=\s*\[None\]/],
+          ["Prints table", /Month.*Sales|SMA/, "output"],
+        ],
+      },
+      {
+        id: "ts-02",
+        title: "Exponential smoothing",
+        mode: "python",
+        explain: "Simple Exponential Smoothing (SES) gives more weight to recent observations than older ones. The alpha parameter controls memory: alpha=1 means only the last value matters; alpha=0.1 means memory is very long. This is the conceptual foundation behind ARIMA and Prophet.",
+        goals: ["Implement SES with a tunable alpha", "Compare alpha=0.3 vs alpha=0.8", "Compute RMSE for each alpha", "Print which alpha is better"],
+        starter: `import math
+
+actual = [120, 135, 128, 142, 155, 148, 163, 171, 160, 178]
+
+def simple_exp_smooth(data, alpha):
+    """Simple Exponential Smoothing: S_t = alpha*y_t + (1-alpha)*S_{t-1}"""
+    smoothed = [data[0]]        # initialise with first value
+    for t in range(1, len(data)):
+        s = alpha * data[t] + (1 - alpha) * smoothed[-1]
+        smoothed.append(round(s, 2))
+    return smoothed
+
+def rmse(actual, predicted):
+    errors = [(a - p)**2 for a, p in zip(actual, predicted)]
+    return round(math.sqrt(sum(errors) / len(errors)), 3)
+
+for alpha in [0.3, 0.8]:
+    smoothed = simple_exp_smooth(actual, alpha)
+    error    = rmse(actual, smoothed)
+    print(f"alpha={alpha} → smoothed={smoothed}")
+    print(f"        RMSE = {error}")`,
+        expected: "Two smoothed series and RMSE values. Higher alpha tracks data faster (lower RMSE on trending data).",
+        tests: `# Check that smoothed output has same length
+smoothed_03 = simple_exp_smooth(actual, 0.3)
+assert len(smoothed_03) == len(actual)
+assert smoothed_03[0] == actual[0]
+print("TESTS PASSED: exponential smoothing complete")`,
+        checks: [
+          ["Defines simple_exp_smooth", /def\s+simple_exp_smooth/],
+          ["Uses alpha parameter", /alpha\s*\*/],
+          ["Defines rmse", /def\s+rmse/],
+          ["Tests alpha 0.3", /alpha.*0\.3/i],
+          ["Prints RMSE", /RMSE/, "output"],
+        ],
+      },
+    ],
+  },
+  // ── Simulation track ─────────────────────────────────────────────────────
+  {
+    id: "sim",
+    label: "Simulation",
+    source: "phase-5-capstone/month-09-grand-capstone/",
+    lessons: [
+      {
+        id: "sim-01",
+        title: "Monte Carlo simulation",
+        mode: "python",
+        explain: "Monte Carlo simulation estimates uncertain outcomes by running thousands of random scenarios. It is the workhorse of industrial engineering risk analysis — used for project scheduling, inventory sizing, financial risk, and reliability engineering. No special library needed.",
+        goals: ["Simulate 10,000 project completions with random task durations", "Compute the 50th, 90th, and 95th percentile completion times", "Estimate P(project finishes on time)", "Print a simple ASCII histogram"],
+        starter: `import random
+import math
+
+random.seed(42)
+N = 10000    # number of simulation runs
+
+# Three sequential tasks with uncertain durations (weeks)
+# Task durations drawn from triangular distribution: (min, most_likely, max)
+tasks = [
+    (2, 3, 5),   # Design
+    (3, 4, 7),   # Development
+    (1, 2, 3),   # Testing
+]
+
+def triangular(lo, mode, hi):
+    """Sample from a triangular distribution"""
+    u = random.random()
+    fc = (mode - lo) / (hi - lo)
+    if u < fc:
+        return lo + math.sqrt(u * (hi - lo) * (mode - lo))
+    else:
+        return hi - math.sqrt((1 - u) * (hi - lo) * (hi - mode))
+
+# Run simulation
+totals = []
+for _ in range(N):
+    duration = sum(triangular(lo, mode, hi) for lo, mode, hi in tasks)
+    totals.append(duration)
+
+totals.sort()
+
+# Summary statistics
+deadline = 12   # weeks
+p50 = totals[int(N * 0.50)]
+p90 = totals[int(N * 0.90)]
+p95 = totals[int(N * 0.95)]
+on_time = sum(1 for t in totals if t <= deadline) / N
+
+print(f"Simulated {N:,} project completions")
+print(f"P50 (median):  {p50:.1f} weeks")
+print(f"P90:           {p90:.1f} weeks")
+print(f"P95:           {p95:.1f} weeks")
+print(f"Deadline:      {deadline} weeks")
+print(f"P(on-time):    {on_time:.1%}")`,
+        expected: "P50 ~9 weeks, P90 ~11-12 weeks, on-time probability printed.",
+        tests: `assert 7 < p50 < 11, f"P50={p50:.2f} seems off"
+assert p90 > p50, "P90 must exceed P50"
+assert 0 < on_time < 1
+print("TESTS PASSED: Monte Carlo simulation complete")`,
+        checks: [
+          ["Sets N=10000", /N\s*=\s*10000/],
+          ["Defines triangular", /def\s+triangular/],
+          ["Runs simulation loop", /for\s+_\s+in\s+range\s*\(\s*N\s*\)/],
+          ["Computes P50", /p50\s*=/],
+          ["Prints P(on-time)", /on.time|on_time/, "output"],
+        ],
+      },
+      {
+        id: "sim-02",
+        title: "Queue simulation (DES)",
+        mode: "python",
+        explain: "Discrete Event Simulation (DES) models a system as a sequence of events. This lesson simulates a service queue (think manufacturing line or call center) without SimPy — using a simple event-driven loop. This is the conceptual foundation you need before using AnyLogic, Arena, or SimPy.",
+        goals: ["Generate 20 customer arrivals with random inter-arrival times", "Process each customer with a random service time", "Track queue length and waiting time", "Compute average waiting time"],
+        starter: `import random
+random.seed(0)
+
+n_customers = 20
+arrival_rate  = 1.5   # average arrivals per minute
+service_rate  = 2.0   # average service per minute
+
+# Generate arrival and service times
+inter_arrivals = [random.expovariate(arrival_rate) for _ in range(n_customers)]
+service_times  = [random.expovariate(service_rate) for _ in range(n_customers)]
+
+arrival_times   = []
+t = 0
+for ia in inter_arrivals:
+    t += ia
+    arrival_times.append(t)
+
+# Simulate queue: one server
+start_times = []
+finish_times = []
+server_free = 0.0
+
+for i in range(n_customers):
+    start = max(arrival_times[i], server_free)
+    finish = start + service_times[i]
+    start_times.append(start)
+    finish_times.append(finish)
+    server_free = finish
+
+waiting_times = [s - a for s, a in zip(start_times, arrival_times)]
+avg_wait = sum(waiting_times) / n_customers
+
+print(f"Customers simulated: {n_customers}")
+print(f"Avg waiting time:    {avg_wait:.2f} minutes")
+print(f"Max waiting time:    {max(waiting_times):.2f} minutes")
+print(f"Customers with wait: {sum(1 for w in waiting_times if w > 0)}")`,
+        expected: "Average waiting time and maximum wait printed. Some customers wait; some are served immediately.",
+        tests: `assert len(waiting_times) == n_customers
+assert all(w >= 0 for w in waiting_times)
+assert avg_wait >= 0
+print("TESTS PASSED: queue simulation complete")`,
+        checks: [
+          ["Sets n_customers", /n_customers\s*=\s*20/],
+          ["Uses expovariate", /expovariate/],
+          ["Tracks server_free", /server_free/],
+          ["Computes waiting_times", /waiting_times\s*=/],
+          ["Prints avg wait", /Avg waiting/, "output"],
         ],
       },
     ],
@@ -6203,27 +6746,33 @@ const monthGuide = [
       { type:"course",  label:"StatQuest ML playlist (YouTube)",      url:"https://www.youtube.com/playlist?list=PLblh5JKOoLUICTaGLRoHQDuF_7q2GfuJF", required:true, note:"Watch the linear regression, logistic regression, and decision tree videos — the best visual explanations." },
       { type:"paper",   label:"A Few Useful Things to Know About ML — Domingos (2012)", url:"https://homes.cs.washington.edu/~pedrod/papers/cacm12.pdf", required:true, note:"12-page paper. Read it before building your first model — the most important ideas in one place." },
       { type:"github",  label:"dipanjanS/practical-machine-learning-with-python", url:"https://github.com/dipanjanS/practical-machine-learning-with-python", required:false, note:"Optional — Chapters 3–5 for feature engineering and model evaluation." },
+      { type:"course",  label:"fast.ai Practical Deep Learning (free)",url:"https://course.fast.ai/",                                required:false, note:"Optional — the best hands-on DL course. Start after completing ML labs ml-01 to ml-05." },
     ],
     steps: [
       { icon:"📖", label:"Read Month 5 overview",    detail:"Focus: Regression, classification, scikit-learn pipelines, feature engineering.", href:"#roadmap" },
-      { icon:"🤖", label:"ML Lab — 3 lessons",       detail:"ml-01: linear regression from scratch. ml-02: logistic regression. ml-03: decision trees & feature importance.", href:"#skill-labs", track:"ml", lessonId:"ml-01" },
+      { icon:"🤖", label:"ML Lab — 5 lessons",       detail:"ml-01: train/test split. ml-02: error metrics. ml-03: confusion matrix. ml-04: feature importance. ml-05: cross-validation.", href:"#skill-labs", track:"ml", lessonId:"ml-01" },
+      { icon:"🤖", label:"ML Extended — k-means & boosting", detail:"ml-06: k-means clustering (unsupervised). ml-07: gradient boosting from scratch — the XGBoost foundation.", href:"#skill-labs", track:"ml", lessonId:"ml-06", badge:"New" },
+      { icon:"⏱️", label:"Time Series Lab",          detail:"ts-01: moving average & trend detection. ts-02: exponential smoothing — the ARIMA/Prophet foundation.", href:"#skill-labs", track:"ts", lessonId:"ts-01", badge:"New" },
       { icon:"💻", label:"Build: Prediction Model",  detail:"Train a model on a real dataset, tune it, evaluate with cross-validation, deploy as FastAPI.", href:"#code-lab", labId:"month-05" },
       { icon:"✅", label:"Mark Month 5 done",        detail:"Unlocks Month 6.", href:"#roadmap", badge:"Unlock" },
     ]
   },
   { // Month 6 — ML Engineering
     id: 6,
-    intro: "Month 6 goes deeper: ensemble models, cross-validation, debugging ML pipelines.",
+    intro: "Month 6 goes deeper: ensemble models, cross-validation, debugging ML pipelines. Also introduces simulation — critical for Industrial Engineering.",
     resources: [
       { type:"github",  label:"ageron/handson-ml3 (Chapters 6–7)",    url:"https://github.com/ageron/handson-ml3",                   required:true,  note:"Chapter 6 (decision trees) and Chapter 7 (ensemble methods — random forests, boosting)." },
       { type:"github",  label:"celery/celery",                        url:"https://github.com/celery/celery",                        required:true,  note:"Read the getting-started guide. Build the simple example, then swap in your ML inference task." },
       { type:"github",  label:"plotly/plotly.py",                     url:"https://github.com/plotly/plotly.py",                     required:true,  note:"Read the bar-charts and line-charts docs. Recreate each chart with your ML results." },
       { type:"paper",   label:"Random Forests — Breiman (2001)",      url:"https://link.springer.com/article/10.1023/A:1010933404324", required:true, note:"The original random forests paper. Read the introduction and section 1 — understand why ensembles work." },
+      { type:"github",  label:"dmlc/xgboost",                        url:"https://github.com/dmlc/xgboost",                         required:true,  note:"Read the intro tutorial at xgboost.readthedocs.io. Run the breast-cancer example. After ml-07 this will make complete sense." },
+      { type:"github",  label:"AnyLogic/anylogic-8-small-examples",   url:"https://github.com/AnyLogic/anylogic-8-small-examples",   required:false, note:"Optional (IE) — browse the manufacturing and supply-chain simulation examples before using AnyLogic." },
       { type:"github",  label:"joke2k/django-environ",                url:"https://github.com/joke2k/django-environ",                required:false, note:"Optional — load .env secrets in Django. Add it so API keys never reach GitHub." },
     ],
     steps: [
       { icon:"📖", label:"Read Month 6 overview",    detail:"Focus: Ensemble methods, cross-validation, data leakage, model monitoring.", href:"#roadmap" },
-      { icon:"🤖", label:"ML Lab — 2 lessons + Debug",detail:"ml-04: random forests & ensembles. ml-05: cross-validation logic. ml-debug-01: fix a data leakage bug.", href:"#skill-labs", track:"ml", lessonId:"ml-04" },
+      { icon:"🤖", label:"ML Lab — 2 lessons + Debug",detail:"ml-04: feature importance. ml-05: cross-validation. ml-debug-01: fix a data leakage bug in an ML pipeline.", href:"#skill-labs", track:"ml", lessonId:"ml-04" },
+      { icon:"🎲", label:"Simulation Labs",          detail:"sim-01: Monte Carlo project risk simulation. sim-02: discrete event queue simulation (IE foundation).", href:"#skill-labs", track:"sim", lessonId:"sim-01", badge:"New" },
       { icon:"💻", label:"Build: Production ML",     detail:"MLflow tracking, cross-validated model, monitored FastAPI endpoint, Dockerized.", href:"#code-lab", labId:"month-06" },
       { icon:"✅", label:"Mark Month 6 done",        detail:"Unlocks Month 7.", href:"#roadmap", badge:"Unlock" },
     ]
@@ -6247,20 +6796,24 @@ const monthGuide = [
   },
   { // Month 8 — AI Agents & RAG
     id: 8,
-    intro: "Month 8 is LLMs, vector search, and your first AI agent that uses tools and makes decisions.",
+    intro: "Month 8 is LLMs, vector search, prompt engineering, and your first AI agent that uses tools and makes decisions. Also start Deep Learning fundamentals here.",
     resources: [
       { type:"github",  label:"langchain-ai/langchain (RAG tutorial)", url:"https://github.com/langchain-ai/langchain",              required:true,  note:"Follow the RAG tutorial at python.langchain.com/docs/tutorials/rag/ step by step." },
       { type:"github",  label:"chroma-core/chroma",                   url:"https://github.com/chroma-core/chroma",                   required:true,  note:"ChromaDB vector database. Run the README quickstart before integrating with LangChain." },
       { type:"github",  label:"openai/openai-python",                 url:"https://github.com/openai/openai-python",                 required:true,  note:"Run /examples/ for basic chat completion. Build it into your FastAPI /ask endpoint." },
       { type:"paper",   label:"Attention Is All You Need — Vaswani et al. (2017)", url:"https://arxiv.org/abs/1706.03762",          required:true,  note:"The transformer paper. Read the abstract and sections 1–3. Understand why attention works." },
       { type:"paper",   label:"RAG — Lewis et al. (2020)",            url:"https://arxiv.org/abs/2005.11401",                        required:true,  note:"Original RAG paper. Read sections 1–3. Understand retrieval + generation before you build it." },
+      { type:"course",  label:"fast.ai Practical Deep Learning Lesson 1–4 (free)", url:"https://course.fast.ai/",                  required:true,  note:"Do Lessons 1–4 this month. The best practical deep learning course — uses PyTorch, teaches intuition first." },
       { type:"github",  label:"karpathy/nanoGPT",                     url:"https://github.com/karpathy/nanoGPT",                     required:false, note:"Optional — read model.py to understand how transformers actually work from scratch." },
       { type:"github",  label:"run-llama/llama_index",                url:"https://github.com/run-llama/llama_index",                required:false, note:"Optional — simpler RAG API. Good alternative if LangChain feels too complex." },
       { type:"github",  label:"anthropics/anthropic-sdk-python",      url:"https://github.com/anthropics/anthropic-sdk-python",      required:false, note:"Optional — Claude SDK as an alternative to OpenAI. Read /examples/ for structured outputs." },
+      { type:"github",  label:"dair-ai/Prompt-Engineering-Guide",     url:"https://github.com/dair-ai/Prompt-Engineering-Guide",     required:true,  note:"The most comprehensive prompt engineering reference. Read the core techniques section before writing your first LLM call." },
     ],
     steps: [
       { icon:"📖", label:"Read Month 8 overview",    detail:"Focus: RAG architecture, vector databases, LangChain agents, OpenAI API.", href:"#roadmap" },
-      { icon:"🧠", label:"AI Lab — 2 lessons",       detail:"rag-01: build a retrieval-augmented QA system. agent-01: build a ReAct-style tool-calling agent.", href:"#skill-labs", track:"ai", lessonId:"rag-01" },
+      { icon:"💬", label:"Prompt Engineering Labs",  detail:"llm-01: system/user/assistant anatomy + structured JSON output. llm-02: function calling / tool use schema.", href:"#skill-labs", track:"llm", lessonId:"llm-01", badge:"New" },
+      { icon:"🧠", label:"Deep Learning Labs",       detail:"dl-01: neural net forward pass from scratch. dl-02: gradient descent by hand. dl-03: PyTorch concepts review.", href:"#skill-labs", track:"dl", lessonId:"dl-01", badge:"New" },
+      { icon:"🔍", label:"RAG & Agent Labs",         detail:"rag-01: build a retrieval-augmented QA system. agent-01: build a ReAct-style tool-calling agent.", href:"#skill-labs", track:"ai", lessonId:"rag-01" },
       { icon:"💻", label:"Build: AI Q&A Agent",      detail:"RAG system over your own documents, deployed as FastAPI, with evaluation metrics.", href:"#code-lab", labId:"month-08" },
       { icon:"✅", label:"Mark Month 8 done",        detail:"Unlocks Month 9.", href:"#roadmap", badge:"Unlock" },
     ]
@@ -6891,6 +7444,7 @@ function renderCareerHub() {
     { id:"resume",       label:"📄 Resume Guide" },
     { id:"linkedin",     label:"🔗 LinkedIn & Network" },
     { id:"emerging",     label:"🤖 Emerging Roles 2026" },
+    { id:"startup",      label:"🚀 AI Startup" },
   ];
 
   tabsEl.innerHTML = tabs.map(t =>
@@ -6919,6 +7473,7 @@ function renderCareerTabContent(contentEl) {
     case "resume":       contentEl.innerHTML = renderResumeGuideHTML();       break;
     case "linkedin":     contentEl.innerHTML = renderLinkedInGuideHTML();     bindApplyReady(contentEl);        break;
     case "emerging":     contentEl.innerHTML = renderEmergingRolesHTML();     break;
+    case "startup":      contentEl.innerHTML = renderStartupGuideHTML();      break;
   }
 }
 
@@ -7216,6 +7771,168 @@ function renderEmergingRolesHTML() {
     <strong>How to position yourself:</strong> ${role.howToPosition}
   </div>
 </div>`).join("")}
+  </div>
+</div>`;
+}
+
+// ── AI Startup Guide ──────────────────────────────────────────────────────────
+
+const startupModels = [
+  {
+    model: "API Wrapper SaaS",
+    description: "Wrap OpenAI / Anthropic with a vertical-specific UI and workflow. You add value through: domain-specific prompts, integrations, and UX — not the model itself.",
+    examples: ["AI legal contract reviewer", "AI medical note summariser", "AI cold email generator for sales"],
+    moat: "Distribution, niche expertise, and switching costs (data in your system).",
+    risk: "Model providers could build the same feature. Defensibility comes from the vertical, not the AI.",
+    monthsReady: 10,
+    resources: [
+      { label: "Indie Hackers — AI SaaS case studies", url: "https://www.indiehackers.com/products?category=artificial-intelligence" },
+      { label: "Pieter Levels — build and ship fast", url: "https://x.com/levelsio" },
+    ],
+  },
+  {
+    model: "RAG-Powered Knowledge Tool",
+    description: "Index a company's internal documents, support tickets, or knowledge base. Users query in natural language and get sourced answers. This solves a real enterprise pain point.",
+    examples: ["AI customer support over product docs", "Internal HR policy chatbot", "AI over engineering runbooks"],
+    moat: "Customer data stays in your system. Proprietary embeddings improve over time.",
+    risk: "Retrieval quality is hard. Hallucinations in enterprise = liability. Must invest in evaluation.",
+    monthsReady: 11,
+    resources: [
+      { label: "LlamaIndex production RAG guide", url: "https://docs.llamaindex.ai/en/stable/" },
+      { label: "RAG evaluation with RAGAS", url: "https://github.com/explodinggradients/ragas" },
+    ],
+  },
+  {
+    model: "AI Agent for a Repetitive Workflow",
+    description: "Automate one high-value repetitive task end-to-end with an AI agent. The agent calls APIs, reads emails, fills forms, and writes reports. Sell the time saved, not the technology.",
+    examples: ["Lead research agent (finds contact info + writes outreach)", "Invoice processing agent", "Competitive intelligence agent"],
+    moat: "Each client's workflow is customised. Agent improves with feedback. Hard to replicate quickly.",
+    risk: "Reliability is critical. One bad run breaks trust. Invest in human-in-the-loop + monitoring.",
+    monthsReady: 12,
+    resources: [
+      { label: "LangGraph production agent patterns", url: "https://langchain-ai.github.io/langgraph/" },
+      { label: "E2B code sandbox (safe agent execution)", url: "https://e2b.dev/" },
+    ],
+  },
+  {
+    model: "Industrial AI / Digital Twin",
+    description: "Apply ML + simulation to manufacturing, logistics, or supply chain. Your IE background is a genuine competitive advantage here — most AI founders do not understand operations.",
+    examples: ["Predictive maintenance SaaS for SME manufacturers", "AI supply chain risk monitor", "Simulation-as-a-service for capacity planning"],
+    moat: "Domain expertise + sensor data + models trained on proprietary industrial data.",
+    risk: "Long sales cycles (6–12 months), complex procurement, need physical integration. Start with pilot.",
+    monthsReady: 9,
+    resources: [
+      { label: "AnyLogic — industrial simulation", url: "https://www.anylogic.com/" },
+      { label: "NASA CMAPSS predictive maintenance dataset", url: "https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/" },
+    ],
+  },
+  {
+    model: "AI-Native Analytics Platform",
+    description: "Replace a static dashboard with a conversational analytics interface. Users ask questions in plain English and get charts + data + SQL behind the scenes.",
+    examples: ["Text-to-SQL analytics for non-technical teams", "AI-powered BI for e-commerce", "Conversational reporting for operations managers"],
+    moat: "Semantic layer built on the customer's data model. Compounding accuracy as queries are corrected.",
+    risk: "Text-to-SQL fails on complex schemas. Must handle edge cases gracefully. Start with narrow scope.",
+    monthsReady: 8,
+    resources: [
+      { label: "Vanna.AI — open source text-to-SQL", url: "https://github.com/vanna-ai/vanna" },
+      { label: "DuckDB for fast in-process analytics", url: "https://duckdb.org/" },
+    ],
+  },
+  {
+    model: "Fine-tuned Vertical LLM",
+    description: "Fine-tune a small open-source LLM on domain data (medical, legal, financial, industrial). Sell it as a private, on-premise AI with better accuracy than generic models on domain tasks.",
+    examples: ["Medical coding LLM (ICD-10 classification)", "Legal clause extraction model", "Industrial equipment failure NER model"],
+    moat: "Training data is the moat. Models improve as you collect more labelled domain data.",
+    risk: "High upfront cost. Needs MLOps infrastructure. Regulatory risk in healthcare/finance.",
+    monthsReady: 13,
+    resources: [
+      { label: "Hugging Face PEFT (LoRA fine-tuning)", url: "https://github.com/huggingface/peft" },
+      { label: "LLM fine-tuning guide (HF)", url: "https://huggingface.co/docs/transformers/training" },
+    ],
+  },
+];
+
+const mvpFramework = [
+  { step: 1, title: "Define the problem sharply", detail: "Who loses time or money because of this problem? Quantify it. 'Saves 4 hours/week for operations managers at 50-person manufacturers.' If you can't quantify it, the problem is not real enough." },
+  { step: 2, title: "Identify 5 potential users before building", detail: "Talk to 5 people in the target role. Ask: 'Walk me through how you currently solve this.' Do NOT ask if they would buy your product. Listen for pain. Build only what they mention repeatedly." },
+  { step: 3, title: "Build the simplest possible version in 2 weeks", detail: "Week 1: backend only (Python + FastAPI). Week 2: minimal UI (Streamlit or simple Django page). No auth, no payments, no settings. Just the core loop that proves the value." },
+  { step: 4, title: "Charge from day 1 (or find why they won't pay)", detail: "If someone won't pay for it, they don't have the problem badly enough. Pricing signals value. Start at $99/month for early testers. Raise when demand exceeds capacity." },
+  { step: 5, title: "Iterate on feedback, not on ideas", detail: "After each user session, write one sentence: 'The user was stuck at X because Y.' Fix X. Nothing else matters until X is fixed. Never build from assumptions." },
+  { step: 6, title: "Frame value in business language", detail: "Engineers say: 'It uses a transformer with RAG.' Founders say: 'It cuts document review time from 4 hours to 15 minutes.' Always translate to: time saved, cost reduced, revenue gained, or risk eliminated." },
+];
+
+function renderStartupGuideHTML() {
+  return `
+<div class="startup-guide">
+  <div class="startup-intro">
+    <h3>Build an AI Startup While Learning</h3>
+    <p>Your 12-month roadmap is also a startup curriculum. By Month 9 you have the technical foundation for 4 of the 6 models below. By Month 12 you have all 6. The goal is not to quit and start a company today — it is to build the skills and side projects that could become a startup after you have 1–2 years of industry experience.</p>
+    <div class="startup-principle-row">
+      <div class="startup-principle">🎯 <strong>One niche, one pain</strong> — narrow beats broad every time in early-stage AI</div>
+      <div class="startup-principle">💰 <strong>Charge early</strong> — fake traction is worse than no traction</div>
+      <div class="startup-principle">🏭 <strong>Your IE background = moat</strong> — most AI founders can't read a P&L or a factory floor</div>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:12px">6 AI Business Models — with your roadmap readiness</h3>
+  <div class="startup-models-grid">
+    ${startupModels.map(m => `
+<div class="startup-model-card">
+  <div class="startup-model-header">
+    <strong>${m.model}</strong>
+    <span class="startup-ready-badge">Ready after Month ${m.monthsReady}</span>
+  </div>
+  <p class="startup-model-desc">${m.description}</p>
+  <div class="startup-examples">
+    <strong>Examples:</strong>
+    <ul>${m.examples.map(e => `<li>${e}</li>`).join("")}</ul>
+  </div>
+  <div class="startup-moat-risk">
+    <div class="startup-moat">🏰 <strong>Moat:</strong> ${m.moat}</div>
+    <div class="startup-risk">⚠️ <strong>Risk:</strong> ${m.risk}</div>
+  </div>
+  <div class="startup-res-list">
+    ${m.resources.map(r => `<a href="${r.url}" target="_blank" rel="noopener" class="startup-res-link">🔗 ${r.label}</a>`).join("")}
+  </div>
+</div>`).join("")}
+  </div>
+
+  <div class="startup-mvp-section">
+    <h3>MVP Framework — from idea to first paying user in 4 weeks</h3>
+    <div class="startup-mvp-steps">
+      ${mvpFramework.map(s => `
+<div class="startup-mvp-step">
+  <div class="startup-mvp-num">${s.step}</div>
+  <div class="startup-mvp-body">
+    <strong>${s.title}</strong>
+    <p>${s.detail}</p>
+  </div>
+</div>`).join("")}
+    </div>
+  </div>
+
+  <div class="startup-roi-section">
+    <h3>ROI Framing — translate AI into business language</h3>
+    <table class="startup-roi-table">
+      <thead><tr><th>Technical output</th><th>Business framing</th><th>Metric</th></tr></thead>
+      <tbody>
+        <tr><td>Anomaly detection model (AUC 0.93)</td><td>Catches 93% of equipment failures before downtime</td><td>Cost avoided per prevented failure × annual incidents</td></tr>
+        <tr><td>RAG chatbot over support docs</td><td>Resolves 60% of support tickets without human review</td><td>Hours saved per ticket × ticket volume per month</td></tr>
+        <tr><td>Text-to-SQL query interface</td><td>Non-technical managers self-serve data in seconds</td><td>Data analyst hours freed per week</td></tr>
+        <tr><td>Route optimisation with OR-Tools</td><td>18% reduction in delivery fleet mileage</td><td>Fuel cost saved per year + CO₂ reduction</td></tr>
+        <tr><td>Monte Carlo project simulation</td><td>P90 deadline set with confidence, not guesswork</td><td>Risk of late delivery reduced from X% to Y%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="startup-reading">
+    <h3>Recommended startup reading (while doing the technical work)</h3>
+    <div class="startup-books">
+      <a href="https://www.ycombinator.com/library" target="_blank" rel="noopener" class="startup-book-link">📚 YC Startup Library — free essays from Airbnb, Stripe, Dropbox founders</a>
+      <a href="https://paulgraham.com/articles.html" target="_blank" rel="noopener" class="startup-book-link">✍️ Paul Graham essays — Do Things That Don't Scale, How to Get Startup Ideas</a>
+      <a href="https://www.leanstartup.co/" target="_blank" rel="noopener" class="startup-book-link">📖 The Lean Startup — Eric Ries (build-measure-learn loop)</a>
+      <a href="https://github.com/carolstran/tech-talks" target="_blank" rel="noopener" class="startup-book-link">🎤 AI startup talks — search 'AI founder' on YC YouTube</a>
+    </div>
   </div>
 </div>`;
 }
