@@ -3603,6 +3603,12 @@ details p {
 .startup-risk  { color: #92400e; }
 [data-theme="dark"] .startup-moat { color: #86efac; }
 [data-theme="dark"] .startup-risk  { color: #fcd34d; }
+[data-theme="dark"] .startup-model-card { background: var(--surface); border-color: var(--line); }
+[data-theme="dark"] .startup-roi-table th { background: #1e3028; }
+[data-theme="dark"] .startup-roi-table td { color: var(--ink); }
+[data-theme="dark"] .startup-mvp-step { background: var(--surface); border-color: var(--line); }
+[data-theme="dark"] .startup-book-link { background: var(--surface); border-color: var(--line); }
+[data-theme="dark"] .startup-book-link:hover { background: #0e2820; }
 .startup-res-list { display: flex; flex-direction: column; gap: 4px; margin-top: auto; }
 .startup-res-link {
   font-size: 12px;
