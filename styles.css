@@ -3058,6 +3058,31 @@ details p {
 
 /* Interview Prep */
 .interview-prep { display:flex; flex-direction:column; gap:20px; }
+.interview-resource-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 13px;
+}
+.interview-strip-label { font-weight: 600; color: var(--muted); white-space: nowrap; }
+.interview-strip-link {
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+}
+.interview-strip-link:hover { background: var(--accent); color: #fff; }
+[data-theme="dark"] .interview-resource-strip { background: var(--surface); border-color: var(--line); }
 .interview-tracks { display:flex; flex-wrap:wrap; gap:8px; }
 .interview-track-btn { padding:8px 16px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:13px; font-weight:500; cursor:pointer; transition:background .15s,color .15s; }
 .interview-track-btn:hover { background:var(--accent-soft); }
