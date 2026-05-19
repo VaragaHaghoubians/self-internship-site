@@ -7523,6 +7523,7 @@ function renderCareerHub() {
     { id:"linkedin",     label:"🔗 LinkedIn & Network" },
     { id:"emerging",     label:"🤖 Emerging Roles 2026" },
     { id:"startup",      label:"🚀 AI Startup" },
+    { id:"freelance",    label:"🌍 Freelance Profiles" },
   ];
 
   tabsEl.innerHTML = tabs.map(t =>
@@ -7552,6 +7553,7 @@ function renderCareerTabContent(contentEl) {
     case "linkedin":     contentEl.innerHTML = renderLinkedInGuideHTML();     bindApplyReady(contentEl);        break;
     case "emerging":     contentEl.innerHTML = renderEmergingRolesHTML();     break;
     case "startup":      contentEl.innerHTML = renderStartupGuideHTML();      break;
+    case "freelance":    contentEl.innerHTML = renderFreelanceGuideHTML();   bindFreelanceChecklist(contentEl); break;
   }
 }
 
@@ -8047,6 +8049,397 @@ function renderLinkedInGuideHTML() {
 </details>`).join("")}
   </div>
 </div>`;
+}
+
+// ── Freelance Profile Guide ───────────────────────────────────────────────────
+
+// Platform metadata: timing, selectivity, best use, differentiator
+const freelancePlatforms = [
+  {
+    name: "LinkedIn Italy",
+    applyNow: "Yes — today",
+    selectivity: "Open",
+    bestFor: "Discoverability, Italian market",
+    differentiator: "Italian keywords + weekly engagement",
+    url: "https://www.linkedin.com/jobs/data-science-jobs/",
+    priority: "high",
+  },
+  {
+    name: "MeetFrank",
+    applyNow: "Yes — today",
+    selectivity: "Low",
+    bestFor: "Junior / internship algorithmic matching",
+    differentiator: "Algorithm matches you to companies — seniority accuracy is critical",
+    url: "https://meetfrank.com/",
+    priority: "high",
+  },
+  {
+    name: "Arc.dev",
+    applyNow: "After project 1",
+    selectivity: "High (top 2%)",
+    bestFor: "Remote freelance work globally",
+    differentiator: "60-second video intro — clarity and confidence matter more than accent",
+    url: "https://arc.dev/",
+    priority: "medium",
+  },
+  {
+    name: "Toptal",
+    applyNow: "After projects 2–3",
+    selectivity: "Very high (top 3%)",
+    bestFor: "Premium freelance rates (€60–120/hr)",
+    differentiator: "4-step vetting: English → technical → live session → paid test project",
+    url: "https://www.toptal.com/",
+    priority: "future",
+  },
+  {
+    name: "Devjobsscanner",
+    applyNow: "Yes — as aggregator",
+    selectivity: "Aggregator (no profile)",
+    bestFor: "Finding Milan / Italy listings from 15+ boards in one place",
+    differentiator: "Set weekly alert for 'data scientist Milan' — check every Monday",
+    url: "https://devjobsscanner.com/",
+    priority: "low",
+  },
+];
+
+// Italian cultural norms that shape every profile decision
+const italianNorms = [
+  {
+    icon: "🤝",
+    title: "Warm Formality",
+    detail: "Use full sentences, avoid slang, lead with credentials before personality. On global platforms (Toptal, Arc.dev) write confident English. On LinkedIn Italy, blend both — English headlines for SEO, Italian phrases in your About section to signal local integration.",
+  },
+  {
+    icon: "🎓",
+    title: "Credentials First",
+    detail: "Italian employers weight formal qualifications heavily. Always lead with your academic background before listing tools or projects. A degree in a quantitative field (mathematics, statistics, engineering) carries significant weight even at intern level.",
+  },
+  {
+    icon: "🗣️",
+    title: "Il Passaparola — Word of Mouth",
+    detail: "Over 60% of placements in Italy happen through personal referrals. Your online profile opens the door; the relationship closes the deal. Comment on Italian data science posts, join Italian tech communities, and attend local meetups in Milan, Rome, or Bologna.",
+  },
+  {
+    icon: "🎨",
+    title: "Aesthetic Matters",
+    detail: "Italians notice presentation. Use a professional headshot (bust height, neutral background, natural smile — not a selfie), clean formatting, no typos, and a consistent visual identity. Your profile photo is evaluated as part of your personal brand.",
+  },
+  {
+    icon: "⚖️",
+    title: "Humility + Confidence",
+    detail: "American-style self-promotion ('world-class', 'rockstar') reads as arrogant. Instead, let outcomes speak: describe what you built, what it achieved, and what problem it solved. Say 'experienced in' or 'solid foundation in' rather than 'expert' until you have years of evidence.",
+  },
+  {
+    icon: "🔍",
+    title: "Dual-Language Keywords",
+    detail: "Italian recruiters search in both Italian and English. Use these pairs naturally: 'Data scientist | Scienziato dei dati', 'Machine learning | Apprendimento automatico', 'Freelance | Libero professionista', 'Stage / Tirocinio', 'Disponibile per collaborazioni remote'.",
+  },
+];
+
+// Ready-to-copy profile templates for each platform
+const profileTemplates = [
+  {
+    platform: "LinkedIn — Headline",
+    instruction: "Under 220 characters. Pack keywords — this is the most-searched field on LinkedIn.",
+    template: [
+      "Data Scientist | Machine Learning & Predictive Analytics | Python · scikit-learn · SQL",
+      "Disponibile per stage e collaborazioni freelance | Milano / Remote",
+    ],
+    projectNote: "Once your churn project is live, add: 'Customer Churn · XGBoost · Streamlit' to the keyword list.",
+  },
+  {
+    platform: "LinkedIn — About Section",
+    instruction: "4–5 lines max. Write in first person. Paragraphs feel warmer than bullet points in the Italian context.",
+    template: [
+      "I am a data scientist with a strong foundation in machine learning, statistical modelling,",
+      "and Python-based analytics. My focus is on building predictive solutions that translate",
+      "directly into business decisions — not just models, but insights that teams can act on.",
+      "",
+      "I am currently building my portfolio through hands-on projects and am actively seeking",
+      "freelance collaborations or internship opportunities (stage/tirocinio) in Italy or remote.",
+      "",
+      "Core skills: Python · pandas · scikit-learn · XGBoost · SQL · Matplotlib · SHAP",
+      "",
+      "Sono disponibile per collaborazioni freelance e tirocini. Contattatemi su LinkedIn",
+      "o via email — rispondo sempre entro 24 ore.",
+    ],
+    projectNote: "Add before 'Core skills': 'Recent project: Customer Churn Prediction — 87% AUC-ROC, interactive Streamlit dashboard, full notebook on GitHub.' Then link your GitHub.",
+  },
+  {
+    platform: "LinkedIn — Experience Entry (use now, before any client work)",
+    instruction: "List your practice project as a self-initiated entry — this is standard and expected for junior data scientists.",
+    template: [
+      "Title:    Freelance Data Scientist (Self-initiated Projects)",
+      "Company:  Independent / Portfolio",
+      "Dates:    [Month Year] – Present",
+      "Location: Remote",
+      "",
+      "Description (add after finishing churn project):",
+      "Customer Churn Prediction — Telco dataset (7,000+ customers). Built a",
+      "classification pipeline using Logistic Regression and XGBoost. Achieved 87% AUC-ROC.",
+      "Delivered a Streamlit dashboard and a business-facing executive summary.",
+      "Tools: Python, pandas, scikit-learn, SHAP, Matplotlib.",
+    ],
+    projectNote: "Replace the description placeholder with your actual results when the project is complete.",
+  },
+  {
+    platform: "Toptal — Professional Summary (prepare now, apply after 2–3 projects)",
+    instruction: "Toptal accepts top 3%. Lead with outcomes. Every sentence must justify senior-level positioning.",
+    template: [
+      "I build end-to-end data science solutions — from raw data to deployed product.",
+      "My work sits at the intersection of rigorous statistical modelling and clear business",
+      "communication: I don't just deliver a model, I deliver a recommendation.",
+      "",
+      "[After churn project]: Recent work includes a Customer Churn Prediction pipeline",
+      "on a 7,000-record telco dataset, achieving 87% AUC-ROC with XGBoost, explainability",
+      "via SHAP, and a Streamlit dashboard that non-technical stakeholders use directly.",
+      "",
+      "I am comfortable working independently across time zones and communicating findings",
+      "to both technical and executive audiences.",
+    ],
+    projectNote: "Do not apply to Toptal until you have 2–3 projects and ideally some real client work. A premature application wastes your one best first impression.",
+  },
+  {
+    platform: "Arc.dev — Video Self-Introduction Script (60–90 seconds)",
+    instruction: "Arc.dev screens with a video intro. Speak at a measured pace — Italian-accented English is completely fine. Clarity beats a native accent.",
+    template: [
+      "0:00–0:15  WHO YOU ARE",
+      "           'Hi, I'm [Name], a data scientist based in Italy, specializing in",
+      "            predictive modelling and machine learning with Python.'",
+      "",
+      "0:15–0:45  YOUR STRONGEST PROJECT (be specific, use numbers)",
+      "           '[After churn project]: My most recent project was a Customer Churn",
+      "            Prediction system for a telecom dataset. I built a full pipeline — EDA,",
+      "            feature engineering, XGBoost — achieving 87% AUC-ROC. I also built a",
+      "            Streamlit dashboard so non-technical stakeholders could use it directly.'",
+      "",
+      "0:45–1:00  WHAT YOU ARE LOOKING FOR",
+      "           'I'm looking for remote freelance engagements where I can apply ML to",
+      "            real business problems. I'm collaborative, communicate clearly, and",
+      "            deliver on time.'",
+    ],
+    projectNote: "Record this after your churn project is live. Apply to Arc.dev only once you can fill in the project section with real metrics.",
+  },
+  {
+    platform: "MeetFrank — Bio (apply today)",
+    instruction: "MeetFrank profiles are shorter and more casual. Be accurate about experience level — the algorithm uses it for matching. Misrepresenting seniority causes poor matches.",
+    template: [
+      "Headline: Data Scientist · Machine Learning · Python · Remote-ready · Italy",
+      "",
+      "Bio (2–3 sentences):",
+      "I build predictive models and translate data into clear business decisions.",
+      "Strong in Python, scikit-learn, and XGBoost. Currently completing my first",
+      "portfolio project and actively seeking junior or internship-level engagements",
+      "in data science — remote or Italy-based.",
+      "",
+      "Skills: Python, Machine Learning, Data Analysis, SQL, Data Visualization,",
+      "        scikit-learn, Statistics, Jupyter",
+      "",
+      "Experience level: Junior / Entry-level  ← be accurate, this drives match quality",
+      "Job type: Internship, Part-time freelance, Remote",
+    ],
+    projectNote: "After your churn project: add 'Built a churn prediction model (87% AUC-ROC) — GitHub portfolio available.' to your bio.",
+  },
+];
+
+// Master update checklist: what to do on each platform when churn project is live
+const freelanceUpdateChecklist = [
+  {
+    platform: "GitHub (do this first — all profiles link here)",
+    items: [
+      "Create repo: customer-churn-prediction",
+      "README.md: problem statement, dataset, methodology, results (AUC-ROC, confusion matrix screenshot), how to run",
+      "Include: Jupyter notebook, requirements.txt, Streamlit app file, and a 1-page PDF executive summary",
+      "Pin the repo on your GitHub profile page",
+    ],
+  },
+  {
+    platform: "LinkedIn",
+    items: [
+      "Featured section: add GitHub link with project thumbnail (highest-visibility section)",
+      "Experience: update project description with final AUC-ROC and business framing",
+      "About: add the project sentence (template above in Profile Templates)",
+      "Skills: add XGBoost, SHAP, Streamlit if not already there",
+    ],
+  },
+  {
+    platform: "Arc.dev",
+    items: [
+      "Now eligible to apply",
+      "Re-record your video intro with the project specifics and real metrics",
+      "Update written summary with AUC-ROC score and Streamlit dashboard mention",
+    ],
+  },
+  {
+    platform: "Toptal",
+    items: [
+      "Not yet — apply after projects 2–3",
+      "Start preparing for the 4-step screening (English → technical → live → paid project)",
+      "Practice explaining ML pipeline decisions out loud — the live session tests reasoning, not just coding",
+    ],
+  },
+  {
+    platform: "MeetFrank",
+    items: [
+      "Update bio with: 'Built a churn prediction model (87% AUC-ROC) — GitHub portfolio available.'",
+      "Do NOT upgrade experience level until you have a second project or real client work",
+    ],
+  },
+];
+
+function renderFreelanceGuideHTML() {
+  // Platform priority badge colour
+  const priorityColour = { high:"#166534", medium:"#92400e", future:"#1e3a5f", low:"#4b5563" };
+  const priorityBg     = { high:"#dcfce7", medium:"#fef3c7", future:"#dbeafe", low:"#f3f4f6" };
+
+  // Platform comparison table rows
+  const platformRows = freelancePlatforms.map(p => {
+    const badgeStyle = `background:${priorityBg[p.priority]};color:${priorityColour[p.priority]};padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600`;
+    return `
+<tr>
+  <td><a href="${p.url}" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">${p.name}</a></td>
+  <td><span style="${badgeStyle}">${p.applyNow}</span></td>
+  <td>${p.selectivity}</td>
+  <td>${p.bestFor}</td>
+  <td style="color:var(--muted);font-size:12px">${p.differentiator}</td>
+</tr>`;
+  }).join("");
+
+  // Italian norms cards
+  const normCards = italianNorms.map(n => `
+<div class="fl-norm-card">
+  <div class="fl-norm-icon">${n.icon}</div>
+  <div class="fl-norm-body">
+    <strong>${n.title}</strong>
+    <p>${n.detail}</p>
+  </div>
+</div>`).join("");
+
+  // Profile template code boxes
+  const templateBoxes = profileTemplates.map(t => `
+<details class="fl-template-item">
+  <summary class="fl-template-summary">
+    <strong>${t.platform}</strong>
+    <small>${t.instruction}</small>
+  </summary>
+  <div class="fl-template-body">
+    <pre class="fl-code-box">${t.template.join("\n")}</pre>
+    <p class="fl-project-note">📌 <strong>When project is live:</strong> ${t.projectNote}</p>
+  </div>
+</details>`).join("");
+
+  // Update checklist
+  const checklistHTML = freelanceUpdateChecklist.map((section, si) => `
+<div class="fl-checklist-section">
+  <strong class="fl-checklist-platform">${section.platform}</strong>
+  <ul class="fl-checklist-items">
+    ${section.items.map((item, ii) => {
+      const key = `fl-check-${si}-${ii}`;
+      const checked = localStorage.getItem(key) === "1";
+      return `<li>
+        <label class="fl-check-label ${checked ? "fl-check-done" : ""}">
+          <input type="checkbox" class="fl-cb" data-key="${key}" ${checked ? "checked" : ""}> ${item}
+        </label>
+      </li>`;
+    }).join("")}
+  </ul>
+</div>`).join("");
+
+  return `
+<div class="freelance-guide">
+
+  <!-- Intro banner -->
+  <div class="fl-intro-banner">
+    <h3>Freelance Profile Guide — Italian Market</h3>
+    <p>Your self-internship builds the exact portfolio these platforms need. Read the cultural norms first — they shape every profile decision. Use the copy-paste templates immediately. Return to the update checklist when your first project is live on GitHub.</p>
+    <div class="fl-timing-strip">
+      <span class="fl-timing-pill fl-timing-now">✅ Do today: LinkedIn Italy + MeetFrank</span>
+      <span class="fl-timing-pill fl-timing-soon">📌 After project 1: Arc.dev</span>
+      <span class="fl-timing-pill fl-timing-later">🎯 After projects 2–3: Toptal</span>
+    </div>
+  </div>
+
+  <!-- Platform comparison table -->
+  <div class="fl-section">
+    <h3>Platform Comparison</h3>
+    <div class="fl-table-wrap">
+      <table class="fl-platform-table">
+        <thead><tr>
+          <th>Platform</th><th>Apply Now?</th><th>Selectivity</th><th>Best For</th><th>Key Differentiator</th>
+        </tr></thead>
+        <tbody>${platformRows}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Italian cultural norms -->
+  <div class="fl-section">
+    <h3>Italian Cultural Norms — Read Before Writing Any Profile</h3>
+    <p class="fl-section-intro">These 6 norms shape every word choice, tone, and format decision across all platforms.</p>
+    <div class="fl-norms-grid">${normCards}</div>
+  </div>
+
+  <!-- Copy-paste profile templates -->
+  <div class="fl-section">
+    <h3>Ready-to-Copy Profile Templates</h3>
+    <p class="fl-section-intro">Click any platform to expand. Text marked <strong>[After churn project]</strong> should be filled in once your Customer Churn Prediction project is live on GitHub.</p>
+    <div class="fl-templates">${templateBoxes}</div>
+  </div>
+
+  <!-- LinkedIn skills list -->
+  <div class="fl-section">
+    <h3>LinkedIn Skills List (add all — maps to Italian recruiter searches)</h3>
+    <pre class="fl-code-box">Python · SQL · Machine Learning · Data Analysis · Statistical Analysis
+scikit-learn · XGBoost · pandas · NumPy · Matplotlib · Seaborn · SHAP
+Predictive Modeling · Data Visualization · Feature Engineering
+Jupyter Notebooks · Git · Streamlit · Business Intelligence</pre>
+    <p class="fl-muted">LinkedIn allows up to 50 skills. These are the ones Italian data science recruiters search for most.</p>
+  </div>
+
+  <!-- Master update checklist -->
+  <div class="fl-section">
+    <h3>Master Update Checklist — run this when your project is live on GitHub</h3>
+    <p class="fl-section-intro">Work through every platform in this order. Tick each item as you complete it.</p>
+    <div class="fl-checklist">${checklistHTML}</div>
+  </div>
+
+  <!-- LinkedIn engagement strategy -->
+  <div class="fl-section">
+    <h3>LinkedIn Engagement Strategy (weekly habit)</h3>
+    <div class="fl-engagement-grid">
+      <div class="fl-engagement-card">
+        <strong>📊 Post once per week</strong>
+        <p>Share a key insight from your project with a chart: "Month-to-month customers churn at 3× the rate — here's what the data shows." One insight per post, not a summary.</p>
+      </div>
+      <div class="fl-engagement-card">
+        <strong>💬 Comment thoughtfully</strong>
+        <p>Comment on posts by Italian data scientists and recruiters — this surfaces your name in their network. Two thoughtful comments per week beats ten generic ones.</p>
+      </div>
+      <div class="fl-engagement-card">
+        <strong>🏢 Follow target companies</strong>
+        <p>Intesa Sanpaolo · CRIF · STMicroelectronics · Deloitte Italy · PwC Italy · Edison · Sky Italia · Enel · Generali · Unicredit</p>
+      </div>
+      <div class="fl-engagement-card">
+        <strong>🔍 Search Italian terms too</strong>
+        <p>Search "stage data scientist" or "tirocinio data science" on LinkedIn and Indeed Italia to find roles not tagged in English. Many companies post only in Italian.</p>
+      </div>
+    </div>
+  </div>
+
+</div>`;
+}
+
+// ── Bind freelance checklist checkboxes ──────────────────────────────────────
+function bindFreelanceChecklist(contentEl) {
+  const el = contentEl || document.getElementById("careerHubContent");
+  if (!el) return;
+  el.querySelectorAll(".fl-cb").forEach(cb => {
+    cb.addEventListener("change", () => {
+      localStorage.setItem(cb.dataset.key, cb.checked ? "1" : "0");
+      const label = cb.closest(".fl-check-label");
+      if (label) label.classList.toggle("fl-check-done", cb.checked);
+    });
+  });
 }
 
 init();

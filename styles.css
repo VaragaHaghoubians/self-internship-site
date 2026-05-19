@@ -3683,3 +3683,248 @@ details p {
   border-radius: 8px;
 }
 .startup-book-link:hover { background: var(--accent-soft); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Freelance Profile Guide tab  (.fl-*)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Wrapper ── */
+.freelance-guide {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+/* ── Intro banner ── */
+.fl-intro-banner {
+  background: linear-gradient(135deg, #1a4731 0%, #0d5e41 100%);
+  color: #fff;
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 28px;
+}
+.fl-intro-banner h2 { margin: 0 0 6px; font-size: 20px; font-weight: 700; }
+.fl-intro-banner p  { margin: 0; font-size: 13px; opacity: 0.88; }
+
+/* ── Timing strip ── */
+.fl-timing-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.fl-timing-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1.5px solid transparent;
+}
+.fl-timing-now   { background: #dcfce7; color: #14532d; border-color: #86efac; }
+.fl-timing-soon  { background: #fef9c3; color: #713f12; border-color: #fde047; }
+.fl-timing-later { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+
+/* ── Section wrapper ── */
+.fl-section { margin-bottom: 36px; }
+.fl-section h3 { font-size: 16px; font-weight: 700; margin: 0 0 10px; color: var(--deep); }
+.fl-section-intro {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 14px;
+  line-height: 1.55;
+}
+
+/* ── Platform table ── */
+.fl-table-wrap { overflow-x: auto; }
+.fl-platform-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.fl-platform-table th {
+  background: var(--deep);
+  color: #fff;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.fl-platform-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.fl-platform-table tr:last-child td { border-bottom: none; }
+.fl-platform-table tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+.fl-platform-table a { color: var(--accent); text-decoration: none; }
+.fl-platform-table a:hover { text-decoration: underline; }
+
+/* ── Norms grid ── */
+.fl-norms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.fl-norm-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.fl-norm-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.fl-norm-body strong { font-size: 13px; display: block; margin-bottom: 4px; color: var(--deep); }
+.fl-norm-body p      { font-size: 12px; color: var(--muted); margin: 0; line-height: 1.5; }
+
+/* ── Profile templates ── */
+.fl-templates { display: flex; flex-direction: column; gap: 10px; }
+.fl-template-item {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.fl-template-item summary,
+.fl-template-summary {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--deep);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fl-template-item summary::-webkit-details-marker { display: none; }
+.fl-template-item[open] summary { border-bottom: 1px solid var(--line); }
+.fl-template-body { padding: 14px 16px; }
+
+/* ── Code/text box inside template ── */
+.fl-code-box {
+  background: #f8f9fa;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  line-height: 1.65;
+  color: #1a2e1a;
+  margin: 0;
+  overflow-x: auto;
+}
+
+/* ── Project placeholder note ── */
+.fl-project-note {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #fef9c3;
+  border-left: 3px solid #fde047;
+  border-radius: 0 6px 6px 0;
+  font-size: 12px;
+  color: #713f12;
+  line-height: 1.5;
+}
+
+/* ── Muted helper text ── */
+.fl-muted { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+/* ── Master checklist ── */
+.fl-checklist { display: flex; flex-direction: column; gap: 18px; }
+.fl-checklist-section {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.fl-checklist-platform {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--deep);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+.fl-checklist-items { padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
+.fl-check-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.fl-check-label.fl-check-done {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.fl-cb {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ── Engagement grid ── */
+.fl-engagement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.fl-engagement-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.fl-engagement-card strong { font-size: 13px; display: block; margin-bottom: 6px; color: var(--deep); }
+.fl-engagement-card ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ── Dark mode overrides ── */
+[data-theme="dark"] .fl-intro-banner { background: linear-gradient(135deg, #0d2e20 0%, #093d2a 100%); }
+[data-theme="dark"] .fl-timing-now   { background: #14532d; color: #bbf7d0; border-color: #166534; }
+[data-theme="dark"] .fl-timing-soon  { background: #451a03; color: #fde68a; border-color: #92400e; }
+[data-theme="dark"] .fl-timing-later { background: #1e293b; color: #94a3b8; border-color: #334155; }
+[data-theme="dark"] .fl-norm-card    { background: var(--surface); border-color: var(--line); }
+[data-theme="dark"] .fl-norm-body strong { color: var(--ink); }
+[data-theme="dark"] .fl-template-item    { border-color: var(--line); }
+[data-theme="dark"] .fl-template-summary,
+[data-theme="dark"] .fl-template-item summary { background: var(--surface); color: var(--ink); }
+[data-theme="dark"] .fl-code-box { background: #0d1f14; color: #a7f3d0; border-color: var(--line); }
+[data-theme="dark"] .fl-project-note { background: #451a03; color: #fde68a; border-left-color: #92400e; }
+[data-theme="dark"] .fl-platform-table th { background: #0d2e20; }
+[data-theme="dark"] .fl-platform-table td { color: var(--ink); }
+[data-theme="dark"] .fl-platform-table tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+[data-theme="dark"] .fl-checklist-section { border-color: var(--line); }
+[data-theme="dark"] .fl-checklist-platform { background: #0d2e20; }
+[data-theme="dark"] .fl-checklist-items { background: var(--surface); }
+[data-theme="dark"] .fl-check-label.fl-check-done { color: #4b5563; }
+[data-theme="dark"] .fl-engagement-card { background: var(--surface); border-color: var(--line); }
+[data-theme="dark"] .fl-engagement-card strong { color: var(--ink); }
