@@ -4736,6 +4736,390 @@ print("TESTS PASSED: queue simulation complete")`,
       },
     ],
   },
+  // ── NumPy track ────────────────────────────────────────────────────────────
+  {
+    id: "numpy",
+    label: "NumPy",
+    source: "phase-1-software-engineering/month-01-python-git/resources/",
+    lessons: [
+      {
+        id: "numpy-01",
+        title: "Arrays and vector math",
+        mode: "python",
+        explain: "NumPy is the foundation of every ML library. An array is a fast, typed list. Vector operations (add, multiply, dot product) are the building block of every model weight update and prediction step.",
+        goals: [
+          "Import numpy as np",
+          "Create a 1-D array from a list",
+          "Perform element-wise addition and multiplication",
+          "Calculate the dot product of two vectors",
+          "Print shape, mean, and sum of the array",
+        ],
+        starter: `import numpy as np
+
+# Create 1-D arrays
+a = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+b = np.array([10.0, 20.0, 30.0, 40.0, 50.0])
+
+# Element-wise operations
+total   = a + b          # [11, 22, 33, 44, 55]
+scaled  = a * 2.0        # [2, 4, 6, 8, 10]
+
+# Dot product (sum of element-wise products)
+dot = float(np.dot(a, b))   # 1*10 + 2*20 + 3*30 + 4*40 + 5*50 = 550
+
+print("a + b  :", total)
+print("a * 2  :", scaled)
+print("dot(a,b):", dot)
+print("shape  :", a.shape)
+print("mean   :", float(np.mean(a)))
+print("sum    :", float(np.sum(a)))`,
+        expected: "dot product 550.0, shape (5,), mean 3.0, sum 15.0",
+        tests: `assert dot == 550.0, f"Expected 550.0, got {dot}"
+assert a.shape == (5,), "Shape should be (5,)"
+assert round(float(np.mean(a)), 1) == 3.0
+assert float(np.sum(a)) == 15.0
+print("TESTS PASSED: numpy array and vector math complete")`,
+        checks: [
+          ["Imports numpy", /import\s+numpy\s+as\s+np/],
+          ["Creates array with np.array", /np\.array\s*\(/],
+          ["Calculates dot product", /np\.dot\s*\(/],
+          ["Prints dot product 550", /550/, "output"],
+          ["Prints shape", /shape.*5|5.*shape/i, "output"],
+        ],
+      },
+      {
+        id: "numpy-02",
+        title: "Matrix multiply and statistics",
+        mode: "python",
+        explain: "Matrix multiplication (A @ B) is how neural networks compute every layer: input × weights. NumPy also gives you fast descriptive statistics — mean, std, percentile — used daily in EDA and ML evaluation.",
+        goals: [
+          "Create a 2-D matrix with np.array",
+          "Multiply two matrices with the @ operator",
+          "Compute mean, std, and a percentile on a data array",
+          "Use np.where to apply a threshold condition",
+        ],
+        starter: `import numpy as np
+
+# 2x2 matrices
+A = np.array([[1, 2],
+              [3, 4]])
+B = np.array([[5, 6],
+              [7, 8]])
+
+# Matrix multiply: A @ B  (not A * B, which is element-wise)
+C = A @ B
+
+print("A @ B =")
+print(C)
+
+# Statistics on a dataset
+scores = np.array([14, 22, 18, 35, 12, 28, 19, 31, 25, 16], dtype=float)
+
+mean_score   = round(float(np.mean(scores)), 2)
+std_score    = round(float(np.std(scores)), 2)
+p75          = float(np.percentile(scores, 75))
+
+print(f"\\nMean:   {mean_score}")
+print(f"Std:    {std_score}")
+print(f"P75:    {p75}")
+
+# Flag scores above the mean
+above_mean = np.where(scores > mean_score, "high", "low")
+print("Labels:", above_mean)`,
+        expected: "C[0][0]=19, C[1][0]=43. Mean 22.0, scores labelled high/low.",
+        tests: `assert C[0, 0] == 19, f"Expected C[0,0]=19, got {C[0,0]}"
+assert C[1, 0] == 43, f"Expected C[1,0]=43, got {C[1,0]}"
+assert mean_score == 22.0, f"Expected mean 22.0, got {mean_score}"
+assert len(above_mean) == len(scores)
+print("TESTS PASSED: matrix multiply and statistics complete")`,
+        checks: [
+          ["Uses @ for matrix multiply", /A\s*@\s*B|@/],
+          ["Uses np.mean", /np\.mean\s*\(/],
+          ["Uses np.std", /np\.std\s*\(/],
+          ["Uses np.percentile", /np\.percentile\s*\(/],
+          ["Uses np.where", /np\.where\s*\(/],
+          ["Prints matrix result", /19/, "output"],
+        ],
+      },
+    ],
+  },
+  // ── Pandas track ──────────────────────────────────────────────────────────
+  {
+    id: "pandas",
+    label: "Pandas",
+    source: "phase-1-software-engineering/month-01-python-git/resources/",
+    lessons: [
+      {
+        id: "pandas-01",
+        title: "DataFrame basics and EDA",
+        mode: "python",
+        explain: "Pandas is how every data scientist loads, inspects, and cleans data. The first thing you do with any new dataset is: check shape, check dtypes, check nulls, check basic statistics. This is the EDA ritual.",
+        goals: [
+          "Import pandas as pd",
+          "Create a DataFrame from a dict",
+          "Use .shape, .dtypes, and .isnull().sum()",
+          "Filter rows with a boolean condition",
+          "Use .groupby().agg() to get totals per group",
+        ],
+        starter: `import pandas as pd
+
+# Build a small sales DataFrame
+data = {
+    "region":  ["North", "South", "North", "West",  "South", "West"],
+    "product": ["A",     "B",     "B",     "A",     "A",     "B"],
+    "revenue": [1200,    800,     2200,    1500,    900,     1100],
+    "profit":  [240,     120,     510,     260,     180,     190],
+}
+df = pd.DataFrame(data)
+
+# ── EDA ritual ──
+print("Shape  :", df.shape)
+print("Dtypes :")
+print(df.dtypes)
+print("\\nNulls  :")
+print(df.isnull().sum())
+print("\\nStats  :")
+print(df.describe())
+
+# ── Filter rows ──
+north = df[df["region"] == "North"]
+print("\\nNorth rows:")
+print(north)
+
+# ── GroupBy KPI ──
+summary = df.groupby("region").agg(
+    total_revenue=("revenue", "sum"),
+    total_profit=("profit",  "sum"),
+    orders=("revenue", "count"),
+).reset_index()
+
+print("\\nGrouped summary:")
+print(summary)`,
+        expected: "Shape (6, 4). North total revenue 3400. Summary shows North, South, West rows.",
+        tests: `assert df.shape == (6, 4), f"Expected shape (6,4), got {df.shape}"
+north_rev = int(summary.loc[summary['region']=='North', 'total_revenue'].values[0])
+assert north_rev == 3400, f"Expected North revenue 3400, got {north_rev}"
+assert "total_revenue" in summary.columns
+print("TESTS PASSED: DataFrame basics and groupby complete")`,
+        checks: [
+          ["Imports pandas", /import\s+pandas\s+as\s+pd/],
+          ["Creates DataFrame", /pd\.DataFrame\s*\(/],
+          ["Checks shape", /\.shape/],
+          ["Checks nulls", /\.isnull\s*\(\s*\)\.sum\s*\(\s*\)/],
+          ["Uses groupby", /\.groupby\s*\(/],
+          ["Prints North", /North/, "output"],
+          ["Prints 3400", /3400/, "output"],
+        ],
+      },
+      {
+        id: "pandas-02",
+        title: "Merge, sort, and clean",
+        mode: "python",
+        explain: "Real datasets are split across multiple tables (like SQL). pd.merge() is your JOIN. After merging, you will almost always need to sort results, rename columns, drop nulls, and fill missing values — these are the daily cleaning operations.",
+        goals: [
+          "Merge two DataFrames on a key column",
+          "Sort by a column in descending order",
+          "Drop rows with missing values",
+          "Fill remaining nulls with a default",
+          "Rename a column",
+        ],
+        starter: `import pandas as pd
+import numpy as np
+
+# Two tables: orders and customers
+orders = pd.DataFrame({
+    "order_id":    [101, 102, 103, 104, 105],
+    "customer_id": [1,   2,   1,   3,   2],
+    "amount":      [500, 700, 300, None, 400],
+    "status":      ["shipped", "pending", "shipped", "shipped", "pending"],
+})
+
+customers = pd.DataFrame({
+    "customer_id": [1,       2,     3],
+    "name":        ["Alice", "Bob", "Carol"],
+    "segment":     ["Gold",  None,  "Silver"],
+})
+
+# ── Merge (LEFT JOIN) ──
+merged = pd.merge(orders, customers, on="customer_id", how="left")
+print("Merged:")
+print(merged)
+
+# ── Drop rows where amount is null ──
+clean = merged.dropna(subset=["amount"])
+
+# ── Fill segment nulls with 'Standard' ──
+clean = clean.copy()
+clean["segment"] = clean["segment"].fillna("Standard")
+
+# ── Sort by amount descending ──
+clean = clean.sort_values("amount", ascending=False).reset_index(drop=True)
+
+# ── Rename column ──
+clean = clean.rename(columns={"amount": "order_value"})
+
+print("\\nClean + sorted:")
+print(clean[["name", "order_value", "status", "segment"]])`,
+        expected: "4 rows after drop. Bob's segment filled as Standard. Sorted by order_value descending with Alice 700 first.",
+        tests: `assert len(clean) == 4, f"Expected 4 rows after dropna, got {len(clean)}"
+assert "order_value" in clean.columns, "Column rename failed"
+assert "Standard" in clean["segment"].values, "fillna did not apply"
+assert clean.iloc[0]["order_value"] == 700.0, f"First row should be 700, got {clean.iloc[0]['order_value']}"
+print("TESTS PASSED: merge, sort, and clean complete")`,
+        checks: [
+          ["Imports pandas", /import\s+pandas\s+as\s+pd/],
+          ["Uses pd.merge", /pd\.merge\s*\(/],
+          ["Uses dropna", /\.dropna\s*\(/],
+          ["Uses fillna", /\.fillna\s*\(/],
+          ["Uses sort_values", /\.sort_values\s*\(/],
+          ["Uses rename", /\.rename\s*\(/],
+          ["Output includes Standard", /Standard/, "output"],
+        ],
+      },
+    ],
+  },
+  // ── Scikit-learn / sklearn track ──────────────────────────────────────────
+  {
+    id: "sklearn",
+    label: "Sklearn",
+    source: "phase-2-production-ml/month-03-docker-mlops/resources/",
+    lessons: [
+      {
+        id: "sklearn-01",
+        title: "Manual Pipeline: scale → train → evaluate",
+        mode: "python",
+        explain: "Every production ML workflow is a pipeline: normalize features → fit model → evaluate on held-out data. In scikit-learn this becomes Pipeline([('scaler', StandardScaler()), ('model', SomeClassifier())]). This lesson builds the exact same logic in pure Python so you understand what each step does before using the library.",
+        goals: [
+          "Z-score normalize features (mean 0, std 1)",
+          "Train a logistic regression from scratch (gradient descent)",
+          "Predict classes on the test set",
+          "Calculate accuracy, precision, and recall",
+        ],
+        starter: `import math, random
+random.seed(42)
+
+# ── Dataset: 2 features, binary label ──
+# Feature 0: study_hours, Feature 1: sleep_hours
+# Label: 1=pass, 0=fail
+X = [[2,5],[3,7],[5,6],[1,4],[4,8],[6,7],[2,4],[5,5],[3,6],[7,8]]
+y = [0,   0,   1,   0,   1,   1,   0,   1,   0,   1  ]
+
+# ── Step 1: Z-score normalize each feature ──
+def z_normalize(X):
+    n_features = len(X[0])
+    means = [sum(row[j] for row in X) / len(X) for j in range(n_features)]
+    stds  = [(sum((row[j]-means[j])**2 for row in X)/len(X))**0.5 for j in range(n_features)]
+    return [[( X[i][j] - means[j]) / (stds[j] or 1) for j in range(n_features)] for i in range(len(X))], means, stds
+
+X_norm, means, stds = z_normalize(X)
+
+# ── Step 2: Train/test split (80/20) ──
+split = int(len(X_norm) * 0.8)
+X_train, X_test = X_norm[:split], X_norm[split:]
+y_train, y_test = y[:split],      y[split:]
+
+# ── Step 3: Logistic regression via gradient descent ──
+def sigmoid(z):
+    return 1 / (1 + math.exp(-z))
+
+w = [0.0] * len(X_train[0])  # weights
+b = 0.0                       # bias
+lr = 0.1
+
+for _ in range(200):          # 200 gradient descent steps
+    for xi, yi in zip(X_train, y_train):
+        pred = sigmoid(sum(w[j]*xi[j] for j in range(len(w))) + b)
+        error = pred - yi
+        for j in range(len(w)):
+            w[j] -= lr * error * xi[j]
+        b -= lr * error
+
+# ── Step 4: Evaluate on test set ──
+def predict(xi):
+    return 1 if sigmoid(sum(w[j]*xi[j] for j in range(len(w))) + b) >= 0.5 else 0
+
+preds = [predict(xi) for xi in X_test]
+
+TP = sum(1 for a,p in zip(y_test, preds) if a==1 and p==1)
+FP = sum(1 for a,p in zip(y_test, preds) if a==0 and p==1)
+FN = sum(1 for a,p in zip(y_test, preds) if a==1 and p==0)
+TN = sum(1 for a,p in zip(y_test, preds) if a==0 and p==0)
+
+accuracy  = (TP+TN)/len(y_test)
+precision = TP/(TP+FP) if (TP+FP)>0 else 0
+recall    = TP/(TP+FN) if (TP+FN)>0 else 0
+
+print(f"Test predictions : {preds}")
+print(f"Actual labels    : {y_test}")
+print(f"Accuracy  : {round(accuracy,2)}")
+print(f"Precision : {round(precision,2)}")
+print(f"Recall    : {round(recall,2)}")`,
+        expected: "Predictions printed. Accuracy, precision, recall each between 0 and 1.",
+        tests: `assert 0 <= accuracy <= 1, "Accuracy must be between 0 and 1"
+assert 0 <= precision <= 1, "Precision must be between 0 and 1"
+assert 0 <= recall <= 1, "Recall must be between 0 and 1"
+assert len(preds) == len(y_test), "Number of predictions must match test set"
+print("TESTS PASSED: manual pipeline — normalize, train, evaluate complete")`,
+        checks: [
+          ["Defines z_normalize", /def\s+z_normalize\s*\(/],
+          ["Defines sigmoid", /def\s+sigmoid\s*\(/],
+          ["Runs gradient descent loop", /for.*range\s*\(\s*200/],
+          ["Calculates accuracy", /accuracy\s*=/],
+          ["Calculates precision", /precision\s*=/],
+          ["Prints accuracy", /Accuracy/, "output"],
+        ],
+      },
+      {
+        id: "sklearn-02",
+        title: "Scikit-learn Pipeline: scaler → model → cross-validate",
+        mode: "text",
+        explain: "Once you understand the manual pipeline (sklearn-01), scikit-learn does it in 4 lines. The Pipeline object chains preprocessing and model steps. Cross-validation repeats the split K times so a single lucky split never misleads you. This is the production ML workflow every job posting expects.",
+        goals: [
+          "Import Pipeline, StandardScaler, and a classifier",
+          "Chain scaler + model in one Pipeline object",
+          "Run cross_val_score with cv=5",
+          "Print mean F1 and std across folds",
+          "Save the fitted pipeline with joblib",
+        ],
+        starter: `from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
+import joblib
+
+# Features and labels (same toy dataset as sklearn-01)
+X = [[2,5],[3,7],[5,6],[1,4],[4,8],[6,7],[2,4],[5,5],[3,6],[7,8]]
+y = [0,   0,   1,   0,   1,   1,   0,   1,   0,   1  ]
+
+# ── Build the pipeline ──
+pipe = Pipeline([
+    ("scaler", StandardScaler()),
+    ("model",  RandomForestClassifier(n_estimators=50, random_state=42)),
+])
+
+# ── Cross-validate (5 folds) ──
+scores = cross_val_score(pipe, X, y, cv=5, scoring="f1")
+print(f"F1 per fold : {[round(s,2) for s in scores]}")
+print(f"Mean F1     : {round(scores.mean(),3)}")
+print(f"Std F1      : {round(scores.std(),3)}")
+
+# ── Fit on full data and save ──
+pipe.fit(X, y)
+joblib.dump(pipe, "pipeline.pkl")
+print("Pipeline saved to pipeline.pkl")`,
+        expected: "F1 scores per fold printed, mean and std printed, pipeline.pkl saved.",
+        checks: [
+          ["Imports Pipeline", /from\s+sklearn\.pipeline\s+import\s+Pipeline/],
+          ["Imports StandardScaler", /StandardScaler/],
+          ["Imports cross_val_score", /cross_val_score/],
+          ["Uses Pipeline with scaler and model", /Pipeline\s*\(\s*\[[\s\S]*scaler[\s\S]*model/i],
+          ["Runs cross_val_score", /cross_val_score\s*\(/],
+          ["Fits on full data", /pipe\.fit\s*\(/],
+          ["Saves with joblib", /joblib\.dump\s*\(/],
+        ],
+      },
+    ],
+  },
 ];
 
 function link(path) {
@@ -6745,6 +7129,9 @@ const monthGuide = [
       { type:"github",  label:"TheAlgorithms/Python",                 url:"https://github.com/TheAlgorithms/Python",                 required:false, note:"Optional — reference for how pros write Python. Look up any class you write." },
       { type:"book",    label:"Python Data Science Handbook (free online)", url:"https://jakevdp.github.io/PythonDataScienceHandbook/",required:true, note:"Chapters 3 (Pandas) and 4 (Matplotlib). Same as the GitHub repo above but easier to read." },
       { type:"book",    label:"Mathematics for Machine Learning (free PDF)", url:"https://mml-book.github.io/book/mml-book.pdf",    required:false, note:"Optional — read Linear Algebra chapter now, Probability later in Month 5." },
+      { type:"book",    label:"Automate the Boring Stuff with Python (free)", url:"https://automatetheboringstuff.com",              required:true,  note:"Free full textbook — perfect for IE background. Chapters 1–9 cover every Python concept in Month 1. Read alongside the 30-Days repo." },
+      { type:"course",  label:"Exercism — Python track (free exercises)",    url:"https://exercism.org/tracks/python",              required:false, note:"Optional — structured exercises with automated feedback and mentoring. Do 2 per day in Weeks 2–3 after each Python lesson." },
+      { type:"tool",    label:"Google Colab — run Python free in browser",   url:"https://colab.research.google.com",               required:true,  note:"Zero install. Open it today and run your first Python cell before finishing local setup. Every code example in the roadmap runs here." },
     ],
     steps: [
       { icon:"⚙️", label:"One-time setup",          detail:"Install Python 3.11, VS Code, and Git. Do this first, once only.", href:"#mission-control", badge:"Once" },
@@ -6768,6 +7155,10 @@ const monthGuide = [
       { type:"github",  label:"AllenDowney/ThinkStats2",              url:"https://github.com/AllenDowney/ThinkStats2",              required:true,  note:"Run the notebooks alongside the book. This is your stats foundation." },
       { type:"github",  label:"tiangolo/full-stack-fastapi-template",url:"https://github.com/tiangolo/full-stack-fastapi-template", required:false, note:"Optional — study the folder structure to see how a real FastAPI project is organised." },
       { type:"course",  label:"StatQuest (p-value, t-test, regression videos)", url:"https://www.youtube.com/@statquest",           required:false, note:"Optional — watch the p-value, t-test, and logistic regression videos on YouTube." },
+      { type:"course",  label:"SQLZoo — interactive SQL practice (free)",       url:"https://sqlzoo.net",                              required:true,  note:"Do tutorials 1–7 in Week 5. Best interactive SQL practice site — runs queries directly in the browser without setup." },
+      { type:"course",  label:"LeetCode SQL 50 — interview study plan (free)",  url:"https://leetcode.com/studyplan/top-sql-50/",      required:true,  note:"50 real interview SQL questions. Do 2 per day in Week 6 after SQLZoo. Window functions appear in at least 10 questions." },
+      { type:"course",  label:"Mode Analytics SQL Tutorial (free)",             url:"https://mode.com/sql-tutorial/",                  required:false, note:"Optional — best business context for SQL window functions and CTEs. Use when you need a real-data example beyond SQLZoo." },
+      { type:"video",   label:"3Blue1Brown — Essence of Linear Algebra (YouTube)", url:"https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab", required:true, note:"15 short animated videos. Watch the full playlist in one weekend in Week 6. Makes matrix operations, dot products, and eigenvalues visual and intuitive — the math behind every ML model." },
     ],
     steps: [
       { icon:"📖", label:"Read Month 2 overview",    detail:"Open the Roadmap, select Month 2. Read the SQL + FastAPI focus.", href:"#roadmap" },
@@ -6823,12 +7214,17 @@ const monthGuide = [
       { type:"paper",   label:"A Few Useful Things to Know About ML — Domingos (2012)", url:"https://homes.cs.washington.edu/~pedrod/papers/cacm12.pdf", required:true, note:"12-page paper. Read it before building your first model — the most important ideas in one place." },
       { type:"github",  label:"dipanjanS/practical-machine-learning-with-python", url:"https://github.com/dipanjanS/practical-machine-learning-with-python", required:false, note:"Optional — Chapters 3–5 for feature engineering and model evaluation." },
       { type:"course",  label:"fast.ai Practical Deep Learning (free)",url:"https://course.fast.ai/",                                required:false, note:"Optional — the best hands-on DL course. Start after completing ML labs ml-01 to ml-05." },
+      { type:"course",  label:"Kaggle Learn — free ML micro-courses",         url:"https://www.kaggle.com/learn",                            required:true,  note:"Free 3–4 hour courses. Do 'Pandas', 'Intro to Machine Learning', and 'Intermediate ML' this month — they run directly in Kaggle notebooks, no setup." },
+      { type:"course",  label:"Machine Learning Specialization — Andrew Ng (free audit)", url:"https://www.coursera.org/specializations/machine-learning-introduction", required:false, note:"Optional — free to audit on Coursera. Do Course 1 (supervised learning) in parallel with ml-01 to ml-05. The most structured ML curriculum available." },
     ],
     steps: [
       { icon:"📖", label:"Read Month 5 overview",    detail:"Focus: Regression, classification, scikit-learn pipelines, feature engineering.", href:"#roadmap" },
       { icon:"🤖", label:"ML Lab — 5 lessons",       detail:"ml-01: train/test split. ml-02: error metrics. ml-03: confusion matrix. ml-04: feature importance. ml-05: cross-validation.", href:"#skill-labs", track:"ml", lessonId:"ml-01" },
       { icon:"🤖", label:"ML Extended — k-means & boosting", detail:"ml-06: k-means clustering (unsupervised). ml-07: gradient boosting from scratch — the XGBoost foundation.", href:"#skill-labs", track:"ml", lessonId:"ml-06", badge:"New" },
       { icon:"⏱️", label:"Time Series Lab",          detail:"ts-01: moving average & trend detection. ts-02: exponential smoothing — the ARIMA/Prophet foundation.", href:"#skill-labs", track:"ts", lessonId:"ts-01", badge:"New" },
+      { icon:"🔢", label:"NumPy Labs",               detail:"numpy-01: array creation, element-wise ops, dot product, shape/mean/sum. numpy-02: matrix multiply (A@B), statistics, np.where — the math behind every ML layer.", href:"#skill-labs", track:"numpy", lessonId:"numpy-01", badge:"New" },
+      { icon:"🐼", label:"Pandas Labs",              detail:"pandas-01: DataFrame EDA ritual — shape, dtypes, nulls, describe, groupby.agg(). pandas-02: merge, dropna, fillna, sort_values, rename.", href:"#skill-labs", track:"pandas", lessonId:"pandas-01", badge:"New" },
+      { icon:"⚙️", label:"Sklearn Pipeline Lab",    detail:"sklearn-01: manual pipeline from scratch — normalize, train, evaluate. sklearn-02: scikit-learn Pipeline + cross_val_score.", href:"#skill-labs", track:"sklearn", lessonId:"sklearn-01", badge:"New" },
       { icon:"💻", label:"Build: Prediction Model",  detail:"Train a model on a real dataset, tune it, evaluate with cross-validation, deploy as FastAPI.", href:"#code-lab", labId:"month-05" },
       { icon:"✅", label:"Mark Month 5 done",        detail:"Unlocks Month 6.", href:"#roadmap", badge:"Unlock" },
     ]
@@ -6886,6 +7282,7 @@ const monthGuide = [
       { type:"github",  label:"dair-ai/Prompt-Engineering-Guide",     url:"https://github.com/dair-ai/Prompt-Engineering-Guide",     required:true,  note:"The most comprehensive prompt engineering reference. Read the core techniques section before writing your first LLM call." },
       { type:"github",  label:"f/awesome-chatgpt-prompts",            url:"https://github.com/f/awesome-chatgpt-prompts",            required:false, note:"Optional — curated collection of real system prompts. Study their structure before writing llm-03." },
       { type:"paper",   label:"Constitutional AI — Bai et al. (2022)",url:"https://arxiv.org/abs/2212.08073",                        required:false, note:"Optional — how Anthropic trains Claude with rules. Understand how model-level safety and prompt-level rules differ." },
+      { type:"course",  label:"LeetCode 75 — Python study plan (free)", url:"https://leetcode.com/studyplan/leetcode-75/",             required:false, note:"Optional — 75 curated coding problems. Start now, aim for 2 per day. DS interviews test Medium difficulty — arrays, hash maps, sliding window." },
     ],
     steps: [
       { icon:"📖", label:"Read Month 8 overview",    detail:"Focus: RAG architecture, vector databases, LangChain agents, OpenAI API.", href:"#roadmap" },
@@ -7673,6 +8070,14 @@ function renderInterviewPrepHTML() {
 
   return `
 <div class="interview-prep">
+  <div class="interview-resource-strip">
+    <span class="interview-strip-label">🔗 Practice platforms:</span>
+    <a class="interview-strip-link" href="https://leetcode.com/studyplan/leetcode-75/" target="_blank" rel="noopener">LeetCode 75 (Python)</a>
+    <a class="interview-strip-link" href="https://leetcode.com/studyplan/top-sql-50/" target="_blank" rel="noopener">LeetCode SQL 50</a>
+    <a class="interview-strip-link" href="https://www.stratascratch.com" target="_blank" rel="noopener">StrataScratch (DS SQL)</a>
+    <a class="interview-strip-link" href="https://sqlzoo.net" target="_blank" rel="noopener">SQLZoo</a>
+    <a class="interview-strip-link" href="https://www.kaggle.com/learn" target="_blank" rel="noopener">Kaggle Learn</a>
+  </div>
   <div class="interview-tracks" id="interviewTracks">
     ${tracks.map(t=>`<button class="interview-track-btn ${t.id===activeTrack?"is-active":""}" data-track="${t.id}">${t.label}</button>`).join("")}
   </div>
