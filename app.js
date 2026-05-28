@@ -108,6 +108,11 @@ const glossary = [
   ["Sandbox", "An isolated code execution environment where untrusted code runs safely. Used in code agents so the LLM-generated code cannot damage the host system."],
   ["LoRA", "Low-Rank Adaptation. A fine-tuning method that adds small trainable matrices to a frozen model, reducing GPU memory and compute cost dramatically."],
   ["vLLM", "A high-throughput LLM serving library using PagedAttention for efficient GPU memory management. Standard tool for production LLM API servers."],
+  ["Round Robin", "A scheduling algorithm that assigns tasks to workers in a fixed cyclic order — A, B, C, A, B, C… — so every resource gets an equal turn. Used in OS process scheduling, Kubernetes pod load balancing, GPU inference servers (TorchServe, Triton), Spark/Dask partitioning, LLM API key rotation (LiteLLM), and scikit-learn K-Fold cross-validation. Implemented in Python with itertools.cycle() or the modulo operator (i % len(workers))."],
+  ["Modulo operator", "The % operator returns the remainder of integer division. Used in Round Robin scheduling (i % n wraps an index back to 0 after n steps), hash functions, and cyclic data structures. Example: 7 % 3 = 1 because 7 = 2×3 + 1."],
+  ["itertools.cycle", "A Python standard-library iterator that repeats a sequence infinitely in order. next(cycle(['A','B','C'])) returns A, B, C, A, B, C… Used to implement Round Robin dispatch without tracking an index manually."],
+  ["Time quantum", "The fixed time slice given to each process in Round Robin CPU scheduling before the scheduler moves to the next process. Typical values: 10–100ms. Too small → overhead from context switching. Too large → degrades to FIFO. Also called 'time slice'."],
+  ["Load balancer", "A system that distributes incoming requests across multiple servers or workers. Common strategies: Round Robin (cyclic), Least Connections (pick least busy), Weighted Round Robin (proportional capacity), Consistent Hashing (sticky routing). In ML: distributes inference requests across GPU replicas."],
 ];
 
 const blockers = [
@@ -4736,6 +4741,201 @@ print("TESTS PASSED: queue simulation complete")`,
       },
     ],
   },
+  // ── Round Robin track ─────────────────────────────────────────────────────
+  {
+    id: "rr",
+    label: "Round Robin",
+    source: "phase-1-software-engineering/month-01-python-git/resources/",
+    lessons: [
+      {
+        id: "rr-01",
+        title: "Dispatch tasks with modulo and cycle",
+        mode: "python",
+        explain: "Round Robin distributes work in a fixed cyclic order — every worker gets an equal turn. The math behind it is the modulo operator (%). Python's itertools.cycle() wraps this into an infinite iterator. This pattern appears in GPU load balancing, Spark partitioning, and LLM API key rotation.",
+        goals: [
+          "Distribute 6 tasks across 3 workers using the % operator",
+          "Do the same with itertools.cycle and next()",
+          "Verify both methods produce identical assignments",
+          "Print a per-worker task count to confirm even distribution",
+        ],
+        starter: `import itertools
+
+workers = ["GPU-0", "GPU-1", "GPU-2"]
+tasks   = ["task_1", "task_2", "task_3", "task_4", "task_5", "task_6"]
+
+# ── Method 1: modulo index ──
+# workers[i % len(workers)] wraps i back to 0 after every 3 steps
+print("=== Modulo method ===")
+assignments = []
+for i, task in enumerate(tasks):
+    worker = workers[i % len(workers)]
+    assignments.append((task, worker))
+    print(f"  {task} → {worker}")
+
+# ── Method 2: itertools.cycle ──
+# cycle() creates an infinite iterator that repeats the list forever
+print("\\n=== itertools.cycle method ===")
+pool = itertools.cycle(workers)
+cycle_assignments = []
+for task in tasks:
+    worker = next(pool)
+    cycle_assignments.append((task, worker))
+    print(f"  {task} → {worker}")
+
+# ── Verify both give same result ──
+both_agree = all(a[1] == b[1] for a, b in zip(assignments, cycle_assignments))
+print(f"\\nBoth methods agree: {both_agree}")
+
+# ── Per-worker count (should be equal) ──
+for w in workers:
+    count = sum(1 for _, assigned in assignments if assigned == w)
+    print(f"  {w}: {count} tasks")`,
+        expected: "Each GPU gets exactly 2 tasks. Both methods agree: True.",
+        tests: `assert both_agree == True, "Modulo and cycle should give identical assignments"
+for w in workers:
+    count = sum(1 for _, assigned in assignments if assigned == w)
+    assert count == 2, f"{w} should get 2 tasks, got {count}"
+print("TESTS PASSED: round robin dispatch — modulo and cycle complete")`,
+        checks: [
+          ["Imports itertools", /import\s+itertools/],
+          ["Uses modulo operator", /i\s*%\s*len\s*\(workers\)|%\s*\d/],
+          ["Uses itertools.cycle", /itertools\.cycle\s*\(/],
+          ["Uses next()", /next\s*\(\s*pool\s*\)/],
+          ["Both methods agree: True", /True/, "output"],
+          ["Each GPU gets 2 tasks", /2 tasks/, "output"],
+        ],
+      },
+      {
+        id: "rr-02",
+        title: "Time-slice CPU scheduler",
+        mode: "python",
+        explain: "Round Robin was invented for OS process scheduling: each process gets a fixed time slice (quantum), and if it's not finished it goes back to the end of the queue. This loop-with-re-queue pattern is the foundation of every modern scheduler — and the same logic reappears in batch ML job queues and Celery task retries.",
+        goals: [
+          "Build an rr_scheduler function using collections.deque",
+          "Use min(time_slice, remaining) to avoid over-running",
+          "Re-queue unfinished processes at the end",
+          "Track total elapsed time",
+          "Show that all 3 processes finish",
+        ],
+        starter: `from collections import deque
+
+def rr_scheduler(processes, time_slice=2):
+    """
+    Purpose: Simulate Round Robin CPU scheduling with a fixed time quantum.
+    Each process runs for min(time_slice, remaining) ms, then goes back
+    to the end of the queue if not finished.
+    """
+    queue = deque(processes)   # deque gives O(1) popleft and append
+    time  = 0
+    log   = []
+
+    while queue:
+        name, remaining = queue.popleft()      # take next process
+        run = min(time_slice, remaining)       # can't run more than remaining
+        log.append((time, name, run))
+        print(f"t={time:3d}ms: {name} runs {run}ms  (left after: {remaining-run}ms)")
+        time      += run
+        remaining -= run
+        if remaining > 0:
+            queue.append((name, remaining))    # not done → re-queue
+
+    print(f"\\nTotal time: {time}ms")
+    print(f"Steps executed: {len(log)}")
+    return time, log
+
+# P1 needs 6ms, P2 needs 4ms, P3 needs 2ms
+# With time_slice=2: P1→P2→P3→P1→P2→P1
+processes = [("P1", 6), ("P2", 4), ("P3", 2)]
+total_time, execution_log = rr_scheduler(processes, time_slice=2)`,
+        expected: "Total time 12ms. 6 execution steps. Processes interleave: P1, P2, P3, P1, P2, P1.",
+        tests: `assert total_time == 12, f"Total time should be 12ms, got {total_time}"
+assert len(execution_log) == 6, f"Should be 6 execution steps, got {len(execution_log)}"
+names_in_order = [name for _, name, _ in execution_log]
+assert names_in_order[0] == "P1" and names_in_order[2] == "P3", "First=P1, third=P3"
+print("TESTS PASSED: time-slice CPU scheduler complete")`,
+        checks: [
+          ["Imports deque", /from\s+collections\s+import\s+deque/],
+          ["Uses popleft", /\.popleft\s*\(\s*\)/],
+          ["Uses min for time slice", /min\s*\(\s*time_slice\s*,\s*remaining\s*\)/],
+          ["Re-queues unfinished", /queue\.append\s*\(/],
+          ["Prints total time 12", /12ms/, "output"],
+          ["Correct step count", /6/, "output"],
+        ],
+      },
+      {
+        id: "rr-03",
+        title: "LLM API load balancer",
+        mode: "python",
+        explain: "Rate limits are the #1 practical problem when calling LLM APIs at scale. Round Robin across multiple API keys (or endpoints) distributes requests evenly so no single key hits its limit. This is exactly what LiteLLM and OpenRouter do internally. The same pattern works for multi-GPU inference, database read replicas, and any pool of homogeneous workers.",
+        goals: [
+          "Build a key_pool with itertools.cycle",
+          "Simulate 12 requests distributed across 3 API keys",
+          "Track usage count per key",
+          "Print a bar chart of the distribution",
+          "Assert the distribution is perfectly even (max − min ≤ 1)",
+        ],
+        starter: `import itertools
+
+# Three API keys (or GPU endpoints, or database read replicas)
+api_keys = ["key-A", "key-B", "key-C"]
+key_pool = itertools.cycle(api_keys)
+
+usage_count = {k: 0 for k in api_keys}
+
+def call_llm(prompt_id):
+    """Route a prompt to the next API key in the round-robin pool."""
+    key = next(key_pool)
+    usage_count[key] += 1
+    return key
+
+# Simulate 12 requests
+results = []
+for i in range(12):
+    assigned_key = call_llm(f"prompt_{i+1}")
+    results.append(assigned_key)
+
+# ── Distribution report ──
+print("API key usage distribution (12 requests, 3 keys):")
+for key, count in usage_count.items():
+    bar = "█" * count
+    print(f"  {key}: {bar} ({count} requests)")
+
+counts      = list(usage_count.values())
+max_diff    = max(counts) - min(counts)
+total_routed = sum(counts)
+
+print(f"\\nTotal requests routed : {total_routed}")
+print(f"Max imbalance         : {max_diff} (0 = perfectly even)")
+
+# ── Comparison table ──
+comparison = [
+    ("Round Robin",        "Fixed cyclic",   "Equal workers"),
+    ("Least Connections",  "Pick least busy","Variable speeds"),
+    ("Weighted RR",        "Proportional",   "Known capacities"),
+    ("Random",             "Random pick",    "Simple, stateless"),
+]
+print("\\nLoad balancing strategies:")
+print(f"  {'Strategy':<22} {'Pick method':<20} {'Best when'}")
+print(f"  {'-'*22} {'-'*20} {'-'*20}")
+for name, method, best in comparison:
+    print(f"  {name:<22} {method:<20} {best}")`,
+        expected: "Each key gets exactly 4 requests. Max imbalance: 0. Table printed with 4 strategies.",
+        tests: `assert total_routed == 12, f"Should route 12 requests, got {total_routed}"
+assert max_diff == 0, f"Distribution should be perfectly even, max diff={max_diff}"
+for k, v in usage_count.items():
+    assert v == 4, f"{k} should have 4 requests, got {v}"
+print("TESTS PASSED: LLM API load balancer — round robin complete")`,
+        checks: [
+          ["Imports itertools", /import\s+itertools/],
+          ["Uses itertools.cycle", /itertools\.cycle\s*\(/],
+          ["Tracks usage_count dict", /usage_count\s*=/],
+          ["Simulates 12 requests", /range\s*\(\s*12\s*\)/],
+          ["Prints 4 requests per key", /4 requests/, "output"],
+          ["Max imbalance is 0", /0.*perfectly even|imbalance.*0/i, "output"],
+        ],
+      },
+    ],
+  },
   // ── NumPy track ────────────────────────────────────────────────────────────
   {
     id: "numpy",
@@ -7245,6 +7445,7 @@ const monthGuide = [
       { icon:"📖", label:"Read Month 6 overview",    detail:"Focus: Ensemble methods, cross-validation, data leakage, model monitoring.", href:"#roadmap" },
       { icon:"🤖", label:"ML Lab — 2 lessons + Debug",detail:"ml-04: feature importance. ml-05: cross-validation. ml-debug-01: fix a data leakage bug in an ML pipeline.", href:"#skill-labs", track:"ml", lessonId:"ml-04" },
       { icon:"🎲", label:"Simulation Labs",          detail:"sim-01: Monte Carlo project risk simulation. sim-02: discrete event queue simulation (IE foundation).", href:"#skill-labs", track:"sim", lessonId:"sim-01", badge:"New" },
+      { icon:"🔄", label:"Round Robin Labs",         detail:"rr-01: dispatch tasks with modulo and itertools.cycle. rr-02: time-slice CPU scheduler with deque. rr-03: LLM API load balancer — rate-limit avoidance pattern.", href:"#skill-labs", track:"rr", lessonId:"rr-01", badge:"New" },
       { icon:"💻", label:"Build: Production ML",     detail:"MLflow tracking, cross-validated model, monitored FastAPI endpoint, Dockerized.", href:"#code-lab", labId:"month-06" },
       { icon:"✅", label:"Mark Month 6 done",        detail:"Unlocks Month 7.", href:"#roadmap", badge:"Unlock" },
     ]
