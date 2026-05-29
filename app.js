@@ -57,6 +57,8 @@ const superpowers = [
 const startChecklistItems = [
   ["read-root", "Read the root roadmap once end to end", "Open the clean README reader and understand the 12-month path before coding."],
   ["install-python", "Install Python 3.11+ and VS Code", "Go to python.org/downloads → click the yellow button → run installer. ⚠️ Windows: check 'Add Python to PATH' before clicking Install Now — if you miss this, Python won't be found in PowerShell. Verify with: python --version"],
+  ["install-packages", "Install the data science package stack", "Open PowerShell and run: pip install numpy pandas matplotlib scikit-learn requests. These 5 packages cover every task in the python_practice folder and every skill lab on this site."],
+  ["python-practice-folder", "Open your python_practice folder and read START_HERE.py", "Your 20 task files are the hands-on companion to this website. Tasks 01–13 = Month 1. Tasks 14–18 = Month 2. Tasks 19–20 = Month 5. Run each task with: python task_XX_name.py"],
   ["install-git", "Install Git and create a GitHub account", "Every project should become a clean GitHub repo with a README."],
   ["ubuntu-plan", "Prepare Ubuntu VM or Linux environment", "Docker, Redis, cloud workflows, and ML tools are easier on Linux."],
   ["open-python-lab", "Finish Python lesson 1 in this website", "This proves the run/submit/save loop works."],
@@ -5684,6 +5686,136 @@ plt.show()`,
       },
     ],
   },
+  // ── Requests / API track ─────────────────────────────────────────────────
+  {
+    id: "requests",
+    label: "API Requests",
+    source: "phase-1-software-engineering/month-02-databases-web/resources/",
+    lessons: [
+      {
+        id: "requests-01",
+        title: "GET request and JSON parsing",
+        mode: "text",
+        explain: "In AI engineering you call APIs constantly — OpenAI, HuggingFace, your own ML model, live data feeds. The pattern is always the same: requests.get(url) → check status_code → .json() gives you a Python dict. JSON is just a Python dictionary written as text. This is one of the most important skills to build early.",
+        goals: [
+          "Import the requests library",
+          "Make a GET request with requests.get(url)",
+          "Check response.status_code (200 = OK)",
+          "Parse JSON with response.json()",
+          "Navigate nested JSON like data['key']['subkey']",
+          "Print a formatted result from the parsed data",
+        ],
+        starter: `import requests
+
+# ── Bitcoin price (free, no API key needed) ──
+url = "https://api.coindesk.com/v1/bpi/currentprice.json"
+response = requests.get(url, timeout=5)
+
+print(f"Status code : {response.status_code}")   # 200 = OK
+
+# .json() converts the JSON response to a Python dictionary
+data = response.json()
+
+# Navigate nested JSON
+bitcoin_usd = data["bpi"]["USD"]["rate"]
+bitcoin_eur = data["bpi"]["EUR"]["rate"]
+updated_at  = data["time"]["updated"]
+
+print(f"Bitcoin (USD): {bitcoin_usd}")
+print(f"Bitcoin (EUR): {bitcoin_eur}")
+print(f"Updated at   : {updated_at}")
+
+# ── Pokemon API (free, no key needed) ──
+poke_url  = "https://pokeapi.co/api/v2/pokemon/pikachu"
+poke_resp = requests.get(poke_url, timeout=5)
+poke      = poke_resp.json()
+
+print(f"\\nPokémon : {poke['name'].upper()}")
+print(f"Height  : {poke['height'] * 10} cm")
+print(f"Weight  : {poke['weight'] / 10} kg")
+print(f"Types   : {[t['type']['name'] for t in poke['types']]}")
+print(f"Abilities: {[a['ability']['name'] for a in poke['abilities'][:3]]}")`,
+        expected: "Status 200, Bitcoin prices in USD and EUR, Pikachu's height/weight/types.",
+        checks: [
+          ["Imports requests", /import\s+requests/],
+          ["Uses requests.get with timeout", /requests\.get\s*\([\s\S]*timeout/],
+          ["Checks status_code", /\.status_code/],
+          ["Parses JSON with .json()", /\.json\s*\(\s*\)/],
+          ["Navigates nested JSON with brackets", /data\s*\[["']/],
+          ["Prints Bitcoin price", /bitcoin|Bitcoin|bpi/i],
+          ["Calls Pokemon API", /pokeapi|pokemon|pikachu/i],
+        ],
+      },
+      {
+        id: "requests-02",
+        title: "Error handling for API calls",
+        mode: "text",
+        explain: "Networks fail. Servers return 404. Timeouts happen. Production code NEVER crashes on a bad API response. The pattern is: wrap every request in try/except, use response.raise_for_status() to catch HTTP errors, and always set a timeout. This is the exact pattern used in LLM wrappers, data pipelines, and ML inference services.",
+        goals: [
+          "Wrap requests.get in try/except",
+          "Catch Timeout, ConnectionError, and HTTPError separately",
+          "Use response.raise_for_status() to catch 4xx/5xx errors",
+          "Build a reusable safe_get(url) helper function",
+          "Test with a working URL and a broken URL",
+          "Add a retry loop that retries up to 3 times",
+        ],
+        starter: `import requests
+import time
+
+def safe_get(url, timeout=5, retries=3):
+    """
+    Purpose: Fetch a URL safely — never crashes, retries on failure.
+    Returns the parsed JSON dict, or None on failure.
+    """
+    for attempt in range(1, retries + 1):
+        try:
+            response = requests.get(url, timeout=timeout)
+            response.raise_for_status()  # raises HTTPError for 4xx/5xx
+            return response.json()
+
+        except requests.exceptions.Timeout:
+            print(f"  Attempt {attempt}: timed out after {timeout}s")
+        except requests.exceptions.ConnectionError:
+            print(f"  Attempt {attempt}: no connection")
+        except requests.exceptions.HTTPError as e:
+            print(f"  Attempt {attempt}: HTTP error {e}")
+            return None   # don't retry on HTTP errors (404, 403 won't change)
+
+        if attempt < retries:
+            time.sleep(1)   # wait 1 second before retrying
+
+    print(f"All {retries} attempts failed for {url}")
+    return None
+
+# ── Test with working URL ──
+print("=== Working URL ===")
+data = safe_get("https://api.agify.io?name=michael")
+if data:
+    print(f"Name: {data['name']}, Predicted age: {data['age']}")
+
+# ── Test with a URL that returns 404 ──
+print("\\n=== 404 URL ===")
+bad = safe_get("https://httpstat.us/404")
+
+# ── Test with weather API (no key needed) ──
+print("\\n=== Weather API ===")
+weather = safe_get("https://api.open-meteo.com/v1/forecast?latitude=25.2&longitude=55.3&current_weather=true")
+if weather:
+    current = weather["current_weather"]
+    print(f"Dubai: {current['temperature']}°C, wind {current['windspeed']} km/h")`,
+        expected: "Age prediction for Michael printed. 404 error handled without crash. Dubai weather printed.",
+        checks: [
+          ["Imports requests", /import\s+requests/],
+          ["Defines safe_get function", /def\s+safe_get\s*\(/],
+          ["Uses response.raise_for_status()", /\.raise_for_status\s*\(\s*\)/],
+          ["Catches Timeout", /requests\.exceptions\.Timeout/],
+          ["Catches ConnectionError", /requests\.exceptions\.ConnectionError/],
+          ["Catches HTTPError", /requests\.exceptions\.HTTPError/],
+          ["Has retry loop", /for\s+attempt\s+in\s+range/],
+        ],
+      },
+    ],
+  },
 ];
 
 function link(path) {
@@ -7708,6 +7840,8 @@ const monthGuide = [
       { icon:"🛠️", label:"Git Lab — 3 lessons",       detail:"git-01: stage/commit/push workflow. git-02: feature branches. git-debug-01: fix broken Git commands.", href:"#skill-labs", track:"git", lessonId:"git-01" },
       { icon:"🐧", label:"Linux Labs — 2 lessons",   detail:"linux-01: navigation, mkdir -p, cp, grep — set up a full ML project structure. linux-02: chmod, ps aux, kill, export, pipes — production process management.", href:"#skill-labs", track:"linux", lessonId:"linux-01", badge:"New" },
       { icon:"🧮", label:"Mini Projects 1 & 2",      detail:"py-24: Build a calculator — 4 functions, division-by-zero guard, f-string output. py-25: Build a guessing game — random secret, while loop, Too low/Too high feedback. Do these before the CSV Cleaner.", href:"#python-lab", lessonId:"py-24", badge:"Beginner" },
+      { icon:"📂", label:"Local: tasks 01–10 (Fundamentals)", detail:"In PowerShell: cd Desktop\\python_practice → python task_01_hello_world.py. Work through in order: 01 print/input, 02 calculator, 03 loops, 04 functions, 05 lists, 06 dictionaries, 07 files, 08 error handling, 09 OOP classes, 10 Student Grade Manager (final project). Do alongside the Python lessons above.", href:"#mission-control", badge:"Local" },
+      { icon:"📂", label:"Local: tasks 11–13 (Intermediate)", detail:"task_11: string slicing, .strip()/.upper()/.split(), Caesar cipher, password validator. task_12: list/dict comprehensions, lambda, map(), filter(), sorted(key=). task_13: math, random, datetime, os modules — appointment scheduler. Run after py-23.", href:"#mission-control", badge:"Local" },
       { icon:"💻", label:"Build: CSV Cleaner",       detail:"Write a Python CLI tool that cleans a messy CSV using argparse and classes. Push it to GitHub with a README.", href:"#code-lab", labId:"month-01" },
       { icon:"✅", label:"Mark Month 1 done",        detail:"Click 'Mark done' on Month 1 in the Roadmap. This unlocks Month 2.", href:"#roadmap", badge:"Unlock" },
     ]
@@ -7727,12 +7861,16 @@ const monthGuide = [
       { type:"course",  label:"LeetCode SQL 50 — interview study plan (free)",  url:"https://leetcode.com/studyplan/top-sql-50/",      required:true,  note:"50 real interview SQL questions. Do 2 per day in Week 6 after SQLZoo. Window functions appear in at least 10 questions." },
       { type:"course",  label:"Mode Analytics SQL Tutorial (free)",             url:"https://mode.com/sql-tutorial/",                  required:false, note:"Optional — best business context for SQL window functions and CTEs. Use when you need a real-data example beyond SQLZoo." },
       { type:"video",   label:"3Blue1Brown — Essence of Linear Algebra (YouTube)", url:"https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab", required:true, note:"15 short animated videos. Watch the full playlist in one weekend in Week 6. Makes matrix operations, dot products, and eigenvalues visual and intuitive — the math behind every ML model." },
+      { type:"tool",    label:"pip install — data science stack (run once in PowerShell)", url:"https://pypi.org/", required:true, note:"Run: pip install numpy pandas matplotlib scikit-learn requests — installs all 5 packages needed for tasks 14-20 and every Month 2-5 lab. Takes ~2 minutes." },
+      { type:"github",  label:"psf/requests — HTTP library for Python",                  url:"https://github.com/psf/requests",       required:true, note:"Read the 5-minute quickstart at requests.readthedocs.io. Used in task_17 and the requests-01/02 skill labs — fundamental for calling any API." },
     ],
     steps: [
       { icon:"📖", label:"Read Month 2 overview",    detail:"Open the Roadmap, select Month 2. Read the SQL + FastAPI focus.", href:"#roadmap" },
       { icon:"🗄️", label:"SQL Lessons 1–6 + Debug",  detail:"SELECT, GROUP BY, JOINs, CTEs, window functions, HAVING/subqueries, then fix a broken JOIN.", href:"#skill-labs", track:"sql", lessonId:"sql-01" },
       { icon:"⚡", label:"FastAPI Lab",               detail:"fastapi-01: Build your first HTTP endpoint and wrap a simple prediction in an API.", href:"#skill-labs", track:"fastapi", lessonId:"fastapi-01" },
       { icon:"📊", label:"Matplotlib + Seaborn Labs", detail:"matplotlib-01: line chart and histogram with titles, grid, axvline, legend. matplotlib-02: seaborn correlation heatmap and EDA scatter — the two charts every DS interview expects.", href:"#skill-labs", track:"matplotlib", lessonId:"matplotlib-01", badge:"New" },
+      { icon:"🌐", label:"API Requests Lab",         detail:"requests-01: GET request + JSON parsing (Bitcoin, Pokémon APIs). requests-02: error handling — safe_get() with Timeout/ConnectionError/HTTPError + retry loop.", href:"#skill-labs", track:"requests", lessonId:"requests-01", badge:"New" },
+      { icon:"📂", label:"Local: tasks 14–18 (Data Stack)", detail:"task_14: NumPy arrays, vectorized math, reshape, statistics — install: pip install numpy. task_15: Pandas DataFrames, groupby, EDA, missing values, CSV — pip install pandas. task_16: SQLite + Python, CREATE TABLE, JOIN, pandas.read_sql_query(). task_17: requests library, live APIs — Bitcoin, Pokémon, weather, country — pip install requests. task_18: Matplotlib all chart types + 2×2 dashboard — pip install matplotlib.", href:"#mission-control", badge:"Local" },
       { icon:"💻", label:"Build: ML REST API",       detail:"FastAPI endpoint that serves a scikit-learn model. Tested with curl.", href:"#code-lab", labId:"month-02" },
       { icon:"✅", label:"Mark Month 2 done",        detail:"Unlocks Month 3.", href:"#roadmap", badge:"Unlock" },
     ]
@@ -7794,6 +7932,8 @@ const monthGuide = [
       { icon:"🔢", label:"NumPy Labs",               detail:"numpy-01: array creation, element-wise ops, dot product, shape/mean/sum. numpy-02: matrix multiply (A@B), statistics, np.where — the math behind every ML layer.", href:"#skill-labs", track:"numpy", lessonId:"numpy-01", badge:"New" },
       { icon:"🐼", label:"Pandas Labs",              detail:"pandas-01: DataFrame EDA ritual — shape, dtypes, nulls, describe, groupby.agg(). pandas-02: merge, dropna, fillna, sort_values, rename.", href:"#skill-labs", track:"pandas", lessonId:"pandas-01", badge:"New" },
       { icon:"⚙️", label:"Sklearn Pipeline Lab",    detail:"sklearn-01: manual pipeline from scratch — normalize, train, evaluate. sklearn-02: scikit-learn Pipeline + cross_val_score.", href:"#skill-labs", track:"sklearn", lessonId:"sklearn-01", badge:"New" },
+      { icon:"📂", label:"Local: task 19 — ML Intro", detail:"task_19_machine_learning_intro.py: linear regression (salary vs experience), logistic regression (pass/fail), decision tree, full pipeline on Iris dataset — compare 3 models, save best with joblib. Run: python task_19_machine_learning_intro.py. Mirrors the skill lab sequence ml-01 to sklearn-02.", href:"#mission-control", badge:"Local" },
+      { icon:"📂", label:"Local: task 20 — Final Boss ☠️", detail:"task_20_final_project_advanced.py: 7-phase Student Performance Predictor — data generation (200 students), cleaning, EDA, SQLite database, 2×3 visualization dashboard, 3 ML models (LogReg/DTree/RandomForest), feature importance, predict_student() function, formatted report. Estimated 5–15 hours. When you finish this, you are internship-ready.", href:"#mission-control", badge:"Expert" },
       { icon:"💻", label:"Build: Prediction Model",  detail:"Train a model on a real dataset, tune it, evaluate with cross-validation, deploy as FastAPI.", href:"#code-lab", labId:"month-05" },
       { icon:"✅", label:"Mark Month 5 done",        detail:"Unlocks Month 6.", href:"#roadmap", badge:"Unlock" },
     ]
