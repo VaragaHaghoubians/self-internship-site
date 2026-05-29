@@ -56,7 +56,7 @@ const superpowers = [
 
 const startChecklistItems = [
   ["read-root", "Read the root roadmap once end to end", "Open the clean README reader and understand the 12-month path before coding."],
-  ["install-python", "Install Python 3.11+ and VS Code", "Needed for local project work, even though browser labs cover beginner practice."],
+  ["install-python", "Install Python 3.11+ and VS Code", "Go to python.org/downloads → click the yellow button → run installer. ⚠️ Windows: check 'Add Python to PATH' before clicking Install Now — if you miss this, Python won't be found in PowerShell. Verify with: python --version"],
   ["install-git", "Install Git and create a GitHub account", "Every project should become a clean GitHub repo with a README."],
   ["ubuntu-plan", "Prepare Ubuntu VM or Linux environment", "Docker, Redis, cloud workflows, and ML tools are easier on Linux."],
   ["open-python-lab", "Finish Python lesson 1 in this website", "This proves the run/submit/save loop works."],
@@ -3321,6 +3321,118 @@ print("TESTS PASSED: TypeError and IndexError fixed")`,
       ["IndexError fixed: uses index 2", /scores\s*\[\s*2\s*\]/],
       ["Output shows Years left: 40", /Years left:\s*40/, "output"],
       ["Output shows Last score: 79", /Last score:\s*79/, "output"],
+    ],
+  },
+  {
+    id: "py-24",
+    day: "Mini Project 1",
+    title: "Build a calculator",
+    explain: "Your first real program. A calculator puts together everything from Lessons 1–10: functions, parameters, return values, f-strings, and calling functions with different inputs. The goal is to write four clean functions and prove they all work by testing each one.",
+    goals: [
+      "Write add(), subtract(), multiply(), and divide() functions",
+      "Handle division by zero — return an error message, not a crash",
+      "Test every function with at least one example",
+      "Print results with f-strings",
+    ],
+    starter: `# Mini Project 1: Calculator
+# Write four functions. Each takes two numbers and returns the result.
+
+def add(a, b):
+    return a + b
+
+def subtract(a, b):
+    return a - b
+
+def multiply(a, b):
+    return a * b
+
+def divide(a, b):
+    if b == 0:
+        return "Error: cannot divide by zero"
+    return a / b
+
+# ── Test every operation ──
+print(f"10 + 3  = {add(10, 3)}")
+print(f"10 - 3  = {subtract(10, 3)}")
+print(f"10 * 3  = {multiply(10, 3)}")
+print(f"10 / 3  = {round(divide(10, 3), 2)}")
+print(f"10 / 0  = {divide(10, 0)}")
+
+# ── More tests ──
+print(f"\\n7 + 8   = {add(7, 8)}")
+print(f"100 / 4 = {divide(100, 4)}")
+print(f"-5 * 3  = {multiply(-5, 3)}")`,
+    expected: "All 8 lines print correctly. Division by zero shows the error message, not a crash.",
+    tests: `assert add(10, 3) == 13
+assert subtract(10, 3) == 7
+assert multiply(10, 3) == 30
+assert round(divide(10, 3), 2) == 3.33
+assert divide(10, 0) == "Error: cannot divide by zero"
+assert add(7, 8) == 15
+assert divide(100, 4) == 25.0
+print("TESTS PASSED: calculator complete")`,
+    checks: [
+      ["Defines add function", /def\s+add\s*\(\s*a\s*,\s*b\s*\)/],
+      ["Defines subtract function", /def\s+subtract\s*\(\s*a\s*,\s*b\s*\)/],
+      ["Defines multiply function", /def\s+multiply\s*\(\s*a\s*,\s*b\s*\)/],
+      ["Defines divide function", /def\s+divide\s*\(\s*a\s*,\s*b\s*\)/],
+      ["Handles division by zero", /if\s+b\s*==\s*0/],
+      ["Output includes 10 + 3 = 13", /10\s*\+\s*3.*13|13/, "output"],
+      ["Output includes division by zero message", /cannot divide by zero|Error/, "output"],
+    ],
+  },
+  {
+    id: "py-25",
+    day: "Mini Project 2",
+    title: "Build a guessing game",
+    explain: "Your second mini project uses random numbers, a while loop, if/elif/else, and user feedback — all concepts from Lessons 1–10. A guessing game is the classic beginner project because it combines everything in a small, satisfying program you can actually play.",
+    goals: [
+      "Generate a random secret number between 1 and 10",
+      "Loop through a list of guesses and compare each to the secret",
+      "Print 'Too low', 'Too high', or 'Correct!' for each guess",
+      "Stop the loop as soon as the correct guess is found",
+      "Count and print the number of attempts",
+    ],
+    starter: `import random
+random.seed(42)   # fixed seed so your tests are predictable
+
+secret = random.randint(1, 10)   # random number between 1 and 10
+
+# Simulate 5 guesses (in a real game these would come from input())
+guesses = [3, 7, 5, 9, secret]
+
+attempts = 0
+found = False
+
+for guess in guesses:
+    attempts += 1
+    if guess < secret:
+        print(f"Guess {guess}: Too low!  Try higher.")
+    elif guess > secret:
+        print(f"Guess {guess}: Too high! Try lower.")
+    else:
+        print(f"Guess {guess}: 🎉 Correct! You found it in {attempts} attempt(s).")
+        found = True
+        break
+
+if not found:
+    print(f"Game over. The secret was {secret}.")
+
+print(f"\\nSecret number was: {secret}")
+print(f"Total guesses made: {attempts}")`,
+    expected: "Several 'Too low/high' lines then a 'Correct!' line. Secret = 6 with seed 42.",
+    tests: `assert secret == 6, f"With seed 42, secret should be 6, got {secret}"
+assert found == True, "The correct guess should be in the guesses list"
+assert attempts <= len(guesses), "Attempts should not exceed number of guesses"
+print("TESTS PASSED: guessing game complete")`,
+    checks: [
+      ["Imports random", /import\s+random/],
+      ["Uses randint to pick secret", /random\.randint\s*\(\s*1\s*,\s*10\s*\)/],
+      ["Loops through guesses", /for\s+guess\s+in/],
+      ["Checks if too low", /guess\s*<\s*secret|Too low/i],
+      ["Checks if too high", /guess\s*>\s*secret|Too high/i],
+      ["Breaks on correct guess", /break/],
+      ["Output includes Correct", /Correct/, "output"],
     ],
   },
 ];
@@ -7584,6 +7696,8 @@ const monthGuide = [
       { type:"book",    label:"Automate the Boring Stuff with Python (free)", url:"https://automatetheboringstuff.com",              required:true,  note:"Free full textbook — perfect for IE background. Chapters 1–9 cover every Python concept in Month 1. Read alongside the 30-Days repo." },
       { type:"course",  label:"Exercism — Python track (free exercises)",    url:"https://exercism.org/tracks/python",              required:false, note:"Optional — structured exercises with automated feedback and mentoring. Do 2 per day in Weeks 2–3 after each Python lesson." },
       { type:"tool",    label:"Google Colab — run Python free in browser",   url:"https://colab.research.google.com",               required:true,  note:"Zero install. Open it today and run your first Python cell before finishing local setup. Every code example in the roadmap runs here." },
+      { type:"course",  label:"W3Schools Python Tutorial (free, browser-based)", url:"https://www.w3schools.com/python/",            required:false, note:"Optional — best quick-reference site. Use it to look up any syntax you forget. Each page has a live 'Try it Yourself' editor." },
+      { type:"course",  label:"freeCodeCamp — Scientific Computing with Python", url:"https://www.freecodecamp.org/learn/scientific-computing-with-python/", required:false, note:"Optional — free structured course with 56 lessons and 5 projects. Good alternative path if you prefer video + exercises side by side." },
     ],
     steps: [
       { icon:"⚙️", label:"One-time setup",          detail:"Install Python 3.11, VS Code, and Git. Do this first, once only.", href:"#mission-control", badge:"Once" },
@@ -7593,6 +7707,7 @@ const monthGuide = [
       { icon:"🐛", label:"Debug Lessons 21–23",      detail:"Fix real errors: NameError/SyntaxError, logic bugs, TypeError/IndexError. These teach you how to read Python error messages.", href:"#python-lab", lessonId:"py-21", badge:"Debug" },
       { icon:"🛠️", label:"Git Lab — 3 lessons",       detail:"git-01: stage/commit/push workflow. git-02: feature branches. git-debug-01: fix broken Git commands.", href:"#skill-labs", track:"git", lessonId:"git-01" },
       { icon:"🐧", label:"Linux Labs — 2 lessons",   detail:"linux-01: navigation, mkdir -p, cp, grep — set up a full ML project structure. linux-02: chmod, ps aux, kill, export, pipes — production process management.", href:"#skill-labs", track:"linux", lessonId:"linux-01", badge:"New" },
+      { icon:"🧮", label:"Mini Projects 1 & 2",      detail:"py-24: Build a calculator — 4 functions, division-by-zero guard, f-string output. py-25: Build a guessing game — random secret, while loop, Too low/Too high feedback. Do these before the CSV Cleaner.", href:"#python-lab", lessonId:"py-24", badge:"Beginner" },
       { icon:"💻", label:"Build: CSV Cleaner",       detail:"Write a Python CLI tool that cleans a messy CSV using argparse and classes. Push it to GitHub with a README.", href:"#code-lab", labId:"month-01" },
       { icon:"✅", label:"Mark Month 1 done",        detail:"Click 'Mark done' on Month 1 in the Roadmap. This unlocks Month 2.", href:"#roadmap", badge:"Unlock" },
     ]
