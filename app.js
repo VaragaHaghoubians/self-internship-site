@@ -113,6 +113,14 @@ const glossary = [
   ["itertools.cycle", "A Python standard-library iterator that repeats a sequence infinitely in order. next(cycle(['A','B','C'])) returns A, B, C, A, B, C… Used to implement Round Robin dispatch without tracking an index manually."],
   ["Time quantum", "The fixed time slice given to each process in Round Robin CPU scheduling before the scheduler moves to the next process. Typical values: 10–100ms. Too small → overhead from context switching. Too large → degrades to FIFO. Also called 'time slice'."],
   ["Load balancer", "A system that distributes incoming requests across multiple servers or workers. Common strategies: Round Robin (cyclic), Least Connections (pick least busy), Weighted Round Robin (proportional capacity), Consistent Hashing (sticky routing). In ML: distributes inference requests across GPU replicas."],
+  ["chmod", "Linux command to change file permissions. chmod +x script.py makes a file executable. chmod 755 gives owner full access, others read+execute. Every ML deployment script needs chmod +x before it can run."],
+  ["grep", "Linux command to search text using patterns. grep 'ERROR' train.log finds error lines. grep -r 'import pandas' . searches recursively. grep -n shows line numbers. Used daily for debugging logs and finding code patterns."],
+  ["ps aux", "Linux command that lists all running processes with PID, CPU%, memory%, and command name. ps aux | grep python finds your training jobs. PID is the number you pass to kill to stop a process."],
+  ["Environment variable", "A named value stored in the shell session, set with export KEY=value. Used to pass API keys, database URLs, and file paths to programs without hardcoding them in source code. Read in Python with os.environ['KEY'] or os.getenv('KEY')."],
+  ["Pipe (Linux)", "The | character connects the output of one command to the input of the next. cat file.txt | grep ERROR | tail -20 reads a file, filters for ERROR lines, then shows the last 20. Pipes are how Linux commands compose into powerful one-liners."],
+  ["Matplotlib", "Python's foundational plotting library. plt.figure() → plt.plot()/plt.hist()/plt.scatter() → add labels → plt.show(). Lower-level than Seaborn but gives full control. Used for custom charts, publication figures, and when Seaborn's defaults don't fit."],
+  ["Seaborn", "Statistical visualization library built on Matplotlib. sns.heatmap(df.corr()) draws a correlation matrix in one line. sns.scatterplot() handles hue/size/style encoding automatically. Designed for DataFrames — pass data= and column names, not raw arrays."],
+  ["Correlation heatmap", "A grid showing pairwise Pearson correlation coefficients between all numeric columns in a DataFrame. Values range from -1 (perfect negative) to +1 (perfect positive), 0 = no linear relationship. The first EDA chart every data scientist draws on a new dataset. Created with sns.heatmap(df.corr())."],
 ];
 
 const blockers = [
@@ -5320,6 +5328,250 @@ print("Pipeline saved to pipeline.pkl")`,
       },
     ],
   },
+  // ── Linux track ────────────────────────────────────────────────────────────
+  {
+    id: "linux",
+    label: "Linux",
+    source: "knowledge-base/zero-to-hero-guides/linux/linux_zero_to_hero.sh",
+    lessons: [
+      {
+        id: "linux-01",
+        title: "Navigation and project setup",
+        mode: "text",
+        explain: "Every ML/data job runs on Linux — your cloud server, Docker container, and CI/CD pipeline are all Linux. The five commands you use 100 times a day: cd (change directory), ls (list files), mkdir (make directory), pwd (print working directory), grep (search text). Learn these before writing any model code.",
+        goals: [
+          "Navigate to a project directory with cd",
+          "List files with ls -la (show hidden files and permissions)",
+          "Create a nested folder structure with mkdir -p",
+          "Print the current directory with pwd",
+          "Copy a file with cp",
+          "Search inside files with grep",
+        ],
+        starter: `# ── Navigate to your project ──
+cd ~/projects/ml-project
+
+# ── List all files including hidden ones ──
+ls -la
+
+# ── Create a full project folder structure in one command ──
+# -p means "create parent directories too, no error if exists"
+mkdir -p data/raw data/processed models notebooks logs
+
+# ── Check where you are ──
+pwd
+
+# ── Create and read a requirements file ──
+echo "pandas==2.0.0"       > requirements.txt
+echo "scikit-learn==1.3.0" >> requirements.txt
+echo "fastapi==0.110.0"    >> requirements.txt
+cat requirements.txt
+
+# ── Copy raw data to processed folder ──
+cp data/raw/sales.csv data/processed/sales_clean.csv
+
+# ── Search recursively for all Python imports of pandas ──
+grep -r "import pandas" .
+
+# ── Find a function definition in a specific file ──
+grep -n "def predict" main.py`,
+        expected: "A shell script that sets up a complete ML project structure.",
+        checks: [
+          ["Uses cd to navigate", /cd\s+/],
+          ["Uses ls to list files", /ls\s+-?l?a?/],
+          ["Uses mkdir with -p flag", /mkdir\s+-p/],
+          ["Creates nested structure", /data\/raw|data\/processed|models/],
+          ["Uses pwd", /pwd/],
+          ["Uses cp to copy file", /cp\s+/],
+          ["Uses grep to search", /grep\s+/],
+        ],
+      },
+      {
+        id: "linux-02",
+        title: "Processes, permissions, and pipes",
+        mode: "text",
+        explain: "Production ML runs in the background. You need to start processes, check if they're running, and stop them. chmod makes scripts executable. Pipes (|) chain commands — the most powerful Linux feature. Environment variables keep secrets out of code. These are the skills that separate 'I write Python' from 'I can deploy a model'.",
+        goals: [
+          "Make a script executable with chmod +x",
+          "Run a process in the background with &",
+          "Check running processes with ps aux | grep",
+          "Kill a process by PID",
+          "Set and read environment variables with export",
+          "Chain commands with pipes (|) and filter with grep and tail",
+        ],
+        starter: `# ── Make scripts executable ──
+chmod +x train.py
+chmod 755 scripts/run_pipeline.sh
+
+# ── Run training in background (& = don't wait, return prompt) ──
+python train.py &
+python -m uvicorn main:app --reload &
+
+# ── Find your running Python processes ──
+ps aux | grep python
+ps aux | grep uvicorn
+
+# ── Kill a process by PID (get PID from ps aux output) ──
+kill 12345
+kill -9 12345      # force kill (use when normal kill is ignored)
+
+# ── Environment variables (keep API keys out of code) ──
+export OPENAI_API_KEY="sk-..."
+export MODEL_PATH="/data/models/v2.pkl"
+export DATABASE_URL="postgresql://localhost/mydb"
+echo $OPENAI_API_KEY
+
+# ── Pipe and filter examples ──
+# Show only ERROR lines from training log, last 20 lines
+cat logs/train.log | grep "ERROR" | tail -20
+
+# List model files sorted by size (largest first), top 5
+ls -la models/ | sort -k5 -rn | head -5
+
+# Count how many times 'epoch' appears in logs
+grep -c "epoch" logs/train.log`,
+        expected: "A shell script covering process management, permissions, env vars, and pipe patterns.",
+        checks: [
+          ["Uses chmod to set permissions", /chmod\s+/],
+          ["Runs process in background", /&\s*$/m],
+          ["Uses ps aux with grep", /ps\s+aux\s*\|\s*grep/],
+          ["Kills a process", /kill\s+/],
+          ["Sets environment variable with export", /export\s+\w+=/],
+          ["Uses pipe operator", /\|\s*(grep|tail|head|sort)/],
+        ],
+      },
+    ],
+  },
+  // ── Matplotlib track ──────────────────────────────────────────────────────
+  {
+    id: "matplotlib",
+    label: "Matplotlib",
+    source: "phase-1-software-engineering/month-01-python-git/resources/",
+    lessons: [
+      {
+        id: "matplotlib-01",
+        title: "Line chart and histogram",
+        mode: "text",
+        explain: "Matplotlib is Python's core plotting library. Every data scientist uses it for exploratory data analysis (EDA). The pattern is always the same: plt.figure() → plot data → add labels → plt.show(). A line chart shows trends over time. A histogram shows the shape of a distribution — the first thing to check on any new dataset.",
+        goals: [
+          "Import matplotlib.pyplot as plt",
+          "Plot a line chart with plt.plot() including marker and color",
+          "Add title, xlabel, ylabel, and grid",
+          "Create a histogram with plt.hist() and set bins",
+          "Add a vertical reference line with plt.axvline()",
+          "Add a legend and call plt.show()",
+        ],
+        starter: `import matplotlib.pyplot as plt
+
+# ── Dataset ──
+months  = list(range(1, 13))
+revenue = [12, 15, 14, 18, 22, 20, 25, 28, 24, 30, 35, 40]
+
+# ── Line chart ──
+plt.figure(figsize=(10, 4))
+plt.plot(months, revenue, marker="o", color="steelblue", linewidth=2, label="Revenue")
+plt.title("Monthly Revenue 2025")
+plt.xlabel("Month")
+plt.ylabel("Revenue ($K)")
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+# ── Histogram ──
+import random
+random.seed(42)
+scores = [random.gauss(75, 10) for _ in range(200)]
+
+plt.figure(figsize=(8, 4))
+plt.hist(scores, bins=20, color="coral", edgecolor="white", alpha=0.8)
+plt.title("Score Distribution (n=200)")
+plt.xlabel("Score")
+plt.ylabel("Count")
+plt.axvline(x=75, color="navy", linestyle="--", linewidth=2, label="Mean (75)")
+plt.legend()
+plt.tight_layout()
+plt.show()`,
+        expected: "Two chart definitions: a line chart with markers and a histogram with a reference line.",
+        checks: [
+          ["Imports matplotlib.pyplot", /import\s+matplotlib\.pyplot\s+as\s+plt/],
+          ["Uses plt.figure", /plt\.figure\s*\(/],
+          ["Uses plt.plot for line chart", /plt\.plot\s*\(/],
+          ["Adds title, xlabel, ylabel", /plt\.title\s*\([\s\S]*plt\.xlabel\s*\([\s\S]*plt\.ylabel\s*\(/],
+          ["Uses plt.hist for histogram", /plt\.hist\s*\(/],
+          ["Adds reference line with axvline", /plt\.axvline\s*\(/],
+          ["Adds legend", /plt\.legend\s*\(\s*\)/],
+          ["Calls plt.show", /plt\.show\s*\(\s*\)/],
+        ],
+      },
+      {
+        id: "matplotlib-02",
+        title: "Seaborn heatmap and EDA scatter",
+        mode: "text",
+        explain: "Seaborn builds on Matplotlib and is designed for statistical visualization. The correlation heatmap (sns.heatmap + df.corr()) is the single most useful EDA chart — it shows every pairwise relationship in your dataset at once and tells you which features are related to each other and to the target. Every DS job interview expects you to know this.",
+        goals: [
+          "Import seaborn as sns",
+          "Create a DataFrame and compute .corr()",
+          "Plot a heatmap with annot=True and a diverging colormap",
+          "Create a scatter plot with sns.scatterplot using hue and size",
+          "Add titles and call plt.tight_layout() before plt.show()",
+        ],
+        starter: `import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+# ── Dataset ──
+df = pd.DataFrame({
+    "revenue":    [1200, 800, 2200, 1500, 900, 1800, 2600, 1100],
+    "profit":     [240,  120, 510,  260,  180, 380,  620,  200 ],
+    "orders":     [12,   8,   22,   15,   9,   18,   26,   11  ],
+    "return_rate":[0.05, 0.12, 0.03, 0.07, 0.15, 0.04, 0.02, 0.09],
+})
+
+# ── Correlation heatmap ──
+# corr() computes pairwise Pearson correlation: +1 = perfect positive, -1 = perfect negative
+plt.figure(figsize=(6, 5))
+sns.heatmap(
+    df.corr(numeric_only=True),
+    annot=True,          # show numbers in cells
+    fmt=".2f",           # 2 decimal places
+    cmap="coolwarm",     # blue=negative, red=positive
+    vmin=-1, vmax=1,
+    linewidths=0.5,
+)
+plt.title("Feature Correlation Matrix")
+plt.tight_layout()
+plt.show()
+
+# ── Scatter plot: orders vs revenue ──
+plt.figure(figsize=(7, 5))
+sns.scatterplot(
+    data=df,
+    x="orders",
+    y="revenue",
+    size="profit",       # bubble size = profit
+    hue="return_rate",   # color = return rate
+    palette="viridis",
+    sizes=(50, 300),
+)
+plt.title("Orders vs Revenue (size=profit, color=return rate)")
+plt.xlabel("Number of Orders")
+plt.ylabel("Revenue ($)")
+plt.tight_layout()
+plt.show()`,
+        expected: "Two seaborn charts: a correlation heatmap with annotations and a scatter plot with hue and size encoding.",
+        checks: [
+          ["Imports seaborn as sns", /import\s+seaborn\s+as\s+sns/],
+          ["Imports pandas as pd", /import\s+pandas\s+as\s+pd/],
+          ["Computes correlation with .corr()", /\.corr\s*\(/],
+          ["Uses sns.heatmap with annot=True", /sns\.heatmap\s*\([\s\S]*annot\s*=\s*True/],
+          ["Uses coolwarm colormap", /coolwarm/],
+          ["Uses sns.scatterplot", /sns\.scatterplot\s*\(/],
+          ["Encodes a third variable with hue or size", /hue\s*=|size\s*=/],
+          ["Calls plt.tight_layout", /plt\.tight_layout\s*\(\s*\)/],
+        ],
+      },
+    ],
+  },
 ];
 
 function link(path) {
@@ -7340,6 +7592,7 @@ const monthGuide = [
       { icon:"🐍", label:"Python Lessons 11–20",     detail:"List comprehensions, tuples/sets, error handling, file I/O, classes, inheritance, lambda, CSV, decorators, generators.", href:"#python-lab", lessonId:"py-11" },
       { icon:"🐛", label:"Debug Lessons 21–23",      detail:"Fix real errors: NameError/SyntaxError, logic bugs, TypeError/IndexError. These teach you how to read Python error messages.", href:"#python-lab", lessonId:"py-21", badge:"Debug" },
       { icon:"🛠️", label:"Git Lab — 3 lessons",       detail:"git-01: stage/commit/push workflow. git-02: feature branches. git-debug-01: fix broken Git commands.", href:"#skill-labs", track:"git", lessonId:"git-01" },
+      { icon:"🐧", label:"Linux Labs — 2 lessons",   detail:"linux-01: navigation, mkdir -p, cp, grep — set up a full ML project structure. linux-02: chmod, ps aux, kill, export, pipes — production process management.", href:"#skill-labs", track:"linux", lessonId:"linux-01", badge:"New" },
       { icon:"💻", label:"Build: CSV Cleaner",       detail:"Write a Python CLI tool that cleans a messy CSV using argparse and classes. Push it to GitHub with a README.", href:"#code-lab", labId:"month-01" },
       { icon:"✅", label:"Mark Month 1 done",        detail:"Click 'Mark done' on Month 1 in the Roadmap. This unlocks Month 2.", href:"#roadmap", badge:"Unlock" },
     ]
@@ -7364,6 +7617,7 @@ const monthGuide = [
       { icon:"📖", label:"Read Month 2 overview",    detail:"Open the Roadmap, select Month 2. Read the SQL + FastAPI focus.", href:"#roadmap" },
       { icon:"🗄️", label:"SQL Lessons 1–6 + Debug",  detail:"SELECT, GROUP BY, JOINs, CTEs, window functions, HAVING/subqueries, then fix a broken JOIN.", href:"#skill-labs", track:"sql", lessonId:"sql-01" },
       { icon:"⚡", label:"FastAPI Lab",               detail:"fastapi-01: Build your first HTTP endpoint and wrap a simple prediction in an API.", href:"#skill-labs", track:"fastapi", lessonId:"fastapi-01" },
+      { icon:"📊", label:"Matplotlib + Seaborn Labs", detail:"matplotlib-01: line chart and histogram with titles, grid, axvline, legend. matplotlib-02: seaborn correlation heatmap and EDA scatter — the two charts every DS interview expects.", href:"#skill-labs", track:"matplotlib", lessonId:"matplotlib-01", badge:"New" },
       { icon:"💻", label:"Build: ML REST API",       detail:"FastAPI endpoint that serves a scikit-learn model. Tested with curl.", href:"#code-lab", labId:"month-02" },
       { icon:"✅", label:"Mark Month 2 done",        detail:"Unlocks Month 3.", href:"#roadmap", badge:"Unlock" },
     ]
