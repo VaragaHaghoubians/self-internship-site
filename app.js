@@ -3711,6 +3711,371 @@ git log --oneline`,
           ["Includes git log", /git\s+log/],
         ],
       },
+      {
+        id: "git-03",
+        title: "Staging area and .gitignore",
+        mode: "text",
+        explain: "Git's staging area lets you choose exactly which changes go into each commit — not everything at once. You might fix a bug AND add a feature, but commit them separately so history stays clean. .gitignore tells Git to permanently ignore certain files (API keys, logs, __pycache__). This is non-negotiable on every real project.",
+        goals: [
+          "Stage a specific file (not git add . for everything)",
+          "Write a commit with a type prefix: Fix:, Add:, Update:, Docs:",
+          "Unstage a file accidentally added with git restore --staged",
+          "Create a .gitignore that ignores .env, *.log, and __pycache__/",
+          "Show the staged diff before committing with git diff --staged",
+        ],
+        starter: `# ── Scenario: you fixed a bug AND added a feature ──
+# Commit them SEPARATELY so history is clean
+
+# Step 1: Stage only the bug fix file (not everything)
+git add bugfix.py
+
+# Step 2: Commit with a descriptive type prefix
+git commit -m "Fix: divide-by-zero error in calculator"
+
+# Step 3: Now stage the feature
+git add feature.py
+git commit -m "Add: export results to CSV"
+
+# Step 4: You accidentally staged a WIP file — unstage it
+git add wip.py
+git restore --staged wip.py
+
+# Step 5: See exactly what is staged BEFORE committing
+git diff --staged
+
+# Step 6: Create a .gitignore
+# .gitignore contents:
+.env
+*.log
+__pycache__/
+*.pyc
+.DS_Store
+
+# Step 7: Stage and commit the .gitignore
+git add .gitignore
+git commit -m "Add: gitignore to protect secrets and ignore cache"`,
+        expected: "Two separate commits with type prefixes, unstage command, diff --staged, and .gitignore with .env and *.log.",
+        checks: [
+          ["Stages specific file (not just git add .)", /git\s+add\s+\w+\.py/],
+          ["Uses type-prefix commit message", /git\s+commit\s+-m\s+["'](Fix|Add|Update|Docs|Refactor|Remove):/],
+          ["Unstages with git restore --staged", /git\s+restore\s+--staged/],
+          ["Uses git diff --staged", /git\s+diff\s+--staged/],
+          [".gitignore covers .env", /\.env/],
+          [".gitignore covers __pycache__", /__pycache__/],
+          ["Commits the .gitignore", /git\s+commit[\s\S]*gitignore/],
+        ],
+      },
+      {
+        id: "git-04",
+        title: "History and undoing mistakes",
+        mode: "text",
+        explain: "Git's greatest superpower: you can NEVER permanently destroy committed work. Every scenario has a safe undo command. The key is knowing which one to use — restore discards file changes, reset --soft un-commits (keeps changes staged), reset --hard destroys everything, and revert is the only safe undo after pushing to a team repository.",
+        goals: [
+          "View pretty one-line history with git log --oneline",
+          "See what changed in a specific commit with git show <hash>",
+          "Discard unstaged file changes with git restore",
+          "Undo the last commit but keep changes staged with git reset --soft HEAD~1",
+          "Safely undo a pushed commit with git revert (creates a new undo commit)",
+        ],
+        starter: `# ── Viewing history ──
+git log --oneline                    # compact one-line format
+git log --oneline --graph --all      # show branch graph
+git log --oneline -5                 # last 5 commits only
+git show a1b2c3d                     # see full diff of one commit
+
+# ── Scenario 1: you edited a file and want to DISCARD changes ──
+# (file is NOT staged yet)
+git restore models.py                # ⚠️ permanent — gone forever
+
+# ── Scenario 2: you staged a file but want to unstage ──
+git restore --staged models.py       # changes kept in file, removed from staging
+
+# ── Scenario 3: last commit message is wrong ──
+# (only fix BEFORE pushing to GitHub)
+git commit --amend -m "Fix: correct the actual bug description"
+
+# ── Scenario 4: undo last commit but KEEP your changes ──
+git reset --soft HEAD~1              # changes go back to staging area
+
+# ── Scenario 5: undo a commit that was already pushed to GitHub ──
+# NEVER use reset --hard on pushed commits — use revert instead
+git revert a1b2c3d                   # creates a new "undo" commit — safe for teams
+
+# ── Summary table (write this from memory) ──
+# git restore <file>          → discard file changes (⚠️ permanent)
+# git restore --staged <file> → unstage only
+# git reset --soft HEAD~1     → un-commit, keep changes staged
+# git reset --hard HEAD~1     → un-commit AND discard changes (⚠️ nuclear)
+# git revert <hash>           → safe undo for pushed/shared commits`,
+        expected: "All 5 undo scenarios covered, git log --oneline used, git revert used for the pushed-commit case.",
+        checks: [
+          ["Uses git log --oneline", /git\s+log\s+--oneline/],
+          ["Uses git show for a specific commit", /git\s+show\s+\w+/],
+          ["Uses git restore to discard file changes", /git\s+restore\s+\w+/],
+          ["Uses git reset --soft HEAD~1", /git\s+reset\s+--soft\s+HEAD~1/],
+          ["Uses git revert for pushed commits", /git\s+revert\s+\w+/],
+          ["Comments warn about --hard being destructive", /nuclear|permanent|⚠️|NEVER/i],
+        ],
+      },
+      {
+        id: "git-05",
+        title: "Merging and conflict resolution",
+        mode: "text",
+        explain: "Merging combines two branches. Fast-forward merge is the simple case — main just moves forward. Three-way merge happens when both branches diverged — Git creates a merge commit. Conflicts happen when two branches edited the same line — Git marks them and YOU decide which version to keep. Conflict resolution is a daily skill at every company.",
+        goals: [
+          "Fast-forward merge a feature branch into main",
+          "Read the merge conflict markers (<<<<<<< HEAD, =======, >>>>>>>)",
+          "Resolve a conflict by editing the file and removing all markers",
+          "Stage the resolved file and commit the merge",
+          "Delete the feature branch after merging",
+        ],
+        starter: `# ── Fast-forward merge (simple case) ──
+git switch main
+git merge feature-calculator         # moves main forward, no conflict
+git log --oneline --graph --all      # see the linear history
+
+# ── Three-way merge ──
+# (main and feature both had commits since branching)
+git switch main
+git merge feature-about-page         # Git creates a merge commit
+# Editor opens for merge commit message — save and close
+
+# ── Conflict resolution ──
+# When you see: CONFLICT (content): Merge conflict in README.md
+
+# Open README.md — it looks like this:
+<<<<<<< HEAD
+Hello from main branch
+=======
+Hello from feature branch
+>>>>>>> feature-readme-update
+
+# Edit the file — decide what the final version should be:
+Hello from main and feature branch combined!
+
+# Remove ALL conflict markers — none of <<< === >>> should remain
+
+# Stage the resolved file
+git add README.md
+
+# Commit the merge
+git commit -m "Merge: resolve README conflict between main and feature"
+
+# ── Clean up: delete merged branch ──
+git branch -d feature-calculator
+git branch -d feature-about-page
+git branch -d feature-readme-update
+git branch                           # verify they're gone`,
+        expected: "Fast-forward and three-way merge shown, conflict markers shown and resolved, branch cleanup done.",
+        checks: [
+          ["Switches to main before merging", /git\s+switch\s+main/],
+          ["Uses git merge", /git\s+merge\s+\w+/],
+          ["Shows conflict markers in example", /<<<<<<|=======|>>>>>>>/],
+          ["Stages resolved file", /git\s+add\s+README\.md/],
+          ["Commits the merge with message", /git\s+commit\s+-m\s+["']Merge:/],
+          ["Deletes branches with git branch -d", /git\s+branch\s+-d/],
+        ],
+      },
+      {
+        id: "git-06",
+        title: "Clone, pull, and team workflow",
+        mode: "text",
+        explain: "git clone downloads a repo for the first time — full history included. git pull updates a repo you already have. Together these are how every team shares code: one person pushes, others pull. git fetch lets you see remote changes without applying them yet — useful before merging. This is the daily rhythm of professional team development.",
+        goals: [
+          "Clone a repository with git clone",
+          "Pull the latest changes with git pull",
+          "Use git fetch before merging to preview remote changes",
+          "Show the GitHub push/pull/clone relationship diagram",
+          "Simulate the teammate workflow: push from one place, pull in another",
+        ],
+        starter: `# ── Clone (first time — no local copy yet) ──
+git clone git@github.com:yourusername/my-project.git
+cd my-project
+git log --oneline                    # full history is already here
+
+# ── Clone any public open-source project ──
+git clone https://github.com/psf/requests.git
+# Now you have the full source code of the requests library locally!
+
+# ── Pull (you already have the repo, get teammate's changes) ──
+cd my-project
+git pull                             # fetch + merge in one step
+
+# ── Fetch (look before you merge) ──
+git fetch                            # download but don't apply
+git log --oneline origin/main        # see remote commits
+git diff main origin/main            # see exactly what changed
+git merge origin/main                # apply when ready
+
+# ── The daily team workflow ──
+# Morning: pull before starting work
+git pull
+
+# Work + commit
+git add .
+git commit -m "Add: new prediction feature"
+
+# Push at end of day
+git push
+
+# ── Relationship diagram ──
+# GitHub  ──── git clone ────►  Your Computer (first time)
+# GitHub  ──── git pull  ────►  Your Computer (get updates)
+# Your Computer ── git push ──►  GitHub (share your work)`,
+        expected: "git clone, git pull, git fetch all used, daily workflow shown, diagram included.",
+        checks: [
+          ["Uses git clone with a URL", /git\s+clone\s+(https?|git@)/],
+          ["Uses git pull", /git\s+pull/],
+          ["Uses git fetch before merging", /git\s+fetch/],
+          ["Shows the relationship: clone, pull, push", /clone[\s\S]*pull[\s\S]*push|GitHub[\s\S]*clone[\s\S]*pull/i],
+          ["Includes git log after clone to verify history", /git\s+log/],
+        ],
+      },
+      {
+        id: "git-07",
+        title: "git stash and advanced conflict resolution",
+        mode: "text",
+        explain: "git stash is a temporary save slot — it stores your work-in-progress without committing so you can switch branches or pull cleanly. VS Code shows conflict markers with clickable buttons (Accept Current / Accept Incoming / Accept Both). Multiple-file conflicts are common on teams — git status shows every conflicted file. Prevention is better than resolution: always pull before starting work.",
+        goals: [
+          "Stash current work with git stash",
+          "List stashes with git stash list",
+          "Restore stashed work with git stash pop",
+          "Show git status output when multiple files have conflicts",
+          "Write the 5 conflict-prevention rules",
+        ],
+        starter: `# ── Scenario: mid-feature and need to switch branches urgently ──
+
+# Step 1: Save work-in-progress without committing
+git stash                            # saves to stash stack, cleans working dir
+git status                           # should show "nothing to commit"
+
+# Step 2: Switch branch, do urgent fix, come back
+git switch main
+git pull
+git switch feature-ml-pipeline       # back to your work
+
+# Step 3: Restore your stashed work
+git stash pop                        # applies most recent stash + removes it
+
+# ── Stash commands ──
+git stash                            # save (unnamed stash)
+git stash save "WIP: half-done feature normalization"  # named stash
+git stash list                       # see all stashes (stash@{0}, stash@{1}...)
+git stash pop                        # apply most recent + delete it
+git stash apply stash@{1}            # apply specific stash but KEEP it
+git stash drop stash@{0}             # delete a stash without applying
+
+# ── When conflicts exist in multiple files ──
+git status
+# Both modified: models.py
+# Both modified: config.py
+# Both modified: README.md
+
+# Resolve EACH file: remove all <<< === >>> markers
+git add models.py
+git add config.py
+git add README.md
+git commit -m "Merge: resolve 3-file conflict between main and feature"
+
+# ── 5 rules to PREVENT conflicts ──
+# 1. git pull before starting work — always
+# 2. Work on separate files from teammates when possible
+# 3. Keep branches short-lived — merge quickly, don't wait weeks
+# 4. Communicate: tell team which files you're touching
+# 5. Make small frequent commits — easier to merge than one giant commit`,
+        expected: "git stash, stash list, stash pop shown. Multiple-file conflict resolution shown. 5 prevention rules listed.",
+        checks: [
+          ["Uses git stash to save WIP", /git\s+stash\b/],
+          ["Uses git stash list", /git\s+stash\s+list/],
+          ["Uses git stash pop to restore", /git\s+stash\s+pop/],
+          ["Shows multi-file conflict resolution", /git\s+add[\s\S]*git\s+add[\s\S]*git\s+commit/],
+          ["Lists conflict prevention rules", /git pull before|pull before|short.lived|frequent/i],
+        ],
+      },
+      {
+        id: "git-08",
+        title: "Professional Pull Request workflow",
+        mode: "text",
+        explain: "At every company — Google, startups, open source — no one commits directly to main. The professional flow is: pull → branch → work → push branch → open Pull Request → get reviewed → merge → delete branch. A Pull Request (PR) is a GitHub feature (not Git) that lets teammates review your code before it enters main. This workflow is what separates junior from professional developers.",
+        goals: [
+          "Start from a fresh pull (always pull before branching)",
+          "Create a feature branch with the feature/ prefix naming convention",
+          "Make 3 commits with proper type-prefix messages (Add:, Docs:, Test:)",
+          "Push the branch to GitHub with git push -u origin",
+          "Write a Pull Request description with: What it does, Changes made, How to test",
+          "Write the 6 Golden Rules of Git from memory",
+        ],
+        starter: `# ══════════════════════════════════════
+# THE PROFESSIONAL GIT WORKFLOW
+# Used at every company worldwide
+# ══════════════════════════════════════
+
+# ── Step 1: Always start from fresh main ──
+git switch main
+git pull                             # get all teammates' latest changes
+
+# ── Step 2: Create a properly named feature branch ──
+git switch -c feature/add-data-validation
+# Naming conventions:
+# feature/description    → new feature
+# fix/description        → bug fix
+# hotfix/description     → urgent production fix
+# docs/description       → documentation only
+# refactor/description   → code cleanup
+
+# ── Step 3: Work with clean, atomic commits ──
+git add validators.py
+git commit -m "Add: input validation for CSV upload endpoint"
+
+git add tests/test_validators.py
+git commit -m "Test: add unit tests for CSV validator"
+
+git add README.md
+git commit -m "Docs: document CSV validation rules and error codes"
+
+# ── Step 4: Push your branch to GitHub ──
+git push -u origin feature/add-data-validation
+
+# ── Step 5: Open a Pull Request on github.com ──
+# Click "Compare & pull request" banner
+# Write a clear PR description:
+#
+# ## What does this PR do?
+# Adds input validation for the CSV upload endpoint to prevent
+# malformed data from reaching the ML model.
+#
+# ## Changes made:
+# - Added validators.py with type and range checks
+# - Added unit tests (all passing)
+# - Updated README with validation rules
+#
+# ## How to test:
+# Run: python -m pytest tests/test_validators.py
+
+# ── Step 6: After PR is merged on GitHub ──
+git switch main
+git pull                             # get the merged code
+git branch -d feature/add-data-validation   # clean up local branch
+
+# ══════════════════════════════════════
+# THE 6 GOLDEN RULES OF GIT
+# ══════════════════════════════════════
+# 1. Commit early, commit often — small commits are better than big ones
+# 2. Write meaningful commit messages — your future self will thank you
+# 3. NEVER force push to main — git push --force on main is banned at most companies
+# 4. Always pull before starting work — avoid conflicts before they happen
+# 5. Use branches for EVERYTHING — never work directly on main
+# 6. Delete branches after merging — keep the repo clean`,
+        expected: "Full PR workflow from pull to cleanup. Feature branch with / naming. 3 typed commits. PR description. 6 Golden Rules.",
+        checks: [
+          ["Pulls main before branching", /git\s+pull[\s\S]*git\s+switch\s+-c|git switch main[\s\S]*git pull/],
+          ["Uses feature/ branch naming convention", /feature\//],
+          ["Uses type-prefix commit messages (Add:, Test:, Docs:)", /git\s+commit\s+-m\s+["'](Add|Test|Docs|Fix|Update):/],
+          ["Pushes branch with git push -u origin", /git\s+push\s+-u\s+origin/],
+          ["Includes PR description structure", /What does this PR do|Changes made|How to test/i],
+          ["Lists the 6 Golden Rules", /force push|pull before|never.*main|branches.*EVERYTHING|Delete.*branch/i],
+        ],
+      },
     ],
   },
   {
@@ -7837,7 +8202,8 @@ const monthGuide = [
       { icon:"🐍", label:"Python Lessons 1–10",      detail:"Print, variables, strings, numbers, lists, if/else, loops, functions, dicts, mini cleaner.", href:"#python-lab", lessonId:"py-01" },
       { icon:"🐍", label:"Python Lessons 11–20",     detail:"List comprehensions, tuples/sets, error handling, file I/O, classes, inheritance, lambda, CSV, decorators, generators.", href:"#python-lab", lessonId:"py-11" },
       { icon:"🐛", label:"Debug Lessons 21–23",      detail:"Fix real errors: NameError/SyntaxError, logic bugs, TypeError/IndexError. These teach you how to read Python error messages.", href:"#python-lab", lessonId:"py-21", badge:"Debug" },
-      { icon:"🛠️", label:"Git Lab — 3 lessons",       detail:"git-01: stage/commit/push workflow. git-02: feature branches. git-debug-01: fix broken Git commands.", href:"#skill-labs", track:"git", lessonId:"git-01" },
+      { icon:"🛠️", label:"Git Labs — 8 lessons",       detail:"git-01: add/commit/push. git-02: feature branches. git-debug-01: fix broken commands. git-03: staging area + .gitignore. git-04: history + undo (restore/reset/revert). git-05: merging + conflict resolution. git-06: clone + pull + team workflow. git-07: git stash + multi-file conflicts. git-08: professional PR workflow + 6 Golden Rules.", href:"#skill-labs", track:"git", lessonId:"git-01" },
+      { icon:"📂", label:"Local: git_practice tasks 01–10", detail:"Your git_practice folder on Desktop has 10 detailed markdown guides. Do them alongside the skill labs: task_01 (install + config), task_02 (first repo), task_03 (staging + .gitignore), task_04 (history + undo), task_05 (branches), task_06 (merging), task_07 (GitHub + SSH), task_08 (clone + pull), task_09 (conflicts + stash), task_10 (full PR workflow). Open each in VS Code and follow the steps in PowerShell.", href:"#mission-control", badge:"Local" },
       { icon:"🐧", label:"Linux Labs — 2 lessons",   detail:"linux-01: navigation, mkdir -p, cp, grep — set up a full ML project structure. linux-02: chmod, ps aux, kill, export, pipes — production process management.", href:"#skill-labs", track:"linux", lessonId:"linux-01", badge:"New" },
       { icon:"🧮", label:"Mini Projects 1 & 2",      detail:"py-24: Build a calculator — 4 functions, division-by-zero guard, f-string output. py-25: Build a guessing game — random secret, while loop, Too low/Too high feedback. Do these before the CSV Cleaner.", href:"#python-lab", lessonId:"py-24", badge:"Beginner" },
       { icon:"📂", label:"Local: tasks 01–10 (Fundamentals)", detail:"In PowerShell: cd Desktop\\python_practice → python task_01_hello_world.py. Work through in order: 01 print/input, 02 calculator, 03 loops, 04 functions, 05 lists, 06 dictionaries, 07 files, 08 error handling, 09 OOP classes, 10 Student Grade Manager (final project). Do alongside the Python lessons above.", href:"#mission-control", badge:"Local" },
